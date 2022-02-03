@@ -59,7 +59,6 @@ export default function Home() {
           <IconButton onClick={() => auth.signOut()}>
             <Avatar src={currentUser.photoURL} />
           </IconButton>
-
           <Typography variant="h5">
             {"Hello "}
             {currentUser.displayName}

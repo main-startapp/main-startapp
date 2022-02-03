@@ -42,6 +42,10 @@ const Detail = ({ projectProps }) => {
               {"Max members: "}
               {project.max_member}
             </Typography>
+            <Typography sx={{ mt: 3 }} color="text.secondary">
+              {"Creator: "}
+              {project.creator_email}
+            </Typography>
           </CardContent>
           <CardActions>
             <Link href="/">

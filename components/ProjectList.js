@@ -9,7 +9,7 @@ const ProjectList = () => {
 
   useEffect(() => {
     const collectionRef = collection(db, "projects");
-    const q = query(collectionRef, orderBy("created_time", "desc"));
+    const q = query(collectionRef, orderBy("last_timestamp", "desc"));
 
     // Get realtime updates with Cloud Firestore
     // https://firebase.google.com/docs/firestore/query-data/listen
@@ -19,7 +19,7 @@ const ProjectList = () => {
         querySnapshot.docs.map((doc) => ({
           ...doc.data(),
           id: doc.id,
-          created_time: doc.data().created_time?.toDate().getTime(),
+          last_timestamp: doc.data().last_timestamp?.toDate().getTime(),
         }))
       );
     });
@@ -35,9 +35,9 @@ const ProjectList = () => {
           id={project.id}
           title={project.title}
           detail={project.detail}
-          created_time={project.created_time}
-          cur_member={project.cur_member}
+          last_timestamp={project.last_timestamp}
           max_member={project.max_member}
+          creator_email={project.creator_email}
         />
       ))}
     </div>

@@ -8,12 +8,15 @@ import {
 } from "firebase/firestore";
 import { useContext, useEffect, useRef, useState } from "react";
 import { db } from "../firebase";
+import { useAuth } from "../pages/AuthContext";
 import { ProjectContext } from "../pages/ProjectContext";
 
 // !todo: the form should be move to its own page
 const ProjectForm = () => {
   // context
   const { showAlert, project, setProject } = useContext(ProjectContext);
+  // current user
+  const { currentUser } = useAuth();
   // detect if the user click outside of input field
   const inputAreaRef = useRef();
   useEffect(() => {
@@ -32,10 +35,13 @@ const ProjectForm = () => {
   }, [setProject]);
   // function when click Create or Update button
   const onSubmit = async () => {
-    const projectRef = { ...project, created_time: serverTimestamp() };
-    if (project?.hasOwnProperty("created_time")) {
+    if (project?.hasOwnProperty("last_timestamp")) {
       // to Update
       const docRef = doc(db, "projects", project.id);
+      const projectRef = {
+        ...project,
+        last_timestamp: serverTimestamp(),
+      };
       updateDoc(docRef, projectRef);
       showAlert(
         "info",
@@ -44,6 +50,12 @@ const ProjectForm = () => {
     } else {
       // to Create
       const collectionRef = collection(db, "projects");
+      const projectRef = {
+        ...project,
+        create_timestamp: serverTimestamp(),
+        last_timestamp: serverTimestamp(),
+        creator_email: currentUser.email,
+      };
       const docRef = await addDoc(collectionRef, projectRef);
       showAlert(
         "success",
@@ -79,7 +91,7 @@ const ProjectForm = () => {
         onChange={(e) => setProject({ ...project, max_member: e.target.value })}
       />
       <Button onClick={onSubmit} variant="contained" sx={{ mt: 3 }}>
-        {project.hasOwnProperty("created_time")
+        {project.hasOwnProperty("last_timestamp")
           ? "Update this project"
           : "Create a new project"}
       </Button>

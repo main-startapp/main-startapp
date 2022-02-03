@@ -7,19 +7,23 @@ import { db } from "../firebase";
 import { ProjectContext } from "../pages/ProjectContext";
 import { useContext } from "react";
 import { useRouter } from "next/router";
+import { useAuth } from "../pages/AuthContext";
 
 // the Project component in the ProjectList
 const Project = ({
   // !todo: creator's id, short description, updated_time
   id,
-  created_time,
+  last_timestamp,
   title,
   detail,
-  cur_member,
   max_member,
+  creator_email,
 }) => {
   // global context
   const { showAlert, setProject } = useContext(ProjectContext);
+  const { currentUser } = useAuth();
+  // is cur_user the creator?
+  const isCreator = currentUser?.email == creator_email ? true : false;
   // router
   const router = useRouter();
   // function to Delete project
@@ -36,17 +40,20 @@ const Project = ({
   };
   return (
     <ListItem
-      onClick={() =>
-        setProject({ id, created_time, title, detail, max_member })
+      onClick={
+        isCreator
+          ? () => setProject({ id, last_timestamp, title, detail, max_member })
+          : undefined
       }
       sx={{ mt: 3, boxShadow: 3 }}
       style={{ backgroudColor: "#fafafa" }}
       secondaryAction={
         <>
-          {/* !todo: delete button depends on the user; for now only the creator can delete the entry */}
-          <IconButton onClick={(e) => deleteProject(id, e)}>
-            <DeleteIcon />
-          </IconButton>
+          {isCreator && (
+            <IconButton onClick={(e) => deleteProject(id, e)}>
+              <DeleteIcon />
+            </IconButton>
+          )}
           <IconButton onClick={(e) => seeProject(id, e)}>
             <MoreVertIcon />
           </IconButton>
@@ -55,7 +62,7 @@ const Project = ({
     >
       <ListItemText
         primary={title}
-        secondary={moment(created_time).format("MMMM do, yyyy")}
+        secondary={moment(last_timestamp).format("MMMM do, yyyy")}
       />
     </ListItem>
   );
