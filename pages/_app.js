@@ -1,4 +1,3 @@
-import "../styles/globals.css";
 import { AuthProvider } from "./AuthContext";
 
 function MyApp({ Component, pageProps }) {

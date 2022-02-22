@@ -2,17 +2,21 @@ import {
   Alert,
   Avatar,
   Container,
+  Grid,
   IconButton,
   Snackbar,
   Typography,
+  Box,
+  CssBaseline,
 } from "@mui/material";
-import { Box } from "@mui/system";
 import { useState } from "react";
 import ProjectForm from "../components/ProjectForm";
-import ProjectList from "../components/ProjectList";
+import ProjectList from "../components/ProjectList/ProjectList";
 import { useAuth } from "./AuthContext";
 import { ProjectContext } from "./ProjectContext";
 import { auth } from "../firebase";
+import Header from "../components/Header/Header";
+import ProjectPageBar from "../components/Header/ProjectPageBar";
 
 export default function Home() {
   const { currentUser } = useAuth();
@@ -21,6 +25,7 @@ export default function Home() {
   const [alertMessage, setAlertMessage] = useState("");
   const [project, setProject] = useState({
     title: "",
+    description: "",
     detail: "",
     max_member: "",
   });
@@ -38,7 +43,10 @@ export default function Home() {
 
   return (
     <ProjectContext.Provider value={{ showAlert, project, setProject }}>
-      <Container maxWidth="sm">
+      <CssBaseline />
+      <Header />
+      <ProjectPageBar />
+      <Grid container spaceing={0} justifyContent="center" alignItems="center">
         {/* alert and notification */}
         <Snackbar
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
@@ -54,21 +62,14 @@ export default function Home() {
             {alertMessage}
           </Alert>
         </Snackbar>
-        {/* user info: !todo: can be built as a component */}
-        <Box sx={{ mt: 5, display: "flex", justifyContent: "space-between" }}>
-          <IconButton onClick={() => auth.signOut()}>
-            <Avatar src={currentUser.photoURL} />
-          </IconButton>
-          <Typography variant="h5">
-            {"Hello "}
-            {currentUser.displayName}
-          </Typography>
-        </Box>
         {/* project Creation & Update */}
-        <ProjectForm />
-        {/* project list */}
-        <ProjectList />
-      </Container>
+        <Grid item xs={12}>
+          <ProjectList />
+        </Grid>
+        <Grid item xs={6}>
+          <ProjectForm />
+        </Grid>
+      </Grid>
     </ProjectContext.Provider>
   );
 }

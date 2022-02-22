@@ -1,0 +1,97 @@
+import * as React from 'react';
+import { styled, alpha } from '@mui/material/styles';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import InputBase from '@mui/material/InputBase';
+import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
+import SearchIcon from '@mui/icons-material/Search';
+import { FormControl, MenuItem, Select } from '@mui/material';
+
+const Search = styled('div')(({ theme }) => ({
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.common.black, 0.15),
+    '&:hover': {
+        backgroundColor: alpha(theme.palette.common.black, 0.25),
+    },
+    marginLeft: 0,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+        marginLeft: theme.spacing(1),
+        width: 'auto',
+    },
+}));
+
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+    padding: theme.spacing(0, 2),
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+    color: 'inherit',
+    '& .MuiInputBase-input': {
+        padding: theme.spacing(1, 1, 1, 0),
+        // vertical padding + font size from searchIcon
+        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+        transition: theme.transitions.create('width'),
+        width: '100%',
+        [theme.breakpoints.up('sm')]: {
+            width: '12ch',
+            '&:focus': {
+                width: '20ch',
+            },
+        },
+    },
+}));
+
+export default function ProjectPageBar() {
+    return (
+        <Box sx={{ flexGrow: 1 }}>
+            <AppBar position="static" sx={{ background: '#fafafa', color: '#000000' }} >
+                <Toolbar>
+                    <Search>
+                        <SearchIconWrapper>
+                            <SearchIcon />
+                        </SearchIconWrapper>
+                        <StyledInputBase
+                            placeholder="Search Title…"
+                            inputProps={{ 'aria-label': 'search' }}
+                        />
+                    </Search>
+                    <FormControl sx={{ ml: 3, minWidth: 200 }} size='small'>
+                        <Select
+                            // value={age}
+                            // onChange={handleChange}
+                            displayEmpty
+                            inputProps={{ 'aria-label': 'Without label' }}
+                        >
+                            <MenuItem value="">
+                                <em>Category</em>
+                            </MenuItem>
+                            <MenuItem value={10}>Science</MenuItem>
+                            <MenuItem value={20}>Business</MenuItem>
+                            <MenuItem value={30}>Engineering</MenuItem>
+                            <MenuItem value={40}>Unreasonablely long placeholder</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <Box sx={{ flexGrow: 1 }} />
+                    <Search >
+                        <SearchIconWrapper>
+                            <FilterAltOutlinedIcon />
+                        </SearchIconWrapper>
+                        <StyledInputBase
+                            placeholder="Filter…"
+                            inputProps={{ 'aria-label': 'search' }}
+                        />
+                    </Search>
+                </Toolbar>
+            </AppBar>
+        </Box>
+    );
+}

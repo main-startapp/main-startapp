@@ -1,4 +1,4 @@
-import { IconButton, ListItem, ListItemText } from "@mui/material";
+import { Box, Divider, IconButton, ListItem, ListItemText } from "@mui/material";
 import moment from "moment";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -13,9 +13,12 @@ import { useAuth } from "../pages/AuthContext";
 const Project = ({
   // !todo: creator's id, short description, updated_time
   id,
+  create_timestamp,
   last_timestamp,
   title,
+  description,
   detail,
+  current_member,
   max_member,
   creator_email,
 }) => {
@@ -39,32 +42,41 @@ const Project = ({
     router.push(`/project/${id}`);
   };
   return (
-    <ListItem
-      onClick={
-        isCreator
-          ? () => setProject({ id, last_timestamp, title, detail, max_member })
-          : undefined
-      }
-      sx={{ mt: 3, boxShadow: 3 }}
-      style={{ backgroudColor: "#fafafa" }}
-      secondaryAction={
-        <>
-          {isCreator && (
-            <IconButton onClick={(e) => deleteProject(id, e)}>
-              <DeleteIcon />
+    <Box m={3}>
+      <ListItem
+        onClick={() => setProject({ id, create_timestamp, last_timestamp, title, description, detail, current_member, max_member, creator_email })}
+        sx={{
+          boxShadow: 1,
+          maxWidth: "100%",
+        }}
+        // style={{ backgroudColor: "#fafafa" }}
+        secondaryAction={
+          <>
+            {/* {isCreator && (
+              <IconButton onClick={(e) => deleteProject(id, e)}>
+                <DeleteIcon />
+              </IconButton>
+            )} */}
+            <IconButton onClick={(e) => seeProject(id, e)}>
+              <MoreVertIcon />
             </IconButton>
-          )}
-          <IconButton onClick={(e) => seeProject(id, e)}>
-            <MoreVertIcon />
-          </IconButton>
-        </>
-      }
-    >
-      <ListItemText
-        primary={title}
-        secondary={moment(last_timestamp).format("MMMM do, yyyy")}
-      />
-    </ListItem>
+          </>
+        }
+      >
+        <ListItemText
+          primary={title}
+          secondary={
+            <div>
+              <div>{'Team size: '}{current_member}{'/'}{max_member}</div>
+              <div>{'Description: '}{description}</div>
+              <div>{'Last Update: '}{moment(last_timestamp).format("MMMM do, yyyy")}</div>
+            </div>
+          }
+        />
+      </ListItem>
+      {/* Maybe not a good idea as the project card doesn't seem clickable */}
+      {/* <Divider /> */}
+    </Box>
   );
 };
 
