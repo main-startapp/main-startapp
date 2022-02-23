@@ -1,4 +1,11 @@
-import { Box, Divider, IconButton, ListItem, ListItemText } from "@mui/material";
+import {
+  Box,
+  Divider,
+  IconButton,
+  ListItem,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 import moment from "moment";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -44,10 +51,28 @@ const Project = ({
   return (
     <Box m={3}>
       <ListItem
-        onClick={() => setProject({ id, create_timestamp, last_timestamp, title, description, detail, current_member, max_member, creator_email })}
+        onClick={() =>
+          setProject({
+            id,
+            create_timestamp,
+            last_timestamp,
+            title,
+            description,
+            detail,
+            current_member,
+            max_member,
+            creator_email,
+          })
+        }
         sx={{
-          boxShadow: 1,
+          border: 1,
+          borderRadius: 4,
+          borderColor: "text.secondary",
+          boxShadow: 0,
           maxWidth: "100%",
+          ":hover": {
+            boxShadow: 2,
+          },
         }}
         // style={{ backgroudColor: "#fafafa" }}
         secondaryAction={
@@ -64,12 +89,23 @@ const Project = ({
         }
       >
         <ListItemText
-          primary={title}
+          primary={<Typography sx={{ fontWeight: 600 }}>{title}</Typography>}
           secondary={
             <div>
-              <div>{'Team size: '}{current_member}{'/'}{max_member}</div>
-              <div>{'Description: '}{description}</div>
-              <div>{'Last Update: '}{moment(last_timestamp).format("MMMM do, yyyy")}</div>
+              <div>
+                {"Team size: "}
+                {current_member}
+                {"/"}
+                {max_member}
+              </div>
+              <div>
+                {"Description: "}
+                {description}
+              </div>
+              <div>
+                {"Last Update: "}
+                {moment(last_timestamp).format("MMMM do, yyyy")}
+              </div>
             </div>
           }
         />

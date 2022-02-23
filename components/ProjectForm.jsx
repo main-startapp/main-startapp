@@ -69,7 +69,7 @@ const ProjectForm = () => {
   // func to clear the input fields
   const onClear = () => {
     setProject({ title: "", description: "", detail: "", max_member: "" });
-  }
+  };
   // func to delte proj
   const onDelete = async (id, e) => {
     e.stopPropagation();
@@ -99,19 +99,21 @@ const ProjectForm = () => {
         label="description"
         margin="normal"
         multiline
-        rows={2}
+        rows={4}
         inputProps={{
           maxLength: 200,
         }}
         value={project.description}
-        onChange={(e) => setProject({ ...project, description: e.target.value })}
+        onChange={(e) =>
+          setProject({ ...project, description: e.target.value })
+        }
       />
       <TextField
         fullWidth
         label="detail"
         margin="normal"
         multiline
-        rows={4}
+        rows={8}
         value={project.detail}
         onChange={(e) => setProject({ ...project, detail: e.target.value })}
       />
@@ -124,9 +126,11 @@ const ProjectForm = () => {
           shrink: true,
         }}
         value={project.max_member}
-        onChange={(e) => e.target.value < 1
-          ? setProject({ ...project, max_member: 1 })
-          : setProject({ ...project, max_member: e.target.value })}
+        onChange={(e) =>
+          e.target.value < 1
+            ? setProject({ ...project, max_member: 1 })
+            : setProject({ ...project, max_member: e.target.value })
+        }
       />
       <Button onClick={onSubmit} variant="contained">
         {project.hasOwnProperty("last_timestamp")
@@ -136,7 +140,11 @@ const ProjectForm = () => {
       <Button onClick={onClear} variant="contained" sx={{ ml: 3 }}>
         {"Clear Selected"}
       </Button>
-      <Button onClick={(e) => onDelete(project.id, e)} variant="contained" sx={{ ml: 3 }}>
+      <Button
+        onClick={(e) => onDelete(project.id, e)}
+        variant="contained"
+        sx={{ ml: 3 }}
+      >
         {"Delete Project"}
       </Button>
     </div>

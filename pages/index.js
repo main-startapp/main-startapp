@@ -7,15 +7,14 @@ import {
   Snackbar,
   Typography,
   Box,
-  CssBaseline,
+  Divider,
 } from "@mui/material";
 import { useState } from "react";
 import ProjectForm from "../components/ProjectForm";
-import ProjectList from "../components/ProjectList/ProjectList";
+import ProjectList from "../components/Project/ProjectList";
 import { useAuth } from "./AuthContext";
 import { ProjectContext } from "./ProjectContext";
 import { auth } from "../firebase";
-import Header from "../components/Header/Header";
 import ProjectPageBar from "../components/Header/ProjectPageBar";
 
 export default function Home() {
@@ -43,33 +42,31 @@ export default function Home() {
 
   return (
     <ProjectContext.Provider value={{ showAlert, project, setProject }}>
-      <CssBaseline />
-      <Header />
       <ProjectPageBar />
-      <Grid container spaceing={0} justifyContent="center" alignItems="center">
-        {/* alert and notification */}
-        <Snackbar
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-          open={open}
-          autoHideDuration={6000}
+      <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        open={open}
+        autoHideDuration={6000}
+        onClose={handleClose}
+      >
+        <Alert
           onClose={handleClose}
+          severity={alertType}
+          sx={{ width: "100%" }}
         >
-          <Alert
-            onClose={handleClose}
-            severity={alertType}
-            sx={{ width: "100%" }}
-          >
-            {alertMessage}
-          </Alert>
-        </Snackbar>
-        {/* project Creation & Update */}
-        <Grid item xs={12}>
-          <ProjectList />
-        </Grid>
-        <Grid item xs={6}>
-          <ProjectForm />
-        </Grid>
-      </Grid>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
+      <ProjectList />
+
+      {/* <Divider>End of Project Homepage</Divider>
+      <Box
+        sx={{
+          maxWidth: "40%",
+        }}
+      >
+        <ProjectForm />
+      </Box> */}
     </ProjectContext.Provider>
   );
 }
