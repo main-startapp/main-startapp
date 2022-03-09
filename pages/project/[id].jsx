@@ -1,10 +1,13 @@
-import { stringify } from "@firebase/util";
 import {
+  Avatar,
+  Box,
   Button,
   Card,
   CardActions,
   CardContent,
+  Divider,
   Grid,
+  IconButton,
   Link,
   Typography,
 } from "@mui/material";
@@ -14,45 +17,18 @@ import { db } from "../../firebase";
 const Detail = ({ projectProps }) => {
   const project = JSON.parse(projectProps);
   return (
-    <Grid
-      container
-      spaceing={0}
-      direction="row"
-      alignItems="center"
-      justifyContent="center"
-      style={{ minHeight: "100vh" }}
-    >
+    <Grid container spacing={0} justifyContent="center">
       <Grid item xs={8}>
-        <Card
-          sx={{
-            minWidth: 275,
-            boxShadow: 3,
-            maxWidth: "100%",
-          }}
-          style={{ backgroundColor: "#fafafa" }}
+        <Typography
+          variant="h4"
+          component="div"
+          sx={{ fontWeight: 600, mt: 6 }}
         >
-          <CardContent>
-            <Typography variant="h5" component="div">
-              {project.title}
-            </Typography>
-            <Typography sx={{ mt: 3 }} color="text.secondary">
-              {project.detail}
-            </Typography>
-            <Typography sx={{ mt: 3 }} color="text.secondary">
-              {"Max members: "}
-              {project.max_member}
-            </Typography>
-            <Typography sx={{ mt: 3 }} color="text.secondary">
-              {"Creator: "}
-              {project.creator_email}
-            </Typography>
-          </CardContent>
-          <CardActions>
-            <Link href="/">
-              <Button size="small">Go back</Button>
-            </Link>
-          </CardActions>
-        </Card>
+          {project.hasOwnProperty("title") && project.title.length != 0
+            ? project.title
+            : "Project Title"}
+        </Typography>
+        <Divider sx={{ mt: 3 }} />
       </Grid>
     </Grid>
   );

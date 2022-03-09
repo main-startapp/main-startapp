@@ -1,53 +1,53 @@
 import {
   Box,
-  Divider,
   IconButton,
   ListItem,
   ListItemText,
   Typography,
 } from "@mui/material";
 import moment from "moment";
-import DeleteIcon from "@mui/icons-material/Delete";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { deleteDoc, doc } from "firebase/firestore";
-import { db } from "../firebase";
-import { ProjectContext } from "../pages/ProjectContext";
+import { db } from "../../firebase";
 import { useContext } from "react";
 import { useRouter } from "next/router";
-import { useAuth } from "../pages/AuthContext";
+import { useAuth } from "../Context/AuthContext";
+import { ProjectContext } from "../Context/ProjectContext";
 
 // the Project component in the ProjectList
-const Project = ({
-  // !todo: creator's id, short description, updated_time
+const ProjectListItem = ({
   id,
-  create_timestamp,
-  last_timestamp,
   title,
   description,
   detail,
   current_member,
   max_member,
+  create_timestamp,
+  last_timestamp,
   creator_email,
+  creator_uid,
+  position_list,
 }) => {
   // global context
-  const { showAlert, setProject } = useContext(ProjectContext);
+  const { setProject } = useContext(ProjectContext);
   const { currentUser } = useAuth();
   // is cur_user the creator?
-  const isCreator = currentUser?.email == creator_email ? true : false;
+  const isCreator = currentUser?.uid == creator_uid ? true : false;
   // router
   const router = useRouter();
   // function to Delete project
-  const deleteProject = async (id, e) => {
-    e.stopPropagation();
-    const docRef = doc(db, "projects", id);
-    await deleteDoc(docRef);
-    showAlert("error", `Project with id ${id} is deleted sucessfully!`); // error -> red
-  };
+  // const deleteProject = async (id, e) => {
+  //   e.stopPropagation();
+  //   const docRef = doc(db, "projects", id);
+  //   await deleteDoc(docRef);
+  //   showAlert("error", `Project with id ${id} is deleted sucessfully!`); // error -> red
+  // };
   // function for url routing
   const seeProject = (id, e) => {
     e.stopPropagation();
     router.push(`/project/${id}`);
   };
+
   return (
     <Box m={3}>
       <ListItem
@@ -62,6 +62,8 @@ const Project = ({
             current_member,
             max_member,
             creator_email,
+            creator_uid,
+            position_list,
           })
         }
         sx={{
@@ -89,24 +91,24 @@ const Project = ({
         }
       >
         <ListItemText
-          primary={<Typography sx={{ fontWeight: 600 }}>{title}</Typography>}
+          primary={<Typography sx={{ fontWeight: 600 }}>{title}</Typography>} // 600 is the breakpoint of reg and semi-bold
           secondary={
-            <div>
-              <div>
-                {"Team size: "}
-                {current_member}
-                {"/"}
-                {max_member}
-              </div>
-              <div>
-                {"Description: "}
-                {description}
-              </div>
-              <div>
-                {"Last Update: "}
-                {moment(last_timestamp).format("MMMM do, yyyy")}
-              </div>
-            </div>
+            <span>
+              {"Team size: "}
+              {current_member}
+              {"/"}
+              {max_member}
+              <br />
+              <br />
+              {description}
+              <ul>
+                {position_list.map((position, index) => {
+                  return <li key={index}>{position.positionName}</li>;
+                })}
+              </ul>
+              {"Last Update: "}
+              {moment(last_timestamp).format("MMMM Do, YYYY")}
+            </span>
           }
         />
       </ListItem>
@@ -116,4 +118,4 @@ const Project = ({
   );
 };
 
-export default Project;
+export default ProjectListItem;

@@ -1,10 +1,10 @@
 // theme related
 import { CssBaseline } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { AuthProvider } from "../components/Context/AuthContext";
 import Navbar from "../components/Header/Navbar";
 import "../styles/globals.css";
 // auth related
-import { AuthProvider } from "./AuthContext";
 
 // global font testing
 const fontTheme = createTheme({

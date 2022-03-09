@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getAuth } from "firebase/auth";
-import Loading from "../components/Loading";
-import Login from "../components/Login";
+import Loading from "../Loading";
+import Login from "../Login";
 
 const AuthContext = createContext({});
 

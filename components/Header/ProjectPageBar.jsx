@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useContext } from "react";
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -7,6 +7,7 @@ import InputBase from "@mui/material/InputBase";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { ProjectContext } from "../Context/ProjectContext";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -42,15 +43,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     transition: theme.transitions.create("width"),
     width: "100%",
     [theme.breakpoints.up("sm")]: {
-      width: "12ch",
+      width: "20ch",
       "&:focus": {
-        width: "20ch",
+        width: "25ch",
       },
     },
   },
 }));
 
 export default function ProjectPageBar() {
+  const { setSearchTerm } = useContext(ProjectContext);
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
@@ -63,11 +66,21 @@ export default function ProjectPageBar() {
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase
-              placeholder="Search Title…"
+              placeholder="Project or Position…"
               inputProps={{ "aria-label": "search" }}
+              // onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  setSearchTerm(e.target.value);
+                }
+              }}
+              onBlur={(e) => {
+                e.target.value = "";
+                setSearchTerm("");
+              }}
             />
           </Search>
-          <FormControl sx={{ ml: 3, minWidth: 200 }} size="small">
+          {/* <FormControl sx={{ ml: 3, minWidth: 200 }} size="small">
             <InputLabel id="project-category-label">Category</InputLabel>
             <Select
               labelId="project-category-label"
@@ -82,7 +95,7 @@ export default function ProjectPageBar() {
               <MenuItem value={30}>Engineering</MenuItem>
               <MenuItem value={40}>Unreasonablely long placeholder</MenuItem>
             </Select>
-          </FormControl>
+          </FormControl> */}
           <Box sx={{ flexGrow: 1 }} />
           <Search>
             <SearchIconWrapper>

@@ -10,53 +10,34 @@ import {
   Divider,
 } from "@mui/material";
 import { useState } from "react";
-import ProjectForm from "../components/ProjectForm";
 import ProjectList from "../components/Project/ProjectList";
-import { useAuth } from "./AuthContext";
-import { ProjectContext } from "./ProjectContext";
 import { auth } from "../firebase";
 import ProjectPageBar from "../components/Header/ProjectPageBar";
+import { ProjectContext } from "../components/Context/ProjectContext";
+import { useAuth } from "../components/Context/AuthContext";
 
 export default function Home() {
   const { currentUser } = useAuth();
-  const [open, setOpen] = useState(false);
-  const [alertType, setAlertType] = useState("success");
-  const [alertMessage, setAlertMessage] = useState("");
   const [project, setProject] = useState({
     title: "",
     description: "",
     detail: "",
+    current_member: "",
     max_member: "",
+    create_timestamp: "",
+    last_timestamp: "",
+    creator_email: "",
+    creator_uid: "",
+    position_list: [],
   });
-  const showAlert = (type, msg) => {
-    setAlertType(type);
-    setAlertMessage(msg);
-    setOpen(true);
-  };
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setOpen(false);
-  };
+  const [searchTerm, setSearchTerm] = useState("");
 
   return (
-    <ProjectContext.Provider value={{ showAlert, project, setProject }}>
+    <ProjectContext.Provider
+      value={{ project, setProject, searchTerm, setSearchTerm }}
+    >
       <ProjectPageBar />
-      <Snackbar
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        open={open}
-        autoHideDuration={6000}
-        onClose={handleClose}
-      >
-        <Alert
-          onClose={handleClose}
-          severity={alertType}
-          sx={{ width: "100%" }}
-        >
-          {alertMessage}
-        </Alert>
-      </Snackbar>
+
       <ProjectList />
 
       {/* <Divider>End of Project Homepage</Divider>

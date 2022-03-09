@@ -1,7 +1,6 @@
-import { collection, query, orderBy, onSnapshot } from "@firebase/firestore";
-import { useContext, useEffect, useState } from "react";
+import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import { useContext, useEffect, useRef, useState } from "react";
 import { db } from "../../firebase";
-import Project from "../Project";
 import {
   Avatar,
   Box,
@@ -11,11 +10,19 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import { ProjectContext } from "../../pages/ProjectContext";
 import { useRouter } from "next/router";
+import ProjectListItem from "./ProjectListItem";
+import { ProjectContext } from "../Context/ProjectContext";
+import { useAuth } from "../Context/AuthContext";
+import PositionListItem from "./PositionListItem";
 
 // a list of Project component
 const ProjectList = () => {
+  // context
+  const { project, searchTerm } = useContext(ProjectContext);
+  const { currentUser } = useAuth();
+
+  // projects state
   const [projects, setProjects] = useState([]); // don't be confused with [project, setProject]
 
   useEffect(() => {
@@ -24,7 +31,6 @@ const ProjectList = () => {
 
     // Get realtime updates with Cloud Firestore
     // https://firebase.google.com/docs/firestore/query-data/listen
-    // !todo: simply the listener, especially the docs.map?
     const unsub = onSnapshot(q, (querySnapshot) => {
       setProjects(
         querySnapshot.docs.map((doc) => ({
@@ -38,13 +44,20 @@ const ProjectList = () => {
     return unsub;
   }, []);
 
-  const { project } = useContext(ProjectContext);
+  // is cur_user the creator?
+  const isCreator = currentUser?.uid == project.creator_uid ? true : false;
 
   // link/router https://stackoverflow.com/questions/65086108/next-js-link-vs-router-push-vs-a-tag
   const router = useRouter();
-  const createProject = (e) => {
-    e.stopPropagation();
-    router.push(`/project/create`);
+
+  const createProject = (projObj) => {
+    router.push(
+      {
+        pathname: `/project/create`,
+        query: { projString: JSON.stringify(projObj || null) },
+      },
+      `/project/create` // "as" argument
+    );
   };
 
   return (
@@ -55,41 +68,61 @@ const ProjectList = () => {
       mt={1}
       // alignItems="center"
       //  justifyContent="center"
-      style={{ minHeight: "100vh" }}
+      sx={{ minHeight: "100vh" }}
     >
       {/* left comp: list of projects */}
       <Grid item xs={4}>
         <Box sx={{ minHeight: "80vh", maxHeight: "80vh", overflow: "auto" }}>
-          {projects.map((project) => (
-            <Project
-              key={project.id}
-              id={project.id}
-              title={project.title}
-              description={project.description}
-              detail={project.detail}
-              create_timestamp={project.create_timestamp}
-              last_timestamp={project.last_timestamp}
-              current_member={project.current_member}
-              max_member={project.max_member}
-              creator_email={project.creator_email}
-            />
-          ))}
+          {projects
+            .filter((project) => {
+              // !todo: is this optimized?
+              if (searchTerm == "") {
+                return project;
+              } else if (
+                project.title
+                  .toLowerCase()
+                  .includes(searchTerm.toLowerCase()) ||
+                project.position_list.some((position) =>
+                  position.positionName
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase())
+                ) // position name
+              ) {
+                return project;
+              }
+            })
+            .map((project) => (
+              <ProjectListItem
+                key={project.id}
+                id={project.id}
+                title={project.title}
+                description={project.description}
+                detail={project.detail}
+                current_member={project.current_member}
+                max_member={project.max_member}
+                create_timestamp={project.create_timestamp}
+                last_timestamp={project.last_timestamp}
+                creator_email={project.creator_email}
+                creator_uid={project.creator_uid}
+                position_list={project.position_list}
+              />
+            ))}
         </Box>
         <Box mt={3} sx={{ display: "flex", justifyContent: "center" }}>
           <Button
             variant="contained"
             disableElevation
-            style={{ background: "#6fa8dc" }}
-            onClick={(e) => createProject(e)}
+            sx={{ background: "#6fa8dc" }}
+            onClick={() => createProject(null)}
           >
             {"Create Project"}
           </Button>
         </Box>
       </Grid>
-      {/* right comp: project details  */}
+      {/* right comp: project info  */}
       <Grid item xs={8}>
         {/* Should be its own comp */}
-        <Box style={{ minHeight: "80vh", maxHeight: "80vh", overflow: "auto" }}>
+        <Box sx={{ minHeight: "80vh", maxHeight: "80vh", overflow: "auto" }}>
           <Grid container>
             {/* Info box */}
             <Grid item xs={8}>
@@ -157,21 +190,40 @@ const ProjectList = () => {
                     ? project.creator_email
                     : "Founder Email"}
                 </Typography>
-                <Box m={3} sx={{ display: "flex", justifyContent: "center" }}>
-                  <Button
-                    variant="contained"
-                    style={{ background: "#6fa8dc" }}
-                    disableElevation
-                  >
-                    {"Join"}
-                  </Button>
-                </Box>
+                {!isCreator && (
+                  <Box m={3} sx={{ display: "flex", justifyContent: "center" }}>
+                    <Button
+                      variant="contained"
+                      sx={{ background: "#6fa8dc" }}
+                      disableElevation
+                    >
+                      {"Join"}
+                    </Button>
+                  </Box>
+                )}
+                {isCreator && (
+                  <Box m={3} sx={{ display: "flex", justifyContent: "center" }}>
+                    <Button
+                      onClick={() => createProject(project)}
+                      variant="contained"
+                      sx={{ background: "#6fa8dc" }}
+                      disableElevation
+                    >
+                      {"Modify"}
+                    </Button>
+                  </Box>
+                )}
               </Box>
             </Grid>
           </Grid>
+          {/* project details */}
           <Grid item xs={12}>
             <Box m={3}>
-              <Typography sx={{ mt: 3 }} color="text.secondary">
+              <Typography
+                component="span"
+                sx={{ mt: 3 }}
+                color="text.secondary"
+              >
                 <pre style={{ fontFamily: "inherit", whiteSpace: "pre-wrap" }}>
                   {project.hasOwnProperty("detail") &&
                   project.detail.length != 0
@@ -179,6 +231,18 @@ const ProjectList = () => {
                     : "Project Details"}
                 </pre>
               </Typography>
+            </Box>
+            {/* position details */}
+            <Box>
+              {project.position_list.map((position, index) => (
+                <PositionListItem
+                  key={index}
+                  name={position.positionName}
+                  resp={position.positionResp}
+                  weeklyHour={position.positionWeeklyHour}
+                  uid={position.positionUID}
+                />
+              ))}
             </Box>
           </Grid>
         </Box>

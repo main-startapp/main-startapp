@@ -7,8 +7,8 @@ import {
   IconButton,
   Avatar,
 } from "@mui/material";
-import { useAuth } from "../../pages/AuthContext";
 import { auth } from "../../firebase";
+import { useAuth } from "../Context/AuthContext";
 // import useStyles from './styles'
 
 const Navbar = () => {
