@@ -13,15 +13,18 @@ import { useContext } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../Context/AuthContext";
 import { ProjectContext } from "../Context/ProjectContext";
+import { makeStyles } from "@mui/styles";
 
-// the Project component in the ProjectList
+// Project State Initialization
 const ProjectListItem = ({
   id,
   title,
+  category,
+  completion_date,
   description,
   detail,
-  current_member,
-  max_member,
+  cur_member_count,
+  max_member_count,
   create_timestamp,
   last_timestamp,
   creator_email,
@@ -52,21 +55,27 @@ const ProjectListItem = ({
     <Box m={3}>
       <ListItem
         onClick={() =>
+          // Project State Set
           setProject({
             id,
+            title,
             create_timestamp,
             last_timestamp,
-            title,
+            category,
+            completion_date,
             description,
             detail,
-            current_member,
-            max_member,
+            cur_member_count,
+            max_member_count,
             creator_email,
             creator_uid,
             position_list,
           })
         }
         sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
           border: 1,
           borderRadius: 4,
           borderColor: "text.secondary",
@@ -93,22 +102,31 @@ const ProjectListItem = ({
         <ListItemText
           primary={<Typography sx={{ fontWeight: 600 }}>{title}</Typography>} // 600 is the breakpoint of reg and semi-bold
           secondary={
-            <span>
+            <>
               {"Team size: "}
-              {current_member}
+              {cur_member_count}
               {"/"}
-              {max_member}
+              {max_member_count}
               <br />
               <br />
               {description}
-              <ul>
-                {position_list.map((position, index) => {
-                  return <li key={index}>{position.positionName}</li>;
-                })}
-              </ul>
+            </>
+          }
+        />
+        {position_list.map((position, index) => (
+          <ListItemText
+            sx={{ ml: "5%" }}
+            key={index}
+            secondary={<span>&bull; {position.positionTitle}</span>}
+          />
+        ))}
+        <ListItemText
+          secondary={
+            <>
+              <br />
               {"Last Update: "}
               {moment(last_timestamp).format("MMMM Do, YYYY")}
-            </span>
+            </>
           }
         />
       </ListItem>

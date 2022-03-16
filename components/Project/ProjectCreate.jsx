@@ -2,8 +2,12 @@ import {
   Box,
   Button,
   Divider,
+  FormControl,
   Grid,
   IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
   TextField,
   Tooltip,
 } from "@mui/material";
@@ -17,12 +21,16 @@ import {
   serverTimestamp,
   updateDoc,
   deleteDoc,
+  Timestamp,
 } from "firebase/firestore";
 import { useContext, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { db } from "../../firebase";
 import { useAuth } from "../Context/AuthContext";
 import { ProjectContext } from "../Context/ProjectContext";
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
+import AdapterMoment from "@mui/lab/AdapterMoment";
+import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
 
 const ProjectCreate = (projProps) => {
   // context
@@ -39,52 +47,73 @@ const ProjectCreate = (projProps) => {
   }
   const isUpdate = inProject !== null && inProject !== undefined;
 
-  // states
-  // project state lazy initialization
+  console.log();
+
+  // Project State Lazy Initialization
   // https://stackoverflow.com/questions/68945060/react-make-usestate-initial-value-conditional
   const [project, setProject] = useState(() =>
     isUpdate
       ? {
           title: inProject.title,
+          category: inProject.category,
+          completion_date: inProject.completion_date,
           description: inProject.description,
           detail: inProject.detail,
-          max_member: inProject.max_member,
+          create_timestamp: inProject.create_timestamp,
           creator_email: inProject.creator_email,
           creator_uid: inProject.creator_uid,
-          current_member: inProject.current_member,
-          create_timestamp: inProject.create_timestamp,
+          cur_member_count: inProject.cur_member_count,
         }
       : {
           title: "",
+          category: "",
+          completion_date: "",
           description: "",
           detail: "",
-          max_member: "",
           creator_email: currentUser.email,
           creator_uid: currentUser.uid,
-          current_member: 1,
+          cur_member_count: 1,
         }
   );
   const [doneFlag, setDoneFlag] = useState(false);
   const emptyPositionField = {
-    positionName: "",
+    positionTitle: "",
     positionResp: "",
-    positionWeeklyHour: "",
-    positionUID: "", // !todo: maybe a list?
+    positionWeeklyHour: 1,
+    positionCount: 1,
+    positionRequestUID: [],
+    positionAcceptUID: [], // < or = positionCount
   };
 
   const [positionFields, setPositionFields] = useState(() =>
     isUpdate ? inProject.position_list : [emptyPositionField]
   );
 
-  const onSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     if (formRef.current.reportValidity()) {
       e.stopPropagation();
+      // calucalte the max members
+      let maxMemberCount = 0;
+      positionFields.forEach(
+        (position) => (maxMemberCount += position.positionCount)
+      );
       if (isUpdate) {
         const docRef = doc(db, "projects", inProject.id);
         const projectRef = {
           ...project,
+          // update max num of members
+          max_member_count: maxMemberCount,
           position_list: positionFields,
+          // update timestamp
+          create_timestamp: new Timestamp(
+            project.create_timestamp.seconds,
+            project.create_timestamp.nanoseconds
+          ),
           last_timestamp: serverTimestamp(),
+          // completion_date: new Timestamp(
+          //   project.completion_date.seconds,
+          //   project.completion_date.nanoseconds
+          // ),
         };
         await updateDoc(docRef, projectRef);
         showAlert(
@@ -95,7 +124,10 @@ const ProjectCreate = (projProps) => {
         const collectionRef = collection(db, "projects");
         const projectRef = {
           ...project,
+          // update max num of members
+          max_member_count: maxMemberCount,
           position_list: positionFields,
+          // create timestamp
           create_timestamp: serverTimestamp(),
           last_timestamp: serverTimestamp(),
         };
@@ -105,7 +137,14 @@ const ProjectCreate = (projProps) => {
           `"${project.title}" is added successfully!` // success -> green
         );
       }
-      setProject({ title: "", description: "", detail: "", max_member: "" });
+      setProject({
+        // only the fields on the screen
+        title: "",
+        category: "",
+        completion_date: "",
+        description: "",
+        detail: "",
+      });
       setPositionFields([emptyPositionField]);
       setDoneFlag(true);
     }
@@ -117,18 +156,28 @@ const ProjectCreate = (projProps) => {
   };
 
   const handleDeleteProj = async (id, e) => {
-    e.stopPropagation();
     const docRef = doc(db, "projects", id);
     await deleteDoc(docRef);
     showAlert("error", `"${project.title}" is deleted sucessfully!`); // error -> red
-    setProject({ title: "", description: "", detail: "", max_member: "" });
+    setProject({
+      title: "",
+      category: "",
+      completion_date: "",
+      description: "",
+      detail: "",
+    });
     setPositionFields([emptyPositionField]);
     setDoneFlag(true);
   };
 
   const handleChangePosInput = (index, e) => {
     const pFields = [...positionFields];
-    pFields[index][e.target.name] = e.target.value;
+    let fieldValue =
+      e.target.name === "positionWeeklyHour" ||
+      e.target.name === "positionCount"
+        ? Number(e.target.value)
+        : e.target.value;
+    pFields[index][e.target.name] = fieldValue;
     setPositionFields(pFields);
   };
 
@@ -142,25 +191,70 @@ const ProjectCreate = (projProps) => {
     setPositionFields(pFields);
   };
 
+  const handleDateTimeChange = (e) => {
+    setProject({ ...project, completion_date: e?._d });
+  };
+
   const formRef = useRef();
+
+  // console logs if there's any
 
   return (
     <Grid container spacing={0} justifyContent="center">
       <Grid item xs={6}>
         <form ref={formRef}>
+          {/* Title textfield */}
           <TextField
             sx={{ mt: 5 }}
             fullWidth
             required
-            label="Title"
+            label="Project Title"
             margin="none"
             inputProps={{
               maxLength: 50,
             }}
-            helperText="Project title is required (char limit: 50)"
+            helperText="The name of your project (limit: 50)"
             value={project.title}
             onChange={(e) => setProject({ ...project, title: e.target.value })}
           />
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mt={5}
+          >
+            {/* Category select */}
+            <FormControl fullWidth sx={{ mr: 5 }}>
+              <InputLabel>Category</InputLabel>
+              <Select
+                required
+                label="Category"
+                value={project.category}
+                onChange={(e) =>
+                  setProject({ ...project, category: e.target.value })
+                }
+              >
+                <MenuItem value={"Startup"}>Startup</MenuItem>
+                <MenuItem value={"PersonalProject"}>Personal Project</MenuItem>
+                <MenuItem value={"Event"}>Event</MenuItem>
+                <MenuItem value={"CharityInitiative"}>
+                  Charity Initiative
+                </MenuItem>
+              </Select>
+            </FormControl>
+            {/* Completion date */}
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+              <DesktopDatePicker
+                renderInput={(props) => <TextField {...props} />}
+                label="Completion Date"
+                value={project.completion_date}
+                onChange={(e) => {
+                  handleDateTimeChange(e);
+                }}
+              />
+            </LocalizationProvider>
+          </Box>
+          {/* Short description */}
           <TextField
             sx={{ mt: 5 }}
             fullWidth
@@ -172,41 +266,24 @@ const ProjectCreate = (projProps) => {
             inputProps={{
               maxLength: 200,
             }}
-            helperText="Short description (char limit: 200)"
+            helperText="A brief description of your project (limit: 200)"
             value={project.description}
             onChange={(e) =>
               setProject({ ...project, description: e.target.value })
             }
           />
+          {/* Full details */}
           <TextField
             sx={{ mt: 5 }}
             fullWidth
-            label="Detail"
+            label="Details"
             margin="none"
             multiline
             minRows={2}
             maxRows={8}
-            helperText="Project details (e.g., scope, potential member requirement, contact info)"
+            helperText="Project details (e.g., scope, mission, general work fomat, self/team description)"
             value={project.detail}
             onChange={(e) => setProject({ ...project, detail: e.target.value })}
-          />
-          <TextField
-            sx={{ mt: 5 }}
-            fullWidth
-            required
-            label="Max Team Members"
-            margin="none"
-            type="number"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            helperText="Positive integer"
-            value={project.max_member}
-            onChange={(e) =>
-              e.target.value < 1
-                ? setProject({ ...project, max_member: 1 })
-                : setProject({ ...project, max_member: e.target.value })
-            }
           />
           {/* firebase dynamic array: http://y2u.be/zgKH12s_95A */}
           {positionFields.map((positionField, index) => {
@@ -219,29 +296,43 @@ const ProjectCreate = (projProps) => {
                   alignItems="center"
                   mt={5}
                 >
+                  {/* Title */}
                   <TextField
                     sx={{ mr: 2.5 }}
                     fullWidth
                     margin="none"
-                    name="positionName"
-                    label="Position Name"
-                    value={positionField.positionName}
+                    name="positionTitle" // has to be the same as key
+                    label="Position Title"
+                    value={positionField.positionTitle}
                     onChange={(e) => {
                       handleChangePosInput(index, e);
                     }}
                   />
+                  {/* Weekly hour */}
                   <TextField
                     sx={{ mr: 2.5 }}
-                    fullWidth
                     margin="none"
                     type="number"
-                    name="positionWeeklyHour"
+                    name="positionWeeklyHour" // has to be the same as key
                     label="Weekly Hour"
                     value={positionField.positionWeeklyHour}
                     onChange={(e) => {
                       handleChangePosInput(index, e);
                     }}
                   />
+                  {/* Number of people */}
+                  <TextField
+                    sx={{ mr: 2.5 }}
+                    margin="none"
+                    type="number"
+                    name="positionCount" // has to be the same as key
+                    label="NO. of People"
+                    value={positionField.positionCount}
+                    onChange={(e) => {
+                      handleChangePosInput(index, e);
+                    }}
+                  />
+                  {/* Add / Remove position button */}
                   {index == 0 && (
                     <IconButton disabled>
                       <DoDisturbAltRoundedIcon />
@@ -259,6 +350,7 @@ const ProjectCreate = (projProps) => {
                   alignItems="center"
                   mt={2.5}
                 >
+                  {/* Responsibilities */}
                   <TextField
                     sx={{ mr: 2.5 }}
                     fullWidth
@@ -287,33 +379,31 @@ const ProjectCreate = (projProps) => {
                 sx={{ mt: 5 }}
                 variant="contained"
                 disableElevation
-                style={{ background: "#6fa8dc" }}
+                style={{ background: "#3e95c2" }}
                 onClick={(e) => handleDeleteProj(inProject.id, e)}
               >
                 {"Delete"}
               </Button>
             )}
             <Box sx={{ flexGrow: 1 }} />
+            <Button
+              sx={{ mt: 5, mr: 5 }}
+              variant="contained"
+              disableElevation
+              style={{ background: "#3e95c2" }}
+              onClick={(e) => handleGoBack(e)}
+            >
+              {"Go Back"}
+            </Button>
             {!doneFlag && (
               <Button
                 sx={{ mt: 5 }}
                 variant="contained"
                 disableElevation
-                style={{ background: "#6fa8dc" }}
-                onClick={(e) => onSubmit(e)}
+                style={{ background: "#3e95c2" }}
+                onClick={(e) => handleSubmit(e)}
               >
                 {isUpdate ? "Update" : "Submit"}
-              </Button>
-            )}
-            {doneFlag && (
-              <Button
-                sx={{ mt: 5 }}
-                variant="contained"
-                disableElevation
-                style={{ background: "#6fa8dc" }}
-                onClick={(e) => handleGoBack(e)}
-              >
-                {"Go Back"}
               </Button>
             )}
           </Box>

@@ -1,10 +1,11 @@
-// theme related
-import { CssBaseline } from "@mui/material";
+import { Container, CssBaseline } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { AuthProvider } from "../components/Context/AuthContext";
 import Navbar from "../components/Header/Navbar";
 import "../styles/globals.css";
-// auth related
+import { makeStyles } from "@mui/styles";
+import AdapterMoment from "@mui/lab/AdapterMoment";
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
 
 // global font testing
 const fontTheme = createTheme({
@@ -31,9 +32,11 @@ function MyApp({ Component, pageProps }) {
     // uncomment the ThemeProvider to use the theme defined above
     // <ThemeProvider theme={fontTheme}>
     <AuthProvider>
-      <CssBaseline />
-      <Navbar />
-      <Component {...pageProps} />
+      <LocalizationProvider dateAdapter={AdapterMoment}>
+        <CssBaseline />
+        <Navbar />
+        <Component {...pageProps} />
+      </LocalizationProvider>
     </AuthProvider>
     // </ThemeProvider>
   );

@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useRef } from "react";
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -6,23 +6,16 @@ import Toolbar from "@mui/material/Toolbar";
 import InputBase from "@mui/material/InputBase";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import SearchIcon from "@mui/icons-material/Search";
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import {
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  Tooltip,
+} from "@mui/material";
 import { ProjectContext } from "../Context/ProjectContext";
-
-const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.black, 0.15),
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.common.black, 0.25),
-  },
-  marginLeft: 0,
-  width: "100%",
-  [theme.breakpoints.up("sm")]: {
-    marginLeft: theme.spacing(1),
-    width: "auto",
-  },
-}));
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
 const SearchIconWrapper = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 2),
@@ -32,6 +25,21 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+}));
+
+const Search = styled("div")(({ theme }) => ({
+  position: "relative",
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.black, 0.15),
+  "&:hover": {
+    backgroundColor: alpha(theme.palette.common.black, 0.25),
+  },
+  marginLeft: 10,
+  width: "100%",
+  [theme.breakpoints.up("sm")]: {
+    marginLeft: theme.spacing(0),
+    width: "auto",
+  },
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
@@ -52,62 +60,68 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function ProjectPageBar() {
-  const { setSearchTerm } = useContext(ProjectContext);
+  const { setSearchTerm, setSearchCategory } = useContext(ProjectContext);
+  const textRef = useRef();
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar
-        position="static"
-        sx={{ background: "#fafafa", color: "#000000" }}
-      >
-        <Toolbar>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
+    <AppBar position="static" sx={{ background: "#fafafa", color: "#000000" }}>
+      <Toolbar sx={{ maxHeight: "64px" }}>
+        <Search>
+          <SearchIconWrapper>
+            <SearchIcon />
+          </SearchIconWrapper>
+          <Tooltip title="Search for projects or positions...">
             <StyledInputBase
               placeholder="Project or Position…"
               inputProps={{ "aria-label": "search" }}
+              inputRef={textRef}
               // onChange={(e) => setSearchTerm(e.target.value)}
               onKeyPress={(e) => {
                 if (e.key === "Enter") {
                   setSearchTerm(e.target.value);
                 }
               }}
-              onBlur={(e) => {
-                e.target.value = "";
+            />
+          </Tooltip>
+          <Tooltip title="Reset">
+            <IconButton
+              sx={{ color: "#000000" }}
+              onClick={() => {
+                textRef.current.value = "";
                 setSearchTerm("");
               }}
-            />
-          </Search>
-          {/* <FormControl sx={{ ml: 3, minWidth: 200 }} size="small">
-            <InputLabel id="project-category-label">Category</InputLabel>
-            <Select
-              labelId="project-category-label"
-              id="project-category"
-              // value={age}
-              label="Category"
-              // onChange={handleChange}
-              displayEmpty
             >
-              <MenuItem value={10}>Science</MenuItem>
-              <MenuItem value={20}>Business</MenuItem>
-              <MenuItem value={30}>Engineering</MenuItem>
-              <MenuItem value={40}>Unreasonablely long placeholder</MenuItem>
-            </Select>
-          </FormControl> */}
-          <Box sx={{ flexGrow: 1 }} />
-          <Search>
-            <SearchIconWrapper>
-              <FilterAltOutlinedIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Filter…"
-              inputProps={{ "aria-label": "search" }}
-            />
-          </Search>
-        </Toolbar>
-      </AppBar>
-    </Box>
+              <RestartAltIcon />
+            </IconButton>
+          </Tooltip>
+        </Search>
+        <FormControl sx={{ ml: 3, minWidth: 200 }} size="small">
+          <InputLabel>Category</InputLabel>
+          <Select
+            label="Category"
+            defaultValue={""}
+            onChange={(e) => {
+              setSearchCategory(e.target.value);
+            }}
+          >
+            <MenuItem value={""}>None</MenuItem>
+            <MenuItem value={"Startup"}>Startup</MenuItem>
+            <MenuItem value={"PersonalProject"}>Personal Project</MenuItem>
+            <MenuItem value={"Event"}>Event</MenuItem>
+            <MenuItem value={"CharityInitiative"}>Charity Initiative</MenuItem>
+          </Select>
+        </FormControl>
+        <Box sx={{ flexGrow: 1 }} />
+        <Search>
+          <SearchIconWrapper>
+            <FilterAltOutlinedIcon />
+          </SearchIconWrapper>
+          <StyledInputBase
+            placeholder="Filter…"
+            inputProps={{ "aria-label": "search" }}
+          />
+        </Search>
+      </Toolbar>
+    </AppBar>
   );
 }
