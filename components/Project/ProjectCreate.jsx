@@ -23,7 +23,7 @@ import {
   deleteDoc,
   Timestamp,
 } from "firebase/firestore";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { db } from "../../firebase";
 import { useAuth } from "../Context/AuthContext";
@@ -31,6 +31,7 @@ import { ProjectContext } from "../Context/ProjectContext";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import AdapterMoment from "@mui/lab/AdapterMoment";
 import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
+import moment from "moment";
 
 const ProjectCreate = (props) => {
   // context
@@ -64,7 +65,7 @@ const ProjectCreate = (props) => {
       ? {
           title: "",
           category: "",
-          completion_date: "",
+          completion_date: moment(),
           details: "",
           description: "",
           creator_email: currentUser.email,
@@ -84,7 +85,27 @@ const ProjectCreate = (props) => {
         }
   );
 
+  // convert to timestamp obj if isUpdate and the format has not been converted
+  if (
+    !isCreate &&
+    project.create_timestamp?.seconds &&
+    project.completion_date?.seconds
+  ) {
+    const newCreateTimestamp = new Timestamp(
+      project.create_timestamp.seconds,
+      project.create_timestamp.nanoseconds
+    );
+    const newCompletionDate = new Timestamp(
+      project.completion_date.seconds,
+      project.completion_date.nanoseconds
+    );
+    project.create_timestamp = newCreateTimestamp.toDate();
+    project.completion_date = newCompletionDate.toDate();
+  }
+
+  // local states
   const [doneFlag, setDoneFlag] = useState(false);
+
   const emptyPositionField = {
     positionTitle: "",
     positionResp: "",
@@ -93,11 +114,11 @@ const ProjectCreate = (props) => {
     positionRequestUID: [],
     positionAcceptUID: [], // < or = positionCount
   };
-
   const [positionFields, setPositionFields] = useState(() =>
     isCreate ? [emptyPositionField] : argProject.position_list
   );
 
+  // helper functions
   const handleSubmit = async (e) => {
     if (formRef.current.reportValidity()) {
       e.stopPropagation();
@@ -107,13 +128,13 @@ const ProjectCreate = (props) => {
         (position) => (maxMemberCount += position.positionCount)
       );
       if (isCreate) {
+        // create a new project
         const collectionRef = collection(db, "projects");
         const projectRef = {
           ...project,
           // update max num of members
           max_member_count: maxMemberCount,
           position_list: positionFields,
-          // create timestamp
           create_timestamp: serverTimestamp(),
           last_timestamp: serverTimestamp(),
         };
@@ -123,17 +144,13 @@ const ProjectCreate = (props) => {
           `"${project.title}" is added successfully!` // success -> green
         );
       } else {
+        // update an existing project
         const docRef = doc(db, "projects", argProject.id);
         const projectRef = {
           ...project,
           // update max num of members
           max_member_count: maxMemberCount,
           position_list: positionFields,
-          // update timestamp
-          create_timestamp: new Timestamp(
-            project.create_timestamp.seconds,
-            project.create_timestamp.nanoseconds
-          ),
           last_timestamp: serverTimestamp(),
         };
         await updateDoc(docRef, projectRef);
@@ -219,7 +236,7 @@ const ProjectCreate = (props) => {
           >
             <TextField
               required
-              sx={{ mr: 5, width: "65%" }} // have to be 65% to align with the Completion Date field
+              sx={{ mr: 5, width: "65%" }} // !todo: have to be 65% to align with the Completion Date field. Why not 75%?
               label="Project Title"
               margin="none"
               inputProps={{
@@ -423,7 +440,7 @@ const ProjectCreate = (props) => {
             )}
             <Box sx={{ flexGrow: 1 }} />
             <Button
-              sx={{ mt: 5, mr: 5 }}
+              sx={{ mt: 5 }}
               variant="contained"
               disableElevation
               style={{ background: "#3e95c2" }}
@@ -433,7 +450,7 @@ const ProjectCreate = (props) => {
             </Button>
             {!doneFlag && (
               <Button
-                sx={{ mt: 5 }}
+                sx={{ mt: 5, ml: 5 }}
                 variant="contained"
                 disableElevation
                 style={{ background: "#3e95c2" }}

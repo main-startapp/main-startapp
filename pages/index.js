@@ -11,7 +11,7 @@ export default function Home() {
     title: "",
     category: "",
     completion_date: "",
-    details: "", // will be a list latter
+    details: "", // will be a list
     description: "",
     cur_member_count: 1, // include the creator
     max_member_count: 1,

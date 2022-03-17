@@ -34,6 +34,9 @@ const ProjectInfo = () => {
     );
   };
 
+  // debugging console logs
+  // console.log(project.completion_date);
+
   return (
     <Box
       sx={{
