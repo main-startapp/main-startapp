@@ -32,49 +32,58 @@ import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import AdapterMoment from "@mui/lab/AdapterMoment";
 import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
 
-const ProjectCreate = (projProps) => {
+const ProjectCreate = (props) => {
   // context
   const router = useRouter();
   const { currentUser } = useAuth();
   const { showAlert } = useContext(ProjectContext);
 
-  // get the projProps argument
-  let inProject;
-  try {
-    inProject = JSON.parse(projProps.projString);
-  } catch (e) {
-    console.log("Project props parsing error.");
+  // get the props argument
+  const isCreate =
+    props.isCreateStr == null ||
+    props.isCreateStr == undefined ||
+    props.isCreateStr == "true"
+      ? true
+      : false;
+
+  let argProject;
+  if (!isCreate) {
+    try {
+      argProject = JSON.parse(props.projectStr);
+    } catch (e) {
+      console.log("ERROR: ProjectCreate should get a stringified project!");
+      isCreate = true; // nothing to update, force the isCreate to be true
+    }
   }
-  const isUpdate = inProject !== null && inProject !== undefined;
 
-  console.log();
-
-  // Project State Lazy Initialization
+  // Project State Initialization. !todo: it will be much easier if we can share the state between pages
+  // instead of passing stringified project state.
   // https://stackoverflow.com/questions/68945060/react-make-usestate-initial-value-conditional
   const [project, setProject] = useState(() =>
-    isUpdate
+    isCreate
       ? {
-          title: inProject.title,
-          category: inProject.category,
-          completion_date: inProject.completion_date,
-          description: inProject.description,
-          detail: inProject.detail,
-          create_timestamp: inProject.create_timestamp,
-          creator_email: inProject.creator_email,
-          creator_uid: inProject.creator_uid,
-          cur_member_count: inProject.cur_member_count,
-        }
-      : {
           title: "",
           category: "",
           completion_date: "",
+          details: "",
           description: "",
-          detail: "",
           creator_email: currentUser.email,
           creator_uid: currentUser.uid,
           cur_member_count: 1,
         }
+      : {
+          title: argProject.title,
+          category: argProject.category,
+          completion_date: argProject.completion_date,
+          details: argProject.details,
+          description: argProject.description,
+          create_timestamp: argProject.create_timestamp,
+          creator_email: argProject.creator_email,
+          creator_uid: argProject.creator_uid,
+          cur_member_count: argProject.cur_member_count,
+        }
   );
+
   const [doneFlag, setDoneFlag] = useState(false);
   const emptyPositionField = {
     positionTitle: "",
@@ -86,41 +95,18 @@ const ProjectCreate = (projProps) => {
   };
 
   const [positionFields, setPositionFields] = useState(() =>
-    isUpdate ? inProject.position_list : [emptyPositionField]
+    isCreate ? [emptyPositionField] : argProject.position_list
   );
 
   const handleSubmit = async (e) => {
     if (formRef.current.reportValidity()) {
       e.stopPropagation();
       // calucalte the max members
-      let maxMemberCount = 0;
+      let maxMemberCount = project.cur_member_count;
       positionFields.forEach(
         (position) => (maxMemberCount += position.positionCount)
       );
-      if (isUpdate) {
-        const docRef = doc(db, "projects", inProject.id);
-        const projectRef = {
-          ...project,
-          // update max num of members
-          max_member_count: maxMemberCount,
-          position_list: positionFields,
-          // update timestamp
-          create_timestamp: new Timestamp(
-            project.create_timestamp.seconds,
-            project.create_timestamp.nanoseconds
-          ),
-          last_timestamp: serverTimestamp(),
-          // completion_date: new Timestamp(
-          //   project.completion_date.seconds,
-          //   project.completion_date.nanoseconds
-          // ),
-        };
-        await updateDoc(docRef, projectRef);
-        showAlert(
-          "success",
-          `"${project.title}" is updated successfully!` // success -> green
-        );
-      } else {
+      if (isCreate) {
         const collectionRef = collection(db, "projects");
         const projectRef = {
           ...project,
@@ -136,14 +122,34 @@ const ProjectCreate = (projProps) => {
           "success",
           `"${project.title}" is added successfully!` // success -> green
         );
+      } else {
+        const docRef = doc(db, "projects", argProject.id);
+        const projectRef = {
+          ...project,
+          // update max num of members
+          max_member_count: maxMemberCount,
+          position_list: positionFields,
+          // update timestamp
+          create_timestamp: new Timestamp(
+            project.create_timestamp.seconds,
+            project.create_timestamp.nanoseconds
+          ),
+          last_timestamp: serverTimestamp(),
+        };
+        await updateDoc(docRef, projectRef);
+        showAlert(
+          "success",
+          `"${project.title}" is updated successfully!` // success -> green
+        );
       }
       setProject({
         // only the fields on the screen
         title: "",
+        cur_member_count: "",
         category: "",
         completion_date: "",
+        details: "",
         description: "",
-        detail: "",
       });
       setPositionFields([emptyPositionField]);
       setDoneFlag(true);
@@ -161,10 +167,11 @@ const ProjectCreate = (projProps) => {
     showAlert("error", `"${project.title}" is deleted sucessfully!`); // error -> red
     setProject({
       title: "",
+      cur_member_count: "",
       category: "",
       completion_date: "",
+      details: "",
       description: "",
-      detail: "",
     });
     setPositionFields([emptyPositionField]);
     setDoneFlag(true);
@@ -197,37 +204,61 @@ const ProjectCreate = (projProps) => {
 
   const formRef = useRef();
 
-  // console logs if there's any
+  // debugging console logs if there's any
 
   return (
     <Grid container spacing={0} justifyContent="center">
       <Grid item xs={6}>
         <form ref={formRef}>
-          {/* Title textfield */}
-          <TextField
-            sx={{ mt: 5 }}
-            fullWidth
-            required
-            label="Project Title"
-            margin="none"
-            inputProps={{
-              maxLength: 50,
-            }}
-            helperText="The name of your project (limit: 50)"
-            value={project.title}
-            onChange={(e) => setProject({ ...project, title: e.target.value })}
-          />
+          {/* Title textfield & Current team size */}
           <Box
             display="flex"
             justifyContent="space-between"
             alignItems="center"
             mt={5}
           >
-            {/* Category select */}
-            <FormControl fullWidth sx={{ mr: 5 }}>
+            <TextField
+              required
+              sx={{ mr: 5, width: "65%" }} // have to be 65% to align with the Completion Date field
+              label="Project Title"
+              margin="none"
+              inputProps={{
+                maxLength: 50,
+              }}
+              helperText="The name of your project (limit: 50)"
+              value={project.title}
+              onChange={(e) =>
+                setProject({ ...project, title: e.target.value })
+              }
+            />
+            <TextField
+              required
+              margin="none"
+              type="number"
+              label="Current Team Size"
+              inputProps={{
+                min: 1,
+              }}
+              helperText="Including the creator"
+              value={project.cur_member_count}
+              onChange={(e) => {
+                setProject({
+                  ...project,
+                  cur_member_count: Number(e.target.value),
+                });
+              }}
+            />
+          </Box>
+          {/* Category select & completion date*/}
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mt={5}
+          >
+            <FormControl required sx={{ mr: 5, width: "75%" }}>
               <InputLabel>Category</InputLabel>
               <Select
-                required
                 label="Category"
                 value={project.category}
                 onChange={(e) =>
@@ -242,7 +273,6 @@ const ProjectCreate = (projProps) => {
                 </MenuItem>
               </Select>
             </FormControl>
-            {/* Completion date */}
             <LocalizationProvider dateAdapter={AdapterMoment}>
               <DesktopDatePicker
                 renderInput={(props) => <TextField {...props} />}
@@ -254,36 +284,36 @@ const ProjectCreate = (projProps) => {
               />
             </LocalizationProvider>
           </Box>
-          {/* Short description */}
+          {/* Details */}
+          <TextField
+            sx={{ mt: 5 }}
+            fullWidth
+            label="Details"
+            margin="none"
+            // multiline
+            // minRows={2}
+            // maxRows={8}
+            helperText="Descriptive project details separated by commas (e.g., tags, keywords)"
+            value={project.detail}
+            onChange={(e) => setProject({ ...project, detail: e.target.value })}
+          />
+          {/* Description */}
           <TextField
             sx={{ mt: 5 }}
             fullWidth
             label="Description"
             margin="none"
             multiline
-            minRows={2}
-            maxRows={4}
+            minRows={4}
+            maxRows={8}
             inputProps={{
               maxLength: 200,
             }}
-            helperText="A brief description of your project (limit: 200)"
+            helperText="A brief description of the project (e.g., scope, mission, work format, self/team introduction)"
             value={project.description}
             onChange={(e) =>
               setProject({ ...project, description: e.target.value })
             }
-          />
-          {/* Full details */}
-          <TextField
-            sx={{ mt: 5 }}
-            fullWidth
-            label="Details"
-            margin="none"
-            multiline
-            minRows={2}
-            maxRows={8}
-            helperText="Project details (e.g., scope, mission, general work fomat, self/team description)"
-            value={project.detail}
-            onChange={(e) => setProject({ ...project, detail: e.target.value })}
           />
           {/* firebase dynamic array: http://y2u.be/zgKH12s_95A */}
           {positionFields.map((positionField, index) => {
@@ -298,6 +328,7 @@ const ProjectCreate = (projProps) => {
                 >
                   {/* Title */}
                   <TextField
+                    required
                     sx={{ mr: 2.5 }}
                     fullWidth
                     margin="none"
@@ -310,6 +341,7 @@ const ProjectCreate = (projProps) => {
                   />
                   {/* Weekly hour */}
                   <TextField
+                    required
                     sx={{ mr: 2.5 }}
                     margin="none"
                     type="number"
@@ -322,11 +354,15 @@ const ProjectCreate = (projProps) => {
                   />
                   {/* Number of people */}
                   <TextField
+                    required
                     sx={{ mr: 2.5 }}
                     margin="none"
                     type="number"
                     name="positionCount" // has to be the same as key
                     label="NO. of People"
+                    inputProps={{
+                      min: 1,
+                    }}
                     value={positionField.positionCount}
                     onChange={(e) => {
                       handleChangePosInput(index, e);
@@ -374,13 +410,13 @@ const ProjectCreate = (projProps) => {
           })}
           {/* Buttons */}
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            {isUpdate && (
+            {!isCreate && (
               <Button
                 sx={{ mt: 5 }}
                 variant="contained"
                 disableElevation
                 style={{ background: "#3e95c2" }}
-                onClick={(e) => handleDeleteProj(inProject.id, e)}
+                onClick={(e) => handleDeleteProj(argProject.id, e)}
               >
                 {"Delete"}
               </Button>
@@ -403,7 +439,7 @@ const ProjectCreate = (projProps) => {
                 style={{ background: "#3e95c2" }}
                 onClick={(e) => handleSubmit(e)}
               >
-                {isUpdate ? "Update" : "Submit"}
+                {isCreate ? "Submit" : "Update"}
               </Button>
             )}
           </Box>

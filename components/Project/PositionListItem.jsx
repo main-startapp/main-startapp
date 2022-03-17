@@ -6,12 +6,10 @@ import {
   Button,
   Divider,
   Grid,
-  ListItem,
   Typography,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { makeStyles } from "@mui/styles";
-import { useState } from "react";
 
 // override the style Accordion Summary
 const useStyles = makeStyles({
@@ -22,7 +20,7 @@ const useStyles = makeStyles({
   },
 });
 
-const PositionListItem = ({ name, resp, weeklyHour, uid }) => {
+const PositionListItem = ({ name, resp, weeklyHour }) => {
   // override Accordion style to use justifyConent
   const classes = useStyles();
 

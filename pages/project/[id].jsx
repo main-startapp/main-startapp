@@ -14,19 +14,20 @@ import {
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { db } from "../../firebase";
 
-const Detail = ({ projectProps }) => {
-  const project = JSON.parse(projectProps);
+const Detail = ({ props }) => {
+  const project = JSON.parse(props);
   return (
     <Grid container spacing={0} justifyContent="center">
       <Grid item xs={8}>
+        <Typography>
+          Proof of concept. Will dive into dynamic routing later.
+        </Typography>
         <Typography
           variant="h4"
           component="div"
           sx={{ fontWeight: 600, mt: 6 }}
         >
-          {project.hasOwnProperty("title") && project.title.length != 0
-            ? project.title
-            : "Project Title"}
+          {project.title}
         </Typography>
         <Divider sx={{ mt: 3 }} />
       </Grid>

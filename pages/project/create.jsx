@@ -6,8 +6,6 @@ import ProjectCreate from "../../components/Project/ProjectCreate";
 
 const Create = () => {
   const { query } = useRouter();
-  // console.log(JSON.parse(query.projString));
-  // alert
   const [open, setOpen] = useState(false);
   const [alertType, setAlertType] = useState("success");
   const [alertMessage, setAlertMessage] = useState("");
@@ -40,7 +38,10 @@ const Create = () => {
           {alertMessage}
         </Alert>
       </Snackbar>
-      <ProjectCreate projString={query.projString} />
+      <ProjectCreate
+        isCreateStr={query.isCreateStr}
+        projectStr={query.projectStr}
+      />
     </ProjectContext.Provider>
   );
 };

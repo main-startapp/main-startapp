@@ -1,20 +1,8 @@
-import {
-  Alert,
-  Avatar,
-  Container,
-  Grid,
-  IconButton,
-  Snackbar,
-  Typography,
-  Box,
-  Divider,
-} from "@mui/material";
 import { useState } from "react";
-import ProjectList from "../components/Project/ProjectList";
-import { auth } from "../firebase";
 import ProjectPageBar from "../components/Header/ProjectPageBar";
 import { ProjectContext } from "../components/Context/ProjectContext";
 import { useAuth } from "../components/Context/AuthContext";
+import ProjectPanel from "../components/Project/ProjectPanel";
 
 export default function Home() {
   const { currentUser } = useAuth();
@@ -23,9 +11,9 @@ export default function Home() {
     title: "",
     category: "",
     completion_date: "",
+    details: "", // will be a list latter
     description: "",
-    detail: "",
-    cur_member_count: 0,
+    cur_member_count: 1, // include the creator
     max_member_count: 1,
     create_timestamp: "",
     last_timestamp: "",
@@ -45,20 +33,12 @@ export default function Home() {
         setSearchTerm,
         searchCategory,
         setSearchCategory,
+        currentUser,
       }}
     >
+      {/* Toolbar for searching keywords, category and filter */}
       <ProjectPageBar />
-
-      <ProjectList />
-
-      {/* <Divider>End of Project Homepage</Divider>
-      <Box
-        sx={{
-          maxWidth: "40%",
-        }}
-      >
-        <ProjectForm />
-      </Box> */}
+      <ProjectPanel />
     </ProjectContext.Provider>
   );
 }
