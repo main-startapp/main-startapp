@@ -1,11 +1,14 @@
 import { Alert, Snackbar } from "@mui/material";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { ProjectContext } from "../../components/Context/ShareContexts";
-import ProjectCreate from "../../components/Project/ProjectCreate";
+import { doc, getDoc } from "firebase/firestore";
+import { useEffect, useRef, useState } from "react";
+import { useAuth } from "../../components/Context/AuthContext";
+import { StudentContext } from "../../components/Context/ShareContexts";
+import DebugStudentCreate from "../../components/Student/DebugStudentCreate";
+import { db } from "../../firebase";
 
-const Create = () => {
-  const { query } = useRouter();
+const DebugCreate = () => {
+  const { currentUser } = useAuth();
+
   const [open, setOpen] = useState(false);
   const [alertType, setAlertType] = useState("success");
   const [alertMessage, setAlertMessage] = useState("");
@@ -22,8 +25,9 @@ const Create = () => {
     }
     setOpen(false);
   };
+
   return (
-    <ProjectContext.Provider value={{ showAlert }}>
+    <StudentContext.Provider value={{ showAlert }}>
       <Snackbar
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         open={open}
@@ -38,12 +42,9 @@ const Create = () => {
           {alertMessage}
         </Alert>
       </Snackbar>
-      <ProjectCreate
-        isCreateStr={query.isCreateStr}
-        projectStr={query.projectStr}
-      />
-    </ProjectContext.Provider>
+      <DebugStudentCreate />
+    </StudentContext.Provider>
   );
 };
 
-export default Create;
+export default DebugCreate;

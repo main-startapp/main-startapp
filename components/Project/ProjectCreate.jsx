@@ -23,29 +23,25 @@ import {
   deleteDoc,
   Timestamp,
 } from "firebase/firestore";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { db } from "../../firebase";
-import { useAuth } from "../Context/AuthContext";
-import { ProjectContext } from "../Context/ProjectContext";
+import { ProjectContext } from "../Context/ShareContexts";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import AdapterMoment from "@mui/lab/AdapterMoment";
 import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
 import moment from "moment";
+import { useAuth } from "../Context/AuthContext";
 
 const ProjectCreate = (props) => {
-  // context
   const router = useRouter();
   const { currentUser } = useAuth();
+
+  // context
   const { showAlert } = useContext(ProjectContext);
 
-  // get the props argument
-  const isCreate =
-    props.isCreateStr == null ||
-    props.isCreateStr == undefined ||
-    props.isCreateStr == "true"
-      ? true
-      : false;
+  // get the props
+  const isCreate = props.isCreateStr === "false" ? false : true; // null, undefined, "true" are all true isCreate
 
   let argProject;
   if (!isCreate) {
@@ -73,23 +69,15 @@ const ProjectCreate = (props) => {
           cur_member_count: 1,
         }
       : {
-          title: argProject.title,
-          category: argProject.category,
-          completion_date: argProject.completion_date,
-          details: argProject.details,
-          description: argProject.description,
-          create_timestamp: argProject.create_timestamp,
-          creator_email: argProject.creator_email,
-          creator_uid: argProject.creator_uid,
-          cur_member_count: argProject.cur_member_count,
+          ...argProject,
         }
   );
 
-  // convert to timestamp obj if isUpdate and the format has not been converted
+  // convert to timestamp obj if isUpdate and the format has not been converted yet
   if (
     !isCreate &&
     project.create_timestamp?.seconds &&
-    project.completion_date?.seconds
+    project.completion_date?.seconds // the format must contain seconds, nanoseconds is optional (0)
   ) {
     const newCreateTimestamp = new Timestamp(
       project.create_timestamp.seconds,
@@ -99,11 +87,14 @@ const ProjectCreate = (props) => {
       project.completion_date.seconds,
       project.completion_date.nanoseconds
     );
-    project.create_timestamp = newCreateTimestamp.toDate();
-    project.completion_date = newCompletionDate.toDate();
+    setProject({
+      ...project,
+      create_timestamp: newCreateTimestamp.toDate(),
+      completion_date: newCompletionDate.toDate(),
+    });
   }
 
-  // local states
+  // state to remove submit and update buttons
   const [doneFlag, setDoneFlag] = useState(false);
 
   const emptyPositionField = {
@@ -138,7 +129,9 @@ const ProjectCreate = (props) => {
           create_timestamp: serverTimestamp(),
           last_timestamp: serverTimestamp(),
         };
-        const docRef = await addDoc(collectionRef, projectRef);
+        const docRef = await addDoc(collectionRef, projectRef).catch((err) => {
+          console.log("addDoc() error: ", err);
+        });
         showAlert(
           "success",
           `"${project.title}" is added successfully!` // success -> green
@@ -153,7 +146,9 @@ const ProjectCreate = (props) => {
           position_list: positionFields,
           last_timestamp: serverTimestamp(),
         };
-        await updateDoc(docRef, projectRef);
+        await updateDoc(docRef, projectRef).catch((err) => {
+          console.log("updateDoc() error: ", err);
+        });
         showAlert(
           "success",
           `"${project.title}" is updated successfully!` // success -> green
@@ -164,7 +159,7 @@ const ProjectCreate = (props) => {
         title: "",
         cur_member_count: "",
         category: "",
-        completion_date: "",
+        completion_date: moment(0),
         details: "",
         description: "",
       });
@@ -180,13 +175,15 @@ const ProjectCreate = (props) => {
 
   const handleDeleteProj = async (id, e) => {
     const docRef = doc(db, "projects", id);
-    await deleteDoc(docRef);
+    await deleteDoc(docRef).catch((err) => {
+      console.log("deleteDoc() error: ", err);
+    });
     showAlert("error", `"${project.title}" is deleted sucessfully!`); // error -> red
     setProject({
       title: "",
       cur_member_count: "",
       category: "",
-      completion_date: "",
+      completion_date: moment(0),
       details: "",
       description: "",
     });
@@ -195,7 +192,7 @@ const ProjectCreate = (props) => {
   };
 
   const handleChangePosInput = (index, e) => {
-    const pFields = [...positionFields];
+    let pFields = [...positionFields];
     let fieldValue =
       e.target.name === "positionWeeklyHour" ||
       e.target.name === "positionCount"
@@ -224,8 +221,14 @@ const ProjectCreate = (props) => {
   // debugging console logs if there's any
 
   return (
-    <Grid container spacing={0} justifyContent="center">
-      <Grid item xs={6}>
+    <Grid
+      container
+      spacing={0}
+      direction="row"
+      alignItems="center"
+      justifyContent="center"
+    >
+      <Grid item xs={8}>
         <form ref={formRef}>
           {/* Title textfield & Current team size */}
           <Box
@@ -236,7 +239,7 @@ const ProjectCreate = (props) => {
           >
             <TextField
               required
-              sx={{ mr: 5, width: "65%" }} // !todo: have to be 65% to align with the Completion Date field. Why not 75%?
+              sx={{ mr: 5, width: "75%" }}
               label="Project Title"
               margin="none"
               inputProps={{
@@ -250,6 +253,7 @@ const ProjectCreate = (props) => {
             />
             <TextField
               required
+              sx={{ width: "25%" }}
               margin="none"
               type="number"
               label="Current Team Size"
@@ -290,16 +294,18 @@ const ProjectCreate = (props) => {
                 </MenuItem>
               </Select>
             </FormControl>
-            <LocalizationProvider dateAdapter={AdapterMoment}>
-              <DesktopDatePicker
-                renderInput={(props) => <TextField {...props} />}
-                label="Completion Date"
-                value={project.completion_date}
-                onChange={(e) => {
-                  handleDateTimeChange(e);
-                }}
-              />
-            </LocalizationProvider>
+            <Box sx={{ width: "25%" }}>
+              <LocalizationProvider dateAdapter={AdapterMoment}>
+                <DesktopDatePicker
+                  renderInput={(props) => <TextField {...props} />}
+                  label="Completion Date"
+                  value={project.completion_date}
+                  onChange={(e) => {
+                    handleDateTimeChange(e);
+                  }}
+                />
+              </LocalizationProvider>
+            </Box>
           </Box>
           {/* Details */}
           <TextField
@@ -323,9 +329,9 @@ const ProjectCreate = (props) => {
             multiline
             minRows={4}
             maxRows={8}
-            inputProps={{
-              maxLength: 200,
-            }}
+            // inputProps={{
+            //   maxLength: 200,
+            // }}
             helperText="A brief description of the project (e.g., scope, mission, work format, self/team introduction)"
             value={project.description}
             onChange={(e) =>
@@ -427,7 +433,7 @@ const ProjectCreate = (props) => {
           })}
           {/* Buttons */}
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            {!isCreate && (
+            {!isCreate && !doneFlag && (
               <Button
                 sx={{ mt: 5 }}
                 variant="contained"

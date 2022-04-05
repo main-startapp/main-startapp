@@ -9,8 +9,7 @@ import {
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import moment from "moment";
-import { ProjectContext } from "../Context/ProjectContext";
-import { makeStyles } from "@mui/styles";
+import { ProjectContext } from "../Context/ShareContexts";
 
 // the project list item component in the project list: has full project data but only shows some brief information
 const ProjectListItem = (props) => {
@@ -21,6 +20,7 @@ const ProjectListItem = (props) => {
 
   // router
   const router = useRouter();
+
   const seeProject = (id, e) => {
     e.stopPropagation();
     router.push(`/project/${id}`);
@@ -44,23 +44,22 @@ const ProjectListItem = (props) => {
           },
         }}
         // style={{ backgroudColor: "#fafafa" }}
-        secondaryAction={
-          <>
-            {/* {isCreator && (
-              <IconButton onClick={(e) => deleteProject(id, e)}>
-                <DeleteIcon />
-              </IconButton>
-            )} */}
-            <IconButton onClick={(e) => seeProject(project.id, e)}>
-              <MoreVertIcon />
-            </IconButton>
-          </>
-        }
+        // secondaryAction={
+        //   <>
+        //     {/* {isCreator && (
+        //       <IconButton onClick={(e) => deleteProject(id, e)}>
+        //         <DeleteIcon />
+        //       </IconButton>
+        //     )} */}
+        //     <IconButton onClick={(e) => seeProject(project.id, e)}>
+        //       <MoreVertIcon />
+        //     </IconButton>
+        //   </>
+        // }
       >
         <ListItemText
-          primary={
-            <Typography sx={{ fontWeight: 600 }}>{project.title}</Typography>
-          } // 600 is the breakpoint of reg and semi-bold
+          primary={project.title}
+          primaryTypographyProps={{ fontWeight: 600 }} // 600 is the breakpoint of reg and semi-bold
           secondary={
             <>
               {"Team size: "}
@@ -68,9 +67,26 @@ const ProjectListItem = (props) => {
               {"/"}
               {project.max_member_count}
               <br />
-              <br />
-              {project.description}
             </>
+          }
+        />
+        <ListItemText
+          secondary={
+            <Typography
+              sx={{
+                display: "-webkit-box",
+                overflow: "hidden",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: 2,
+                // is there any better way to directly ref to ListItemText Secondary style?
+                fontSize: "0.875rem",
+                lineHeight: 1.43,
+                letterSpacing: "0.01071em",
+                color: "rgba(0, 0, 0, 0.6)",
+              }}
+            >
+              {project.description}
+            </Typography>
           }
         />
         {project.position_list.map((position, index) => (

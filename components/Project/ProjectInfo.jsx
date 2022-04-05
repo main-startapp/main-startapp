@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import {
   Avatar,
@@ -9,15 +9,16 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import { ProjectContext } from "../Context/ProjectContext";
+import { ProjectContext } from "../Context/ShareContexts";
 import PositionListItem from "./PositionListItem";
 
 const ProjectInfo = () => {
   // context
   const { project, currentUser } = useContext(ProjectContext);
 
-  // is cur_user the creator? !todo: should this go into useEffect?
-  const isCreator = currentUser?.uid === project.creator_uid ? true : false;
+  // is cur_user the creator?
+  // !todo: should this go into useEffect?
+  const isCreator = currentUser?.uid === project?.creator_uid ? true : false;
 
   // similar func createProject() in ProjectList.jsx
   const router = useRouter();
@@ -27,18 +28,23 @@ const ProjectInfo = () => {
         pathname: `/project/create`,
         query: {
           isCreateStr: "false",
-          projectStr: JSON.stringify(projectObj || null),
+          projectStr: JSON.stringify(projectObj),
         },
       },
       `/project/create` // "as" argument
     );
   };
 
-  // debugging console logs
-  // console.log(project.completion_date);
+  // box ref to used by useEffect
+  const boxRef = useRef();
+  // useEffect to reset box scrollbar position
+  useEffect(() => {
+    boxRef.current.scrollTop = 0;
+  }, [project]); // every time project changes, this forces each accordion to collapse
 
   return (
     <Box
+      ref={boxRef}
       sx={{
         maxHeight: "calc(96vh - 128px)",
         overflow: "auto",
@@ -168,10 +174,11 @@ const ProjectInfo = () => {
               {project.position_list.map((position, index) => (
                 <PositionListItem
                   key={index}
-                  name={position.positionTitle}
+                  title={position.positionTitle}
                   resp={position.positionResp}
                   weeklyHour={position.positionWeeklyHour}
-                  uid={position.positionUID}
+                  isCreator={isCreator}
+                  // uid={position.positionUID}
                 />
               ))}
             </Box>

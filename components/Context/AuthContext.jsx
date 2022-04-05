@@ -17,7 +17,9 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
         return;
       }
-      const token = await user.getIdToken();
+      const token = await user.getIdToken().catch((err) => {
+        console.log("getIdToken() error: ", err);
+      });
       setCurrentUser(user);
       setLoading(false);
     });

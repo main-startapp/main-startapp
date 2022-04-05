@@ -60,7 +60,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function ProjectPageBar() {
-  const { setSearchTerm, setSearchCategory } = useContext(ProjectContext);
+  // const { setSearchTerm, setSearchCategory } = useContext(ProjectContext);
   const textRef = useRef();
 
   return (
@@ -95,7 +95,7 @@ export default function ProjectPageBar() {
             </IconButton>
           </Tooltip>
         </Search>
-        <FormControl sx={{ ml: 3, width: 300 }} size="small">
+        {/* <FormControl sx={{ ml: 3, minWidth: 200 }} size="small">
           <InputLabel>Category</InputLabel>
           <Select
             label="Category"
@@ -110,7 +110,7 @@ export default function ProjectPageBar() {
             <MenuItem value={"Event"}>Event</MenuItem>
             <MenuItem value={"CharityInitiative"}>Charity Initiative</MenuItem>
           </Select>
-        </FormControl>
+        </FormControl> */}
         <Box sx={{ flexGrow: 1 }} />
         <Search>
           <SearchIconWrapper>

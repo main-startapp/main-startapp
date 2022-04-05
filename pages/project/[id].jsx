@@ -38,7 +38,9 @@ const Detail = ({ props }) => {
 export default Detail;
 
 export const getStaticPaths = async () => {
-  const snapShot = await getDocs(collection(db, "projects"));
+  const snapShot = await getDocs(collection(db, "projects")).catch((err) => {
+    console.log("getDocs() error: ", err);
+  });
   const paths = snapShot.docs.map((doc) => {
     return {
       params: { id: doc.id.toString() },
@@ -51,7 +53,9 @@ export const getStaticPaths = async () => {
 export const getStaticProps = async (context) => {
   const id = context.params.id;
   const docRef = doc(db, "projects", id);
-  const docSnap = await getDoc(docRef);
+  const docSnap = await getDoc(docRef).catch((err) => {
+    console.log("getDoc() error: ", err);
+  });
   return {
     props: { projectProps: JSON.stringify(docSnap.data() || null) },
   };
