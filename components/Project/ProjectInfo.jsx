@@ -7,18 +7,23 @@ import {
   Divider,
   Grid,
   IconButton,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { ProjectContext } from "../Context/ShareContexts";
 import PositionListItem from "./PositionListItem";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { db } from "../../firebase";
 
 const ProjectInfo = () => {
   // context
-  const { project, currentUser } = useContext(ProjectContext);
+  const { project, currentStudent } = useContext(ProjectContext);
 
+  // local vars
+  const currentUID = currentStudent?.uid;
   // is cur_user the creator?
   // !todo: should this go into useEffect?
-  const isCreator = currentUser?.uid === project?.creator_uid ? true : false;
+  const isCreator = currentStudent?.uid === project?.creator_uid ? true : false;
 
   // similar func createProject() in ProjectList.jsx
   const router = useRouter();
@@ -35,6 +40,44 @@ const ProjectInfo = () => {
     );
   };
 
+  // helper func
+  // similar function in StudentGridCard; StudentProfile
+  const handleConnect = async (e) => {
+    e.stopPropagation();
+    const senderDocRef = doc(db, "students", currentUID);
+    const receiverDocRef = doc(db, "students", project?.creator_uid);
+    // get the receiver's student doc
+    const receiverDocSnap = await getDoc(receiverDocRef);
+    if (receiverDocSnap.exists()) {
+      const student = receiverDocSnap.data();
+      const senderPendingConnections = currentStudent.pending_connections;
+      const receiverReceivedConnections = student.received_connections;
+      // don't need to check uniqueness as the Connect button will be disabled
+      senderPendingConnections.push(project?.creator_uid);
+      receiverReceivedConnections.push(currentUID);
+      const senderStudentRef = {
+        ...currentStudent,
+        pending_connections: senderPendingConnections,
+      };
+      const receiverStudentRef = {
+        ...student,
+        received_connections: receiverReceivedConnections,
+      };
+      delete senderStudentRef?.uid;
+      delete receiverStudentRef?.uid;
+      await updateDoc(senderDocRef, senderStudentRef).catch((err) => {
+        console.log("updateDoc() error: ", err);
+      });
+      await updateDoc(receiverDocRef, receiverStudentRef).catch((err) => {
+        console.log("updateDoc() error: ", err);
+      });
+    } else {
+      console.log("No such document!");
+    }
+    // don't need to setState, since the student and currentStudent in pages/students is real-time updated
+  };
+
+  // similar alg in components/Student/StudentProfile
   // box ref to used by useEffect
   const boxRef = useRef();
   // useEffect to reset box scrollbar position
@@ -46,7 +89,7 @@ const ProjectInfo = () => {
     <Box
       ref={boxRef}
       sx={{
-        maxHeight: "calc(96vh - 128px)",
+        maxHeight: "calc(99vh - 128px)",
         overflow: "auto",
       }}
     >
@@ -55,11 +98,14 @@ const ProjectInfo = () => {
           {/* Top left info box */}
           <Grid item xs={8}>
             <Box mt={3} ml={3} mr={1.5}>
-              <Typography variant="h4" component="div" sx={{ fontWeight: 600 }}>
+              <Typography sx={{ fontWeight: "bold", fontSize: "2.5em" }}>
                 {project.title}
               </Typography>
               <Divider sx={{ mt: 3 }} />
-              <Typography sx={{ mt: 3, fontWeight: 600 }} color="text.primary">
+              <Typography
+                sx={{ mt: 3, fontWeight: "bold" }}
+                color="text.primary"
+              >
                 {"Team size: "}
               </Typography>
               <Typography color="text.secondary">
@@ -67,7 +113,10 @@ const ProjectInfo = () => {
                 {"/"}
                 {project.max_member_count}
               </Typography>
-              <Typography sx={{ mt: 3, fontWeight: 600 }} color="text.primary">
+              <Typography
+                sx={{ mt: 3, fontWeight: "bold" }}
+                color="text.primary"
+              >
                 {"Details: "}
               </Typography>
               <Typography color="text.secondary">{project.details}</Typography>
@@ -78,7 +127,7 @@ const ProjectInfo = () => {
           <Grid item xs={4}>
             <Box mt={3} mr={3} ml={1.5}>
               <Box sx={{ display: "flex", justifyContent: "center" }}>
-                <IconButton sx={{ width: "5em", height: "5em" }}>
+                <IconButton>
                   <Avatar
                     sx={{
                       width: "5em",
@@ -89,48 +138,83 @@ const ProjectInfo = () => {
                 </IconButton>
               </Box>
               <Typography
-                variant="h5"
-                component="div"
-                sx={{ display: "flex", justifyContent: "center" }}
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  fontSize: "1.5em",
+                  mt: 3,
+                }}
               >
                 {"Founder"}
               </Typography>
               <Typography
-                sx={{ mt: 3, display: "flex", justifyContent: "center" }}
+                sx={{ display: "flex", justifyContent: "center" }}
                 color="text.secondary"
               >
                 {project.creator_email}
               </Typography>
-              {!isCreator && (
-                <Box m={3} sx={{ display: "flex", justifyContent: "center" }}>
-                  <Button
-                    variant="contained"
-                    sx={{ background: "#3e95c2" }}
-                    disableElevation
-                  >
-                    {"Connect"}
-                  </Button>
-                </Box>
-              )}
-              {isCreator && (
-                <Box m={3} sx={{ display: "flex", justifyContent: "center" }}>
+              <Box m={3} sx={{ display: "flex", justifyContent: "center" }}>
+                {/* disabled Connect button */}
+                {!isCreator && !currentUID && (
+                  <Tooltip title="Edit your profile first.">
+                    <span>
+                      <Button
+                        variant="contained"
+                        disabled
+                        sx={{ borderRadius: 4, bgcolor: "#3e95c2" }}
+                        disableElevation
+                      >
+                        &emsp; {"Connect"} &emsp;
+                      </Button>
+                    </span>
+                  </Tooltip>
+                )}
+                {!isCreator &&
+                  currentUID &&
+                  !currentStudent.pending_connections.includes(
+                    project?.creator_uid
+                  ) && (
+                    <Button
+                      variant="contained"
+                      sx={{ borderRadius: 4, bgcolor: "#3e95c2" }}
+                      disableElevation
+                      onClick={(e) => handleConnect(e)}
+                    >
+                      &emsp; {"Connect"} &emsp;
+                    </Button>
+                  )}
+                {!isCreator &&
+                  currentUID &&
+                  currentStudent.pending_connections.includes(
+                    project?.creator_uid
+                  ) && (
+                    <Button
+                      variant="contained"
+                      disabled
+                      sx={{ borderRadius: 4, bgcolor: "#3e95c2" }}
+                      disableElevation
+                    >
+                      &emsp; {"Pending"} &emsp;
+                    </Button>
+                  )}
+                {isCreator && (
                   <Button
                     onClick={() => updateProject(project)}
                     variant="contained"
-                    sx={{ background: "#3e95c2" }}
+                    sx={{ borderRadius: 4, bgcolor: "#3e95c2" }}
                     disableElevation
                   >
                     {"Modify"}
                   </Button>
-                </Box>
-              )}
+                )}
+              </Box>
             </Box>
           </Grid>
 
           {/* Bottom description and position boxes */}
           <Grid item xs={12}>
             <Box mt={3} ml={3} mr={3}>
-              <Typography sx={{ fontWeight: 600 }} color="text.primary">
+              <Typography sx={{ fontWeight: "bold" }} color="text.primary">
                 {"Description:"}
               </Typography>
               <Typography
@@ -161,9 +245,9 @@ const ProjectInfo = () => {
             >
               <Typography
                 sx={{
-                  fontWeight: 600,
+                  fontWeight: "bold",
                   color: "white",
-                  background: "#3e95c2",
+                  bgcolor: "#3e95c2",
                   borderTopLeftRadius: 15,
                   borderTopRightRadius: 15,
                 }}

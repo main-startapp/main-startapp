@@ -41,7 +41,7 @@ const Navbar = () => {
   };
   return (
     // https://www.color-hex.com/color/6fa8dc
-    <AppBar position="static" sx={{ background: "#3e95c2" }} elevation={0}>
+    <AppBar position="static" sx={{ bgcolor: "#3e95c2" }} elevation={0}>
       <Toolbar
         sx={{
           display: "flex",
@@ -58,10 +58,10 @@ const Navbar = () => {
             alignItems: "center",
             flexGrow: 1,
             flexBasis: 0,
-            justifyContent: "start",
+            justifyContent: "flex-start",
           }}
         >
-          <Typography variant="h5">{"Edium"}</Typography>
+          <Typography sx={{ fontSize: "1.5em" }}>{"Edium"}</Typography>
         </Box>
         {/* tabs */}
         {/* https://stackoverflow.com/questions/32378953/keep-the-middle-item-centered-when-side-items-have-different-widths */}
@@ -73,13 +73,13 @@ const Navbar = () => {
           }}
         >
           <Link className={classes.customLink} href="/">
-            <Typography variant="h7">{"Projects"}</Typography>
+            <Typography sx={{ fontSize: "1.1em" }}>{"Projects"}</Typography>
           </Link>
           <Divider sx={{ ml: 3, mr: 3 }} orientation="vertical" flexItem />
-          <Typography variant="h7">{"Events"}</Typography>
+          <Typography sx={{ fontSize: "1.1em" }}>{"Events"}</Typography>
           <Divider sx={{ ml: 3, mr: 3 }} orientation="vertical" flexItem />
           <Link className={classes.customLink} href="/students">
-            <Typography variant="h7">{"Students"}</Typography>
+            <Typography sx={{ fontSize: "1.1em" }}>{"Students"}</Typography>
           </Link>
         </Box>
         {/* user */}
@@ -92,7 +92,9 @@ const Navbar = () => {
             justifyContent: "end",
           }}
         >
-          <Typography variant="h6">{currentUser.displayName}</Typography>
+          <Typography sx={{ fontSize: "1.1em" }}>
+            {currentUser.displayName}
+          </Typography>
           <IconButton onClick={handleUserMenu}>
             <Avatar src={currentUser.photoURL} />
           </IconButton>

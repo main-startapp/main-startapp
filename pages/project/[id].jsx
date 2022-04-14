@@ -22,13 +22,7 @@ const Detail = ({ props }) => {
         <Typography>
           Proof of concept. Will dive into dynamic routing later.
         </Typography>
-        <Typography
-          variant="h4"
-          component="div"
-          sx={{ fontWeight: 600, mt: 6 }}
-        >
-          {project.title}
-        </Typography>
+        <Typography sx={{ fontWeight: 600, mt: 6 }}>{project.title}</Typography>
         <Divider sx={{ mt: 3 }} />
       </Grid>
     </Grid>

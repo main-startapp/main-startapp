@@ -77,7 +77,7 @@ const PositionListItem = (props) => {
             <Button
               variant="contained"
               size="small"
-              sx={{ mr: 3, borderRadius: 4, background: "#3e95c2" }}
+              sx={{ mr: 3, borderRadius: 4, bgcolor: "#3e95c2" }}
               disableElevation
               onClick={(e) => handleJoinRequest(e)}
             >

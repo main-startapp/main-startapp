@@ -1,5 +1,5 @@
 import { Alert, Snackbar } from "@mui/material";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../components/Context/AuthContext";
 import { StudentContext } from "../../components/Context/ShareContexts";
@@ -14,25 +14,19 @@ const Create = () => {
   const [alertType, setAlertType] = useState("success");
   const [alertMessage, setAlertMessage] = useState("");
 
-  // fetch current user's student data if there's any
+  // listen to the current user's student data for realtime update
+  // similar alg in pages/students; pages/index
   useEffect(() => {
-    async function fetchDoc(argDocRef) {
-      const docSnap = await getDoc(argDocRef).catch((err) => {
-        console.log("getDoc() error: ", err);
-      });
-      if (docSnap.exists()) {
-        // return docSnap.data();
-        setCurrentStudent({ ...docSnap.data(), uid: uid });
-      } else {
-        console.log("No such document for this student!");
+    const docID = currentUser?.uid || 0;
+    const unsub = onSnapshot(doc(db, "students", docID), (doc) => {
+      if (doc.exists()) {
+        setCurrentStudent({ ...doc.data(), uid: docID });
       }
-    }
+    });
 
-    const uid = currentUser?.uid;
-    const docRef = doc(db, "students", uid);
-    fetchDoc(docRef);
-
-    return docRef;
+    return () => {
+      unsub;
+    };
   }, [currentUser]);
 
   const showAlert = (type, msg) => {

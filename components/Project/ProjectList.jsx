@@ -1,14 +1,19 @@
 import { useContext } from "react";
 import { useRouter } from "next/router";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Tooltip } from "@mui/material";
 import { ProjectContext } from "../Context/ShareContexts";
 import ProjectListItem from "./ProjectListItem";
 // import { makeStyles } from "@mui/styles";
 
-// the project list comp: consists of project list items; will filter based on the search term and/or search category
+// description: a list of projects (project list items); a button to create new project (router.push)
+// behavior: filters projects based on the search term and/or search category
 const ProjectList = () => {
   // context
-  const { projects, searchTerm, searchCategory } = useContext(ProjectContext);
+  const { projects, searchTerm, searchCategory, currentStudent } =
+    useContext(ProjectContext);
+
+  // local vars
+  const currentUID = currentStudent?.uid;
 
   // link/router https://stackoverflow.com/questions/65086108/next-js-link-vs-router-push-vs-a-tag
   const router = useRouter();
@@ -28,7 +33,7 @@ const ProjectList = () => {
     <>
       <Box
         sx={{
-          maxHeight: "calc(96vh - 188px)", // navbar: 64px; projectbar: 64px; create project button: 36px; margin: 24px
+          maxHeight: "calc(99vh - 188px)", // navbar: 64px; projectbar: 64px; create project button: 36px; margin: 24px
           overflow: "auto",
         }}
       >
@@ -72,19 +77,35 @@ const ProjectList = () => {
             }
           })
           .map((project) => (
-            // Project State Props
             <ProjectListItem key={project.id} project={project} />
           ))}
       </Box>
+
       <Box mt={3} sx={{ display: "flex", justifyContent: "center" }}>
-        <Button
-          variant="contained"
-          disableElevation
-          sx={{ background: "#3e95c2" }}
-          onClick={() => createProject()}
-        >
-          {"Create Project"}
-        </Button>
+        {!currentUID && (
+          <Tooltip title="Edit your profile first.">
+            <span>
+              <Button
+                variant="contained"
+                disabled
+                sx={{ borderRadius: 4, bgcolor: "#3e95c2" }}
+                disableElevation
+              >
+                {"Create Project"}
+              </Button>
+            </span>
+          </Tooltip>
+        )}
+        {currentUID && (
+          <Button
+            variant="contained"
+            sx={{ borderRadius: 4, bgcolor: "#3e95c2" }}
+            disableElevation
+            onClick={() => createProject()}
+          >
+            {"Create Project"}
+          </Button>
+        )}
       </Box>
     </>
   );

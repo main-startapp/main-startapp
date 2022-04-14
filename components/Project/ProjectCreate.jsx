@@ -219,6 +219,7 @@ const ProjectCreate = (props) => {
   const formRef = useRef();
 
   // debugging console logs if there's any
+  // console.log(positionFields);
 
   return (
     <Grid
@@ -378,7 +379,6 @@ const ProjectCreate = (props) => {
                   {/* Number of people */}
                   <TextField
                     required
-                    sx={{ mr: 2.5 }}
                     margin="none"
                     type="number"
                     name="positionCount" // has to be the same as key
@@ -392,11 +392,7 @@ const ProjectCreate = (props) => {
                     }}
                   />
                   {/* Add / Remove position button */}
-                  {index == 0 && (
-                    <IconButton disabled>
-                      <DoDisturbAltRoundedIcon />
-                    </IconButton>
-                  )}
+
                   {index > 0 && (
                     <IconButton onClick={() => handleRemovePosField(index)}>
                       <RemoveRoundedIcon />
@@ -411,7 +407,6 @@ const ProjectCreate = (props) => {
                 >
                   {/* Responsibilities */}
                   <TextField
-                    sx={{ mr: 2.5 }}
                     fullWidth
                     multiline
                     minRows={2}
@@ -424,9 +419,11 @@ const ProjectCreate = (props) => {
                       handleChangePosInput(index, e);
                     }}
                   />
-                  <IconButton onClick={() => handleAddPosField()}>
-                    <AddRoundedIcon />
-                  </IconButton>
+                  {index == positionFields.length - 1 && (
+                    <IconButton onClick={() => handleAddPosField()}>
+                      <AddRoundedIcon />
+                    </IconButton>
+                  )}
                 </Box>
               </div>
             );
@@ -438,7 +435,7 @@ const ProjectCreate = (props) => {
                 sx={{ mt: 5 }}
                 variant="contained"
                 disableElevation
-                style={{ background: "#3e95c2" }}
+                style={{ bgcolor: "#3e95c2" }}
                 onClick={(e) => handleDeleteProj(argProject.id, e)}
               >
                 {"Delete"}
@@ -449,7 +446,7 @@ const ProjectCreate = (props) => {
               sx={{ mt: 5 }}
               variant="contained"
               disableElevation
-              style={{ background: "#3e95c2" }}
+              style={{ bgcolor: "#3e95c2" }}
               onClick={(e) => handleGoBack(e)}
             >
               {"Go Back"}
@@ -459,7 +456,7 @@ const ProjectCreate = (props) => {
                 sx={{ mt: 5, ml: 5 }}
                 variant="contained"
                 disableElevation
-                style={{ background: "#3e95c2" }}
+                style={{ bgcolor: "#3e95c2" }}
                 onClick={(e) => handleSubmit(e)}
               >
                 {isCreate ? "Submit" : "Update"}

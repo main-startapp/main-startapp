@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Grid } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import {
   collection,
   doc,
@@ -13,14 +13,15 @@ import { useAuth } from "../components/Context/AuthContext";
 import { StudentContext } from "../components/Context/ShareContexts";
 import StudentPageBar from "../components/Header/StudentPageBar";
 import StudentProfile from "../components/Student/StudentProfile";
-import StudentList from "../components/Student/StudentList";
+import StudentGrid from "../components/Student/StudentGrid";
 
 export default function Students() {
   const { currentUser } = useAuth();
-  const [students, setStudents] = useState([]);
-  const [currentStudent, setCurrentStudent] = useState(null);
+  const [student, setStudent] = useState(null); // the selected student by clicking the student card in the StudentGrid
+  const [students, setStudents] = useState([]); // the list of realtime students from the db
+  const [currentStudent, setCurrentStudent] = useState(null); // the student data of the currentUser
 
-  // fetch the students collection
+  // listen to Students collection for realtime updates
   // !todo: do we need to fetch all data?
   useEffect(() => {
     // db query
@@ -41,36 +42,35 @@ export default function Students() {
     return unsub;
   }, []);
 
-  // fetch the users student data (in case it's not in the students)
-  // !todo: can this be merged into the prev useEffect?
+  // listen to the current user's student data for realtime update
+  // similar alg in pages/student/create; pages/index
   useEffect(() => {
-    // !todo: also used in /student/create.jsx, should this go into lib?
-    async function fetchDoc(argDocRef) {
-      const docSnap = await getDoc(argDocRef).catch((err) => {
-        console.log("getDoc() error: ", err);
-      });
-      if (docSnap.exists()) {
-        // return docSnap.data();
-        setCurrentStudent({ ...docSnap.data(), uid: uid });
-      } else {
-        console.log("No such document for this student!");
+    const docID = currentUser?.uid || 0;
+    const unsub = onSnapshot(doc(db, "students", docID), (doc) => {
+      if (doc.exists()) {
+        setCurrentStudent({ ...doc.data(), uid: docID });
       }
-    }
+    });
 
-    const uid = currentUser?.uid;
-    const docRef = doc(db, "students", uid);
-    fetchDoc(docRef);
-
-    return docRef;
+    return () => {
+      unsub;
+    };
   }, [currentUser]);
 
   // debug console logs
-  console.log("students state: ", students);
+  // console.log("students state: ", students);
   // console.log("currentStudent state: ", currentStudent);
 
   return (
     <StudentContext.Provider
-      value={{ currentUser, students, setStudents, currentStudent }}
+      value={{
+        currentUser,
+        student,
+        setStudent,
+        students,
+        setStudents,
+        currentStudent,
+      }}
     >
       <StudentPageBar />
       <Grid
@@ -78,13 +78,13 @@ export default function Students() {
         spaceing={0}
         mt={1}
         direction="row"
-        alignItems="center"
+        // alignItems="center"
         justifyContent="center"
       >
-        <Grid item xs={8}>
-          <StudentList />
+        <Grid item xs={7}>
+          <StudentGrid />
         </Grid>
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           <StudentProfile />
         </Grid>
       </Grid>

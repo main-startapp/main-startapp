@@ -43,6 +43,7 @@ const StudentCreate = () => {
     awards: [],
     connections: [],
     pending_connections: [],
+    received_connections: [],
     requested_posititons: [],
     joined_projects: [],
     my_projects: [],
@@ -59,23 +60,30 @@ const StudentCreate = () => {
   const handleSubmit = async (e) => {
     if (formRef.current.reportValidity()) {
       const uid = currentUser?.uid;
+      const docRef = doc(db, "students", uid);
+      let studentRef = {
+        ...student,
+        // remove empty strings
+        social_media: student.social_media.filter((ele) => ele),
+        past_exp: student.past_exp.filter((ele) => ele),
+      };
+      // remove unnecessary uid to keep the doc consistent
+      delete studentRef?.uid;
+
       if (student.create_timestamp) {
         // update
-        const docRef = doc(db, "students", uid);
-        const studentRef = {
-          ...student,
-        };
         await updateDoc(docRef, studentRef).catch((err) => {
           console.log("updateDoc() error: ", err);
         });
       } else {
-        // create
-        const studentRef = { ...student, create_timestamp: serverTimestamp() };
-        const docRef = await setDoc(doc(db, "students", uid), studentRef).catch(
-          (err) => {
-            console.log("setDoc() error: ", err);
-          }
-        );
+        // create; add create_timestamp
+        studentRef = {
+          ...studentRef,
+          create_timestamp: serverTimestamp(),
+        };
+        await setDoc(docRef, studentRef).catch((err) => {
+          console.log("setDoc() error: ", err);
+        });
       }
     }
     showAlert(
@@ -123,7 +131,7 @@ const StudentCreate = () => {
               label="Name"
               margin="none"
               inputProps={{
-                maxLength: 50,
+                maxLength: 20,
               }}
               value={student.name}
               onChange={(e) => setStudent({ ...student, name: e.target.value })}
@@ -137,7 +145,7 @@ const StudentCreate = () => {
               type="number"
               inputProps={{
                 min: 0,
-                max: 100,
+                max: 10,
               }}
               onChange={(e) =>
                 setStudent({ ...student, year_of_ed: e.target.value })
@@ -157,7 +165,7 @@ const StudentCreate = () => {
               label="Desired Position"
               margin="none"
               inputProps={{
-                maxLength: 50,
+                maxLength: 20,
               }}
               value={student.desired_position}
               onChange={(e) =>
@@ -186,10 +194,10 @@ const StudentCreate = () => {
             </FormControl>
           </Box>
           {/* social media links list */}
+          <Divider sx={{ mt: 5 }} />
           {student.social_media.map((link, index) => {
             return (
               <div key={index}>
-                <Divider sx={{ mt: 5 }} />
                 <Box
                   display="flex"
                   justifyContent="space-between"
@@ -211,35 +219,32 @@ const StudentCreate = () => {
                     }}
                   />
                   {/* Add / Remove buttons */}
-                  {index == 0 && (
-                    <IconButton disabled>
-                      <DoDisturbAltRoundedIcon />
-                    </IconButton>
-                  )}
                   {index > 0 && (
                     <IconButton onClick={() => handleRemoveSocialMedia(index)}>
                       <RemoveRoundedIcon />
                     </IconButton>
                   )}
-                  <IconButton
-                    onClick={() =>
-                      setStudent({
-                        ...student,
-                        social_media: [...student.social_media, ""],
-                      })
-                    }
-                  >
-                    <AddRoundedIcon />
-                  </IconButton>
+                  {index == student.social_media.length - 1 && (
+                    <IconButton
+                      onClick={() =>
+                        setStudent({
+                          ...student,
+                          social_media: [...student.social_media, ""],
+                        })
+                      }
+                    >
+                      <AddRoundedIcon />
+                    </IconButton>
+                  )}
                 </Box>
               </div>
             );
           })}
           {/* past experience list */}
+          <Divider sx={{ mt: 5 }} />
           {student.past_exp.map((exp_desc, index) => {
             return (
               <div key={index}>
-                <Divider sx={{ mt: 5 }} />
                 <Box
                   display="flex"
                   justifyContent="space-between"
@@ -250,10 +255,10 @@ const StudentCreate = () => {
                     fullWidth
                     margin="none"
                     inputProps={{
-                      maxLength: 100,
+                      maxLength: 150,
                     }}
                     label="Past Experience"
-                    helperText="One sentence description of your past experience (limit: 100)"
+                    helperText="One sentence description of your past experience (limit: 150)"
                     value={exp_desc}
                     onChange={(e) => {
                       let cur_past_exp = student.past_exp;
@@ -265,26 +270,23 @@ const StudentCreate = () => {
                     }}
                   />
                   {/* Add / Remove buttons */}
-                  {index == 0 && (
-                    <IconButton disabled>
-                      <DoDisturbAltRoundedIcon />
-                    </IconButton>
-                  )}
                   {index > 0 && (
                     <IconButton onClick={() => handleRemovePastExp(index)}>
                       <RemoveRoundedIcon />
                     </IconButton>
                   )}
-                  <IconButton
-                    onClick={() =>
-                      setStudent({
-                        ...student,
-                        past_exp: [...student.past_exp, ""],
-                      })
-                    }
-                  >
-                    <AddRoundedIcon />
-                  </IconButton>
+                  {index == student.past_exp.length - 1 && (
+                    <IconButton
+                      onClick={() =>
+                        setStudent({
+                          ...student,
+                          past_exp: [...student.past_exp, ""],
+                        })
+                      }
+                    >
+                      <AddRoundedIcon />
+                    </IconButton>
+                  )}
                 </Box>
               </div>
             );
@@ -295,10 +297,10 @@ const StudentCreate = () => {
               sx={{ mt: 5 }}
               variant="contained"
               disableElevation
-              style={{ background: "#3e95c2" }}
+              style={{ bgcolor: "#3e95c2" }}
               onClick={(e) => handleSubmit(e)}
             >
-              {"Update"}
+              {"Submit"}
             </Button>
           </Box>
         </form>

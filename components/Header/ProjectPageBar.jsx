@@ -64,7 +64,7 @@ export default function ProjectPageBar() {
   const textRef = useRef();
 
   return (
-    <AppBar position="static" sx={{ background: "#fafafa", color: "#000000" }}>
+    <AppBar position="static" sx={{ bgcolor: "#fafafa", color: "#000000" }}>
       <Toolbar sx={{ maxHeight: "64px" }}>
         <Search>
           <SearchIconWrapper>

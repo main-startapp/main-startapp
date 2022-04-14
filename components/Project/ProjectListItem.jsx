@@ -59,7 +59,7 @@ const ProjectListItem = (props) => {
       >
         <ListItemText
           primary={project.title}
-          primaryTypographyProps={{ fontWeight: 600 }} // 600 is the breakpoint of reg and semi-bold
+          primaryTypographyProps={{ fontWeight: "bold" }}
           secondary={
             <>
               {"Team size: "}
@@ -93,7 +93,7 @@ const ProjectListItem = (props) => {
           <ListItemText
             sx={{ ml: "5%" }}
             key={index}
-            secondary={<span>&bull; {position.positionTitle}</span>}
+            secondary={<span>&bull; &nbsp; {position.positionTitle}</span>}
           />
         ))}
         <ListItemText
