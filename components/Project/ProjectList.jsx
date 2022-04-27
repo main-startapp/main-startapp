@@ -33,7 +33,7 @@ const ProjectList = () => {
     <>
       <Box
         sx={{
-          maxHeight: "calc(99vh - 188px)", // navbar: 64px; projectbar: 64px; create project button: 36px; margin: 24px
+          height: "calc(99vh - 188px)", // navbar: 64px; projectbar: 64px; create project button: 36px; margin: 24px
           overflow: "auto",
         }}
       >
@@ -86,10 +86,10 @@ const ProjectList = () => {
           <Tooltip title="Edit your profile first.">
             <span>
               <Button
-                variant="contained"
                 disabled
-                sx={{ borderRadius: 4, bgcolor: "#3e95c2" }}
                 disableElevation
+                sx={{ borderRadius: 4, bgcolor: "#3e95c2" }}
+                variant="contained"
               >
                 {"Create Project"}
               </Button>

@@ -89,7 +89,7 @@ const ProjectInfo = () => {
     <Box
       ref={boxRef}
       sx={{
-        maxHeight: "calc(99vh - 128px)",
+        height: "calc(99vh - 128px)",
         overflow: "auto",
       }}
     >
@@ -159,10 +159,10 @@ const ProjectInfo = () => {
                   <Tooltip title="Edit your profile first.">
                     <span>
                       <Button
-                        variant="contained"
                         disabled
-                        sx={{ borderRadius: 4, bgcolor: "#3e95c2" }}
                         disableElevation
+                        sx={{ borderRadius: 4, bgcolor: "#3e95c2" }}
+                        variant="contained"
                       >
                         &emsp; {"Connect"} &emsp;
                       </Button>
@@ -189,10 +189,10 @@ const ProjectInfo = () => {
                     project?.creator_uid
                   ) && (
                     <Button
-                      variant="contained"
                       disabled
-                      sx={{ borderRadius: 4, bgcolor: "#3e95c2" }}
                       disableElevation
+                      sx={{ borderRadius: 4, bgcolor: "#3e95c2" }}
+                      variant="contained"
                     >
                       &emsp; {"Pending"} &emsp;
                     </Button>

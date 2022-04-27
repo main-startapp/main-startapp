@@ -6,6 +6,7 @@ import {
   Button,
   Divider,
   Grid,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -24,13 +25,16 @@ const useStyles = makeStyles({
 
 const PositionListItem = (props) => {
   // context
-  const { project } = useContext(ProjectContext);
+  const { project, currentStudent } = useContext(ProjectContext);
 
   // args
   const title = props.title;
   const resp = props.resp;
   const weeklyHour = props.weeklyHour;
   const isCreator = props.isCreator;
+
+  // local vars
+  const currentUID = currentStudent?.uid;
 
   // override Accordion style to use justifyConent
   const classes = useStyles();
@@ -73,7 +77,7 @@ const PositionListItem = (props) => {
           onClick={(e) => handleExpand(e)}
         >
           <Typography color="text.primary">{title}</Typography>
-          {!isCreator && (
+          {!isCreator && currentUID && (
             <Button
               variant="contained"
               size="small"
@@ -83,6 +87,21 @@ const PositionListItem = (props) => {
             >
               &emsp; {"Join Request"} &emsp;
             </Button>
+          )}
+          {!isCreator && !currentUID && (
+            <Tooltip title="Edit your profile first.">
+              <span>
+                <Button
+                  disabled
+                  disableElevation
+                  size="small"
+                  sx={{ mr: 3, borderRadius: 4, bgcolor: "#3e95c2" }}
+                  variant="contained"
+                >
+                  &emsp; {"Join Request"} &emsp;
+                </Button>
+              </span>
+            </Tooltip>
           )}
         </AccordionSummary>
         <AccordionDetails>

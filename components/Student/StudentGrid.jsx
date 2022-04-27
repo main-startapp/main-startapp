@@ -10,7 +10,7 @@ const StudentGrid = () => {
   return (
     <Box
       sx={{
-        maxHeight: "calc(99vh - 128px)",
+        height: "calc(99vh - 128px)",
         overflow: "auto",
       }}
     >

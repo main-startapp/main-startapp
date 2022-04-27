@@ -238,15 +238,15 @@ const StudentProfile = () => {
             <Tooltip title="Edit your profile first.">
               <span>
                 <Button
-                  variant="contained"
                   disabled
+                  disableElevation
                   size="large"
                   sx={{
                     m: 3,
                     borderRadius: 4,
                     bgcolor: "#3e95c2",
                   }}
-                  disableElevation
+                  variant="contained"
                 >
                   <Typography sx={{ fontSize: "0.9em" }}>
                     &emsp; {"Connect"} &emsp;
@@ -280,15 +280,15 @@ const StudentProfile = () => {
             (currentStudent.pending_connections.includes(student?.uid) ||
               currentStudent.received_connections.includes(student?.uid)) && (
               <Button
-                variant="contained"
                 disabled
+                disableElevation
                 size="large"
                 sx={{
                   m: 3,
                   borderRadius: 4,
                   bgcolor: "#3e95c2",
                 }}
-                disableElevation
+                variant="contained"
               >
                 <Typography sx={{ fontSize: "0.9em" }}>
                   &ensp; {"Pending"} &ensp;

@@ -47,6 +47,7 @@ const StudentCreate = () => {
     requested_posititons: [],
     joined_projects: [],
     my_projects: [],
+    photo_url: currentUser.photoURL,
   });
 
   // if currentStudent changes, update the student state
