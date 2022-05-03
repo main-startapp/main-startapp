@@ -1,23 +1,18 @@
 import { doc, onSnapshot } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
-import {
-  Avatar,
-  Box,
-  IconButton,
-  ListItem,
-  ListItemText,
-  Typography,
-} from "@mui/material";
+import { Avatar, Box, Typography } from "@mui/material";
 import { db } from "../../firebase";
 import moment from "moment";
 import { ChatContext } from "../Context/ShareContexts";
 import { styled } from "@mui/material/styles";
+import { useAuth } from "../Context/AuthContext";
 
-const ChatListItem = (props) => {
+const ChatAccordionContact = (props) => {
   const chat = props.chat;
 
   // context
-  const { currentUser, setChat, setPartner } = useContext(ChatContext);
+  const { currentUser } = useAuth();
+  const { setChat, setPartner, showMsg, setShowMsg } = useContext(ChatContext);
 
   // get the chat partner' info
   // !todo: support group chat
@@ -41,6 +36,9 @@ const ChatListItem = (props) => {
       onClick={() => {
         setChat(chat);
         setPartner(chatPartner);
+        if (!showMsg) {
+          setShowMsg(true);
+        }
       }}
     >
       <Avatar sx={{ m: "14px" }} src={chatPartner?.photo_url} />
@@ -55,21 +53,21 @@ const ChatListItem = (props) => {
         >
           <Typography fontSize="14px">{chatPartner?.name}</Typography>
           <Typography fontSize="14px">
-            {moment(chat?.last_timestamp?.toDate().getTime()).format("LT")}
+            {moment(chat?.last_timestamp?.toDate().getTime()).format("MMM D")}
           </Typography>
         </Box>
-        {/* last msg */}
+        {/* position */}
         <Box>
           <Typography
             fontSize="14px"
-            sx={{
-              display: "-webkit-box",
-              overflow: "hidden",
-              WebkitBoxOrient: "vertical",
-              WebkitLineClamp: 1,
-            }}
+            // sx={{
+            //   display: "-webkit-box",
+            //   overflow: "hidden",
+            //   WebkitBoxOrient: "vertical",
+            //   WebkitLineClamp: 1,
+            // }}
           >
-            {chat?.last_text}
+            {chatPartner?.desired_position}
           </Typography>
         </Box>
       </ChatInfo>
@@ -77,12 +75,12 @@ const ChatListItem = (props) => {
   );
 };
 
-export default ChatListItem;
+export default ChatAccordionContact;
 
 const Container = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  height: "64px",
+  height: "80px",
   cursor: "pointer",
   borderBottom: "1px solid #ededed",
   "&:hover": {

@@ -12,7 +12,15 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { makeStyles } from "@mui/styles";
 import { useContext, useEffect, useState } from "react";
-import { ProjectContext } from "../Context/ShareContexts";
+import { ChatContext, ProjectContext } from "../Context/ShareContexts";
+import { db } from "../../firebase";
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
 
 // override the style Accordion Summary
 const useStyles = makeStyles({
@@ -26,8 +34,10 @@ const useStyles = makeStyles({
 const PositionListItem = (props) => {
   // context
   const { project, currentStudent } = useContext(ProjectContext);
+  const { chats } = useContext(ChatContext);
 
   // args
+  const index = props.index;
   const title = props.title;
   const resp = props.resp;
   const weeklyHour = props.weeklyHour;
@@ -50,8 +60,98 @@ const PositionListItem = (props) => {
       ? setExpandState("collapseIt")
       : setExpandState("expandIt");
   };
-  const handleJoinRequest = (e) => {
+
+  const handleJoinRequest = async (e) => {
     e.stopPropagation();
+    {
+      /* update student; update requested positions, remove uid */
+    }
+    const currentStudentDocRef = doc(db, "students", currentUID);
+    const currentStudenReqPos = currentStudent.requested_posititons;
+    currentStudenReqPos.push({
+      project_id: project.id,
+      position_index: index,
+      position_title: title,
+    });
+    const currentStudentRef = {
+      ...currentStudent,
+      requested_posititons: currentStudenReqPos,
+    };
+    delete currentStudentRef?.uid;
+    await updateDoc(currentStudentDocRef, currentStudentRef).catch((err) => {
+      console.log("updateDoc() error: ", err);
+    });
+    {
+      /* create or update chat */
+    }
+    const foundChat = chats.find((chat) =>
+      chat.chat_user_ids.some((uid) => uid === project.creator_uid)
+    );
+    const msgStr =
+      currentStudent.name +
+      " has requested to join " +
+      project.title +
+      " as " +
+      title;
+    const messageRef = {
+      text: msgStr,
+      sent_by: currentUID,
+      sent_at: serverTimestamp(),
+    };
+    if (foundChat) {
+      // update
+      // add message
+      const msgCollectionRef = collection(
+        db,
+        "chats",
+        foundChat.id,
+        "messages"
+      );
+      const msgAddDocRef = await addDoc(msgCollectionRef, messageRef).catch(
+        (err) => {
+          console.log("addDoc() error: ", err);
+        }
+      );
+      // update chat
+      const chatDocRef = doc(db, "chats", foundChat.id);
+      const chatRef = {
+        ...foundChat,
+        last_text: msgStr,
+        last_timestamp: serverTimestamp(),
+      };
+      delete chatRef.id;
+      const chatUpdateDocRef = await updateDoc(chatDocRef, chatRef).catch(
+        (err) => {
+          console.log("updateDoc() error: ", err);
+        }
+      );
+    } else {
+      // create
+      // add chat doc
+      const collectionRef = collection(db, "chats");
+      const chatRef = {
+        chat_user_ids: [currentStudent?.uid, project?.creator_uid],
+        last_text: msgStr,
+        last_timestamp: serverTimestamp(),
+      };
+      const chatAddDocRef = await addDoc(collectionRef, chatRef).catch(
+        (err) => {
+          console.log("addDoc() error: ", err);
+        }
+      );
+      // add message
+      const msgCollectionRef = collection(
+        db,
+        "chats",
+        chatAddDocRef.id,
+        "messages"
+      );
+      const msgAddDocRef = await addDoc(msgCollectionRef, messageRef).catch(
+        (err) => {
+          console.log("addDoc() error: ", err);
+        }
+      );
+    }
   };
 
   return (
@@ -77,26 +177,24 @@ const PositionListItem = (props) => {
           onClick={(e) => handleExpand(e)}
         >
           <Typography color="text.primary">{title}</Typography>
-          {!isCreator && currentUID && (
-            <Button
-              variant="contained"
-              size="small"
-              sx={{ mr: 3, borderRadius: 4, bgcolor: "#3e95c2" }}
-              disableElevation
-              onClick={(e) => handleJoinRequest(e)}
-            >
-              &emsp; {"Join Request"} &emsp;
-            </Button>
-          )}
-          {!isCreator && !currentUID && (
-            <Tooltip title="Edit your profile first.">
+          {!isCreator && (
+            <Tooltip title={currentUID ? "" : "Edit your profile first."}>
               <span>
                 <Button
-                  disabled
+                  disabled={
+                    !currentUID ||
+                    currentStudent.requested_posititons.some(
+                      (pos) =>
+                        pos.project_id === project.id &&
+                        pos.position_index === index &&
+                        pos.position_title === title
+                    )
+                  }
                   disableElevation
                   size="small"
                   sx={{ mr: 3, borderRadius: 4, bgcolor: "#3e95c2" }}
                   variant="contained"
+                  onClick={(e) => handleJoinRequest(e)}
                 >
                   &emsp; {"Join Request"} &emsp;
                 </Button>

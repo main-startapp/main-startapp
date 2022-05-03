@@ -42,6 +42,8 @@ const ProjectInfo = () => {
 
   // helper func
   // similar function in StudentGridCard; StudentProfile
+  // !todo: this function is bloated, might need an external lib to hold these func
+  // !todo: user should not change/update other user's data
   const handleConnect = async (e) => {
     e.stopPropagation();
     const senderDocRef = doc(db, "students", currentUID);
@@ -258,6 +260,7 @@ const ProjectInfo = () => {
               {project.position_list.map((position, index) => (
                 <PositionListItem
                   key={index}
+                  index={index}
                   title={position.positionTitle}
                   resp={position.positionResp}
                   weeklyHour={position.positionWeeklyHour}

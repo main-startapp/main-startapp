@@ -1,4 +1,4 @@
-import { CssBaseline } from "@mui/material";
+import { Box, CssBaseline } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { AuthProvider } from "../components/Context/AuthContext";
 import Navbar from "../components/Header/Navbar";
@@ -6,6 +6,10 @@ import "../styles/globals.css";
 import { makeStyles } from "@mui/styles";
 import AdapterMoment from "@mui/lab/AdapterMoment";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
+import ChatAccordion from "../components/Chat/ChatAccordion";
+import { useState } from "react";
+import { ChatContext } from "../components/Context/ShareContexts";
+import ChatAccordionMsg from "../components/Chat/ChatAccordionMsg";
 
 // global font testing
 const fontTheme = createTheme({
@@ -28,14 +32,36 @@ const fontTheme = createTheme({
 });
 
 function MyApp({ Component, pageProps }) {
+  const [chats, setChats] = useState([]);
+  const [chat, setChat] = useState(null);
+  const [students, setStudents] = useState([]);
+  const [partner, setPartner] = useState(null);
+  const [showMsg, setShowMsg] = useState(false);
   return (
     // uncomment the ThemeProvider to use the theme defined above
     // <ThemeProvider theme={fontTheme}>
     <AuthProvider>
       <LocalizationProvider dateAdapter={AdapterMoment}>
-        <CssBaseline />
-        <Navbar />
-        <Component {...pageProps} />
+        <ChatContext.Provider
+          value={{
+            chats,
+            setChats,
+            chat,
+            setChat,
+            students,
+            setStudents,
+            partner,
+            setPartner,
+            showMsg,
+            setShowMsg,
+          }}
+        >
+          <CssBaseline />
+          <Navbar />
+          <Component {...pageProps} />
+          <ChatAccordionMsg />
+          <ChatAccordion />
+        </ChatContext.Provider>
       </LocalizationProvider>
     </AuthProvider>
     // </ThemeProvider>

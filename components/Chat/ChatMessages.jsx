@@ -1,4 +1,4 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Box, Button, TextField } from "@mui/material";
 import {
   addDoc,
   collection,
@@ -12,11 +12,13 @@ import {
 import { useContext, useEffect, useRef, useState } from "react";
 import { db } from "../../firebase";
 import { ChatContext } from "../Context/ShareContexts";
+import { useAuth } from "../Context/AuthContext";
 import ChatMessageItem from "./ChatMessageItem";
 
 const ChatMessages = () => {
   // context
-  const { currentUser, chat } = useContext(ChatContext);
+  const { currentUser } = useAuth();
+  const { chat } = useContext(ChatContext);
 
   // get the messages
   const [message, setMessage] = useState({
@@ -41,6 +43,7 @@ const ChatMessages = () => {
 
   // helper func
   const handleSubmit = async (e) => {
+    // add message
     let messageRef = { ...message, sent_at: serverTimestamp() };
     const msgCollectionRef = collection(db, "chats", chat.id, "messages");
     const msgAddDocRef = await addDoc(msgCollectionRef, messageRef).catch(
@@ -48,6 +51,7 @@ const ChatMessages = () => {
         console.log("addDoc() error: ", err);
       }
     );
+    // update chat
     const chatDocRef = doc(db, "chats", chat.id);
     const chatRef = {
       ...chat,
@@ -60,6 +64,7 @@ const ChatMessages = () => {
         console.log("updateDoc() error: ", err);
       }
     );
+    // set message state
     setMessage({ text: "", sent_by: currentUser.uid });
   };
 
@@ -87,7 +92,7 @@ const ChatMessages = () => {
         sx={{
           display: "flex",
           flexDirection: "column",
-          overflow: "scroll",
+          overflow: "auto",
           flexGrow: 1,
         }}
       >

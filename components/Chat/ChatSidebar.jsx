@@ -1,23 +1,11 @@
+import { styled } from "@mui/material/styles";
 import { useContext, useEffect, useState } from "react";
-import {
-  Autocomplete,
-  Avatar,
-  Box,
-  InputAdornment,
-  TextField,
-} from "@mui/material";
+import { Autocomplete, Avatar, InputAdornment, TextField } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import {
-  addDoc,
-  collection,
-  onSnapshot,
-  orderBy,
-  query,
-  serverTimestamp,
-} from "firebase/firestore";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { ChatContext } from "../Context/ShareContexts";
 import { db } from "../../firebase";
-import ChatList from "./ChatList";
+import ChatListItem from "./ChatListItem";
 
 const ChatSidebar = () => {
   // context
@@ -52,39 +40,11 @@ const ChatSidebar = () => {
   }, [selectedStudent, chats, currentUser]);
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        backgroundColor: "white",
-        width: "20%",
-        height: "100%",
-      }}
-    >
-      {/* Header */}
-      <Box
-        sx={{
-          display: "flex",
-          top: 0,
-          backgroundColor: "white",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "15px",
-          borderBottom: "1px solid whitesmoke",
-          width: "100%",
-        }}
-      >
+    <Container>
+      <Header>
         <Avatar src={currentUser.photoURL} />
-      </Box>
-      {/* search area */}
-      <Box
-        sx={{
-          backgroundColor: "#f6f6f6",
-          borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
-          alignItems: "center",
-          padding: "16px",
-        }}
-      >
+      </Header>
+      <SearchArea>
         <Autocomplete
           freeSolo
           disableClearable
@@ -99,7 +59,6 @@ const ChatSidebar = () => {
               sx={{ backgroundColor: "white" }}
               variant="standard"
               {...params}
-              label="Search student..."
               InputProps={{
                 ...params.InputProps,
                 type: "search",
@@ -113,13 +72,47 @@ const ChatSidebar = () => {
             />
           )}
         />
-      </Box>
-      {/* chats */}
-      <Box sx={{ height: "100%", overflow: "auto" }}>
-        <ChatList />
-      </Box>
-    </Box>
+      </SearchArea>
+      {/* chat list */}
+      <ChatList>
+        {chats.map((chat) => (
+          <ChatListItem key={chat.id} chat={chat} />
+        ))}
+      </ChatList>
+    </Container>
   );
 };
 
 export default ChatSidebar;
+
+const Container = styled("div")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  backgroundColor: "white",
+  width: "20%",
+  height: "100%",
+}));
+
+const Header = styled("div")(({ theme }) => ({
+  display: "flex",
+  top: 0,
+  backgroundColor: "white",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: "15px",
+  borderBottom: "1px solid whitesmoke",
+  width: "100%",
+}));
+
+const SearchArea = styled("div")(({ theme }) => ({
+  backgroundColor: "#f6f6f6",
+  borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
+  alignItems: "center",
+  padding: "15px",
+}));
+
+const ChatList = styled("div")(({ theme }) => ({
+  width: "100%",
+  height: "100%",
+  overflow: "auto",
+}));

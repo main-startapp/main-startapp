@@ -1,12 +1,14 @@
 import { Box, Typography } from "@mui/material";
 import { useContext } from "react";
+import { useAuth } from "../Context/AuthContext";
 import { ChatContext } from "../Context/ShareContexts";
 
 const ChatMessageItem = (props) => {
   const message = props.message;
 
   // context
-  const { currentUser, partner } = useContext(ChatContext);
+  const { currentUser } = useAuth();
+  const { partner } = useContext(ChatContext);
 
   return (
     <>
