@@ -5,7 +5,9 @@ import { signInWithPopup } from "firebase/auth";
 
 const Login = ({ type, color }) => {
   const loginWithGoogle = () => {
-    signInWithPopup(auth, provider);
+    signInWithPopup(auth, provider).catch((err) => {
+      console.log("signInWithPopup() error: ", err);
+    });
   };
   return (
     <Grid

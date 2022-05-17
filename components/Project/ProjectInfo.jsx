@@ -10,14 +10,22 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { ProjectContext } from "../Context/ShareContexts";
+import { ChatContext, ProjectContext } from "../Context/ShareContexts";
 import PositionListItem from "./PositionListItem";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../../firebase";
 
 const ProjectInfo = () => {
   // context
   const { project, currentStudent } = useContext(ProjectContext);
+  const { chats } = useContext(ChatContext);
 
   // local vars
   const currentUID = currentStudent?.uid;
@@ -46,6 +54,8 @@ const ProjectInfo = () => {
   // !todo: user should not change/update other user's data
   const handleConnect = async (e) => {
     e.stopPropagation();
+    {
+      /* 
     const senderDocRef = doc(db, "students", currentUID);
     const receiverDocRef = doc(db, "students", project?.creator_uid);
     // get the receiver's student doc
@@ -76,7 +86,89 @@ const ProjectInfo = () => {
     } else {
       console.log("No such document!");
     }
-    // don't need to setState, since the student and currentStudent in pages/students is real-time updated
+      */
+    }
+    console.log("connect");
+    {
+      /* update student data: add project creator uid to pending connections array */
+    }
+    const senderDocRef = doc(db, "students", currentUID);
+    const senderPendingConnections = currentStudent.pending_connections;
+    senderPendingConnections.push(project?.creator_uid);
+    const senderStudentRef = {
+      ...currentStudent,
+      pending_connections: senderPendingConnections,
+    };
+    delete senderStudentRef?.uid;
+    await updateDoc(senderDocRef, senderStudentRef).catch((err) => {
+      console.log("updateDoc() error: ", err);
+    });
+    {
+      /* create or update chat */
+    }
+    const foundChat = chats.find((chat) =>
+      chat.chat_user_ids.some((uid) => uid === project.creator_uid)
+    );
+    const msgStr = currentStudent.name + " has requested to connect with you";
+    const messageRef = {
+      text: msgStr,
+      sent_by: currentUID,
+      sent_at: serverTimestamp(),
+    };
+    if (foundChat) {
+      // update
+      // add message
+      const msgCollectionRef = collection(
+        db,
+        "chats",
+        foundChat.id,
+        "messages"
+      );
+      const msgAddDocRef = await addDoc(msgCollectionRef, messageRef).catch(
+        (err) => {
+          console.log("addDoc() error: ", err);
+        }
+      );
+      // update chat
+      const chatDocRef = doc(db, "chats", foundChat.id);
+      const chatRef = {
+        ...foundChat,
+        last_text: msgStr,
+        last_timestamp: serverTimestamp(),
+      };
+      delete chatRef.id;
+      const chatUpdateDocRef = await updateDoc(chatDocRef, chatRef).catch(
+        (err) => {
+          console.log("updateDoc() error: ", err);
+        }
+      );
+    } else {
+      // create
+      // add chat doc
+      const collectionRef = collection(db, "chats");
+      const chatRef = {
+        chat_user_ids: [currentStudent?.uid, project?.creator_uid],
+        last_text: msgStr,
+        last_timestamp: serverTimestamp(),
+      };
+      const chatAddDocRef = await addDoc(collectionRef, chatRef).catch(
+        (err) => {
+          console.log("addDoc() error: ", err);
+        }
+      );
+      // add message
+      const msgCollectionRef = collection(
+        db,
+        "chats",
+        chatAddDocRef.id,
+        "messages"
+      );
+      const msgAddDocRef = await addDoc(msgCollectionRef, messageRef).catch(
+        (err) => {
+          console.log("addDoc() error: ", err);
+        }
+      );
+    }
   };
 
   // similar alg in components/Student/StudentProfile
@@ -156,49 +248,26 @@ const ProjectInfo = () => {
                 {project.creator_email}
               </Typography>
               <Box m={3} sx={{ display: "flex", justifyContent: "center" }}>
-                {/* disabled Connect button */}
-                {!isCreator && !currentUID && (
-                  <Tooltip title="Edit your profile first.">
+                {!isCreator && (
+                  <Tooltip title={currentUID ? "" : "Edit your profile first."}>
                     <span>
                       <Button
-                        disabled
+                        disabled={
+                          !currentUID ||
+                          currentStudent.pending_connections.includes(
+                            project.creator_uid
+                          )
+                        }
                         disableElevation
                         sx={{ borderRadius: 4, bgcolor: "#3e95c2" }}
                         variant="contained"
+                        onClick={(e) => handleConnect(e)}
                       >
                         &emsp; {"Connect"} &emsp;
                       </Button>
                     </span>
                   </Tooltip>
                 )}
-                {!isCreator &&
-                  currentUID &&
-                  !currentStudent.pending_connections.includes(
-                    project?.creator_uid
-                  ) && (
-                    <Button
-                      variant="contained"
-                      sx={{ borderRadius: 4, bgcolor: "#3e95c2" }}
-                      disableElevation
-                      onClick={(e) => handleConnect(e)}
-                    >
-                      &emsp; {"Connect"} &emsp;
-                    </Button>
-                  )}
-                {!isCreator &&
-                  currentUID &&
-                  currentStudent.pending_connections.includes(
-                    project?.creator_uid
-                  ) && (
-                    <Button
-                      disabled
-                      disableElevation
-                      sx={{ borderRadius: 4, bgcolor: "#3e95c2" }}
-                      variant="contained"
-                    >
-                      &emsp; {"Pending"} &emsp;
-                    </Button>
-                  )}
                 {isCreator && (
                   <Button
                     onClick={() => updateProject(project)}

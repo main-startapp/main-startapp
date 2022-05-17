@@ -32,7 +32,7 @@ const ChatAccordionMsgItem = (props) => {
             sx={{ display: "inline", color: "gray", fontSize: "0.9em" }}
           >
             {" · "}
-            {moment(message.sent_at.toDate().getTime()).format("M/D LT")}
+            {moment(message?.sent_at?.toDate().getTime()).format("M/D LT")}
           </Typography>
         </Box>
       )}
@@ -54,7 +54,7 @@ const ChatAccordionMsgItem = (props) => {
             sx={{ display: "inline", color: "gray", fontSize: "0.9em" }}
           >
             {" · "}
-            {moment(message.sent_at.toDate().getTime()).format("M/D LT")}
+            {moment(message?.sent_at?.toDate().getTime()).format("M/D LT")}
           </Typography>
         </Box>
       )}

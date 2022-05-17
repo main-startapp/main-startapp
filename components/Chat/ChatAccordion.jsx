@@ -78,6 +78,7 @@ const ChatAccordion = () => {
   return (
     <Box sx={{ display: "flex", justifyContent: "right" }}>
       <Accordion
+        square={true}
         sx={{
           width: "25%",
           maxHeight: "50%",

@@ -64,7 +64,7 @@ const PositionListItem = (props) => {
   const handleJoinRequest = async (e) => {
     e.stopPropagation();
     {
-      /* update student; update requested positions, remove uid */
+      /* update student data: update requested positions*/
     }
     const currentStudentDocRef = doc(db, "students", currentUID);
     const currentStudenReqPos = currentStudent.requested_posititons;
