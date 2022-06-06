@@ -1,74 +1,83 @@
+import { useContext, useEffect, useState } from "react";
+import { Grid } from "@mui/material";
+import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase";
 import {
-  Alert,
-  Avatar,
-  Container,
-  IconButton,
-  Snackbar,
-  Typography,
-} from "@mui/material";
-import { Box } from "@mui/system";
-import { useState } from "react";
-import ProjectForm from "../components/ProjectForm";
-import ProjectList from "../components/ProjectList";
-import { useAuth } from "./AuthContext";
-import { ProjectContext } from "./ProjectContext";
-import { auth } from "../firebase";
+  GlobalContext,
+  ProjectContext,
+} from "../components/Context/ShareContexts";
+import ProjectPageBar from "../components/Header/ProjectPageBar";
+import ProjectList from "../components/Project/ProjectList";
+import ProjectInfo from "../components/Project/ProjectInfo";
 
+// this page is also project homepage. Is this a good practice?
 export default function Home() {
-  const { currentUser } = useAuth();
-  const [open, setOpen] = useState(false);
-  const [alertType, setAlertType] = useState("success");
-  const [alertMessage, setAlertMessage] = useState("");
-  const [project, setProject] = useState({
-    title: "",
-    detail: "",
-    max_member: "",
-  });
-  const showAlert = (type, msg) => {
-    setAlertType(type);
-    setAlertMessage(msg);
-    setOpen(true);
-  };
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setOpen(false);
-  };
+  // global context
+  const { setChat, setShowChat, setShowMsg } = useContext(GlobalContext);
+  useEffect(() => {
+    setShowChat(true);
+    setShowMsg(false);
+    setChat(null);
+  }, [setChat, setShowChat, setShowMsg]);
+
+  // project state init
+  const [project, setProject] = useState(null);
+  const [projects, setProjects] = useState([]); // list of project
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchCategory, setSearchCategory] = useState("");
+
+  // listen to realtime projects collection
+  // https://stackoverflow.com/questions/59841800/react-useeffect-in-depth-use-of-useeffect
+  useEffect(() => {
+    // db query
+    const collectionRef = collection(db, "projects");
+    const q = query(collectionRef, orderBy("last_timestamp", "desc"));
+
+    // https://firebase.google.com/docs/firestore/query-data/listen
+    const unsub = onSnapshot(q, (querySnapshot) => {
+      setProjects(
+        querySnapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+          last_timestamp: doc.data().last_timestamp?.toDate().getTime(),
+        }))
+      );
+    });
+
+    return unsub;
+  }, []);
 
   return (
-    <ProjectContext.Provider value={{ showAlert, project, setProject }}>
-      <Container maxWidth="sm">
-        {/* alert and notification */}
-        <Snackbar
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-          open={open}
-          autoHideDuration={6000}
-          onClose={handleClose}
-        >
-          <Alert
-            onClose={handleClose}
-            severity={alertType}
-            sx={{ width: "100%" }}
-          >
-            {alertMessage}
-          </Alert>
-        </Snackbar>
-        {/* user info: !todo: can be built as a component */}
-        <Box sx={{ mt: 5, display: "flex", justifyContent: "space-between" }}>
-          <IconButton onClick={() => auth.signOut()}>
-            <Avatar src={currentUser.photoURL} />
-          </IconButton>
-          <Typography variant="h5">
-            {"Hello "}
-            {currentUser.displayName}
-          </Typography>
-        </Box>
-        {/* project Creation & Update */}
-        <ProjectForm />
-        {/* project list */}
-        <ProjectList />
-      </Container>
+    <ProjectContext.Provider
+      value={{
+        project,
+        setProject,
+        projects,
+        searchTerm,
+        setSearchTerm,
+        searchCategory,
+        setSearchCategory,
+      }}
+    >
+      {/* Toolbar for searching keywords, category and filter */}
+      <ProjectPageBar />
+      <Grid
+        container
+        spaceing={0}
+        mt={1}
+        direction="row"
+        alignItems="start"
+        justifyContent="center"
+      >
+        {/* left comp: list of projects */}
+        <Grid item xs={4}>
+          <ProjectList />
+        </Grid>
+        {/* right comp: selected project's info  */}
+        <Grid item xs={8}>
+          <ProjectInfo />
+        </Grid>
+      </Grid>
     </ProjectContext.Provider>
   );
 }

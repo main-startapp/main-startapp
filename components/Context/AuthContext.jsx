@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getAuth } from "firebase/auth";
-import Loading from "../components/Loading";
-import Login from "../components/Login";
+import Loading from "../Loading";
+import Login from "../Login";
 
 const AuthContext = createContext({});
 
@@ -17,13 +17,15 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
         return;
       }
-      const token = await user.getIdToken();
+      const token = await user.getIdToken().catch((err) => {
+        console.log("getIdToken() error: ", err);
+      });
       setCurrentUser(user);
       setLoading(false);
     });
   }, []);
   if (loading) {
-    return <Loading type="bubbles" color="yellowgreen" />;
+    return <Loading type="spokes" color="#3e95c2" />;
   }
   if (!currentUser) {
     return <Login />;
