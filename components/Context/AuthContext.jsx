@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
     });
   }, []);
   if (loading) {
-    return <Loading type="bubbles" color="yellowgreen" />;
+    return <Loading type="spokes" color="#3e95c2" />;
   }
   if (!currentUser) {
     return <Login />;

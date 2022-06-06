@@ -3,6 +3,7 @@ import {
   Button,
   Divider,
   FormControl,
+  FormHelperText,
   Grid,
   IconButton,
   InputLabel,
@@ -20,16 +21,17 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useContext, useEffect, useRef, useState } from "react";
-import { StudentContext } from "../Context/ShareContexts";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
 import DoDisturbAltRoundedIcon from "@mui/icons-material/DoDisturbAltRounded";
 import { useAuth } from "../Context/AuthContext";
+import { GlobalContext, StudentContext } from "../Context/ShareContexts";
 
 const StudentCreate = () => {
   // context & hooks
-  const { showAlert, currentStudent } = useContext(StudentContext);
   const { currentUser } = useAuth();
+  const { currentStudent } = useContext(GlobalContext);
+  const { showAlert } = useContext(StudentContext);
 
   const [student, setStudent] = useState({
     name: "",
@@ -42,51 +44,66 @@ const StudentCreate = () => {
     past_exp: [""],
     awards: [],
     connections: [],
-    pending_connections: [],
-    received_connections: [],
     requested_posititons: [],
     joined_projects: [],
     my_projects: [],
     photo_url: currentUser.photoURL,
   });
 
-  // if currentStudent changes, update the student state
+  // update currentStudent state
   useEffect(() => {
-    if (currentStudent?.uid) {
-      setStudent({ ...currentStudent });
+    if (!currentStudent?.uid) return; // !todo: what's the RoT to check existence? what if uid = 0 (not possible?)
+
+    // currentStudent exists
+    const currentStudentRef = { ...currentStudent };
+    if (!currentStudent.social_media.length) {
+      currentStudentRef.social_media = [""];
     }
+    if (!currentStudent.past_exp.length) {
+      currentStudentRef.past_exp = [""];
+    }
+    setStudent({ ...currentStudentRef });
   }, [currentStudent]);
+
+  // local vars
+  const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
+  const [isChanged, setIsChanged] = useState(false); // check if user modified the contents
 
   // helper func
   const handleSubmit = async (e) => {
-    if (formRef.current.reportValidity()) {
-      const uid = currentUser?.uid;
-      const docRef = doc(db, "students", uid);
-      let studentRef = {
-        ...student,
-        // remove empty strings
-        social_media: student.social_media.filter((ele) => ele),
-        past_exp: student.past_exp.filter((ele) => ele),
-      };
-      // remove unnecessary uid to keep the doc consistent
-      delete studentRef?.uid;
+    if (!isClickable) return;
+    if (!formRef.current.reportValidity()) return;
 
-      if (student.create_timestamp) {
-        // update
-        await updateDoc(docRef, studentRef).catch((err) => {
-          console.log("updateDoc() error: ", err);
-        });
-      } else {
-        // create; add create_timestamp
-        studentRef = {
-          ...studentRef,
-          create_timestamp: serverTimestamp(),
-        };
-        await setDoc(docRef, studentRef).catch((err) => {
-          console.log("setDoc() error: ", err);
-        });
-      }
+    // button is clickable & form is valid
+    setIsClickable(false);
+    const uid = currentUser?.uid;
+    const docRef = doc(db, "students", uid);
+    let studentRef = {
+      ...student,
+      // remove empty strings
+      social_media: student.social_media.filter((ele) => ele),
+      past_exp: student.past_exp.filter((ele) => ele),
+    };
+    // remove uid to keep the doc consistent
+    delete studentRef?.uid;
+
+    if (student.create_timestamp) {
+      // update
+      await updateDoc(docRef, studentRef).catch((err) => {
+        console.log("updateDoc() error: ", err);
+      });
+    } else {
+      // create; add create_timestamp
+      studentRef = {
+        ...studentRef,
+        create_timestamp: serverTimestamp(),
+      };
+      await setDoc(docRef, studentRef).catch((err) => {
+        console.log("setDoc() error: ", err);
+      });
     }
+
+    // !todo: check return
     showAlert(
       "success",
       `"${student.name}" is updated successfully!` // success -> green
@@ -135,7 +152,10 @@ const StudentCreate = () => {
                 maxLength: 20,
               }}
               value={student.name}
-              onChange={(e) => setStudent({ ...student, name: e.target.value })}
+              onChange={(e) => {
+                setStudent({ ...student, name: e.target.value });
+                setIsChanged(true);
+              }}
             />
             <TextField
               required
@@ -148,9 +168,10 @@ const StudentCreate = () => {
                 min: 0,
                 max: 10,
               }}
-              onChange={(e) =>
-                setStudent({ ...student, year_of_ed: e.target.value })
-              }
+              onChange={(e) => {
+                setStudent({ ...student, year_of_ed: e.target.value });
+                setIsChanged(true);
+              }}
             />
           </Box>
           {/* desired position and field of interest */}
@@ -169,9 +190,11 @@ const StudentCreate = () => {
                 maxLength: 20,
               }}
               value={student.desired_position}
-              onChange={(e) =>
-                setStudent({ ...student, desired_position: e.target.value })
-              }
+              helperText="Project position you would like to try. Doesn't have to be related to your major."
+              onChange={(e) => {
+                setStudent({ ...student, desired_position: e.target.value });
+                setIsChanged(true);
+              }}
             />
             <FormControl sx={{ width: "50%" }} size="medium">
               <InputLabel>Field of Interest</InputLabel>
@@ -179,9 +202,10 @@ const StudentCreate = () => {
                 label="Field_of_Interest"
                 defaultValue={""}
                 value={student.field_of_interest}
-                onChange={(e) =>
-                  setStudent({ ...student, field_of_interest: e.target.value })
-                }
+                onChange={(e) => {
+                  setStudent({ ...student, field_of_interest: e.target.value });
+                  setIsChanged(true);
+                }}
               >
                 <MenuItem value={"Accounting"}>Accounting</MenuItem>
                 <MenuItem value={"Art"}>Art</MenuItem>
@@ -192,6 +216,9 @@ const StudentCreate = () => {
                 <MenuItem value={"Software"}>Software</MenuItem>
                 <MenuItem value={"Other"}>Other</MenuItem>
               </Select>
+              <FormHelperText>
+                {"Doesn't have to be related to your major"}
+              </FormHelperText>
             </FormControl>
           </Box>
           {/* social media links list */}
@@ -217,22 +244,29 @@ const StudentCreate = () => {
                         ...student,
                         social_media: cur_social_media,
                       });
+                      setIsChanged(true);
                     }}
                   />
                   {/* Add / Remove buttons */}
                   {index > 0 && (
-                    <IconButton onClick={() => handleRemoveSocialMedia(index)}>
+                    <IconButton
+                      onClick={() => {
+                        handleRemoveSocialMedia(index);
+                        setIsChanged(true);
+                      }}
+                    >
                       <RemoveRoundedIcon />
                     </IconButton>
                   )}
-                  {index == student.social_media.length - 1 && (
+                  {index === student.social_media.length - 1 && (
                     <IconButton
-                      onClick={() =>
+                      onClick={() => {
                         setStudent({
                           ...student,
                           social_media: [...student.social_media, ""],
-                        })
-                      }
+                        });
+                        setIsChanged(true);
+                      }}
                     >
                       <AddRoundedIcon />
                     </IconButton>
@@ -272,18 +306,24 @@ const StudentCreate = () => {
                   />
                   {/* Add / Remove buttons */}
                   {index > 0 && (
-                    <IconButton onClick={() => handleRemovePastExp(index)}>
+                    <IconButton
+                      onClick={() => {
+                        handleRemovePastExp(index);
+                        setIsChanged(true);
+                      }}
+                    >
                       <RemoveRoundedIcon />
                     </IconButton>
                   )}
-                  {index == student.past_exp.length - 1 && (
+                  {index === student.past_exp.length - 1 && (
                     <IconButton
-                      onClick={() =>
+                      onClick={() => {
                         setStudent({
                           ...student,
                           past_exp: [...student.past_exp, ""],
-                        })
-                      }
+                        });
+                        setIsChanged(true);
+                      }}
                     >
                       <AddRoundedIcon />
                     </IconButton>
@@ -295,13 +335,13 @@ const StudentCreate = () => {
           {/* Buttons */}
           <Box sx={{ display: "flex", justifyContent: "end" }}>
             <Button
-              sx={{ mt: 5 }}
+              sx={{ mt: 5, backgroundColor: "#3e95c2" }}
               variant="contained"
               disableElevation
-              style={{ bgcolor: "#3e95c2" }}
               onClick={(e) => handleSubmit(e)}
+              disabled={!isClickable}
             >
-              {"Submit"}
+              {isClickable ? "Submit" : "Submitted"}
             </Button>
           </Box>
         </form>

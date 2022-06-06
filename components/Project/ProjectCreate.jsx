@@ -23,7 +23,7 @@ import {
   deleteDoc,
   Timestamp,
 } from "firebase/firestore";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { db } from "../../firebase";
 import { ProjectContext } from "../Context/ShareContexts";
@@ -40,7 +40,7 @@ const ProjectCreate = (props) => {
   // context
   const { showAlert } = useContext(ProjectContext);
 
-  // get the props
+  // props from push query
   const isCreate = props.isCreateStr === "false" ? false : true; // null, undefined, "true" are all true isCreate
 
   let argProject;
@@ -53,15 +53,14 @@ const ProjectCreate = (props) => {
     }
   }
 
-  // Project State Initialization. !todo: it will be much easier if we can share the state between pages
-  // instead of passing stringified project state.
+  // Project State Initialization. !todo: it will be much easier if we can share the state between pages instead of passing stringified project state.
   // https://stackoverflow.com/questions/68945060/react-make-usestate-initial-value-conditional
   const [project, setProject] = useState(() =>
     isCreate
       ? {
           title: "",
           category: "",
-          completion_date: moment(),
+          completion_date: moment().toDate(),
           details: "",
           description: "",
           creator_email: currentUser.email,
@@ -94,8 +93,22 @@ const ProjectCreate = (props) => {
     });
   }
 
-  // state to remove submit and update buttons
-  const [doneFlag, setDoneFlag] = useState(false);
+  // local vars
+  const [doneFlag, setDoneFlag] = useState(false); // state to remove submit and update buttons
+  const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
+
+  /* useEffect(() => {
+    if (isClickable) return;
+
+    // isClickable was false, set back to true after 5s delay
+    const timeout5s = setTimeout(() => {
+      setIsClickable(true);
+    }, 5000);
+
+    return () => {
+      clearTimeout(timeout5s);
+    };
+  }, [isClickable]); // reset button in 5s after click */
 
   const emptyPositionField = {
     positionTitle: "",
@@ -111,61 +124,64 @@ const ProjectCreate = (props) => {
 
   // helper functions
   const handleSubmit = async (e) => {
-    if (formRef.current.reportValidity()) {
-      e.stopPropagation();
-      // calucalte the max members
-      let maxMemberCount = project.cur_member_count;
-      positionFields.forEach(
-        (position) => (maxMemberCount += position.positionCount)
-      );
-      if (isCreate) {
-        // create a new project
-        const collectionRef = collection(db, "projects");
-        const projectRef = {
-          ...project,
-          // update max num of members
-          max_member_count: maxMemberCount,
-          position_list: positionFields,
-          create_timestamp: serverTimestamp(),
-          last_timestamp: serverTimestamp(),
-        };
-        const docRef = await addDoc(collectionRef, projectRef).catch((err) => {
-          console.log("addDoc() error: ", err);
-        });
-        showAlert(
-          "success",
-          `"${project.title}" is added successfully!` // success -> green
-        );
-      } else {
-        // update an existing project
-        const docRef = doc(db, "projects", argProject.id);
-        const projectRef = {
-          ...project,
-          // update max num of members
-          max_member_count: maxMemberCount,
-          position_list: positionFields,
-          last_timestamp: serverTimestamp(),
-        };
-        await updateDoc(docRef, projectRef).catch((err) => {
-          console.log("updateDoc() error: ", err);
-        });
-        showAlert(
-          "success",
-          `"${project.title}" is updated successfully!` // success -> green
-        );
-      }
-      setProject({
-        // only the fields on the screen
-        title: "",
-        cur_member_count: "",
-        category: "",
-        completion_date: moment(0),
-        details: "",
-        description: "",
+    if (!isClickable) return;
+    if (!formRef.current.reportValidity()) return;
+
+    // button is clickable & form is valid
+    setIsClickable(false);
+    // calucalte the max members
+    let maxMemberCount = project.cur_member_count;
+    positionFields.forEach(
+      (position) => (maxMemberCount += position.positionCount)
+    );
+    if (isCreate) {
+      // create a new project
+      const collectionRef = collection(db, "projects");
+      const projectRef = {
+        ...project,
+        // update max num of members
+        max_member_count: maxMemberCount,
+        position_list: positionFields,
+        create_timestamp: serverTimestamp(),
+        last_timestamp: serverTimestamp(),
+      };
+      const docRef = await addDoc(collectionRef, projectRef).catch((err) => {
+        console.log("addDoc() error: ", err);
       });
-      setPositionFields([emptyPositionField]);
-      setDoneFlag(true);
+      showAlert(
+        "success",
+        `"${project.title}" is added successfully!` // success -> green
+      );
+    } else {
+      // update an existing project
+      const docRef = doc(db, "projects", argProject.id);
+      const projectRef = {
+        ...project,
+        // update max num of members
+        max_member_count: maxMemberCount,
+        position_list: positionFields,
+        last_timestamp: serverTimestamp(),
+      };
+      delete projectRef.id;
+      await updateDoc(docRef, projectRef).catch((err) => {
+        console.log("updateDoc() error: ", err);
+      });
+      showAlert(
+        "success",
+        `"${project.title}" is updated successfully!` // success -> green
+      );
     }
+    setProject({
+      // only the fields on the screen
+      title: "",
+      cur_member_count: "",
+      category: "",
+      completion_date: moment().toDate(),
+      details: "",
+      description: "",
+    });
+    setPositionFields([emptyPositionField]);
+    setDoneFlag(true);
   };
 
   const handleGoBack = async (e) => {
@@ -318,8 +334,10 @@ const ProjectCreate = (props) => {
             // minRows={2}
             // maxRows={8}
             helperText="Descriptive project details separated by commas (e.g., tags, keywords)"
-            value={project.detail}
-            onChange={(e) => setProject({ ...project, detail: e.target.value })}
+            value={project.details}
+            onChange={(e) =>
+              setProject({ ...project, details: e.target.value })
+            }
           />
           {/* Description */}
           <TextField
@@ -419,7 +437,7 @@ const ProjectCreate = (props) => {
                       handleChangePosInput(index, e);
                     }}
                   />
-                  {index == positionFields.length - 1 && (
+                  {index === positionFields.length - 1 && (
                     <IconButton onClick={() => handleAddPosField()}>
                       <AddRoundedIcon />
                     </IconButton>
@@ -432,10 +450,9 @@ const ProjectCreate = (props) => {
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             {!isCreate && !doneFlag && (
               <Button
-                sx={{ mt: 5 }}
+                sx={{ mt: 5, bgcolor: "#3e95c2" }}
                 variant="contained"
                 disableElevation
-                style={{ bgcolor: "#3e95c2" }}
                 onClick={(e) => handleDeleteProj(argProject.id, e)}
               >
                 {"Delete"}
@@ -443,20 +460,18 @@ const ProjectCreate = (props) => {
             )}
             <Box sx={{ flexGrow: 1 }} />
             <Button
-              sx={{ mt: 5 }}
+              sx={{ mt: 5, bgcolor: "#3e95c2" }}
               variant="contained"
               disableElevation
-              style={{ bgcolor: "#3e95c2" }}
               onClick={(e) => handleGoBack(e)}
             >
               {"Go Back"}
             </Button>
             {!doneFlag && (
               <Button
-                sx={{ mt: 5, ml: 5 }}
+                sx={{ mt: 5, ml: 5, bgcolor: "#3e95c2" }}
                 variant="contained"
                 disableElevation
-                style={{ bgcolor: "#3e95c2" }}
                 onClick={(e) => handleSubmit(e)}
               >
                 {isCreate ? "Submit" : "Update"}

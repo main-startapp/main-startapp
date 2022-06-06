@@ -10,7 +10,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { ChatContext, ProjectContext } from "../Context/ShareContexts";
+import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import PositionListItem from "./PositionListItem";
 import {
   addDoc,
@@ -21,17 +21,77 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase";
+import ExportedImage from "next-image-export-optimizer";
 
 const ProjectInfo = () => {
   // context
-  const { project, currentStudent } = useContext(ProjectContext);
-  const { chats } = useContext(ChatContext);
+  const {
+    chats,
+    currentStudent,
+    students,
+    setChat,
+    setPartner,
+    setShowMsg,
+    setForceChatExpand,
+    openDirectMsg,
+    setOpenDirectMsg,
+  } = useContext(GlobalContext);
+  const { project } = useContext(ProjectContext);
 
   // local vars
   const currentUID = currentStudent?.uid;
   // is cur_user the creator?
   // !todo: should this go into useEffect?
-  const isCreator = currentStudent?.uid === project?.creator_uid ? true : false;
+  const isCreator = currentUID === project?.creator_uid;
+
+  // hook to find project creator student data
+  const [creatorStudent, setCreatorStudent] = useState(null);
+  useEffect(() => {
+    const foundCreator = students.find(
+      (student) => student.uid === project?.creator_uid
+    );
+    setCreatorStudent(foundCreator);
+    return foundCreator;
+  }, [students, project]);
+
+  // hook to show msg if the chat is newly created by "connect" or "join request"
+  useEffect(() => {
+    if (!openDirectMsg) return;
+
+    const foundChat = chats.find((chat) =>
+      chat.chat_user_ids.some((uid) => uid === creatorStudent?.uid)
+    );
+    if (foundChat) {
+      setForceChatExpand(true);
+      setTimeout(() => {
+        setChat(foundChat);
+        setPartner(creatorStudent);
+        setShowMsg(true);
+      }, 200); // delayed effect to look smooth
+      setOpenDirectMsg(false);
+    }
+    return foundChat;
+  }, [
+    chats,
+    creatorStudent,
+    openDirectMsg,
+    setChat,
+    setForceChatExpand,
+    setOpenDirectMsg,
+    setPartner,
+    setShowMsg,
+  ]); // trigger mainly by chats update and showDirectMsg. will return if don't need to show direct msg.
+
+  // helper func
+  function getCreatorName(students, creatorUID) {
+    const foundStudent = students.find((student) => student.uid === creatorUID);
+    return foundStudent?.name;
+  }
+
+  function getCreatorPhotoURL(students, creatorUID) {
+    const foundStudent = students.find((student) => student.uid === creatorUID);
+    return foundStudent?.photo_url;
+  }
 
   // similar func createProject() in ProjectList.jsx
   const router = useRouter();
@@ -50,49 +110,15 @@ const ProjectInfo = () => {
 
   // helper func
   // similar function in StudentGridCard; StudentProfile
-  // !todo: this function is bloated, might need an external lib to hold these func
+  // !todo: handleConnect; function is bloated, might need an external lib to hold these func
   // !todo: user should not change/update other user's data
   const handleConnect = async (e) => {
     e.stopPropagation();
+    setOpenDirectMsg(true); // trigger the useEffect to show the msg
     {
-      /* 
-    const senderDocRef = doc(db, "students", currentUID);
-    const receiverDocRef = doc(db, "students", project?.creator_uid);
-    // get the receiver's student doc
-    const receiverDocSnap = await getDoc(receiverDocRef);
-    if (receiverDocSnap.exists()) {
-      const student = receiverDocSnap.data();
-      const senderPendingConnections = currentStudent.pending_connections;
-      const receiverReceivedConnections = student.received_connections;
-      // don't need to check uniqueness as the Connect button will be disabled
-      senderPendingConnections.push(project?.creator_uid);
-      receiverReceivedConnections.push(currentUID);
-      const senderStudentRef = {
-        ...currentStudent,
-        pending_connections: senderPendingConnections,
-      };
-      const receiverStudentRef = {
-        ...student,
-        received_connections: receiverReceivedConnections,
-      };
-      delete senderStudentRef?.uid;
-      delete receiverStudentRef?.uid;
-      await updateDoc(senderDocRef, senderStudentRef).catch((err) => {
-        console.log("updateDoc() error: ", err);
-      });
-      await updateDoc(receiverDocRef, receiverStudentRef).catch((err) => {
-        console.log("updateDoc() error: ", err);
-      });
-    } else {
-      console.log("No such document!");
+      /* update student data: add project creator uid to connections array */
     }
-      */
-    }
-    console.log("connect");
-    {
-      /* update student data: add project creator uid to pending connections array */
-    }
-    const senderDocRef = doc(db, "students", currentUID);
+    /* const senderDocRef = doc(db, "students", currentUID);
     const senderPendingConnections = currentStudent.pending_connections;
     senderPendingConnections.push(project?.creator_uid);
     const senderStudentRef = {
@@ -102,73 +128,49 @@ const ProjectInfo = () => {
     delete senderStudentRef?.uid;
     await updateDoc(senderDocRef, senderStudentRef).catch((err) => {
       console.log("updateDoc() error: ", err);
-    });
+    }); */
     {
       /* create or update chat */
     }
     const foundChat = chats.find((chat) =>
-      chat.chat_user_ids.some((uid) => uid === project.creator_uid)
+      chat.chat_user_ids.some((uid) => uid === project?.creator_uid)
     );
-    const msgStr = currentStudent.name + " has requested to connect with you";
+    if (foundChat) {
+      return;
+    }
+    // not found chat -> create
+    const msgStr = currentStudent.name + " requested to connect";
     const messageRef = {
       text: msgStr,
       sent_by: currentUID,
       sent_at: serverTimestamp(),
     };
-    if (foundChat) {
-      // update
-      // add message
-      const msgCollectionRef = collection(
-        db,
-        "chats",
-        foundChat.id,
-        "messages"
-      );
-      const msgAddDocRef = await addDoc(msgCollectionRef, messageRef).catch(
-        (err) => {
-          console.log("addDoc() error: ", err);
-        }
-      );
-      // update chat
-      const chatDocRef = doc(db, "chats", foundChat.id);
-      const chatRef = {
-        ...foundChat,
-        last_text: msgStr,
-        last_timestamp: serverTimestamp(),
-      };
-      delete chatRef.id;
-      const chatUpdateDocRef = await updateDoc(chatDocRef, chatRef).catch(
-        (err) => {
-          console.log("updateDoc() error: ", err);
-        }
-      );
-    } else {
-      // create
-      // add chat doc
-      const collectionRef = collection(db, "chats");
-      const chatRef = {
-        chat_user_ids: [currentStudent?.uid, project?.creator_uid],
-        last_text: msgStr,
-        last_timestamp: serverTimestamp(),
-      };
-      const chatAddDocRef = await addDoc(collectionRef, chatRef).catch(
-        (err) => {
-          console.log("addDoc() error: ", err);
-        }
-      );
-      // add message
-      const msgCollectionRef = collection(
-        db,
-        "chats",
-        chatAddDocRef.id,
-        "messages"
-      );
-      const msgAddDocRef = await addDoc(msgCollectionRef, messageRef).catch(
-        (err) => {
-          console.log("addDoc() error: ", err);
-        }
-      );
-    }
+    // add chat doc
+    const collectionRef = collection(db, "chats");
+    const my_unread_key = currentUID + "_unread";
+    const creator_unread_key = project?.creator_uid + "_unread";
+    const chatRef = {
+      chat_user_ids: [currentStudent?.uid, project?.creator_uid],
+      last_text: msgStr,
+      last_timestamp: serverTimestamp(),
+      [my_unread_key]: 0,
+      [creator_unread_key]: 1,
+    };
+    const chatAddDocRef = await addDoc(collectionRef, chatRef).catch((err) => {
+      console.log("addDoc() error: ", err);
+    });
+    // add message
+    const msgCollectionRef = collection(
+      db,
+      "chats",
+      chatAddDocRef.id,
+      "messages"
+    );
+    const msgAddDocRef = await addDoc(msgCollectionRef, messageRef).catch(
+      (err) => {
+        console.log("addDoc() error: ", err);
+      }
+    );
   };
 
   // similar alg in components/Student/StudentProfile
@@ -183,7 +185,7 @@ const ProjectInfo = () => {
     <Box
       ref={boxRef}
       sx={{
-        height: "calc(99vh - 128px)",
+        height: "calc(98vh - 128px)",
         overflow: "auto",
       }}
     >
@@ -193,7 +195,7 @@ const ProjectInfo = () => {
           <Grid item xs={8}>
             <Box mt={3} ml={3} mr={1.5}>
               <Typography sx={{ fontWeight: "bold", fontSize: "2.5em" }}>
-                {project.title}
+                {project?.title}
               </Typography>
               <Divider sx={{ mt: 3 }} />
               <Typography
@@ -203,9 +205,9 @@ const ProjectInfo = () => {
                 {"Team size: "}
               </Typography>
               <Typography color="text.secondary">
-                {project.cur_member_count}
+                {project?.cur_member_count}
                 {"/"}
-                {project.max_member_count}
+                {project?.max_member_count}
               </Typography>
               <Typography
                 sx={{ mt: 3, fontWeight: "bold" }}
@@ -213,7 +215,7 @@ const ProjectInfo = () => {
               >
                 {"Details: "}
               </Typography>
-              <Typography color="text.secondary">{project.details}</Typography>
+              <Typography color="text.secondary">{project?.details}</Typography>
             </Box>
           </Grid>
 
@@ -228,6 +230,7 @@ const ProjectInfo = () => {
                       height: "5em",
                       border: "1px solid black",
                     }}
+                    src={getCreatorPhotoURL(students, project?.creator_uid)}
                   />
                 </IconButton>
               </Box>
@@ -239,25 +242,20 @@ const ProjectInfo = () => {
                   mt: 3,
                 }}
               >
-                {"Founder"}
+                {getCreatorName(students, project?.creator_uid) || "Founder"}
               </Typography>
               <Typography
                 sx={{ display: "flex", justifyContent: "center" }}
                 color="text.secondary"
               >
-                {project.creator_email}
+                {project?.creator_email}
               </Typography>
               <Box m={3} sx={{ display: "flex", justifyContent: "center" }}>
                 {!isCreator && (
                   <Tooltip title={currentUID ? "" : "Edit your profile first."}>
                     <span>
                       <Button
-                        disabled={
-                          !currentUID ||
-                          currentStudent.pending_connections.includes(
-                            project.creator_uid
-                          )
-                        }
+                        disabled={!currentUID}
                         disableElevation
                         sx={{ borderRadius: 4, bgcolor: "#3e95c2" }}
                         variant="contained"
@@ -275,7 +273,7 @@ const ProjectInfo = () => {
                     sx={{ borderRadius: 4, bgcolor: "#3e95c2" }}
                     disableElevation
                   >
-                    {"Modify"}
+                    &emsp; {"Modify"} &emsp;
                   </Button>
                 )}
               </Box>
@@ -300,7 +298,7 @@ const ProjectInfo = () => {
                     display: "inline",
                   }}
                 >
-                  {project.description}
+                  {project?.description}
                 </pre>
               </Typography>
             </Box>
@@ -310,23 +308,26 @@ const ProjectInfo = () => {
                 mt: 6,
                 ml: 3,
                 mr: 3,
+                mb: "64px",
                 border: 1,
-                borderRadius: 4,
               }}
             >
               <Typography
                 sx={{
                   fontWeight: "bold",
                   color: "white",
-                  bgcolor: "#3e95c2",
-                  borderTopLeftRadius: 15,
-                  borderTopRightRadius: 15,
+                  backgroundColor: "#3e95c2",
+                  // borderTopLeftRadius: 15,
+                  // borderTopRightRadius: 15,
+                  height: "32px",
+                  display: "flex",
+                  alignItems: "center",
                 }}
                 color="text.primary"
               >
                 &emsp; {"Positions:"}
               </Typography>
-              {project.position_list.map((position, index) => (
+              {project?.position_list.map((position, index) => (
                 <PositionListItem
                   key={index}
                   index={index}
@@ -334,12 +335,41 @@ const ProjectInfo = () => {
                   resp={position.positionResp}
                   weeklyHour={position.positionWeeklyHour}
                   isCreator={isCreator}
+                  creator={creatorStudent}
                   // uid={position.positionUID}
                 />
               ))}
             </Box>
           </Grid>
         </Grid>
+      )}
+      {!project?.id && (
+        <Box
+          id="logo placeholder container"
+          sx={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            id="logo placeholder wrapper"
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <ExportedImage
+              src="/images/EDIUM Logo.png"
+              placeholder=""
+              width={256}
+              height={256}
+              unoptimized={true}
+            />
+          </Box>
+        </Box>
       )}
     </Box>
   );

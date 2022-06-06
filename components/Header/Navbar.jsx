@@ -13,19 +13,11 @@ import {
 } from "@mui/material";
 import { auth } from "../../firebase";
 import { useAuth } from "../Context/AuthContext";
-import { makeStyles } from "@mui/styles";
-
-// override the style Accordion Summary
-const useStyles = makeStyles({
-  customLink: {
-    color: "white",
-    textDecoration: "none",
-  },
-});
+import { ThemeProvider, styled, createTheme } from "@mui/material/styles";
+import ExportedImage from "next-image-export-optimizer";
 
 const Navbar = () => {
   const { currentUser } = useAuth();
-  const classes = useStyles();
 
   const [anchorEl, setAnchorEl] = useState(null);
   const handleUserMenu = (e) => {
@@ -39,8 +31,9 @@ const Navbar = () => {
     auth.signOut();
     setAnchorEl(null);
   };
+
   return (
-    // https://www.color-hex.com/color/6fa8dc
+    // https://www.color-hex.com/color/3e95c2
     <AppBar position="static" sx={{ bgcolor: "#3e95c2" }} elevation={0}>
       <Toolbar
         sx={{
@@ -61,7 +54,16 @@ const Navbar = () => {
             justifyContent: "flex-start",
           }}
         >
-          <Typography sx={{ fontSize: "1.5em" }}>{"Edium"}</Typography>
+          <ExportedImage
+            src="/images/EDIUM Platform Logo 256.png"
+            placeholder=""
+            width={48}
+            height={48}
+            unoptimized={true}
+          />
+          <Typography variant="edium" sx={{ fontSize: "2em", ml: 1 }}>
+            {"Edium"}
+          </Typography>
         </Box>
         {/* tabs */}
         {/* https://stackoverflow.com/questions/32378953/keep-the-middle-item-centered-when-side-items-have-different-widths */}
@@ -72,15 +74,17 @@ const Navbar = () => {
             justifyContent: "center",
           }}
         >
-          <Link className={classes.customLink} href="/">
+          <StyledLink href="/">
             <Typography sx={{ fontSize: "1.1em" }}>{"Projects"}</Typography>
-          </Link>
+          </StyledLink>
           <Divider sx={{ ml: 3, mr: 3 }} orientation="vertical" flexItem />
-          <Typography sx={{ fontSize: "1.1em" }}>{"Events"}</Typography>
+          <StyledLink href="/events">
+            <Typography sx={{ fontSize: "1.1em" }}>{"Events"}</Typography>
+          </StyledLink>
           <Divider sx={{ ml: 3, mr: 3 }} orientation="vertical" flexItem />
-          <Link className={classes.customLink} href="/students">
+          <StyledLink href="/students">
             <Typography sx={{ fontSize: "1.1em" }}>{"Students"}</Typography>
-          </Link>
+          </StyledLink>
         </Box>
         {/* user */}
         <Box
@@ -107,18 +111,7 @@ const Navbar = () => {
           >
             <MenuItem onClick={handleUserMenuClose}>
               <Link
-                style={{
-                  textDecoration: "none",
-                  color: "#000",
-                }}
-                href="/student/debugcreate"
-              >
-                Debug Edit Profile
-              </Link>
-            </MenuItem>
-            <MenuItem onClick={handleUserMenuClose}>
-              <Link
-                style={{
+                sx={{
                   textDecoration: "none",
                   color: "#000",
                 }}
@@ -136,3 +129,8 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+const StyledLink = styled(Link)(({ theme }) => ({
+  color: "white",
+  textDecoration: "none",
+}));

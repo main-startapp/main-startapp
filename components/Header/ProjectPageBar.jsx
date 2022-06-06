@@ -75,7 +75,7 @@ export default function ProjectPageBar() {
             <FilterAltOutlinedIcon />
           </SearchIconWrapper>
           <StyledInputBase
-            placeholder="Filter…"
+            placeholder="Filter… (coming soon)"
             inputProps={{ "aria-label": "search" }}
           />
         </Search>

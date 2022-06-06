@@ -1,33 +1,24 @@
 import { Alert, Snackbar } from "@mui/material";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
-import { useEffect, useRef, useState } from "react";
-import { useAuth } from "../../components/Context/AuthContext";
-import { StudentContext } from "../../components/Context/ShareContexts";
+import { useContext, useEffect, useState } from "react";
+import {
+  GlobalContext,
+  StudentContext,
+} from "../../components/Context/ShareContexts";
 import StudentCreate from "../../components/Student/StudentCreate";
-import { db } from "../../firebase";
 
 const Create = () => {
-  const { currentUser } = useAuth();
+  // context
+  const { setChat, setShowChat, setShowMsg } = useContext(GlobalContext);
+  useEffect(() => {
+    setShowChat(false);
+    setShowMsg(false);
+    setChat(null);
+  }, [setChat, setShowChat, setShowMsg]);
 
-  const [currentStudent, setCurrentStudent] = useState(null);
+  // local
   const [open, setOpen] = useState(false);
   const [alertType, setAlertType] = useState("success");
   const [alertMessage, setAlertMessage] = useState("");
-
-  // listen to the current user's student data for realtime update
-  // similar alg in pages/students; pages/index
-  useEffect(() => {
-    const docID = currentUser?.uid || 0;
-    const unsub = onSnapshot(doc(db, "students", docID), (doc) => {
-      if (doc.exists()) {
-        setCurrentStudent({ ...doc.data(), uid: docID });
-      }
-    });
-
-    return () => {
-      unsub;
-    };
-  }, [currentUser]);
 
   const showAlert = (type, msg) => {
     setAlertType(type);
@@ -43,7 +34,7 @@ const Create = () => {
   };
 
   return (
-    <StudentContext.Provider value={{ showAlert, currentStudent }}>
+    <StudentContext.Provider value={{ showAlert }}>
       <Snackbar
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         open={open}

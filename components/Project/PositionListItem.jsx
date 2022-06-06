@@ -6,13 +6,13 @@ import {
   Button,
   Divider,
   Grid,
+  styled,
   Tooltip,
   Typography,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { makeStyles } from "@mui/styles";
 import { useContext, useEffect, useState } from "react";
-import { ChatContext, ProjectContext } from "../Context/ShareContexts";
+import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import { db } from "../../firebase";
 import {
   addDoc,
@@ -22,19 +22,11 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
-// override the style Accordion Summary
-const useStyles = makeStyles({
-  customAccordionSummary: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-});
-
 const PositionListItem = (props) => {
   // context
-  const { project, currentStudent } = useContext(ProjectContext);
-  const { chats } = useContext(ChatContext);
+  const { chats, currentStudent, setChat, setOpenDirectMsg } =
+    useContext(GlobalContext);
+  const { project } = useContext(ProjectContext);
 
   // args
   const index = props.index;
@@ -42,12 +34,10 @@ const PositionListItem = (props) => {
   const resp = props.resp;
   const weeklyHour = props.weeklyHour;
   const isCreator = props.isCreator;
+  const creator = props.creator;
 
   // local vars
   const currentUID = currentStudent?.uid;
-
-  // override Accordion style to use justifyConent
-  const classes = useStyles();
 
   // useEffect to reset accordion expansion
   const [expandState, setExpandState] = useState("collapseIt");
@@ -61,10 +51,12 @@ const PositionListItem = (props) => {
       : setExpandState("expandIt");
   };
 
+  // similar function in StudentProfile; ProjectInfo; StudentGridCard
+  // !todo: handleJoinRequest; function is bloated, might need an external lib to hold these func
   const handleJoinRequest = async (e) => {
     e.stopPropagation();
     {
-      /* update student data: update requested positions*/
+      /* update currentStudent: requested positions*/
     }
     const currentStudentDocRef = doc(db, "students", currentUID);
     const currentStudenReqPos = currentStudent.requested_posititons;
@@ -84,12 +76,13 @@ const PositionListItem = (props) => {
     {
       /* create or update chat */
     }
+    setOpenDirectMsg(true); // trigger the useEffect to show the msg
     const foundChat = chats.find((chat) =>
       chat.chat_user_ids.some((uid) => uid === project.creator_uid)
     );
     const msgStr =
       currentStudent.name +
-      " has requested to join " +
+      " requested to join " +
       project.title +
       " as " +
       title;
@@ -98,6 +91,8 @@ const PositionListItem = (props) => {
       sent_by: currentUID,
       sent_at: serverTimestamp(),
     };
+    const my_unread_key = currentUID + "_unread";
+    const creator_unread_key = project?.creator_uid + "_unread";
     if (foundChat) {
       // update
       // add message
@@ -116,8 +111,11 @@ const PositionListItem = (props) => {
       const chatDocRef = doc(db, "chats", foundChat.id);
       const chatRef = {
         ...foundChat,
+        join_request_project: project?.title,
+        join_request_position: title,
         last_text: msgStr,
         last_timestamp: serverTimestamp(),
+        [creator_unread_key]: foundChat[creator_unread_key] + 1, // dont use ++foundChat[creator_unread_key]; dont directly mutate the state
       };
       delete chatRef.id;
       const chatUpdateDocRef = await updateDoc(chatDocRef, chatRef).catch(
@@ -125,14 +123,23 @@ const PositionListItem = (props) => {
           console.log("updateDoc() error: ", err);
         }
       );
+      // set state
+      setChat({
+        ...foundChat,
+        [creator_unread_key]: foundChat[creator_unread_key] + 1,
+      });
     } else {
       // create
       // add chat doc
       const collectionRef = collection(db, "chats");
       const chatRef = {
         chat_user_ids: [currentStudent?.uid, project?.creator_uid],
+        join_request_project: project?.title,
+        join_request_position: title,
         last_text: msgStr,
         last_timestamp: serverTimestamp(),
+        [my_unread_key]: 0,
+        [creator_unread_key]: 1,
       };
       const chatAddDocRef = await addDoc(collectionRef, chatRef).catch(
         (err) => {
@@ -157,22 +164,20 @@ const PositionListItem = (props) => {
   return (
     <Box sx={{ m: 3 }}>
       <Accordion
-        // TransitionProps={{ unmountOnExit: true }}
+        square={true}
         expanded={expandState === "expandIt"}
-        square // why? only with this prop the corner is rounded!
         sx={{
           border: 1,
           borderRadius: 4,
           borderColor: "text.secondary",
           boxShadow: 0,
           maxWidth: "100%",
-          ":hover": {
-            boxShadow: 2,
+          "&:hover": {
+            backgroundColor: "#f6f6f6",
           },
         }}
       >
-        <AccordionSummary
-          classes={{ content: classes.customAccordionSummary }}
+        <StyledAccordionSummary
           expandIcon={<ExpandMoreIcon />}
           onClick={(e) => handleExpand(e)}
         >
@@ -201,7 +206,7 @@ const PositionListItem = (props) => {
               </span>
             </Tooltip>
           )}
-        </AccordionSummary>
+        </StyledAccordionSummary>
         <AccordionDetails>
           <Divider sx={{ mb: 3 }} />
           <Grid
@@ -242,3 +247,9 @@ const PositionListItem = (props) => {
 };
 
 export default PositionListItem;
+
+const StyledAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
+  "& .MuiAccordionSummary-content": {
+    justifyContent: "space-between",
+  },
+}));

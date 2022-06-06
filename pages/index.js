@@ -1,38 +1,38 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Grid } from "@mui/material";
-import {
-  collection,
-  query,
-  orderBy,
-  onSnapshot,
-  doc,
-} from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
-import { useAuth } from "../components/Context/AuthContext";
-import { ProjectContext } from "../components/Context/ShareContexts";
+import {
+  GlobalContext,
+  ProjectContext,
+} from "../components/Context/ShareContexts";
 import ProjectPageBar from "../components/Header/ProjectPageBar";
 import ProjectList from "../components/Project/ProjectList";
 import ProjectInfo from "../components/Project/ProjectInfo";
 
 // this page is also project homepage. Is this a good practice?
 export default function Home() {
-  const { currentUser } = useAuth();
+  // global context
+  const { setChat, setShowChat, setShowMsg } = useContext(GlobalContext);
+  useEffect(() => {
+    setShowChat(true);
+    setShowMsg(false);
+    setChat(null);
+  }, [setChat, setShowChat, setShowMsg]);
 
   // project state init
   const [project, setProject] = useState(null);
   const [projects, setProjects] = useState([]); // list of project
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
-  const [currentStudent, setCurrentStudent] = useState(null); // the student data of the currentUser
 
-  // listen to Projects collection
+  // listen to realtime projects collection
   // https://stackoverflow.com/questions/59841800/react-useeffect-in-depth-use-of-useeffect
   useEffect(() => {
     // db query
     const collectionRef = collection(db, "projects");
     const q = query(collectionRef, orderBy("last_timestamp", "desc"));
 
-    // Get realtime updates with Cloud Firestore
     // https://firebase.google.com/docs/firestore/query-data/listen
     const unsub = onSnapshot(q, (querySnapshot) => {
       setProjects(
@@ -47,26 +47,9 @@ export default function Home() {
     return unsub;
   }, []);
 
-  // listen to the current user's student data for realtime update
-  // similar alg in pages/students; pages/student/create
-  // reason: Connect button in the ProjectInfo comp; Join Request button in the PositionListItem comp
-  useEffect(() => {
-    const docID = currentUser?.uid || 0;
-    const unsub = onSnapshot(doc(db, "students", docID), (doc) => {
-      if (doc.exists()) {
-        setCurrentStudent({ ...doc.data(), uid: docID });
-      }
-    });
-
-    return () => {
-      unsub;
-    };
-  }, [currentUser]);
-
   return (
     <ProjectContext.Provider
       value={{
-        currentUser,
         project,
         setProject,
         projects,
@@ -74,7 +57,6 @@ export default function Home() {
         setSearchTerm,
         searchCategory,
         setSearchCategory,
-        currentStudent,
       }}
     >
       {/* Toolbar for searching keywords, category and filter */}

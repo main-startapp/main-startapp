@@ -8,6 +8,7 @@ import {
 import { styled } from "@mui/material/styles";
 import {
   collection,
+  doc,
   onSnapshot,
   orderBy,
   query,
@@ -16,30 +17,48 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { db } from "../../firebase";
 import { useAuth } from "../Context/AuthContext";
-import { ChatContext } from "../Context/ShareContexts";
+import { GlobalContext } from "../Context/ShareContexts";
 import ChatAccordionContact from "./ChatAccordionContact";
-
-{
-  /* */
-}
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
 const ChatAccordion = () => {
-  // states
+  // context
   const { currentUser } = useAuth();
   const {
     chats,
     setChats,
-    chat,
     setChat,
-    students,
-    setStudents,
-    partner,
-    setPartner,
-    showMsg,
+    setCurrentStudent,
     setShowMsg,
-  } = useContext(ChatContext);
+    forceChatExpand,
+    setForceChatExpand,
+  } = useContext(GlobalContext);
 
-  // chats data
+  // local
+  const [expandState, setExpandState] = useState("collapseIt");
+
+  // chat expand signal
+  useEffect(() => {
+    if (!forceChatExpand) return;
+    setForceChatExpand(false);
+    if (expandState === "expandIt") {
+      return;
+    }
+    return () => {
+      setExpandState("expandIt");
+    };
+  }, [forceChatExpand, expandState, setForceChatExpand]);
+
+  // helper func
+  const handleExpand = (e) => {
+    expandState === "expandIt"
+      ? setExpandState("collapseIt")
+      : setExpandState("expandIt");
+    setShowMsg(false);
+    setChat(null);
+  };
+
+  // listen to realtime chats collection
   useEffect(() => {
     const chatsRef = collection(db, "chats");
     const q = query(
@@ -58,42 +77,44 @@ const ChatAccordion = () => {
     };
   }, [currentUser, setChats]);
 
-  // students data
+  // listen to realtime currentUser's student doc
   useEffect(() => {
-    // db query
-    const collectionRef = collection(db, "students");
-    const q = query(collectionRef, orderBy("name", "desc"));
-    const unsub = onSnapshot(q, (querySnapshot) => {
-      setStudents(
-        querySnapshot.docs.map((doc) => ({
-          ...doc.data(),
-          uid: doc.id,
-        }))
-      );
+    const docID = currentUser?.uid || "0";
+    const unsub = onSnapshot(doc(db, "students", docID), (doc) => {
+      if (doc.exists()) {
+        setCurrentStudent({ ...doc.data(), uid: docID });
+      }
     });
 
-    return unsub;
-  }, [setStudents]);
+    return () => {
+      unsub;
+    };
+  }, [currentUser, setCurrentStudent]);
 
   return (
     <Box sx={{ display: "flex", justifyContent: "right" }}>
       <Accordion
         square={true}
+        expanded={expandState === "expandIt"}
         sx={{
-          width: "25%",
-          maxHeight: "50%",
+          minWidth: "300px",
+          width: "25vw",
+          maxHeight: "75vh",
           position: "fixed",
           right: "20px",
           bottom: 0,
           //   backgroundColor: "pink",
           border: 1,
-          overflow: "auto",
         }}
       >
-        <AccordionSummary sx={{ borderBottom: 1 }}>
-          <Typography>Courier</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
+        <StyledAccordionSummary
+          sx={{ borderBottom: 1 }}
+          expandIcon={<ExpandLessIcon />}
+          onClick={(e) => handleExpand(e)}
+        >
+          <Typography>Messenger</Typography>
+        </StyledAccordionSummary>
+        <AccordionDetails sx={{ overflow: "auto", maxHeight: "50vh" }}>
           <Wrapper>
             <ChatList>
               {chats.map((chat) => (
@@ -116,7 +137,17 @@ const Wrapper = styled("div")(({ theme }) => ({
 }));
 
 const ChatList = styled("div")(({ theme }) => ({
-  height: "100%",
+  maxHeight: "100%",
   width: "100%",
-  overflow: "auto",
+}));
+
+const StyledAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
+  "& .MuiAccordionSummary-content": {
+    justifyContent: "center",
+  },
+
+  "& .MuiAccordionSummary-expandIconWrapper": {
+    position: "absolute",
+    left: "5%",
+  },
 }));

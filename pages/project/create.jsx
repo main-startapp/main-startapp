@@ -1,10 +1,22 @@
 import { Alert, Snackbar } from "@mui/material";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import { ProjectContext } from "../../components/Context/ShareContexts";
+import { useContext, useEffect, useState } from "react";
+import {
+  GlobalContext,
+  ProjectContext,
+} from "../../components/Context/ShareContexts";
 import ProjectCreate from "../../components/Project/ProjectCreate";
 
 const Create = () => {
+  // context
+  const { setChat, setShowChat, setShowMsg } = useContext(GlobalContext);
+  useEffect(() => {
+    setShowChat(false);
+    setShowMsg(false);
+    setChat(null);
+  }, [setChat, setShowChat, setShowMsg]);
+
+  // local
   const { query } = useRouter();
   const [open, setOpen] = useState(false);
   const [alertType, setAlertType] = useState("success");

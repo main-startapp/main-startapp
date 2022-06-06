@@ -1,13 +1,6 @@
 import { useContext } from "react";
 import { useRouter } from "next/router";
-import {
-  Box,
-  IconButton,
-  ListItem,
-  ListItemText,
-  Typography,
-} from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { Box, ListItem, ListItemText, Typography } from "@mui/material";
 import moment from "moment";
 import { ProjectContext } from "../Context/ShareContexts";
 
@@ -21,10 +14,10 @@ const ProjectListItem = (props) => {
   // router
   const router = useRouter();
 
-  const seeProject = (id, e) => {
+  /* const seeProject = (id, e) => {
     e.stopPropagation();
     router.push(`/project/${id}`);
-  };
+  }; */
 
   return (
     <Box m={3}>
@@ -39,23 +32,10 @@ const ProjectListItem = (props) => {
           borderColor: "text.secondary",
           boxShadow: 0,
           maxWidth: "100%",
-          ":hover": {
-            boxShadow: 2,
+          "&:hover": {
+            backgroundColor: "#f6f6f6",
           },
         }}
-        // style={{ backgroudColor: "#fafafa" }}
-        // secondaryAction={
-        //   <>
-        //     {/* {isCreator && (
-        //       <IconButton onClick={(e) => deleteProject(id, e)}>
-        //         <DeleteIcon />
-        //       </IconButton>
-        //     )} */}
-        //     <IconButton onClick={(e) => seeProject(project.id, e)}>
-        //       <MoreVertIcon />
-        //     </IconButton>
-        //   </>
-        // }
       >
         <ListItemText
           primary={project.title}

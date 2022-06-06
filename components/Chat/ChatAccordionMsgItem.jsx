@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { useContext } from "react";
 import { useAuth } from "../Context/AuthContext";
-import { ChatContext } from "../Context/ShareContexts";
+import { GlobalContext } from "../Context/ShareContexts";
 import moment from "moment";
 
 const ChatAccordionMsgItem = (props) => {
@@ -10,11 +10,11 @@ const ChatAccordionMsgItem = (props) => {
 
   // context
   const { currentUser } = useAuth();
-  const { partner } = useContext(ChatContext);
+  const { partner } = useContext(GlobalContext);
 
   return (
     <>
-      {!isSameAuthor && message.sent_by === partner.uid && (
+      {!isSameAuthor && message.sent_by === partner?.uid && (
         <Box
           sx={{
             padding: "5px",
@@ -26,7 +26,7 @@ const ChatAccordionMsgItem = (props) => {
           }}
         >
           <Typography sx={{ display: "inline", fontWeight: "bold" }}>
-            {partner.name}
+            {partner?.name}
           </Typography>
           <Typography
             sx={{ display: "inline", color: "gray", fontSize: "0.9em" }}

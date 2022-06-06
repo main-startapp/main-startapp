@@ -6,54 +6,79 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { useContext, useEffect, useRef } from "react";
-import { StudentContext } from "../Context/ShareContexts";
+import { useContext, useEffect, useRef, useState } from "react";
+import { GlobalContext, StudentContext } from "../Context/ShareContexts";
 import VerifiedRoundedIcon from "@mui/icons-material/VerifiedRounded";
 import LocalPoliceRoundedIcon from "@mui/icons-material/LocalPoliceRounded";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import LinkIcon from "@mui/icons-material/Link";
-import { doc, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../../firebase";
 
 const StudentProfile = () => {
   // context
-  const { student, currentStudent } = useContext(StudentContext);
+  const { chats, currentStudent, setOpenDirectMsg } = useContext(GlobalContext);
+  const { student } = useContext(StudentContext);
 
   // local vars
   const currentUID = currentStudent?.uid;
 
   // helper func
-  // same function in StudentGridCard; ProjectInfo
+  // !todo: handleConnect; function is bloated, might need an external lib to hold these func
   const handleConnect = async (e) => {
     e.stopPropagation();
-    const senderDocRef = doc(db, "students", currentUID);
-    const receiverDocRef = doc(db, "students", student?.uid);
-    const senderPendingConnections = currentStudent.pending_connections;
-    const receiverReceivedConnections = student.received_connections;
-    // don't need to check uniqueness as the Connect button will be disabled
-    senderPendingConnections.push(student?.uid);
-    receiverReceivedConnections.push(currentUID);
-    const senderStudentRef = {
-      ...currentStudent,
-      pending_connections: senderPendingConnections,
+    setOpenDirectMsg(true); // trigger the useEffect to show the msg
+    {
+      /* create or update chat */
+    }
+    const foundChat = chats.find((chat) =>
+      chat.chat_user_ids.some((uid) => uid === student?.uid)
+    );
+    if (foundChat) {
+      return;
+    }
+
+    // not found chat -> create
+    const msgStr = currentStudent?.name + " requested to connect";
+    const messageRef = {
+      text: msgStr,
+      sent_by: currentUID,
+      sent_at: serverTimestamp(),
     };
-    const receiverStudentRef = {
-      ...student,
-      received_connections: receiverReceivedConnections,
+    // add chat doc
+    const collectionRef = collection(db, "chats");
+    const my_unread_key = currentUID + "_unread";
+    const it_unread_key = student?.uid + "_unread";
+    const chatRef = {
+      chat_user_ids: [currentStudent?.uid, student?.uid],
+      last_text: msgStr,
+      last_timestamp: serverTimestamp(),
+      [my_unread_key]: 0,
+      [it_unread_key]: 1,
     };
-    // uid is not a key in the student document
-    // !todo: maybe we should add uid to the doc?
-    delete senderStudentRef?.uid;
-    delete receiverStudentRef?.uid;
-    await updateDoc(senderDocRef, senderStudentRef).catch((err) => {
-      console.log("updateDoc() error: ", err);
+    const chatAddDocRef = await addDoc(collectionRef, chatRef).catch((err) => {
+      console.log("addDoc() error: ", err);
     });
-    await updateDoc(receiverDocRef, receiverStudentRef).catch((err) => {
-      console.log("updateDoc() error: ", err);
-    });
-    // don't need to setState, since the student and currentStudent in pages/students is real-time updated
+    // add message
+    const msgCollectionRef = collection(
+      db,
+      "chats",
+      chatAddDocRef.id,
+      "messages"
+    );
+    const msgAddDocRef = await addDoc(msgCollectionRef, messageRef).catch(
+      (err) => {
+        console.log("addDoc() error: ", err);
+      }
+    );
   };
 
   // similar alg in components/Project/ProjectInfo
@@ -86,6 +111,7 @@ const StudentProfile = () => {
               height: "10em",
               border: "1px solid black",
             }}
+            src={student?.photo_url}
           />
           {/* name */}
           {student?.name && (
@@ -109,6 +135,17 @@ const StudentProfile = () => {
           {!student?.desired_position && (
             <Typography sx={{ fontSize: "1em", color: "gray" }}>
               {"Position"}
+            </Typography>
+          )}
+          {/* field of interest */}
+          {student?.field_of_interest && (
+            <Typography sx={{ fontSize: "1em" }}>
+              {student.field_of_interest}
+            </Typography>
+          )}
+          {!student?.field_of_interest && (
+            <Typography sx={{ fontSize: "1em", color: "gray" }}>
+              {"Field"}
             </Typography>
           )}
           {/* education year */}
@@ -135,13 +172,13 @@ const StudentProfile = () => {
           }}
         >
           {/* awards */}
-          <Typography sx={{ fontWeight: "bold", fontSize: "1.2em" }}>
+          {/* <Typography sx={{ fontWeight: "bold", fontSize: "1.2em" }}>
             {"Awards"}
           </Typography>
           <Box direction="row">
             <VerifiedRoundedIcon sx={{ fontSize: "3em", mr: 1 }} />
             <LocalPoliceRoundedIcon sx={{ fontSize: "3em", mr: 1 }} />
-          </Box>
+          </Box> */}
           {/* social media links */}
           {student?.social_media.length > 0 && (
             <Typography sx={{ fontWeight: "bold", fontSize: "1.2em", mt: 1 }}>
@@ -233,68 +270,29 @@ const StudentProfile = () => {
             m: 3,
           }}
         >
-          {/* disabled connect button */}
-          {!currentUID && (
-            <Tooltip title="Edit your profile first.">
-              <span>
-                <Button
-                  disabled
-                  disableElevation
-                  size="large"
-                  sx={{
-                    m: 3,
-                    borderRadius: 4,
-                    bgcolor: "#3e95c2",
-                  }}
-                  variant="contained"
-                >
-                  <Typography sx={{ fontSize: "0.9em" }}>
-                    &emsp; {"Connect"} &emsp;
-                  </Typography>
-                </Button>
-              </span>
-            </Tooltip>
-          )}
-          {currentUID &&
-            student?.uid &&
-            !currentStudent.pending_connections.includes(student?.uid) &&
-            !currentStudent.received_connections.includes(student?.uid) && (
+          {/* connect button */}
+          <Tooltip title={currentUID ? "" : "Edit your profile first."}>
+            <span>
               <Button
-                variant="contained"
+                disabled={
+                  !currentUID || !student?.uid || currentUID === student?.uid
+                }
+                disableElevation
                 size="large"
                 sx={{
                   m: 3,
                   borderRadius: 4,
                   bgcolor: "#3e95c2",
                 }}
-                disableElevation
+                variant="contained"
                 onClick={(e) => handleConnect(e)}
               >
                 <Typography sx={{ fontSize: "0.9em" }}>
                   &emsp; {"Connect"} &emsp;
                 </Typography>
               </Button>
-            )}
-          {currentUID &&
-            student?.uid &&
-            (currentStudent.pending_connections.includes(student?.uid) ||
-              currentStudent.received_connections.includes(student?.uid)) && (
-              <Button
-                disabled
-                disableElevation
-                size="large"
-                sx={{
-                  m: 3,
-                  borderRadius: 4,
-                  bgcolor: "#3e95c2",
-                }}
-                variant="contained"
-              >
-                <Typography sx={{ fontSize: "0.9em" }}>
-                  &ensp; {"Pending"} &ensp;
-                </Typography>
-              </Button>
-            )}
+            </span>
+          </Tooltip>
         </Box>
       </Box>
     </>
