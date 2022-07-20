@@ -15,6 +15,8 @@ import { GlobalContext } from "../Context/ShareContexts";
 import { useAuth } from "../Context/AuthContext";
 import ChatAccordionMsgItem from "./ChatAccordionMsgItem";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import OpenInFullRoundedIcon from "@mui/icons-material/OpenInFullRounded";
+import CloseFullscreenRoundedIcon from "@mui/icons-material/CloseFullscreenRounded";
 import IconButton from "@mui/material/IconButton";
 
 const ChatAccordionMsg = () => {
@@ -59,8 +61,9 @@ const ChatAccordionMsg = () => {
     };
   }, [isClickable]); // reset send button in 1s
 
+  const [isMaximized, setIsMaximized] = useState(false);
+
   // helper func
-  // https://stackoverflow.com/questions/43302584/why-doesnt-the-code-after-await-run-right-away-isnt-it-supposed-to-be-non-blo
   const handleSubmit = async (e) => {
     if (!isClickable) return;
     setIsClickable(false);
@@ -69,7 +72,7 @@ const ChatAccordionMsg = () => {
     const messageRef = { ...message, sent_at: serverTimestamp() };
     setMessage({ text: "", sent_by: currentUser.uid }); // reset msg locally
     const msgCollectionRef = collection(db, "chats", chat.id, "messages");
-    const msgAddDocRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
+    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
       console.log("addDoc() error: ", err);
     });
     // update chat
@@ -85,12 +88,17 @@ const ChatAccordionMsg = () => {
     };
     setChat({ ...chatRef }); // update chat locally before id removal to match db
     delete chatRef.id;
-    const chatUpdateDocRef = updateDoc(chatDocRef, chatRef).catch((err) => {
+    const chatModRef = updateDoc(chatDocRef, chatRef).catch((err) => {
       console.log("updateDoc() error: ", err);
     });
 
-    const msgRet = await msgAddDocRef;
-    const chatRet = await chatUpdateDocRef;
+    await msgModRef;
+    await chatModRef;
+  };
+
+  const handleMaximize = (e) => {
+    e.stopPropagation();
+    isMaximized ? setIsMaximized(false) : setIsMaximized(true);
   };
 
   const handleClose = (e) => {
@@ -129,11 +137,12 @@ const ChatAccordionMsg = () => {
       >
         <Box
           sx={{
-            width: "25vw",
-            height: "50vh",
+            width: isMaximized ? "35vw" : "25vw",
+            height: isMaximized ? "75vh" : "50vh",
+            minWidth: "300px",
             maxHeight: "75vh",
             position: "fixed",
-            right: "calc(50px + 25%)",
+            right: "max(calc(50px + 15%), 350px)",
             bottom: 0,
             border: 1,
           }}
@@ -159,6 +168,16 @@ const ChatAccordionMsg = () => {
               <Avatar sx={{ m: "12px" }} src={partner?.photo_url} />
               <Typography>{partner?.name}</Typography>
               <Box sx={{ flexGrow: 1 }} />
+              {!isMaximized && (
+                <IconButton onClick={(e) => handleMaximize(e)}>
+                  <OpenInFullRoundedIcon />
+                </IconButton>
+              )}
+              {isMaximized && (
+                <IconButton onClick={(e) => handleMaximize(e)}>
+                  <CloseFullscreenRoundedIcon />
+                </IconButton>
+              )}
               <IconButton sx={{ m: "12px" }} onClick={(e) => handleClose(e)}>
                 <CloseRoundedIcon />
               </IconButton>
@@ -215,6 +234,8 @@ const ChatAccordionMsg = () => {
                   backgroundColor: "white",
                 }}
                 variant="standard"
+                multiline
+                maxRows={4}
                 InputProps={{
                   disableUnderline: true,
                 }}
@@ -222,20 +243,20 @@ const ChatAccordionMsg = () => {
                 onChange={(e) =>
                   setMessage({ ...message, text: e.target.value })
                 }
-                onKeyPress={(e) => {
+                /* onKeyPress={(e) => {
                   if (e.key === "Enter" && message.text) {
                     handleSubmit(e);
                   }
-                }}
+                }} */
               />
               <Button
                 variant="contained"
                 disabled={!message.text}
                 disableElevation
-                sx={{ bgcolor: "#3e95c2", mr: "15px" }}
+                sx={{ backgroundColor: "#3e95c2", mr: "15px" }}
                 onClick={(e) => handleSubmit(e)}
               >
-                {"Send"}
+                Send
               </Button>
             </Box>
           </Box>

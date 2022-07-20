@@ -55,7 +55,7 @@ const StudentGrid = () => {
         overflow: "auto",
       }}
     >
-      <Grid direction="row" container spacing={0}>
+      <Grid container spacing={4} padding={4}>
         {students
           .filter((student) => {
             const isInName = student.name
@@ -68,7 +68,7 @@ const StudentGrid = () => {
               // no search
               return student;
             }
-            if (isInName || isInPositio) {
+            if (isInName || isInPosition) {
               // in name or in position title
               return student;
             }

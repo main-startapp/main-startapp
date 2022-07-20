@@ -1,32 +1,50 @@
-import { useContext } from "react";
-import { useRouter } from "next/router";
 import {
   Avatar,
-  Box,
   IconButton,
   ListItem,
   ListItemText,
+  Menu,
+  MenuItem,
   Typography,
 } from "@mui/material";
-import moment from "moment";
-import { ProjectContext } from "../Context/ShareContexts";
+import { Box } from "@mui/material";
+import { useContext, useState } from "react";
+import { TeamContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { db } from "../../firebase";
 
-// the project list item component in the project list: has full project data but only shows some brief information
-const ProjectListItem = (props) => {
+const TeamProjectListItem = (props) => {
   const project = props.project;
 
   // context
-  const { setProject } = useContext(ProjectContext);
+  const { setProject } = useContext(TeamContext);
 
-  // router
-  const router = useRouter();
+  // menu
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
 
-  /* const seeProject = (id, e) => {
-    e.stopPropagation();
-    router.push(`/project/${id}`);
-  }; */
+  // helper func
+  const handleVisibility = async () => {
+    const docRef = doc(db, "projects", project?.id);
+    const projectRef = {
+      ...project,
+      isVisible: !project.isVisible,
+      last_timestamp: serverTimestamp(),
+    };
+    delete projectRef.id;
+    const projectModRef = updateDoc(docRef, projectRef).catch((err) => {
+      console.log("updateDoc() error: ", err);
+    });
+    await projectModRef;
+  };
 
   return (
     <Box m={3}>
@@ -44,8 +62,8 @@ const ProjectListItem = (props) => {
             backgroundColor: "#f6f6f6",
             cursor: "default",
           },
-          // height: "180px",
           overflow: "hidden",
+          opacity: project.isVisible ? "100%" : "50%",
         }}
       >
         <Box
@@ -73,9 +91,35 @@ const ProjectListItem = (props) => {
               </>
             }
           />
-          <IconButton>
+          <IconButton
+            id="TPLI-menu-button"
+            aria-controls={open ? "TPLI-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
+            onClick={handleMenuClick}
+          >
             <MoreVertIcon />
           </IconButton>
+          <Menu
+            id="TPLI-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleMenuClose}
+            MenuListProps={{
+              "aria-labelledby": "TPLI-menu-button",
+            }}
+          >
+            <MenuItem
+              onClick={() => {
+                handleVisibility();
+                handleMenuClose();
+              }}
+            >
+              {project.isVisible ? "Hide" : "Display"}
+            </MenuItem>
+
+            <MenuItem onClick={handleMenuClose}>WIP Delete</MenuItem>
+          </Menu>
         </Box>
         <ListItemText
           secondary={
@@ -96,18 +140,16 @@ const ProjectListItem = (props) => {
             </Typography>
           }
         />
-        {project.position_list.map((position, index) => (
-          <ListItemText
-            sx={{ ml: "5%" }}
-            key={index}
-            secondary={<span>&bull; &nbsp; {position.positionTitle}</span>}
-          />
-        ))}
         <ListItemText
           secondary={
             <>
-              {"Last Update: "}
-              {moment(project.last_timestamp).format("MMMM Do, YYYY")}
+              {"Hiring: "}
+              {project.cur_member_count < project.max_member_count
+                ? "Yes"
+                : "No"}
+              <br />
+              {"Visible: "}
+              {project.isVisible ? "Yes" : "No"}
             </>
           }
         />
@@ -116,4 +158,4 @@ const ProjectListItem = (props) => {
   );
 };
 
-export default ProjectListItem;
+export default TeamProjectListItem;

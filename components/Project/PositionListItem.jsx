@@ -29,12 +29,13 @@ const PositionListItem = (props) => {
   const { project } = useContext(ProjectContext);
 
   // args
-  const index = props.index;
   const title = props.title;
+  const posID = props.posID;
   const resp = props.resp;
   const weeklyHour = props.weeklyHour;
-  const isCreator = props.isCreator;
-  const creator = props.creator;
+
+  const reqPositions = props.reqPositions; // a list of currentUser's requesting positions
+  const isCreator = props.isCreator; // whether currentUser is the creator
 
   // local vars
   const currentUID = currentStudent?.uid;
@@ -56,24 +57,6 @@ const PositionListItem = (props) => {
   const handleJoinRequest = async (e) => {
     e.stopPropagation();
     {
-      /* update currentStudent: requested positions*/
-    }
-    const currentStudentDocRef = doc(db, "students", currentUID);
-    const currentStudenReqPos = currentStudent.requested_posititons;
-    currentStudenReqPos.push({
-      project_id: project.id,
-      position_index: index,
-      position_title: title,
-    });
-    const currentStudentRef = {
-      ...currentStudent,
-      requested_posititons: currentStudenReqPos,
-    };
-    delete currentStudentRef?.uid;
-    await updateDoc(currentStudentDocRef, currentStudentRef).catch((err) => {
-      console.log("updateDoc() error: ", err);
-    });
-    {
       /* create or update chat */
     }
     setOpenDirectMsg(true); // trigger the useEffect to show the msg
@@ -93,72 +76,92 @@ const PositionListItem = (props) => {
     };
     const my_unread_key = currentUID + "_unread";
     const creator_unread_key = project?.creator_uid + "_unread";
+    let chatModRef;
     if (foundChat) {
       // update
-      // add message
-      const msgCollectionRef = collection(
-        db,
-        "chats",
-        foundChat.id,
-        "messages"
-      );
-      const msgAddDocRef = await addDoc(msgCollectionRef, messageRef).catch(
-        (err) => {
-          console.log("addDoc() error: ", err);
-        }
-      );
-      // update chat
       const chatDocRef = doc(db, "chats", foundChat.id);
+      let joinRequests = foundChat?.join_requests
+        ? foundChat.join_requests
+        : [];
+      joinRequests.push({
+        project_id: project?.id,
+        position_id: posID,
+        creator_uid: project?.creator_uid,
+        requester_uid: currentUID,
+        status: "requesting",
+      });
       const chatRef = {
         ...foundChat,
-        join_request_project: project?.title,
-        join_request_position: title,
+        [creator_unread_key]: foundChat[creator_unread_key] + 1, // dont use ++foundChat[creator_unread_key]; dont directly mutate the state
+        join_requests: joinRequests,
         last_text: msgStr,
         last_timestamp: serverTimestamp(),
-        [creator_unread_key]: foundChat[creator_unread_key] + 1, // dont use ++foundChat[creator_unread_key]; dont directly mutate the state
       };
+      setChat({ ...chatRef });
       delete chatRef.id;
-      const chatUpdateDocRef = await updateDoc(chatDocRef, chatRef).catch(
-        (err) => {
-          console.log("updateDoc() error: ", err);
-        }
-      );
-      // set state
-      setChat({
-        ...foundChat,
-        [creator_unread_key]: foundChat[creator_unread_key] + 1,
+      chatModRef = updateDoc(chatDocRef, chatRef).catch((err) => {
+        console.log("updateDoc() error: ", err);
       });
     } else {
       // create
-      // add chat doc
       const collectionRef = collection(db, "chats");
       const chatRef = {
+        // new
         chat_user_ids: [currentStudent?.uid, project?.creator_uid],
-        join_request_project: project?.title,
-        join_request_position: title,
-        last_text: msgStr,
-        last_timestamp: serverTimestamp(),
         [my_unread_key]: 0,
         [creator_unread_key]: 1,
+        join_requests: [
+          {
+            project_id: project?.id,
+            position_id: posID,
+            creator_uid: project?.creator_uid,
+            requester_uid: currentUID,
+            status: "requesting",
+          },
+        ],
+        last_text: msgStr,
+        last_timestamp: serverTimestamp(),
       };
-      const chatAddDocRef = await addDoc(collectionRef, chatRef).catch(
-        (err) => {
-          console.log("addDoc() error: ", err);
-        }
-      );
-      // add message
-      const msgCollectionRef = collection(
-        db,
-        "chats",
-        chatAddDocRef.id,
-        "messages"
-      );
-      const msgAddDocRef = await addDoc(msgCollectionRef, messageRef).catch(
-        (err) => {
-          console.log("addDoc() error: ", err);
-        }
-      );
+      chatModRef = addDoc(collectionRef, chatRef).catch((err) => {
+        console.log("addDoc() error: ", err);
+      });
     }
+    {
+      /* awiat chat and add message */
+    }
+    let retID;
+    await chatModRef.then((ret) => {
+      retID = ret?.id;
+    }); // only addDoc will return, updateDoc returns undefined
+    let chatID;
+    if (foundChat) {
+      chatID = foundChat.id;
+    } else {
+      chatID = retID;
+    }
+    const msgCollectionRef = collection(db, "chats", chatID, "messages");
+    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
+      console.log("addDoc() error: ", err);
+    });
+    await msgModRef;
+    /* 
+    const curStudentDocRef = doc(db, "students", currentUID);
+    const curStudentReqPos = currentStudent.requested_positions;
+    curStudentReqPos.push({
+      project_id: project.id,
+      position_id: posID,
+    });
+    const curStudentRef = {
+      ...currentStudent,
+      requested_positions: curStudentReqPos,
+    };
+    delete curStudentRef?.uid;
+    const curStudentModRef = updateDoc(curStudentDocRef, curStudentRef).catch(
+      (err) => {
+        console.log("updateDoc() error: ", err);
+      }
+    );
+    await curStudentModRef; */
   };
 
   return (
@@ -188,20 +191,19 @@ const PositionListItem = (props) => {
                 <Button
                   disabled={
                     !currentUID ||
-                    currentStudent.requested_posititons.some(
+                    reqPositions.some(
                       (pos) =>
                         pos.project_id === project.id &&
-                        pos.position_index === index &&
-                        pos.position_title === title
+                        pos.position_id === posID
                     )
                   }
                   disableElevation
                   size="small"
-                  sx={{ mr: 3, borderRadius: 4, bgcolor: "#3e95c2" }}
+                  sx={{ mr: 3, borderRadius: 4, backgroundColor: "#3e95c2" }}
                   variant="contained"
                   onClick={(e) => handleJoinRequest(e)}
                 >
-                  &emsp; {"Join Request"} &emsp;
+                  &emsp; Join Request &emsp;
                 </Button>
               </span>
             </Tooltip>

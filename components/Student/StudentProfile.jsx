@@ -59,26 +59,24 @@ const StudentProfile = () => {
     const it_unread_key = student?.uid + "_unread";
     const chatRef = {
       chat_user_ids: [currentStudent?.uid, student?.uid],
-      last_text: msgStr,
-      last_timestamp: serverTimestamp(),
       [my_unread_key]: 0,
       [it_unread_key]: 1,
+      last_text: msgStr,
+      last_timestamp: serverTimestamp(),
     };
-    const chatAddDocRef = await addDoc(collectionRef, chatRef).catch((err) => {
+    const chatModRef = addDoc(collectionRef, chatRef).catch((err) => {
       console.log("addDoc() error: ", err);
     });
+    let retID;
+    await chatModRef.then((ret) => {
+      retID = ret?.id;
+    });
     // add message
-    const msgCollectionRef = collection(
-      db,
-      "chats",
-      chatAddDocRef.id,
-      "messages"
-    );
-    const msgAddDocRef = await addDoc(msgCollectionRef, messageRef).catch(
-      (err) => {
-        console.log("addDoc() error: ", err);
-      }
-    );
+    const msgCollectionRef = collection(db, "chats", retID, "messages");
+    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
+      console.log("addDoc() error: ", err);
+    });
+    await msgModRef;
   };
 
   // similar alg in components/Project/ProjectInfo
@@ -90,20 +88,20 @@ const StudentProfile = () => {
   }, [student]); // every time project changes, this forces each accordion to collapse
 
   return (
-    <>
+    <Box
+      ref={boxRef}
+      backgroundColor="#fafafa"
+      sx={{ height: "calc(99vh - 128px)", overflow: "auto" }}
+    >
+      {/* 1st box; center; avatar and student info */}
       <Box
-        ref={boxRef}
-        bgcolor="#fafafa"
-        sx={{ height: "calc(99vh - 128px)", overflow: "auto" }}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
       >
-        {/* 1st box; center; avatar and student info */}
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
+        {student?.uid && (
           <Avatar
             sx={{
               m: 6,
@@ -113,164 +111,138 @@ const StudentProfile = () => {
             }}
             src={student?.photo_url}
           />
-          {/* name */}
-          {student?.name && (
-            <Typography sx={{ fontWeight: "bold", fontSize: "1.2em" }}>
-              {student.name}
-            </Typography>
-          )}
-          {!student?.name && (
-            <Typography
-              sx={{ fontWeight: "bold", fontSize: "1.2em", color: "gray" }}
-            >
-              {"Name"}
-            </Typography>
-          )}
-          {/* position */}
-          {student?.desired_position && (
-            <Typography sx={{ fontSize: "1em" }}>
-              {student.desired_position}
-            </Typography>
-          )}
-          {!student?.desired_position && (
-            <Typography sx={{ fontSize: "1em", color: "gray" }}>
-              {"Position"}
-            </Typography>
-          )}
-          {/* field of interest */}
-          {student?.field_of_interest && (
-            <Typography sx={{ fontSize: "1em" }}>
-              {student.field_of_interest}
-            </Typography>
-          )}
-          {!student?.field_of_interest && (
-            <Typography sx={{ fontSize: "1em", color: "gray" }}>
-              {"Field"}
-            </Typography>
-          )}
-          {/* education year */}
-          {student?.year_of_ed && (
-            <Typography sx={{ fontSize: "1em" }}>
-              {"Education year: "}
-              {student.year_of_ed}
-            </Typography>
-          )}
-          {!student?.year_of_ed && (
-            <Typography sx={{ fontSize: "1em", color: "gray" }}>
-              {"Education year: "}
-              {"0"}
-            </Typography>
-          )}
-        </Box>
-        {/* 2nd box; start; student details */}
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-start",
-            m: 3,
-          }}
-        >
-          {/* awards */}
-          {/* <Typography sx={{ fontWeight: "bold", fontSize: "1.2em" }}>
+        )}
+        {/* name */}
+        <Typography sx={{ fontWeight: "bold", fontSize: "1.2em" }}>
+          {student?.name}
+        </Typography>
+
+        {/* position */}
+        <Typography sx={{ fontSize: "1em" }}>
+          {student?.desired_position}
+        </Typography>
+
+        {/* field of interest */}
+        <Typography sx={{ fontSize: "1em" }}>
+          {student?.field_of_interest}
+        </Typography>
+
+        {/* education year */}
+        {student?.year_of_ed && (
+          <Typography sx={{ fontSize: "1em" }}>
+            {"Education year: "}
+            {student.year_of_ed}
+          </Typography>
+        )}
+      </Box>
+      {/* 2nd box; start; student details */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          m: 3,
+        }}
+      >
+        {/* awards */}
+        {/* <Typography sx={{ fontWeight: "bold", fontSize: "1.2em" }}>
             {"Awards"}
           </Typography>
           <Box direction="row">
             <VerifiedRoundedIcon sx={{ fontSize: "3em", mr: 1 }} />
             <LocalPoliceRoundedIcon sx={{ fontSize: "3em", mr: 1 }} />
           </Box> */}
-          {/* social media links */}
-          {student?.social_media.length > 0 && (
-            <Typography sx={{ fontWeight: "bold", fontSize: "1.2em", mt: 1 }}>
-              {"Social media"}
-            </Typography>
-          )}
-          <Box direction="row">
-            {student?.social_media.length > 0 &&
-              student.social_media.map((link, index) => {
-                // todo!: too hacky, is there any library can do this properly?
-                if (!link.toLowerCase().includes("https://")) {
-                  link = "https://" + link;
-                }
+        {/* social media links */}
+        {student?.social_media?.length > 0 && (
+          <Typography sx={{ fontWeight: "bold", fontSize: "1.2em", mt: 1 }}>
+            {"Social media"}
+          </Typography>
+        )}
+        <Box direction="row">
+          {student?.social_media?.length > 0 &&
+            student.social_media.map((link, index) => {
+              // todo!: too hacky, is there any library can do this properly?
+              if (!link.toLowerCase().includes("https://")) {
+                link = "https://" + link;
+              }
 
-                if (link.toLowerCase().includes("linkedin")) {
-                  return (
-                    <a
-                      key={index}
-                      target="_blank"
-                      href={link}
-                      rel="noopener noreferrer"
-                    >
-                      <LinkedInIcon
-                        sx={{ fontSize: "3em", mr: 1, color: "black" }}
-                      />
-                    </a>
-                  );
-                } else if (link.toLowerCase().includes("facebook")) {
-                  return (
-                    <a
-                      key={index}
-                      target="_blank"
-                      href={link}
-                      rel="noopener noreferrer"
-                    >
-                      <FacebookIcon
-                        sx={{ fontSize: "3em", mr: 1, color: "black" }}
-                      />
-                    </a>
-                  );
-                } else if (link.toLowerCase().includes("instagram")) {
-                  return (
-                    <a
-                      key={index}
-                      target="_blank"
-                      href={link}
-                      rel="noopener noreferrer"
-                    >
-                      <InstagramIcon
-                        sx={{ fontSize: "3em", mr: 1, color: "black" }}
-                      />
-                    </a>
-                  );
-                } else {
-                  return (
-                    <a
-                      key={index}
-                      target="_blank"
-                      href={link}
-                      rel="noopener noreferrer"
-                    >
-                      <LinkIcon
-                        sx={{ fontSize: "3em", mr: 1, color: "black" }}
-                      />
-                    </a>
-                  );
-                }
-              })}
-          </Box>
-          {/* past experience */}
-          {student?.past_exp.length > 0 && (
-            <Typography sx={{ fontWeight: "bold", fontSize: "1.2em", mt: 1 }}>
-              {"Past experience"}
-            </Typography>
-          )}
-          {student?.past_exp.length > 0 &&
-            student.past_exp.map((exp, index) => (
-              <Typography key={index} sx={{ ml: "1em", mb: "1em" }}>
-                &bull; &nbsp; {exp}
-              </Typography>
-            ))}
+              if (link.toLowerCase().includes("linkedin")) {
+                return (
+                  <a
+                    key={index}
+                    target="_blank"
+                    href={link}
+                    rel="noopener noreferrer"
+                  >
+                    <LinkedInIcon
+                      sx={{ fontSize: "3em", mr: 1, color: "black" }}
+                    />
+                  </a>
+                );
+              } else if (link.toLowerCase().includes("facebook")) {
+                return (
+                  <a
+                    key={index}
+                    target="_blank"
+                    href={link}
+                    rel="noopener noreferrer"
+                  >
+                    <FacebookIcon
+                      sx={{ fontSize: "3em", mr: 1, color: "black" }}
+                    />
+                  </a>
+                );
+              } else if (link.toLowerCase().includes("instagram")) {
+                return (
+                  <a
+                    key={index}
+                    target="_blank"
+                    href={link}
+                    rel="noopener noreferrer"
+                  >
+                    <InstagramIcon
+                      sx={{ fontSize: "3em", mr: 1, color: "black" }}
+                    />
+                  </a>
+                );
+              } else {
+                return (
+                  <a
+                    key={index}
+                    target="_blank"
+                    href={link}
+                    rel="noopener noreferrer"
+                  >
+                    <LinkIcon sx={{ fontSize: "3em", mr: 1, color: "black" }} />
+                  </a>
+                );
+              }
+            })}
         </Box>
-        {/* 3rd box; center; buttons */}
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            m: 3,
-          }}
-        >
-          {/* connect button */}
+        {/* past experience */}
+        {student?.past_exp?.length > 0 && (
+          <Typography sx={{ fontWeight: "bold", fontSize: "1.2em", mt: 1 }}>
+            {"Past experience"}
+          </Typography>
+        )}
+        {student?.past_exp?.length > 0 &&
+          student.past_exp.map((exp, index) => (
+            <Typography key={index} sx={{ ml: "1em", mb: "1em" }}>
+              &bull; &nbsp; {exp}
+            </Typography>
+          ))}
+      </Box>
+      {/* 3rd box; center; buttons */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          m: 3,
+        }}
+      >
+        {/* connect button */}
+        {student?.uid && (
           <Tooltip title={currentUID ? "" : "Edit your profile first."}>
             <span>
               <Button
@@ -282,7 +254,7 @@ const StudentProfile = () => {
                 sx={{
                   m: 3,
                   borderRadius: 4,
-                  bgcolor: "#3e95c2",
+                  backgroundColor: "#3e95c2",
                 }}
                 variant="contained"
                 onClick={(e) => handleConnect(e)}
@@ -293,9 +265,9 @@ const StudentProfile = () => {
               </Button>
             </span>
           </Tooltip>
-        </Box>
+        )}
       </Box>
-    </>
+    </Box>
   );
 };
 

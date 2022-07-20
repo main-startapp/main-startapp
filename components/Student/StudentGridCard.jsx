@@ -1,20 +1,5 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Tooltip,
-  Typography,
-} from "@mui/material";
-import {
-  addDoc,
-  collection,
-  doc,
-  serverTimestamp,
-  updateDoc,
-} from "firebase/firestore";
+import { Avatar, Box, Button, Card, Tooltip, Typography } from "@mui/material";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useContext } from "react";
 import { db } from "../../firebase";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
@@ -58,26 +43,24 @@ const StudentGridCard = (props) => {
     const it_unread_key = student.uid + "_unread";
     const chatRef = {
       chat_user_ids: [currentStudent?.uid, student.uid],
-      last_text: msgStr,
-      last_timestamp: serverTimestamp(),
       [my_unread_key]: 0,
       [it_unread_key]: 1,
+      last_text: msgStr,
+      last_timestamp: serverTimestamp(),
     };
-    const chatAddDocRef = await addDoc(collectionRef, chatRef).catch((err) => {
+    const chatModRef = addDoc(collectionRef, chatRef).catch((err) => {
       console.log("addDoc() error: ", err);
     });
+    let retID;
+    await chatModRef.then((ret) => {
+      retID = ret?.id;
+    });
     // add message
-    const msgCollectionRef = collection(
-      db,
-      "chats",
-      chatAddDocRef.id,
-      "messages"
-    );
-    const msgAddDocRef = await addDoc(msgCollectionRef, messageRef).catch(
-      (err) => {
-        console.log("addDoc() error: ", err);
-      }
-    );
+    const msgCollectionRef = collection(db, "chats", retID, "messages");
+    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
+      console.log("addDoc() error: ", err);
+    });
+    await msgModRef;
   };
 
   return (
@@ -85,11 +68,13 @@ const StudentGridCard = (props) => {
       variant="outlined"
       onClick={() => setStudent(student)}
       sx={{
-        mr: 3,
-        mt: 3,
-        bgcolor: "#fafafa",
+        // mr: 3,
+        // mt: 3,
+        backgroundColor: "#fafafa",
         border: "1px solid black",
         borderRadius: 4,
+        height: "100%",
+        minWidth: "200px",
       }}
     >
       <Box
@@ -97,6 +82,7 @@ const StudentGridCard = (props) => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          height: "100%",
           // justifyContent: "center",
         }}
       >
@@ -114,7 +100,7 @@ const StudentGridCard = (props) => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            bgcolor: "green",
+            backgroundColor: "green",
           }}
         > */}
         <Typography sx={{ fontWeight: "bold", fontSize: "1em" }}>
@@ -131,6 +117,8 @@ const StudentGridCard = (props) => {
           {student.year_of_ed}
         </Typography>
 
+        <Box sx={{ flexGrow: 1 }} />
+
         <Tooltip title={currentUID ? "" : "Please edit your profile first."}>
           <span>
             <Button
@@ -140,7 +128,7 @@ const StudentGridCard = (props) => {
               sx={{
                 m: 3,
                 borderRadius: 4,
-                bgcolor: "#3e95c2",
+                backgroundColor: "#3e95c2",
               }}
               variant="contained"
               onClick={(e) => handleConnect(e)}

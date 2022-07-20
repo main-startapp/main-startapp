@@ -1,0 +1,19 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "chats",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "chat_user_ids",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "last_timestamp",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

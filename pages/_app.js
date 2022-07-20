@@ -33,9 +33,11 @@ const globalTheme = createTheme({
 
 function MyApp({ Component, pageProps }) {
   // projects related
+  const [projects, setProjects] = useState([]); // list of project
+  const [oldProject, setOldProject] = useState(null); // the project that needs to be updated
   // students related
   const [students, setStudents] = useState([]); // all students data
-  const [currentStudent, setCurrentStudent] = useState(null); // currentUser's student data
+  const [currentStudent, setCurrentStudent] = useState(null); // currentUser's student data. Can't be listened here. Requires login.
   // chats related
   const [chat, setChat] = useState(null);
   const [chats, setChats] = useState([]);
@@ -44,6 +46,27 @@ function MyApp({ Component, pageProps }) {
   const [showChat, setShowChat] = useState(true);
   const [forceChatExpand, setForceChatExpand] = useState(false);
   const [openDirectMsg, setOpenDirectMsg] = useState(false);
+
+  // https://stackoverflow.com/questions/59841800/react-useeffect-in-depth-use-of-useeffect
+  // listen to realtime projects collection
+  useEffect(() => {
+    // db query
+    const collectionRef = collection(db, "projects");
+    const q = query(collectionRef, orderBy("last_timestamp", "desc"));
+
+    // https://firebase.google.com/docs/firestore/query-data/listen
+    const unsub = onSnapshot(q, (querySnapshot) => {
+      setProjects(
+        querySnapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+          last_timestamp: doc.data().last_timestamp?.toDate(),
+        }))
+      );
+    });
+
+    return unsub;
+  }, []);
 
   // listen to realtime students collection
   useEffect(() => {
@@ -68,6 +91,10 @@ function MyApp({ Component, pageProps }) {
         <LocalizationProvider dateAdapter={AdapterMoment}>
           <GlobalContext.Provider
             value={{
+              projects,
+              setProjects,
+              oldProject,
+              setOldProject,
               students,
               setStudents,
               currentStudent,

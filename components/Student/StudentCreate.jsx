@@ -44,9 +44,9 @@ const StudentCreate = () => {
     past_exp: [""],
     awards: [],
     connections: [],
-    requested_posititons: [],
-    joined_projects: [],
     my_projects: [],
+    // requested_positions: [],
+    // joined_projects: [],
     photo_url: currentUser.photoURL,
   });
 
@@ -87,9 +87,10 @@ const StudentCreate = () => {
     // remove uid to keep the doc consistent
     delete studentRef?.uid;
 
+    let studentModRef;
     if (student.create_timestamp) {
       // update
-      await updateDoc(docRef, studentRef).catch((err) => {
+      studentModRef = updateDoc(docRef, studentRef).catch((err) => {
         console.log("updateDoc() error: ", err);
       });
     } else {
@@ -98,11 +99,11 @@ const StudentCreate = () => {
         ...studentRef,
         create_timestamp: serverTimestamp(),
       };
-      await setDoc(docRef, studentRef).catch((err) => {
+      studentModRef = setDoc(docRef, studentRef).catch((err) => {
         console.log("setDoc() error: ", err);
       });
     }
-
+    await studentModRef;
     // !todo: check return
     showAlert(
       "success",
@@ -335,7 +336,7 @@ const StudentCreate = () => {
           {/* Buttons */}
           <Box sx={{ display: "flex", justifyContent: "end" }}>
             <Button
-              sx={{ mt: 5, backgroundColor: "#3e95c2" }}
+              sx={{ mt: 5, mb: 5, backgroundColor: "#3e95c2" }}
               variant="contained"
               disableElevation
               onClick={(e) => handleSubmit(e)}

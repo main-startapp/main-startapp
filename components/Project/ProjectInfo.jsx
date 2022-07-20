@@ -12,20 +12,16 @@ import {
 } from "@mui/material";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import PositionListItem from "./PositionListItem";
-import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  serverTimestamp,
-  updateDoc,
-} from "firebase/firestore";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebase";
 import ExportedImage from "next-image-export-optimizer";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
+import NextLink from "next/link";
 
 const ProjectInfo = () => {
   // context
   const {
+    setOldProject,
     chats,
     currentStudent,
     students,
@@ -40,9 +36,32 @@ const ProjectInfo = () => {
 
   // local vars
   const currentUID = currentStudent?.uid;
-  // is cur_user the creator?
-  // !todo: should this go into useEffect?
-  const isCreator = currentUID === project?.creator_uid;
+
+  // hook to find is the currentUser the project creator
+  const [isCreator, setIsCreator] = useState(false);
+  useEffect(() => {
+    currentUID === project?.creator_uid
+      ? setIsCreator(true)
+      : setIsCreator(false);
+  }, [currentUID, project]);
+
+  // hook to get requesting positions
+  const [reqPositions, setReqPositions] = useState([]);
+  useEffect(() => {
+    const positions = [];
+    chats.forEach((chat) => {
+      chat?.join_requests?.forEach((joinRequest) => {
+        if (joinRequest.requester_uid === currentUID) {
+          positions.push({
+            project_id: joinRequest.project_id,
+            position_id: joinRequest.position_id,
+          });
+        }
+      });
+    });
+    setReqPositions(positions);
+    return positions;
+  }, [chats, currentUID]);
 
   // hook to find project creator student data
   const [creatorStudent, setCreatorStudent] = useState(null);
@@ -111,24 +130,9 @@ const ProjectInfo = () => {
   // helper func
   // similar function in StudentGridCard; StudentProfile
   // !todo: handleConnect; function is bloated, might need an external lib to hold these func
-  // !todo: user should not change/update other user's data
   const handleConnect = async (e) => {
     e.stopPropagation();
     setOpenDirectMsg(true); // trigger the useEffect to show the msg
-    {
-      /* update student data: add project creator uid to connections array */
-    }
-    /* const senderDocRef = doc(db, "students", currentUID);
-    const senderPendingConnections = currentStudent.pending_connections;
-    senderPendingConnections.push(project?.creator_uid);
-    const senderStudentRef = {
-      ...currentStudent,
-      pending_connections: senderPendingConnections,
-    };
-    delete senderStudentRef?.uid;
-    await updateDoc(senderDocRef, senderStudentRef).catch((err) => {
-      console.log("updateDoc() error: ", err);
-    }); */
     {
       /* create or update chat */
     }
@@ -151,26 +155,24 @@ const ProjectInfo = () => {
     const creator_unread_key = project?.creator_uid + "_unread";
     const chatRef = {
       chat_user_ids: [currentStudent?.uid, project?.creator_uid],
-      last_text: msgStr,
-      last_timestamp: serverTimestamp(),
       [my_unread_key]: 0,
       [creator_unread_key]: 1,
+      last_text: msgStr,
+      last_timestamp: serverTimestamp(),
     };
-    const chatAddDocRef = await addDoc(collectionRef, chatRef).catch((err) => {
+    const chatModRef = addDoc(collectionRef, chatRef).catch((err) => {
       console.log("addDoc() error: ", err);
     });
+    let retID;
+    await chatModRef.then((ret) => {
+      retID = ret?.id;
+    });
     // add message
-    const msgCollectionRef = collection(
-      db,
-      "chats",
-      chatAddDocRef.id,
-      "messages"
-    );
-    const msgAddDocRef = await addDoc(msgCollectionRef, messageRef).catch(
-      (err) => {
-        console.log("addDoc() error: ", err);
-      }
-    );
+    const msgCollectionRef = collection(db, "chats", retID, "messages");
+    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
+      console.log("addDoc() error: ", err);
+    });
+    await msgModRef;
   };
 
   // similar alg in components/Student/StudentProfile
@@ -194,14 +196,23 @@ const ProjectInfo = () => {
           {/* Top left info box */}
           <Grid item xs={8}>
             <Box mt={3} ml={3} mr={1.5}>
-              <Typography sx={{ fontWeight: "bold", fontSize: "2.5em" }}>
-                {project?.title}
-              </Typography>
-              <Divider sx={{ mt: 3 }} />
-              <Typography
-                sx={{ mt: 3, fontWeight: "bold" }}
-                color="text.primary"
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
               >
+                {/* default unit is px */}
+                <Avatar sx={{ mr: 2, height: 75, width: "75px" }}>
+                  <UploadFileIcon />
+                </Avatar>
+                <Typography sx={{ fontWeight: "bold", fontSize: "2.5em" }}>
+                  {project?.title}
+                </Typography>
+              </Box>
+              <Divider sx={{ mt: 3, mb: 3 }} />
+              <Typography sx={{ fontWeight: "bold" }} color="text.primary">
                 {"Team size: "}
               </Typography>
               <Typography color="text.secondary">
@@ -244,12 +255,6 @@ const ProjectInfo = () => {
               >
                 {getCreatorName(students, project?.creator_uid) || "Founder"}
               </Typography>
-              <Typography
-                sx={{ display: "flex", justifyContent: "center" }}
-                color="text.secondary"
-              >
-                {project?.creator_email}
-              </Typography>
               <Box m={3} sx={{ display: "flex", justifyContent: "center" }}>
                 {!isCreator && (
                   <Tooltip title={currentUID ? "" : "Edit your profile first."}>
@@ -257,7 +262,7 @@ const ProjectInfo = () => {
                       <Button
                         disabled={!currentUID}
                         disableElevation
-                        sx={{ borderRadius: 4, bgcolor: "#3e95c2" }}
+                        sx={{ borderRadius: 4, backgroundColor: "#3e95c2" }}
                         variant="contained"
                         onClick={(e) => handleConnect(e)}
                       >
@@ -267,14 +272,23 @@ const ProjectInfo = () => {
                   </Tooltip>
                 )}
                 {isCreator && (
-                  <Button
-                    onClick={() => updateProject(project)}
-                    variant="contained"
-                    sx={{ borderRadius: 4, bgcolor: "#3e95c2" }}
-                    disableElevation
+                  <NextLink
+                    href={{
+                      pathname: "/project/create",
+                      query: { isCreateStr: "false" },
+                    }}
+                    as="/project/create"
+                    passHref
                   >
-                    &emsp; {"Modify"} &emsp;
-                  </Button>
+                    <Button
+                      onClick={() => setOldProject(project)}
+                      variant="contained"
+                      sx={{ borderRadius: 4, backgroundColor: "#3e95c2" }}
+                      disableElevation
+                    >
+                      &emsp; {"Modify"} &emsp;
+                    </Button>
+                  </NextLink>
                 )}
               </Box>
             </Box>
@@ -330,13 +344,13 @@ const ProjectInfo = () => {
               {project?.position_list.map((position, index) => (
                 <PositionListItem
                   key={index}
-                  index={index}
+                  posID={position.positionID}
                   title={position.positionTitle}
                   resp={position.positionResp}
                   weeklyHour={position.positionWeeklyHour}
+                  reqPositions={reqPositions}
                   isCreator={isCreator}
-                  creator={creatorStudent}
-                  // uid={position.positionUID}
+                  // creator={creatorStudent}
                 />
               ))}
             </Box>

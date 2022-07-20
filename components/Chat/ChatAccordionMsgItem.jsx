@@ -48,7 +48,7 @@ const ChatAccordionMsgItem = (props) => {
           }}
         >
           <Typography sx={{ display: "inline", fontWeight: "bold" }}>
-            {"Me"}
+            Me
           </Typography>
           <Typography
             sx={{ display: "inline", color: "gray", fontSize: "0.9em" }}
@@ -67,6 +67,8 @@ const ChatAccordionMsgItem = (props) => {
           mb: "2.5px",
           position: "relative",
           width: "fit-content",
+          wordBreak: "break-all",
+          whiteSpace: "pre-wrap",
         }}
       >
         {message.text}

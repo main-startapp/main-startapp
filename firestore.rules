@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow public read access, but only content owners can write
+    match /projects/{project} {
+      allow read: if true
+      allow write: if request.resource == null || (request.auth != null && request.auth.uid == request.resource.data.creator_uid)
+    }
+    
+    match /students/{student} {
+      allow read: if true
+      allow write: if request.resource == null || (request.auth != null && request.auth.uid == request.resource.id)
+    }
+
+    // public shared data
+    match /shared_students/{shared_student} {
+      allow read: if request.auth != null
+      allow write: if request.auth != null
+    }
+    
+    // debug only
+    match /chats/{chat} {
+    	allow read: if true
+    	allow write: if true
+    }
+    match /chats/{chat}/messages/{message} {
+    	allow read: if true
+    	allow write: if true
+    }
+  }
+}

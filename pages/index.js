@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Grid } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
 import {
@@ -21,38 +21,15 @@ export default function Home() {
   }, [setChat, setShowChat, setShowMsg]);
 
   // project state init
-  const [project, setProject] = useState(null);
-  const [projects, setProjects] = useState([]); // list of project
+  const [project, setProject] = useState(null); // thec selected project
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
-
-  // listen to realtime projects collection
-  // https://stackoverflow.com/questions/59841800/react-useeffect-in-depth-use-of-useeffect
-  useEffect(() => {
-    // db query
-    const collectionRef = collection(db, "projects");
-    const q = query(collectionRef, orderBy("last_timestamp", "desc"));
-
-    // https://firebase.google.com/docs/firestore/query-data/listen
-    const unsub = onSnapshot(q, (querySnapshot) => {
-      setProjects(
-        querySnapshot.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-          last_timestamp: doc.data().last_timestamp?.toDate().getTime(),
-        }))
-      );
-    });
-
-    return unsub;
-  }, []);
 
   return (
     <ProjectContext.Provider
       value={{
         project,
         setProject,
-        projects,
         searchTerm,
         setSearchTerm,
         searchCategory,

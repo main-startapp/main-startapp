@@ -20,6 +20,7 @@ import { useAuth } from "../Context/AuthContext";
 import { GlobalContext } from "../Context/ShareContexts";
 import ChatAccordionContact from "./ChatAccordionContact";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import CircleIcon from "@mui/icons-material/Circle";
 
 const ChatAccordion = () => {
   // context
@@ -36,6 +37,7 @@ const ChatAccordion = () => {
 
   // local
   const [expandState, setExpandState] = useState("collapseIt");
+  const [hasUnread, setHasUnread] = useState(false);
 
   // chat expand signal
   useEffect(() => {
@@ -57,6 +59,17 @@ const ChatAccordion = () => {
     setShowMsg(false);
     setChat(null);
   };
+
+  // unread signal
+  useEffect(() => {
+    const my_unread_key = currentUser.uid + "_unread";
+
+    if (chats.some((chat) => chat[my_unread_key] > 0)) {
+      setHasUnread(true);
+    } else {
+      setHasUnread(false);
+    }
+  }, [chats, currentUser]);
 
   // listen to realtime chats collection
   useEffect(() => {
@@ -97,8 +110,9 @@ const ChatAccordion = () => {
         square={true}
         expanded={expandState === "expandIt"}
         sx={{
+          // minWidth: "100px",
+          width: "15vw",
           minWidth: "300px",
-          width: "25vw",
           maxHeight: "75vh",
           position: "fixed",
           right: "20px",
@@ -113,8 +127,15 @@ const ChatAccordion = () => {
           onClick={(e) => handleExpand(e)}
         >
           <Typography>Messenger</Typography>
+          {hasUnread && (
+            <CircleIcon
+              sx={{ color: "steelblue", fontSize: "15px", ml: "5px" }}
+            />
+          )}
         </StyledAccordionSummary>
-        <AccordionDetails sx={{ overflow: "auto", maxHeight: "50vh" }}>
+        <AccordionDetails
+          sx={{ overflow: "auto", maxHeight: "50vh", padding: 0 }}
+        >
           <Wrapper>
             <ChatList>
               {chats.map((chat) => (

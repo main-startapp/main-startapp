@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -7,10 +7,11 @@ import {
   IconButton,
   Avatar,
   Divider,
-  Link,
+  Link as MuiLink,
   Menu,
   MenuItem,
 } from "@mui/material";
+import NextLink from "next/link";
 import { auth } from "../../firebase";
 import { useAuth } from "../Context/AuthContext";
 import { ThemeProvider, styled, createTheme } from "@mui/material/styles";
@@ -20,6 +21,7 @@ const Navbar = () => {
   const { currentUser } = useAuth();
 
   const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
   const handleUserMenu = (e) => {
     setAnchorEl(e.currentTarget);
   };
@@ -34,7 +36,16 @@ const Navbar = () => {
 
   return (
     // https://www.color-hex.com/color/3e95c2
-    <AppBar position="static" sx={{ bgcolor: "#3e95c2" }} elevation={0}>
+    <AppBar
+      position="static"
+      sx={{
+        backgroundColor: "#3e95c2",
+        "&:hover": {
+          cursor: "default",
+        },
+      }}
+      elevation={0}
+    >
       <Toolbar
         sx={{
           display: "flex",
@@ -62,7 +73,7 @@ const Navbar = () => {
             unoptimized={true}
           />
           <Typography variant="edium" sx={{ fontSize: "2em", ml: 1 }}>
-            {"Edium"}
+            Edium
           </Typography>
         </Box>
         {/* tabs */}
@@ -74,17 +85,23 @@ const Navbar = () => {
             justifyContent: "center",
           }}
         >
-          <StyledLink href="/">
-            <Typography sx={{ fontSize: "1.1em" }}>{"Projects"}</Typography>
-          </StyledLink>
+          <NextLink href="/" passHref>
+            <PageLink>
+              <Typography sx={{ fontSize: "1.1em" }}>Projects</Typography>
+            </PageLink>
+          </NextLink>
           <Divider sx={{ ml: 3, mr: 3 }} orientation="vertical" flexItem />
-          <StyledLink href="/events">
-            <Typography sx={{ fontSize: "1.1em" }}>{"Events"}</Typography>
-          </StyledLink>
+          <NextLink href="/events" passHref>
+            <PageLink>
+              <Typography sx={{ fontSize: "1.1em" }}>Events</Typography>
+            </PageLink>
+          </NextLink>
           <Divider sx={{ ml: 3, mr: 3 }} orientation="vertical" flexItem />
-          <StyledLink href="/students">
-            <Typography sx={{ fontSize: "1.1em" }}>{"Students"}</Typography>
-          </StyledLink>
+          <NextLink href="/students" passHref>
+            <PageLink>
+              <Typography sx={{ fontSize: "1.1em" }}>Students</Typography>
+            </PageLink>
+          </NextLink>
         </Box>
         {/* user */}
         <Box
@@ -99,26 +116,34 @@ const Navbar = () => {
           <Typography sx={{ fontSize: "1.1em" }}>
             {currentUser.displayName}
           </Typography>
-          <IconButton onClick={handleUserMenu}>
+          <IconButton
+            id="navbar-menu-button"
+            aria-controls={open ? "navbar-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
+            onClick={handleUserMenu}
+          >
             <Avatar src={currentUser.photoURL} />
           </IconButton>
           <Menu
-            id="menu-appbar"
+            id="navbar-menu"
             anchorEl={anchorEl}
-            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-            open={Boolean(anchorEl)}
+            // anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            open={open}
             onClose={handleUserMenuClose}
+            MenuListProps={{
+              "aria-labelledby": "navbar-menu-button",
+            }}
           >
             <MenuItem onClick={handleUserMenuClose}>
-              <Link
-                sx={{
-                  textDecoration: "none",
-                  color: "#000",
-                }}
-                href="/student/create"
-              >
-                Edit Profile
-              </Link>
+              <NextLink href="/student/create" passHref>
+                <MenuItemLink>Edit Profile</MenuItemLink>
+              </NextLink>
+            </MenuItem>
+            <MenuItem onClick={handleUserMenuClose}>
+              <NextLink href="/team/management" passHref>
+                <MenuItemLink>Team Management</MenuItemLink>
+              </NextLink>
             </MenuItem>
             <MenuItem onClick={handleUserMenuLogout}>Log Out</MenuItem>
           </Menu>
@@ -130,7 +155,12 @@ const Navbar = () => {
 
 export default Navbar;
 
-const StyledLink = styled(Link)(({ theme }) => ({
+const PageLink = styled(MuiLink)(({ theme }) => ({
   color: "white",
+  textDecoration: "none",
+}));
+
+const MenuItemLink = styled(MuiLink)(({ theme }) => ({
+  color: "#000000",
   textDecoration: "none",
 }));
