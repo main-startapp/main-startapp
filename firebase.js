@@ -11,7 +11,7 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 // !todo: used proper env config supported by firebase
 // https://stackoverflow.com/questions/37482366/is-it-safe-to-expose-firebase-apikey-to-the-public
 const firebaseConfig = {
-  apiKey: "AIzaSyDcbO4XxR7SLe7cKdTM0z4SFz1sdR3qBAk",
+  apiKey: "",
   authDomain: "main-startapp-6f975.firebaseapp.com",
   projectId: "main-startapp-6f975",
   storageBucket: "main-startapp-6f975.appspot.com",
