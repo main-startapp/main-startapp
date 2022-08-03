@@ -21,7 +21,7 @@ const TeamProjectList = () => {
     chats.forEach((chat) => {
       chat?.join_requests?.forEach((request) => {
         if (currentUID === request.creator_uid) {
-          requests.push(request);
+          requests.push({ ...request, chat_id: chat.id });
         }
       });
     });

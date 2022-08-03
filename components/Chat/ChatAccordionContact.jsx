@@ -1,11 +1,10 @@
-import { doc, updateDoc } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 import { Avatar, Badge, Box, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { db } from "../../firebase";
 import moment from "moment";
 import { GlobalContext } from "../Context/ShareContexts";
 import { useAuth } from "../Context/AuthContext";
+import { handleUnread } from "../Reusable/Resusable";
 
 const ChatAccordionContact = (props) => {
   const chat = props.chat;
@@ -66,25 +65,6 @@ const ChatAccordionContact = (props) => {
     };
   }, [chat, projects]);
 
-  // helper func
-  // https://stackoverflow.com/questions/43302584/why-doesnt-the-code-after-await-run-right-away-isnt-it-supposed-to-be-non-blo
-  // https://stackoverflow.com/questions/66263271/firebase-update-returning-undefined-is-it-not-supposed-to-return-the-updated
-  const handleUnread = async () => {
-    if (chat[my_unread_key] > 0) {
-      // update chat
-      const chatDocRef = doc(db, "chats", chat.id);
-      const chatRef = {
-        ...chat,
-        [my_unread_key]: 0,
-      };
-      delete chatRef.id;
-      const chatModRef = updateDoc(chatDocRef, chatRef).catch((err) => {
-        console.log("updateDoc() error: ", err); // .then() is useless as updateDoc() returns Promise<void>
-      });
-      await chatModRef;
-    }
-  };
-
   return (
     <Container
       onClick={() => {
@@ -93,7 +73,7 @@ const ChatAccordionContact = (props) => {
         if (!showMsg) {
           setShowMsg(true);
         }
-        handleUnread();
+        handleUnread(chat, currentUser);
       }}
     >
       <Avatar sx={{ m: "14px" }} src={contact?.photo_url} />

@@ -3,65 +3,18 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useContext } from "react";
 import { db } from "../../firebase";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
+import { handleConnect } from "../Reusable/Resusable";
 
 const StudentGridCard = (props) => {
   const student = props.student;
 
   // context
-  const { chats, currentStudent, setOpenDirectMsg } = useContext(GlobalContext);
+  const { chats, currentStudent, setPartner, setForceChatExpand } =
+    useContext(GlobalContext);
   const { setStudent } = useContext(StudentContext);
 
   // local vars
   const currentUID = currentStudent?.uid;
-
-  // helper func
-  // !todo: handleConnect; function is bloated, might need an external lib to hold these func
-  const handleConnect = async (e) => {
-    e.stopPropagation();
-    setStudent(student);
-    setOpenDirectMsg(true); // trigger the useEffect to show the msg
-    {
-      /* create or update chat */
-    }
-    const foundChat = chats.find((chat) =>
-      chat.chat_user_ids.some((uid) => uid === student.uid)
-    );
-    if (foundChat) {
-      return;
-    }
-
-    // not found chat -> create
-    const msgStr = currentStudent?.name + " requested to connect";
-    const messageRef = {
-      text: msgStr,
-      sent_by: currentUID,
-      sent_at: serverTimestamp(),
-    };
-    // add chat doc
-    const collectionRef = collection(db, "chats");
-    const my_unread_key = currentUID + "_unread";
-    const it_unread_key = student.uid + "_unread";
-    const chatRef = {
-      chat_user_ids: [currentStudent?.uid, student.uid],
-      [my_unread_key]: 0,
-      [it_unread_key]: 1,
-      last_text: msgStr,
-      last_timestamp: serverTimestamp(),
-    };
-    const chatModRef = addDoc(collectionRef, chatRef).catch((err) => {
-      console.log("addDoc() error: ", err);
-    });
-    let retID;
-    await chatModRef.then((ret) => {
-      retID = ret?.id;
-    });
-    // add message
-    const msgCollectionRef = collection(db, "chats", retID, "messages");
-    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
-      console.log("addDoc() error: ", err);
-    });
-    await msgModRef;
-  };
 
   return (
     <Card
@@ -131,7 +84,17 @@ const StudentGridCard = (props) => {
                 backgroundColor: "#3e95c2",
               }}
               variant="contained"
-              onClick={(e) => handleConnect(e)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setStudent(student);
+                handleConnect(
+                  chats,
+                  student,
+                  currentStudent,
+                  setPartner,
+                  setForceChatExpand
+                );
+              }}
             >
               <Typography sx={{ fontSize: "0.9em" }}>
                 &emsp; {"Connect"} &emsp;

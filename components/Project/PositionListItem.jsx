@@ -24,18 +24,18 @@ import {
 
 const PositionListItem = (props) => {
   // context
-  const { chats, currentStudent, setChat, setOpenDirectMsg } =
+  const { chats, currentStudent, setPartner, setForceChatExpand } =
     useContext(GlobalContext);
   const { project } = useContext(ProjectContext);
 
   // args
-  const title = props.title;
   const posID = props.posID;
+  const title = props.title;
   const resp = props.resp;
   const weeklyHour = props.weeklyHour;
-
   const reqPositions = props.reqPositions; // a list of currentUser's requesting positions
   const isCreator = props.isCreator; // whether currentUser is the creator
+  const creator = props.creator;
 
   // local vars
   const currentUID = currentStudent?.uid;
@@ -52,14 +52,12 @@ const PositionListItem = (props) => {
       : setExpandState("expandIt");
   };
 
-  // similar function in StudentProfile; ProjectInfo; StudentGridCard
   // !todo: handleJoinRequest; function is bloated, might need an external lib to hold these func
-  const handleJoinRequest = async (e) => {
-    e.stopPropagation();
-    {
-      /* create or update chat */
-    }
-    setOpenDirectMsg(true); // trigger the useEffect to show the msg
+  const handleJoinRequest = async () => {
+    // chat accordion related
+    setPartner(creator);
+    setForceChatExpand(true);
+    //
     const foundChat = chats.find((chat) =>
       chat.chat_user_ids.some((uid) => uid === project.creator_uid)
     );
@@ -97,7 +95,6 @@ const PositionListItem = (props) => {
         last_text: msgStr,
         last_timestamp: serverTimestamp(),
       };
-      setChat({ ...chatRef });
       delete chatRef.id;
       chatModRef = updateDoc(chatDocRef, chatRef).catch((err) => {
         console.log("updateDoc() error: ", err);
@@ -201,7 +198,10 @@ const PositionListItem = (props) => {
                   size="small"
                   sx={{ mr: 3, borderRadius: 4, backgroundColor: "#3e95c2" }}
                   variant="contained"
-                  onClick={(e) => handleJoinRequest(e)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleJoinRequest();
+                  }}
                 >
                   &emsp; Join Request &emsp;
                 </Button>

@@ -5,48 +5,8 @@ import StudentGridCard from "./StudentGridCard";
 
 const StudentGrid = () => {
   // context
-  const {
-    students,
-    openDirectMsg,
-    chats,
-    setForceChatExpand,
-    setChat,
-    setPartner,
-    setShowMsg,
-    setOpenDirectMsg,
-  } = useContext(GlobalContext);
-  const { searchTerm, student } = useContext(StudentContext);
-
-  // local var
-  // show chat msg after connect
-  useEffect(() => {
-    if (!openDirectMsg) return;
-
-    const foundChat = chats.find((chat) =>
-      chat.chat_user_ids.some((uid) => uid === student.uid)
-    );
-
-    if (foundChat) {
-      setForceChatExpand(true);
-      setTimeout(() => {
-        setChat(foundChat);
-        setPartner(student);
-        setShowMsg(true);
-      }, 200); // delayed effect to look smooth
-      setOpenDirectMsg(false);
-    }
-
-    return foundChat;
-  }, [
-    chats,
-    openDirectMsg,
-    setChat,
-    setForceChatExpand,
-    setOpenDirectMsg,
-    setPartner,
-    setShowMsg,
-    student,
-  ]); // trigger mainly by chats update and openDirectMsg. will return if don't need to show direct msg.
+  const { students } = useContext(GlobalContext);
+  const { searchTerm } = useContext(StudentContext);
 
   return (
     <Box

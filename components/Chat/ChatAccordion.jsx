@@ -21,6 +21,7 @@ import { GlobalContext } from "../Context/ShareContexts";
 import ChatAccordionContact from "./ChatAccordionContact";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import CircleIcon from "@mui/icons-material/Circle";
+import { handleUnread } from "../Reusable/Resusable";
 
 const ChatAccordion = () => {
   // context
@@ -33,23 +34,53 @@ const ChatAccordion = () => {
     setShowMsg,
     forceChatExpand,
     setForceChatExpand,
+    partner,
   } = useContext(GlobalContext);
 
   // local
   const [expandState, setExpandState] = useState("collapseIt");
   const [hasUnread, setHasUnread] = useState(false);
 
-  // chat expand signal
+  // handle chat expansion called by handleConnect
   useEffect(() => {
     if (!forceChatExpand) return;
-    setForceChatExpand(false);
-    if (expandState === "expandIt") {
-      return;
-    }
-    return () => {
+
+    const foundChat = chats.find((chat) =>
+      chat.chat_user_ids.some((uid) => uid === partner.uid)
+    );
+
+    if (!foundChat) return;
+    setChat(foundChat);
+
+    var timeout = 200;
+    if (expandState !== "expandIt") {
       setExpandState("expandIt");
+      timeout = 500;
+    }
+
+    setTimeout(() => {
+      setShowMsg(true);
+    }, timeout); // delayed msg window
+
+    setTimeout(() => {
+      handleUnread(foundChat, currentUser);
+    }, 1000); // delayed reset unread
+
+    setForceChatExpand(false);
+
+    return () => {
+      foundChat;
     };
-  }, [forceChatExpand, expandState, setForceChatExpand]);
+  }, [
+    forceChatExpand,
+    expandState,
+    setForceChatExpand,
+    chats,
+    partner,
+    setChat,
+    setShowMsg,
+    currentUser,
+  ]);
 
   // helper func
   const handleExpand = (e) => {

@@ -45,7 +45,6 @@ function MyApp({ Component, pageProps }) {
   const [showMsg, setShowMsg] = useState(false);
   const [showChat, setShowChat] = useState(true);
   const [forceChatExpand, setForceChatExpand] = useState(false);
-  const [openDirectMsg, setOpenDirectMsg] = useState(false);
 
   // https://stackoverflow.com/questions/59841800/react-useeffect-in-depth-use-of-useeffect
   // listen to realtime projects collection
@@ -111,8 +110,6 @@ function MyApp({ Component, pageProps }) {
               setShowChat,
               forceChatExpand,
               setForceChatExpand,
-              openDirectMsg,
-              setOpenDirectMsg,
             }}
           >
             <CssBaseline />

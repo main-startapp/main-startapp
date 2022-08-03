@@ -8,76 +8,20 @@ import {
 } from "@mui/material";
 import { useContext, useEffect, useRef, useState } from "react";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
-import VerifiedRoundedIcon from "@mui/icons-material/VerifiedRounded";
-import LocalPoliceRoundedIcon from "@mui/icons-material/LocalPoliceRounded";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import LinkIcon from "@mui/icons-material/Link";
-import {
-  addDoc,
-  collection,
-  doc,
-  serverTimestamp,
-  updateDoc,
-} from "firebase/firestore";
-import { db } from "../../firebase";
+import { handleConnect } from "../Reusable/Resusable";
 
 const StudentProfile = () => {
   // context
-  const { chats, currentStudent, setOpenDirectMsg } = useContext(GlobalContext);
+  const { chats, currentStudent, setForceChatExpand, setPartner, setShowMsg } =
+    useContext(GlobalContext);
   const { student } = useContext(StudentContext);
 
   // local vars
   const currentUID = currentStudent?.uid;
-
-  // helper func
-  // !todo: handleConnect; function is bloated, might need an external lib to hold these func
-  const handleConnect = async (e) => {
-    e.stopPropagation();
-    setOpenDirectMsg(true); // trigger the useEffect to show the msg
-    {
-      /* create or update chat */
-    }
-    const foundChat = chats.find((chat) =>
-      chat.chat_user_ids.some((uid) => uid === student?.uid)
-    );
-    if (foundChat) {
-      return;
-    }
-
-    // not found chat -> create
-    const msgStr = currentStudent?.name + " requested to connect";
-    const messageRef = {
-      text: msgStr,
-      sent_by: currentUID,
-      sent_at: serverTimestamp(),
-    };
-    // add chat doc
-    const collectionRef = collection(db, "chats");
-    const my_unread_key = currentUID + "_unread";
-    const it_unread_key = student?.uid + "_unread";
-    const chatRef = {
-      chat_user_ids: [currentStudent?.uid, student?.uid],
-      [my_unread_key]: 0,
-      [it_unread_key]: 1,
-      last_text: msgStr,
-      last_timestamp: serverTimestamp(),
-    };
-    const chatModRef = addDoc(collectionRef, chatRef).catch((err) => {
-      console.log("addDoc() error: ", err);
-    });
-    let retID;
-    await chatModRef.then((ret) => {
-      retID = ret?.id;
-    });
-    // add message
-    const msgCollectionRef = collection(db, "chats", retID, "messages");
-    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
-      console.log("addDoc() error: ", err);
-    });
-    await msgModRef;
-  };
 
   // similar alg in components/Project/ProjectInfo
   // box ref to used by useEffect
@@ -257,7 +201,16 @@ const StudentProfile = () => {
                   backgroundColor: "#3e95c2",
                 }}
                 variant="contained"
-                onClick={(e) => handleConnect(e)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleConnect(
+                    chats,
+                    student,
+                    currentStudent,
+                    setPartner,
+                    setForceChatExpand
+                  );
+                }}
               >
                 <Typography sx={{ fontSize: "0.9em" }}>
                   &emsp; {"Connect"} &emsp;

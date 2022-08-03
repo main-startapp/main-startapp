@@ -12,11 +12,10 @@ import {
 } from "@mui/material";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import PositionListItem from "./PositionListItem";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "../../firebase";
 import ExportedImage from "next-image-export-optimizer";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import NextLink from "next/link";
+import { handleConnect } from "../Reusable/Resusable";
 
 const ProjectInfo = () => {
   // context
@@ -25,12 +24,8 @@ const ProjectInfo = () => {
     chats,
     currentStudent,
     students,
-    setChat,
     setPartner,
-    setShowMsg,
     setForceChatExpand,
-    openDirectMsg,
-    setOpenDirectMsg,
   } = useContext(GlobalContext);
   const { project } = useContext(ProjectContext);
 
@@ -73,34 +68,6 @@ const ProjectInfo = () => {
     return foundCreator;
   }, [students, project]);
 
-  // hook to show msg if the chat is newly created by "connect" or "join request"
-  useEffect(() => {
-    if (!openDirectMsg) return;
-
-    const foundChat = chats.find((chat) =>
-      chat.chat_user_ids.some((uid) => uid === creatorStudent?.uid)
-    );
-    if (foundChat) {
-      setForceChatExpand(true);
-      setTimeout(() => {
-        setChat(foundChat);
-        setPartner(creatorStudent);
-        setShowMsg(true);
-      }, 200); // delayed effect to look smooth
-      setOpenDirectMsg(false);
-    }
-    return foundChat;
-  }, [
-    chats,
-    creatorStudent,
-    openDirectMsg,
-    setChat,
-    setForceChatExpand,
-    setOpenDirectMsg,
-    setPartner,
-    setShowMsg,
-  ]); // trigger mainly by chats update and showDirectMsg. will return if don't need to show direct msg.
-
   // helper func
   function getCreatorName(students, creatorUID) {
     const foundStudent = students.find((student) => student.uid === creatorUID);
@@ -127,55 +94,6 @@ const ProjectInfo = () => {
     );
   };
 
-  // helper func
-  // similar function in StudentGridCard; StudentProfile
-  // !todo: handleConnect; function is bloated, might need an external lib to hold these func
-  const handleConnect = async (e) => {
-    e.stopPropagation();
-    setOpenDirectMsg(true); // trigger the useEffect to show the msg
-    {
-      /* create or update chat */
-    }
-    const foundChat = chats.find((chat) =>
-      chat.chat_user_ids.some((uid) => uid === project?.creator_uid)
-    );
-    if (foundChat) {
-      return;
-    }
-    // not found chat -> create
-    const msgStr = currentStudent.name + " requested to connect";
-    const messageRef = {
-      text: msgStr,
-      sent_by: currentUID,
-      sent_at: serverTimestamp(),
-    };
-    // add chat doc
-    const collectionRef = collection(db, "chats");
-    const my_unread_key = currentUID + "_unread";
-    const creator_unread_key = project?.creator_uid + "_unread";
-    const chatRef = {
-      chat_user_ids: [currentStudent?.uid, project?.creator_uid],
-      [my_unread_key]: 0,
-      [creator_unread_key]: 1,
-      last_text: msgStr,
-      last_timestamp: serverTimestamp(),
-    };
-    const chatModRef = addDoc(collectionRef, chatRef).catch((err) => {
-      console.log("addDoc() error: ", err);
-    });
-    let retID;
-    await chatModRef.then((ret) => {
-      retID = ret?.id;
-    });
-    // add message
-    const msgCollectionRef = collection(db, "chats", retID, "messages");
-    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
-      console.log("addDoc() error: ", err);
-    });
-    await msgModRef;
-  };
-
-  // similar alg in components/Student/StudentProfile
   // box ref to used by useEffect
   const boxRef = useRef();
   // useEffect to reset box scrollbar position
@@ -264,7 +182,16 @@ const ProjectInfo = () => {
                         disableElevation
                         sx={{ borderRadius: 4, backgroundColor: "#3e95c2" }}
                         variant="contained"
-                        onClick={(e) => handleConnect(e)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleConnect(
+                            chats,
+                            creatorStudent,
+                            currentStudent,
+                            setPartner,
+                            setForceChatExpand
+                          );
+                        }}
                       >
                         &emsp; {"Connect"} &emsp;
                       </Button>
@@ -350,7 +277,7 @@ const ProjectInfo = () => {
                   weeklyHour={position.positionWeeklyHour}
                   reqPositions={reqPositions}
                   isCreator={isCreator}
-                  // creator={creatorStudent}
+                  creator={creatorStudent}
                 />
               ))}
             </Box>
