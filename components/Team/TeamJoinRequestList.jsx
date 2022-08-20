@@ -1,18 +1,11 @@
-import {
-  Box,
-  Button,
-  Grid,
-  IconButton,
-  styled,
-  Typography,
-} from "@mui/material";
-import { useContext, useEffect, useRef, useState } from "react";
+import { Box, Typography } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { useContext, useEffect, useState } from "react";
 import { TeamContext } from "../Context/ShareContexts";
 import TeamJoinRequestListItem from "./TeamJoinRequestListItem";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import ArrowCircleLeftOutlinedIcon from "@mui/icons-material/ArrowCircleLeftOutlined";
 
 const TeamJoinRequestList = () => {
   // context
@@ -22,7 +15,8 @@ const TeamJoinRequestList = () => {
   const [projectJoinRequests, setProjectJoinRequests] = useState([]);
   useEffect(() => {
     const filteredJRs = joinRequests.filter(
-      (request) => request.project_id === project?.id
+      (request) =>
+        request.project_id === project?.id && request.status === "requesting"
     );
     setProjectJoinRequests(filteredJRs);
     return filteredJRs;
@@ -33,7 +27,7 @@ const TeamJoinRequestList = () => {
     slidesToShow: 4,
     slidesToScroll: 1,
     infinite: false,
-    dots: false,
+    dots: true,
     draggable: false,
   };
 
@@ -59,10 +53,10 @@ const TeamJoinRequestList = () => {
     }
   `;
 
-  return (
+  return projectJoinRequests?.length > 0 ? (
     <Box
       sx={{
-        // height: "400px",
+        height: "400px",
         border: 1,
         borderRadius: 4,
         borderColor: "text.secondary",
@@ -70,6 +64,7 @@ const TeamJoinRequestList = () => {
         display: "flex",
         flexDirection: "column",
         // backgroundColor: "green",
+        mt: 3,
       }}
     >
       <Typography
@@ -82,10 +77,11 @@ const TeamJoinRequestList = () => {
           height: "50px",
           display: "flex",
           alignItems: "center",
+          ml: "15px",
         }}
         color="text.primary"
       >
-        &emsp; {"Join Requests"}
+        {"Join Requests"}
       </Typography>
       <Box
         sx={{
@@ -94,18 +90,25 @@ const TeamJoinRequestList = () => {
           justifyContent: "center",
         }}
       >
-        <Box sx={{ width: "80%" }}>
+        <Box
+          sx={{
+            width: "80%",
+            paddingTop: 1.5,
+            paddingBottom: 1.5,
+          }}
+        >
           <StyledSlider {...sliderSettings}>
             {projectJoinRequests.map((request) => (
-              <div key={request.project_id}>
-                <TeamJoinRequestListItem request={request} />
-              </div>
+              <TeamJoinRequestListItem
+                key={request.project_id}
+                request={request}
+              />
             ))}
           </StyledSlider>
         </Box>
       </Box>
     </Box>
-  );
+  ) : null;
 };
 
 export default TeamJoinRequestList;

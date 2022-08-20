@@ -32,7 +32,7 @@ const ProjectInfo = () => {
   // local vars
   const currentUID = currentStudent?.uid;
 
-  // hook to find is the currentUser the project creator
+  // hook to find is the currentStudent the project creator
   const [isCreator, setIsCreator] = useState(false);
   useEffect(() => {
     currentUID === project?.creator_uid

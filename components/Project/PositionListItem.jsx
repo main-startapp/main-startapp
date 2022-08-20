@@ -6,10 +6,10 @@ import {
   Button,
   Divider,
   Grid,
-  styled,
   Tooltip,
   Typography,
 } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useContext, useEffect, useState } from "react";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
@@ -33,8 +33,8 @@ const PositionListItem = (props) => {
   const title = props.title;
   const resp = props.resp;
   const weeklyHour = props.weeklyHour;
-  const reqPositions = props.reqPositions; // a list of currentUser's requesting positions
-  const isCreator = props.isCreator; // whether currentUser is the creator
+  const reqPositions = props.reqPositions; // a list of currentStudent's requesting positions
+  const isCreator = props.isCreator; // whether currentStudent is the creator
   const creator = props.creator;
 
   // local vars

@@ -20,7 +20,7 @@ import {
   serverTimestamp,
   updateDoc,
   deleteDoc,
-  Timestamp,
+  setDoc,
 } from "firebase/firestore";
 import { useContext, useRef, useState } from "react";
 import { db } from "../../firebase";
@@ -29,6 +29,7 @@ import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import AdapterMoment from "@mui/lab/AdapterMoment";
 import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
 import moment from "moment";
+import { useRouter } from "next/router";
 
 const ProjectCreate = (props) => {
   // context
@@ -40,6 +41,9 @@ const ProjectCreate = (props) => {
 
   // props from push query
   const isCreate = props.isCreateStr === "false" ? false : true; // null, undefined, "true" are all true isCreate
+
+  // router
+  const router = useRouter();
 
   // Project State Initialization.
   // https://stackoverflow.com/questions/68945060/react-make-usestate-initial-value-conditional
@@ -60,19 +64,6 @@ const ProjectCreate = (props) => {
   // local vars
   const [doneFlag, setDoneFlag] = useState(false); // state to remove submit and update buttons
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
-
-  /* useEffect(() => {
-    if (isClickable) return;
-
-    // isClickable was false, set back to true after 5s delay
-    const timeout5s = setTimeout(() => {
-      setIsClickable(true);
-    }, 5000);
-
-    return () => {
-      clearTimeout(timeout5s);
-    };
-  }, [isClickable]); // reset button in 5s after click */
 
   const emptyPositionField = {
     positionID: Math.random().toString(16).slice(2),
@@ -143,14 +134,14 @@ const ProjectCreate = (props) => {
     await projectModRef.then((ret) => {
       retID = ret?.id;
     });
-    // !todo: since addDoc and updateDoc return Promise<void>, we need other method to check the results
+    // !todo: since updateDoc return Promise<void>, we need other method to check the results
     showAlert(
       "success",
       `"${newProject.title}" is updated successfully!` // success -> green
     );
 
-    // add to my_projects if create
     if (!retID) return; // retID: create; !retID: update
+    // add to my_projects in student data if create
     const curStudentDocRef = doc(db, "students", currentUID);
     const curStudentMyProjects = currentStudent?.my_projects
       ? currentStudent.my_projects
@@ -166,7 +157,20 @@ const ProjectCreate = (props) => {
         console.log("updateDoc() error: ", err);
       }
     );
+
+    // create extension doc for team management if create
+    const extDocRef = doc(db, "projects_ext", retID);
+    const projectExtRef = {
+      members: [currentUID],
+      admins: [currentUID],
+      last_timestamp: serverTimestamp(),
+    };
+    const projectExtModRef = setDoc(extDocRef, projectExtRef).catch((err) => {
+      console.log("setDoc() error: ", err);
+    });
+
     await curStudentModRef;
+    await projectExtModRef;
   };
 
   // const handleGoBack = async (e) => {
@@ -189,10 +193,8 @@ const ProjectCreate = (props) => {
     });
     setPositionFields([emptyPositionField]);
     setDoneFlag(true);
-    await projectModRef;
-    showAlert("error", `"${newProject.title}" is deleted sucessfully!`); // error -> red
 
-    // delete from my_projects
+    // delete project ref from my_projects in student doc
     const curStudentDocRef = doc(db, "students", currentUID);
     const curStudentMyProjects = currentStudent.my_projects.filter(
       (my_proj) => my_proj !== id
@@ -207,7 +209,24 @@ const ProjectCreate = (props) => {
         console.log("updateDoc() error: ", err);
       }
     );
+
+    // delete from project_ext coll
+    const extDocRef = doc(db, "projects_ext", id);
+    const projectExtModRef = deleteDoc(extDocRef).catch((err) => {
+      console.log("deleteDoc() error: ", err);
+    });
+
+    await projectModRef;
     await curStudentModRef;
+    await projectExtModRef;
+    showAlert(
+      "error",
+      `"${newProject.title}" is deleted sucessfully! Navigate to Projects page.`
+    ); // error -> red
+
+    setTimeout(() => {
+      router.push(`/`); // can be customized
+    }, 3000); // wait 3 seconds then go to `projects` page
   };
 
   const handleChangePosInput = (index, e) => {
@@ -238,7 +257,6 @@ const ProjectCreate = (props) => {
   const formRef = useRef();
 
   // debugging console logs if there's any
-  // console.log(positionFields);
 
   return (
     <Grid

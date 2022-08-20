@@ -1,11 +1,17 @@
 import { Avatar, Box, Divider, Typography } from "@mui/material";
-import { useContext } from "react";
-import { TeamContext } from "../Context/ShareContexts";
+import { useContext, useEffect } from "react";
+import { GlobalContext, TeamContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import TeamJoinRequestList from "./TeamJoinRequestList";
+import TeamCommPanel from "./TeamCommPanel";
+import TeamScheduler from "./TeamScheduler";
 
 const TeamInfo = () => {
-  const { project } = useContext(TeamContext);
+  const { currentStudent } = useContext(GlobalContext);
+  const { project, projectExt } = useContext(TeamContext);
+
+  // local var
+  const currentUID = currentStudent?.uid;
 
   return (
     <Box
@@ -15,7 +21,8 @@ const TeamInfo = () => {
       }}
     >
       {project?.id && (
-        <Box mt={3} ml={3} mr={3}>
+        <Box sx={{ mt: 3, mx: 3 }}>
+          {/* title */}
           <Box
             sx={{
               display: "flex",
@@ -31,8 +38,28 @@ const TeamInfo = () => {
               {project?.title}
             </Typography>
           </Box>
-          <Divider sx={{ mt: 3, mb: 3 }} />
-          <TeamJoinRequestList />
+          <Divider sx={{ mt: 3 }} />
+          {/* join requests */}
+          {projectExt?.admins?.includes(currentUID) && <TeamJoinRequestList />}
+          {/* info panel + meeting panel */}
+          <Box sx={{ display: "flex", flexDirection: "row", mt: 3 }}>
+            <Box
+              sx={{
+                width: "60%",
+                backgroundColor: "lightyellow",
+              }}
+            >
+              <TeamCommPanel />
+            </Box>
+            <Box
+              sx={{
+                width: "40%",
+                backgroundColor: "lightblue",
+              }}
+            >
+              <TeamScheduler />
+            </Box>
+          </Box>
         </Box>
       )}
     </Box>

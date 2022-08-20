@@ -26,21 +26,23 @@ const ChatAccordionMsg = () => {
     useContext(GlobalContext);
 
   // listen to realtime messages subcollection in chats collection
+  // !todo: either listen to the msg when necessary or using DBListener which one is better?
   const [message, setMessage] = useState({
     text: "",
     sent_by: currentUser.uid,
   });
   const [messages, setMessages] = useState([]);
   useEffect(() => {
-    let unsub;
-    if (chat?.id) {
-      const collectionRef = collection(db, "chats", chat.id, "messages");
-      const q = query(collectionRef, orderBy("sent_at", "asc"));
+    const chatID = chat?.id;
+    if (!chatID) return;
 
-      unsub = onSnapshot(q, (querySnapshot) => {
-        setMessages(querySnapshot.docs.map((doc) => ({ ...doc.data() })));
-      });
-    }
+    const collectionRef = collection(db, "chats", chatID, "messages");
+    const q = query(collectionRef, orderBy("sent_at", "asc"));
+
+    const unsub = onSnapshot(q, (querySnapshot) => {
+      setMessages(querySnapshot.docs.map((doc) => ({ ...doc.data() })));
+    });
+
     return () => {
       unsub;
     };

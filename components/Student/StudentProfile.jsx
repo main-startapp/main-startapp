@@ -13,6 +13,7 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import LinkIcon from "@mui/icons-material/Link";
 import { handleConnect } from "../Reusable/Resusable";
+import FaceRetouchingNaturalOutlinedIcon from "@mui/icons-material/FaceRetouchingNaturalOutlined";
 
 const StudentProfile = () => {
   // context
@@ -89,13 +90,25 @@ const StudentProfile = () => {
         }}
       >
         {/* awards */}
-        {/* <Typography sx={{ fontWeight: "bold", fontSize: "1.2em" }}>
+        {student?.awards?.length > 0 && (
+          <Typography sx={{ fontWeight: "bold", fontSize: "1.2em" }}>
             {"Awards"}
           </Typography>
-          <Box direction="row">
-            <VerifiedRoundedIcon sx={{ fontSize: "3em", mr: 1 }} />
-            <LocalPoliceRoundedIcon sx={{ fontSize: "3em", mr: 1 }} />
-          </Box> */}
+        )}
+        <Box direction="row">
+          {student?.awards?.length > 0 &&
+            student.awards.map((awardStr, index) => {
+              if (awardStr.toLowerCase() === "betauser") {
+                return (
+                  <Tooltip title="Beta User">
+                    <FaceRetouchingNaturalOutlinedIcon
+                      sx={{ fontSize: "3em", mr: 1 }}
+                    />
+                  </Tooltip>
+                );
+              }
+            })}
+        </Box>
         {/* social media links */}
         {student?.social_media?.length > 0 && (
           <Typography sx={{ fontWeight: "bold", fontSize: "1.2em", mt: 1 }}>

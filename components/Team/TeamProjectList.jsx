@@ -1,34 +1,32 @@
-import { Box } from "@mui/material";
-import { useContext, useEffect } from "react";
-import { GlobalContext, TeamContext } from "../Context/ShareContexts";
+import { Box, Divider } from "@mui/material";
+import { useContext, useEffect, useMemo } from "react";
+import { GlobalContext } from "../Context/ShareContexts";
 import TeamProjectListItem from "./TeamProjectListItem";
 import TeamProjectListItemEmpty from "./TeamProjectListItemEmpty";
 
 const TeamProjectList = () => {
   // contexts
-  const { projects, currentStudent, chats } = useContext(GlobalContext);
-  const { setJoinRequests } = useContext(TeamContext);
+  const { projects, projectsExt, currentStudent, chats } =
+    useContext(GlobalContext);
 
   // local vars
-  const currentUID = currentStudent?.uid;
   const maxProjectCount = 3;
-  const myProjectCount = 0;
+  const myProjectCount = useMemo(() => {
+    // if no currentStudent data, don't show the project creation slot
+    // if no length or 0, treat it as 0
+    // if number > 0, use it
+    if (!currentStudent) return maxProjectCount;
+    return currentStudent?.my_projects?.length || 0;
+  }, [currentStudent]);
 
-  // hook to find all the join requests for all the created projects
-  useEffect(() => {
-    const requests = [];
+  // helper fun
+  const getProject = (id) => {
+    return projects.find((project) => project.id === id) || null;
+  };
 
-    chats.forEach((chat) => {
-      chat?.join_requests?.forEach((request) => {
-        if (currentUID === request.creator_uid) {
-          requests.push({ ...request, chat_id: chat.id });
-        }
-      });
-    });
-    setJoinRequests(requests);
-
-    return requests;
-  }, [chats, currentUID, setJoinRequests]);
+  const getProjectExt = (id) => {
+    return projectsExt.find((projectExt) => projectExt.id === id) || null;
+  };
 
   return (
     <Box
@@ -38,21 +36,27 @@ const TeamProjectList = () => {
       }}
     >
       {/* my projects */}
-      {projects
-        .filter((project) => {
-          if (project.creator_uid === currentUID) {
-            myProjectCount++;
-            return project;
-          }
-        })
-        .map((project) => {
-          return <TeamProjectListItem key={project.id} project={project} />;
-        })}
-      {Array(maxProjectCount - myProjectCount)
+      {currentStudent?.my_projects.map((myProjectID) => {
+        return (
+          <TeamProjectListItem
+            key={myProjectID}
+            project={getProject(myProjectID)}
+            projectExt={getProjectExt(myProjectID)}
+          />
+        );
+      })}
+      {Array(
+        maxProjectCount - myProjectCount > 0
+          ? maxProjectCount - myProjectCount
+          : 0
+      )
         .fill("filler")
         .map((filler, index) => {
           return <TeamProjectListItemEmpty key={index} />;
         })}
+      {/* divider: !! to transfer number to boolean; willl not show if no joined projects */}
+      {/* involved projects */}
+      {}
     </Box>
   );
 };

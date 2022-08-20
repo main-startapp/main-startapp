@@ -11,19 +11,11 @@ import {
   Select,
   TextField,
 } from "@mui/material";
-import {
-  collection,
-  doc,
-  getDoc,
-  serverTimestamp,
-  setDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useContext, useEffect, useRef, useState } from "react";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
-import DoDisturbAltRoundedIcon from "@mui/icons-material/DoDisturbAltRounded";
 import { useAuth } from "../Context/AuthContext";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
 
@@ -45,8 +37,6 @@ const StudentCreate = () => {
     awards: [],
     connections: [],
     my_projects: [],
-    // requested_positions: [],
-    // joined_projects: [],
     photo_url: currentUser.photoURL,
   });
 
@@ -67,7 +57,6 @@ const StudentCreate = () => {
 
   // local vars
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
-  const [isChanged, setIsChanged] = useState(false); // check if user modified the contents
 
   // helper func
   const handleSubmit = async (e) => {

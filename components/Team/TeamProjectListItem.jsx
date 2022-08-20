@@ -9,31 +9,33 @@ import {
 } from "@mui/material";
 import { Box } from "@mui/material";
 import { useContext, useState } from "react";
-import { TeamContext } from "../Context/ShareContexts";
+import { GlobalContext, TeamContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { deleteDoc, doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 
 const TeamProjectListItem = (props) => {
   const project = props.project;
+  const projectExt = props.projectExt;
 
   // context
-  const { setProject } = useContext(TeamContext);
+  const { setProject, setProjectExt } = useContext(TeamContext);
+  const { currentStudent } = useContext(GlobalContext);
 
   // menu
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const handleMenuClick = (event) => {
-    setAnchorEl(event.currentTarget);
+  const handleMenuClick = (e) => {
+    setAnchorEl(e.currentTarget);
   };
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
 
   // helper func
-  const handleVisibility = async () => {
-    const docRef = doc(db, "projects", project?.id);
+  const handleVisibility = async (id, e) => {
+    const docRef = doc(db, "projects", id);
     const projectRef = {
       ...project,
       isVisible: !project.isVisible,
@@ -46,10 +48,50 @@ const TeamProjectListItem = (props) => {
     await projectModRef;
   };
 
+  const handleDeleteProj = async (id, e) => {
+    const docRef = doc(db, "projects", id);
+    const projectModRef = deleteDoc(docRef).catch((err) => {
+      console.log("deleteDoc() error: ", err);
+    });
+
+    // delete project ref from my_projects in student doc
+    const curStudentDocRef = doc(db, "students", currentStudent?.uid);
+    const curStudentMyProjects = currentStudent.my_projects.filter(
+      (my_proj) => my_proj !== id
+    );
+    const curStudentRef = {
+      ...currentStudent,
+      my_projects: curStudentMyProjects,
+    };
+    delete curStudentRef?.uid;
+    const curStudentModRef = updateDoc(curStudentDocRef, curStudentRef).catch(
+      (err) => {
+        console.log("updateDoc() error: ", err);
+      }
+    );
+
+    // delete from project_ext coll
+    const extDocRef = doc(db, "projects_ext", id);
+    const projectExtModRef = deleteDoc(extDocRef).catch((err) => {
+      console.log("deleteDoc() error: ", err);
+    });
+
+    // wait
+    await projectModRef;
+    await curStudentModRef;
+    await projectExtModRef;
+  };
+
+  // stop propagation
+  // https://stackoverflow.com/questions/60436516/prevent-event-propagation-on-row-click-and-dialog-in-material-ui
+  // trdl: put it in the direct parent
   return (
     <Box m={3}>
       <ListItem
-        onClick={() => setProject(project)}
+        onClick={() => {
+          setProject(project);
+          setProjectExt(projectExt);
+        }}
         sx={{
           display: "flex",
           flexDirection: "column",
@@ -72,6 +114,9 @@ const TeamProjectListItem = (props) => {
             flexDirection: "row",
             alignItems: "center",
             width: "100%",
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
           }}
         >
           {/* project icon uploaded by users*/}
@@ -96,7 +141,9 @@ const TeamProjectListItem = (props) => {
             aria-controls={open ? "TPLI-menu" : undefined}
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
-            onClick={handleMenuClick}
+            onClick={(e) => {
+              handleMenuClick(e);
+            }}
           >
             <MoreVertIcon />
           </IconButton>
@@ -111,14 +158,23 @@ const TeamProjectListItem = (props) => {
           >
             <MenuItem
               onClick={() => {
-                handleVisibility();
+                handleVisibility(project?.id);
                 handleMenuClose();
               }}
             >
               {project.isVisible ? "Hide" : "Display"}
             </MenuItem>
 
-            <MenuItem onClick={handleMenuClose}>WIP Delete</MenuItem>
+            <MenuItem
+              onClick={() => {
+                setProject(null);
+                setProjectExt(null);
+                handleDeleteProj(project?.id);
+                handleMenuClose();
+              }}
+            >
+              Delete
+            </MenuItem>
           </Menu>
         </Box>
         <ListItemText

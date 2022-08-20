@@ -8,21 +8,51 @@ import TeamInfo from "../../components/Team/TeamInfo";
 import TeamProjectList from "../../components/Team/TeamProjectList";
 
 const TeamManagement = () => {
-  // chat context
-  const { setChat, setShowChat, setShowMsg } = useContext(GlobalContext);
+  // context
+  const { setChat, setShowChat, setShowMsg, chats, currentStudent } =
+    useContext(GlobalContext);
   useEffect(() => {
     setShowChat(true);
     setShowMsg(false);
     setChat(null);
   }, [setChat, setShowChat, setShowMsg]);
 
+  // local vars
+  const currentUID = currentStudent?.uid;
+
   // team states init
   const [project, setProject] = useState(null);
+  const [projectExt, setProjectExt] = useState(null);
   const [joinRequests, setJoinRequests] = useState([]);
+  const [forceInfoUpdate, setForceInfoUpdate] = useState(false);
+
+  // hook to find all the join requests for all the created projects
+  useEffect(() => {
+    const requests = [];
+
+    chats.forEach((chat) => {
+      chat?.join_requests?.forEach((request) => {
+        if (currentUID === request.creator_uid) {
+          requests.push({ ...request, chat_id: chat.id });
+        }
+      });
+    });
+    setJoinRequests(requests);
+
+    return requests;
+  }, [chats, currentUID]);
 
   return (
     <TeamContext.Provider
-      value={{ project, setProject, joinRequests, setJoinRequests }}
+      value={{
+        project,
+        setProject,
+        projectExt,
+        setProjectExt,
+        joinRequests,
+        forceInfoUpdate,
+        setForceInfoUpdate,
+      }}
     >
       <Grid
         container

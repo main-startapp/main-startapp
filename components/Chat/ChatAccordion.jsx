@@ -6,16 +6,7 @@ import {
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import {
-  collection,
-  doc,
-  onSnapshot,
-  orderBy,
-  query,
-  where,
-} from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
-import { db } from "../../firebase";
 import { useAuth } from "../Context/AuthContext";
 import { GlobalContext } from "../Context/ShareContexts";
 import ChatAccordionContact from "./ChatAccordionContact";
@@ -28,9 +19,7 @@ const ChatAccordion = () => {
   const { currentUser } = useAuth();
   const {
     chats,
-    setChats,
     setChat,
-    setCurrentStudent,
     setShowMsg,
     forceChatExpand,
     setForceChatExpand,
@@ -55,7 +44,7 @@ const ChatAccordion = () => {
     var timeout = 200;
     if (expandState !== "expandIt") {
       setExpandState("expandIt");
-      timeout = 500;
+      timeout = 500; // wait more time
     }
 
     setTimeout(() => {
@@ -101,39 +90,6 @@ const ChatAccordion = () => {
       setHasUnread(false);
     }
   }, [chats, currentUser]);
-
-  // listen to realtime chats collection
-  useEffect(() => {
-    const chatsRef = collection(db, "chats");
-    const q = query(
-      chatsRef,
-      where("chat_user_ids", "array-contains", currentUser.uid),
-      orderBy("last_timestamp", "desc")
-    );
-    const unsub = onSnapshot(q, (querySnapshot) => {
-      setChats(
-        querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-      );
-    });
-
-    return () => {
-      unsub;
-    };
-  }, [currentUser, setChats]);
-
-  // listen to realtime currentUser's student doc
-  useEffect(() => {
-    const docID = currentUser?.uid || "0";
-    const unsub = onSnapshot(doc(db, "students", docID), (doc) => {
-      if (doc.exists()) {
-        setCurrentStudent({ ...doc.data(), uid: docID });
-      }
-    });
-
-    return () => {
-      unsub;
-    };
-  }, [currentUser, setCurrentStudent]);
 
   return (
     <Box sx={{ display: "flex", justifyContent: "right" }}>

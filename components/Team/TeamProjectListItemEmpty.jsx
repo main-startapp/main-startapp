@@ -1,7 +1,6 @@
-import { Box, IconButton, ListItem } from "@mui/material";
+import { Box, ListItem } from "@mui/material";
 import NextLink from "next/link";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import { useRouter } from "next/router";
 
 const TeamProjectListItemEmpty = () => {
   return (
@@ -25,14 +24,14 @@ const TeamProjectListItemEmpty = () => {
             boxShadow: 0,
             "&:hover": {
               backgroundColor: "#f6f6f6",
-              cursor: "default",
+              cursor: "pointer",
             },
             minHeight: "150px",
             overflow: "hidden",
           }}
         >
           <AddCircleOutlineIcon
-            sx={{ height: "70px", width: "70px", opacity: "50%" }}
+            sx={{ height: "70px", width: "70px", color: "lightgray" }}
           />
         </ListItem>
       </NextLink>

@@ -61,8 +61,8 @@ export const handleConnect = async (
 // handle reset unread
 // https://stackoverflow.com/questions/43302584/why-doesnt-the-code-after-await-run-right-away-isnt-it-supposed-to-be-non-blo
 // https://stackoverflow.com/questions/66263271/firebase-update-returning-undefined-is-it-not-supposed-to-return-the-updated
-export const handleUnread = async (chat, currentUser) => {
-  const my_unread_key = currentUser.uid + "_unread";
+export const handleUnread = async (chat, currentStudent) => {
+  const my_unread_key = currentStudent.uid + "_unread";
 
   if (chat[my_unread_key] > 0) {
     const chatDocRef = doc(db, "chats", chat.id);

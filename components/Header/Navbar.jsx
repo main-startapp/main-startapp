@@ -121,7 +121,7 @@ const Navbar = () => {
             aria-controls={open ? "navbar-menu" : undefined}
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
-            onClick={handleUserMenu}
+            onClick={(e) => handleUserMenu(e)}
           >
             <Avatar src={currentUser.photoURL} />
           </IconButton>

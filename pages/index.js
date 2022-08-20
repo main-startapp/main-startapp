@@ -1,7 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Box, Grid } from "@mui/material";
-import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
-import { db } from "../firebase";
+import { Grid } from "@mui/material";
 import {
   GlobalContext,
   ProjectContext,
