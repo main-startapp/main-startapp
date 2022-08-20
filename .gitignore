@@ -35,3 +35,5 @@ yarn-error.log*
 
 # firebase
 /.firebase/
+/firebase.js
+/firestore-debug.log

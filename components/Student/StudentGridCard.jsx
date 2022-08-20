@@ -1,95 +1,33 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Tooltip,
-  Typography,
-} from "@mui/material";
-import {
-  addDoc,
-  collection,
-  doc,
-  serverTimestamp,
-  updateDoc,
-} from "firebase/firestore";
+import { Avatar, Box, Button, Card, Tooltip, Typography } from "@mui/material";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useContext } from "react";
 import { db } from "../../firebase";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
+import { handleConnect } from "../Reusable/Resusable";
 
 const StudentGridCard = (props) => {
   const student = props.student;
 
   // context
-  const { chats, currentStudent, setOpenDirectMsg } = useContext(GlobalContext);
+  const { chats, currentStudent, setPartner, setForceChatExpand } =
+    useContext(GlobalContext);
   const { setStudent } = useContext(StudentContext);
 
   // local vars
   const currentUID = currentStudent?.uid;
-
-  // helper func
-  // !todo: handleConnect; function is bloated, might need an external lib to hold these func
-  const handleConnect = async (e) => {
-    e.stopPropagation();
-    setStudent(student);
-    setOpenDirectMsg(true); // trigger the useEffect to show the msg
-    {
-      /* create or update chat */
-    }
-    const foundChat = chats.find((chat) =>
-      chat.chat_user_ids.some((uid) => uid === student.uid)
-    );
-    if (foundChat) {
-      return;
-    }
-
-    // not found chat -> create
-    const msgStr = currentStudent?.name + " requested to connect";
-    const messageRef = {
-      text: msgStr,
-      sent_by: currentUID,
-      sent_at: serverTimestamp(),
-    };
-    // add chat doc
-    const collectionRef = collection(db, "chats");
-    const my_unread_key = currentUID + "_unread";
-    const it_unread_key = student.uid + "_unread";
-    const chatRef = {
-      chat_user_ids: [currentStudent?.uid, student.uid],
-      last_text: msgStr,
-      last_timestamp: serverTimestamp(),
-      [my_unread_key]: 0,
-      [it_unread_key]: 1,
-    };
-    const chatAddDocRef = await addDoc(collectionRef, chatRef).catch((err) => {
-      console.log("addDoc() error: ", err);
-    });
-    // add message
-    const msgCollectionRef = collection(
-      db,
-      "chats",
-      chatAddDocRef.id,
-      "messages"
-    );
-    const msgAddDocRef = await addDoc(msgCollectionRef, messageRef).catch(
-      (err) => {
-        console.log("addDoc() error: ", err);
-      }
-    );
-  };
 
   return (
     <Card
       variant="outlined"
       onClick={() => setStudent(student)}
       sx={{
-        mr: 3,
-        mt: 3,
-        bgcolor: "#fafafa",
+        // mr: 3,
+        // mt: 3,
+        backgroundColor: "#fafafa",
         border: "1px solid black",
         borderRadius: 4,
+        height: "100%",
+        minWidth: "200px",
       }}
     >
       <Box
@@ -97,6 +35,7 @@ const StudentGridCard = (props) => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          height: "100%",
           // justifyContent: "center",
         }}
       >
@@ -114,7 +53,7 @@ const StudentGridCard = (props) => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            bgcolor: "green",
+            backgroundColor: "green",
           }}
         > */}
         <Typography sx={{ fontWeight: "bold", fontSize: "1em" }}>
@@ -131,6 +70,8 @@ const StudentGridCard = (props) => {
           {student.year_of_ed}
         </Typography>
 
+        <Box sx={{ flexGrow: 1 }} />
+
         <Tooltip title={currentUID ? "" : "Please edit your profile first."}>
           <span>
             <Button
@@ -140,10 +81,20 @@ const StudentGridCard = (props) => {
               sx={{
                 m: 3,
                 borderRadius: 4,
-                bgcolor: "#3e95c2",
+                backgroundColor: "#3e95c2",
               }}
               variant="contained"
-              onClick={(e) => handleConnect(e)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setStudent(student);
+                handleConnect(
+                  chats,
+                  student,
+                  currentStudent,
+                  setPartner,
+                  setForceChatExpand
+                );
+              }}
             >
               <Typography sx={{ fontSize: "0.9em" }}>
                 &emsp; {"Connect"} &emsp;

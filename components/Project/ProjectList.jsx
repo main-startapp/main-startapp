@@ -1,43 +1,32 @@
 import { useContext } from "react";
-import { useRouter } from "next/router";
+import NextLink from "next/link";
 import { Box, Button, Tooltip } from "@mui/material";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import ProjectListItem from "./ProjectListItem";
 
+// link/router https://stackoverflow.com/questions/65086108/next-js-link-vs-router-push-vs-a-tag
 // description: a list of projects (project list items); a button to create new project (router.push)
 // behavior: filters projects based on the search term and/or search category
 const ProjectList = () => {
   // context
-  const { currentStudent } = useContext(GlobalContext);
-  const { projects, searchTerm, searchCategory } = useContext(ProjectContext);
+  const { projects, currentStudent } = useContext(GlobalContext);
+  const { searchTerm, searchCategory } = useContext(ProjectContext);
 
   // local vars
   const currentUID = currentStudent?.uid;
-
-  // link/router https://stackoverflow.com/questions/65086108/next-js-link-vs-router-push-vs-a-tag
-  const router = useRouter();
-
-  // similar func updateProject() in ProjectInfo.jsx
-  const createProject = () => {
-    router.push(
-      {
-        pathname: `/project/create`,
-        query: { isCreateStr: "true", projectStr: "null" },
-      },
-      `/project/create` // "as" argument
-    );
-  };
 
   return (
     <>
       <Box
         sx={{
-          height: "calc(98vh - 188px)", // navbar: 64px; projectbar: 64px; create project button: 36px; margin: 24px
+          height: "calc(98vh - 188px)", // navbar: 64px; projectbar: 64px; margin: 24px; create button: 36px
           overflow: "auto",
         }}
       >
         {projects
           .filter((project) => {
+            if (!project.isVisible) return;
+
             // !todo: is this optimized?
             const isInTitles =
               searchTerm !== "" && // lazy evaluation
@@ -80,18 +69,26 @@ const ProjectList = () => {
           ))}
       </Box>
 
-      <Box mt={3} sx={{ display: "flex", justifyContent: "center" }}>
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
         <Tooltip title={currentUID ? "" : "Edit your profile first."}>
           <span>
-            <Button
-              disabled={!currentUID}
-              disableElevation
-              sx={{ borderRadius: 4, bgcolor: "#3e95c2" }}
-              variant="contained"
-              onClick={() => createProject()}
+            <NextLink
+              href={{
+                pathname: "/project/create",
+                query: { isCreateStr: "true" },
+              }}
+              as="/project/create"
+              passHref
             >
-              {"Create Project"}
-            </Button>
+              <Button
+                disabled={!currentUID}
+                disableElevation
+                sx={{ borderRadius: 4, backgroundColor: "#3e95c2" }}
+                variant="contained"
+              >
+                {"Create Project"}
+              </Button>
+            </NextLink>
           </span>
         </Tooltip>
       </Box>

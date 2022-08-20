@@ -6,48 +6,70 @@ import {
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import {
-  collection,
-  doc,
-  onSnapshot,
-  orderBy,
-  query,
-  where,
-} from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
-import { db } from "../../firebase";
 import { useAuth } from "../Context/AuthContext";
 import { GlobalContext } from "../Context/ShareContexts";
 import ChatAccordionContact from "./ChatAccordionContact";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import CircleIcon from "@mui/icons-material/Circle";
+import { handleUnread } from "../Reusable/Resusable";
 
 const ChatAccordion = () => {
   // context
   const { currentUser } = useAuth();
   const {
     chats,
-    setChats,
     setChat,
-    setCurrentStudent,
     setShowMsg,
     forceChatExpand,
     setForceChatExpand,
+    partner,
   } = useContext(GlobalContext);
 
   // local
   const [expandState, setExpandState] = useState("collapseIt");
+  const [hasUnread, setHasUnread] = useState(false);
 
-  // chat expand signal
+  // handle chat expansion called by handleConnect
   useEffect(() => {
     if (!forceChatExpand) return;
-    setForceChatExpand(false);
-    if (expandState === "expandIt") {
-      return;
-    }
-    return () => {
+
+    const foundChat = chats.find((chat) =>
+      chat.chat_user_ids.some((uid) => uid === partner.uid)
+    );
+
+    if (!foundChat) return;
+    setChat(foundChat);
+
+    var timeout = 200;
+    if (expandState !== "expandIt") {
       setExpandState("expandIt");
+      timeout = 500; // wait more time
+    }
+
+    setTimeout(() => {
+      setShowMsg(true);
+    }, timeout); // delayed msg window
+
+    setTimeout(() => {
+      handleUnread(foundChat, currentUser);
+    }, 1000); // delayed reset unread
+
+    setForceChatExpand(false);
+
+    return () => {
+      foundChat;
     };
-  }, [forceChatExpand, expandState, setForceChatExpand]);
+  }, [
+    forceChatExpand,
+    expandState,
+    setForceChatExpand,
+    chats,
+    partner,
+    setChat,
+    setShowMsg,
+    currentUser,
+  ]);
 
   // helper func
   const handleExpand = (e) => {
@@ -58,38 +80,16 @@ const ChatAccordion = () => {
     setChat(null);
   };
 
-  // listen to realtime chats collection
+  // unread signal
   useEffect(() => {
-    const chatsRef = collection(db, "chats");
-    const q = query(
-      chatsRef,
-      where("chat_user_ids", "array-contains", currentUser.uid),
-      orderBy("last_timestamp", "desc")
-    );
-    const unsub = onSnapshot(q, (querySnapshot) => {
-      setChats(
-        querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-      );
-    });
+    const my_unread_key = currentUser.uid + "_unread";
 
-    return () => {
-      unsub;
-    };
-  }, [currentUser, setChats]);
-
-  // listen to realtime currentUser's student doc
-  useEffect(() => {
-    const docID = currentUser?.uid || "0";
-    const unsub = onSnapshot(doc(db, "students", docID), (doc) => {
-      if (doc.exists()) {
-        setCurrentStudent({ ...doc.data(), uid: docID });
-      }
-    });
-
-    return () => {
-      unsub;
-    };
-  }, [currentUser, setCurrentStudent]);
+    if (chats.some((chat) => chat[my_unread_key] > 0)) {
+      setHasUnread(true);
+    } else {
+      setHasUnread(false);
+    }
+  }, [chats, currentUser]);
 
   return (
     <Box sx={{ display: "flex", justifyContent: "right" }}>
@@ -97,8 +97,9 @@ const ChatAccordion = () => {
         square={true}
         expanded={expandState === "expandIt"}
         sx={{
+          // minWidth: "100px",
+          width: "15vw",
           minWidth: "300px",
-          width: "25vw",
           maxHeight: "75vh",
           position: "fixed",
           right: "20px",
@@ -113,8 +114,15 @@ const ChatAccordion = () => {
           onClick={(e) => handleExpand(e)}
         >
           <Typography>Messenger</Typography>
+          {hasUnread && (
+            <CircleIcon
+              sx={{ color: "steelblue", fontSize: "15px", ml: "5px" }}
+            />
+          )}
         </StyledAccordionSummary>
-        <AccordionDetails sx={{ overflow: "auto", maxHeight: "50vh" }}>
+        <AccordionDetails
+          sx={{ overflow: "auto", maxHeight: "50vh", padding: 0 }}
+        >
           <Wrapper>
             <ChatList>
               {chats.map((chat) => (
