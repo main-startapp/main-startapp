@@ -21,7 +21,10 @@ Get "firebase.js" file from Slack and put it in the root directory (w/ firebase.
 ## Firebase related
 
 Open a new powershell terminal, if firebase refuses to start:
+
+```bash
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
 
 Test locally and deploy to a preview channel:
 [Firebase Test Doc](https://firebase.google.com/docs/hosting/test-preview-deploy)
