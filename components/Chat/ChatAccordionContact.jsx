@@ -38,7 +38,11 @@ const ChatAccordionContact = (props) => {
   // !todo: use a map to reduce searching
   const [lastJR, setLastJR] = useState(null);
   useEffect(() => {
-    if (chat?.join_requests?.length <= 0) return;
+    if (
+      typeof chat?.join_requests?.length !== "number" ||
+      chat?.join_requests?.length <= 0
+    )
+      return;
 
     const tempLastJR = chat.join_requests[chat.join_requests.length - 1];
     const tempLastJRProject = projects.find(
