@@ -1,5 +1,4 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/router";
 import {
   Avatar,
   Box,
@@ -26,6 +25,7 @@ const ProjectInfo = () => {
     students,
     setPartner,
     setForceChatExpand,
+    onMedia,
   } = useContext(GlobalContext);
   const { project } = useContext(ProjectContext);
 
@@ -79,23 +79,9 @@ const ProjectInfo = () => {
     return foundStudent?.photo_url;
   }
 
-  // similar func createProject() in ProjectList.jsx
-  const router = useRouter();
-  const updateProject = (projectObj) => {
-    router.push(
-      {
-        pathname: `/project/create`,
-        query: {
-          isCreateStr: "false",
-          projectStr: JSON.stringify(projectObj),
-        },
-      },
-      `/project/create` // "as" argument
-    );
-  };
-
   // box ref to used by useEffect
   const boxRef = useRef();
+
   // useEffect to reset box scrollbar position
   useEffect(() => {
     boxRef.current.scrollTop = 0;
@@ -105,14 +91,15 @@ const ProjectInfo = () => {
     <Box
       ref={boxRef}
       sx={{
-        height: "calc(98vh - 128px)",
+        height: "calc(99.5vh - 128px)",
         overflow: "auto",
+        backgroundColor: "#fafafa",
       }}
     >
-      {project?.id && (
+      {!!project && (
         <Grid container>
           {/* Top left info box */}
-          <Grid item xs={8}>
+          <Grid item xs={onMedia.onDesktop ? 9 : 12}>
             <Box mt={3} ml={3} mr={1.5}>
               <Box
                 sx={{
@@ -129,8 +116,22 @@ const ProjectInfo = () => {
                   {project?.title}
                 </Typography>
               </Box>
-              <Divider sx={{ mt: 3, mb: 3 }} />
+              <Divider
+                sx={{
+                  mt: 3,
+                  mb: 3,
+                  borderBottomWidth: 1.5,
+                  borderColor: "#dbdbdb",
+                }}
+              />
               <Typography sx={{ fontWeight: "bold" }} color="text.primary">
+                {"Details: "}
+              </Typography>
+              <Typography color="text.secondary">{project?.details}</Typography>
+              <Typography
+                sx={{ mt: 3, fontWeight: "bold" }}
+                color="text.primary"
+              >
                 {"Team size: "}
               </Typography>
               <Typography color="text.secondary">
@@ -138,49 +139,68 @@ const ProjectInfo = () => {
                 {"/"}
                 {project?.max_member_count}
               </Typography>
-              <Typography
-                sx={{ mt: 3, fontWeight: "bold" }}
-                color="text.primary"
-              >
-                {"Details: "}
-              </Typography>
-              <Typography color="text.secondary">{project?.details}</Typography>
             </Box>
           </Grid>
 
           {/* Top right founder box */}
-          <Grid item xs={4}>
-            <Box mt={3} mr={3} ml={1.5}>
-              <Box sx={{ display: "flex", justifyContent: "center" }}>
+          {onMedia.onDesktop && (
+            <Grid item xs={3}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  mt: 3,
+                  mr: 3,
+                  ml: 1.5,
+                }}
+              >
                 <IconButton>
                   <Avatar
                     sx={{
                       width: "5em",
                       height: "5em",
-                      border: "1px solid black",
+                      border: 1.5,
+                      borderColor: "#dbdbdb",
                     }}
                     src={getCreatorPhotoURL(students, project?.creator_uid)}
+                    referrerPolicy="no-referrer"
                   />
                 </IconButton>
-              </Box>
-              <Typography
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  fontSize: "1.5em",
-                  mt: 3,
-                }}
-              >
-                {getCreatorName(students, project?.creator_uid) || "Founder"}
-              </Typography>
-              <Box m={3} sx={{ display: "flex", justifyContent: "center" }}>
+
+                <Typography
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    fontWeight: "bold",
+                    fontSize: "1.1em",
+                    mt: 1,
+                  }}
+                >
+                  {getCreatorName(students, project?.creator_uid) || "Founder"}
+                </Typography>
+
                 {!isCreator && (
                   <Tooltip title={currentUID ? "" : "Edit your profile first."}>
                     <span>
                       <Button
                         disabled={!currentUID}
                         disableElevation
-                        sx={{ borderRadius: 4, backgroundColor: "#3e95c2" }}
+                        sx={{
+                          mt: 1,
+                          border: 1.5,
+                          borderColor: "#dbdbdb",
+                          borderRadius: "30px",
+                          color: "text.primary",
+                          backgroundColor: "#ffffff",
+                          fontWeight: "bold",
+                          fontSize: "0.8em",
+                          "&:hover": {
+                            backgroundColor: "#f6f6f6",
+                          },
+                          textTransform: "none",
+                        }}
                         variant="contained"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -193,7 +213,7 @@ const ProjectInfo = () => {
                           );
                         }}
                       >
-                        &emsp; {"Connect"} &emsp;
+                        {"Connect"}
                       </Button>
                     </span>
                   </Tooltip>
@@ -210,20 +230,33 @@ const ProjectInfo = () => {
                     <Button
                       onClick={() => setOldProject(project)}
                       variant="contained"
-                      sx={{ borderRadius: 4, backgroundColor: "#3e95c2" }}
+                      sx={{
+                        mt: 1,
+                        border: 1.5,
+                        borderColor: "#dbdbdb",
+                        borderRadius: "30px",
+                        color: "text.primary",
+                        backgroundColor: "#ffffff",
+                        fontWeight: "bold",
+                        fontSize: "0.8em",
+                        "&:hover": {
+                          backgroundColor: "#f6f6f6",
+                        },
+                        textTransform: "none",
+                      }}
                       disableElevation
                     >
-                      &emsp; {"Modify"} &emsp;
+                      {"Modify"}
                     </Button>
                   </NextLink>
                 )}
               </Box>
-            </Box>
-          </Grid>
+            </Grid>
+          )}
 
           {/* Bottom description and position boxes */}
           <Grid item xs={12}>
-            <Box mt={3} ml={3} mr={3}>
+            <Box sx={{ mt: 3, mx: 3 }}>
               <Typography sx={{ fontWeight: "bold" }} color="text.primary">
                 {"Description:"}
               </Typography>
@@ -246,27 +279,21 @@ const ProjectInfo = () => {
             {/* position details */}
             <Box
               sx={{
-                mt: 6,
+                mt: 3,
                 ml: 3,
                 mr: 3,
                 mb: "64px",
-                border: 1,
+                border: 1.5,
+                borderColor: "#dbdbdb",
+                borderRadius: "10px",
+                backgroundColor: "#ffffff",
               }}
             >
               <Typography
-                sx={{
-                  fontWeight: "bold",
-                  color: "white",
-                  backgroundColor: "#3e95c2",
-                  // borderTopLeftRadius: 15,
-                  // borderTopRightRadius: 15,
-                  height: "32px",
-                  display: "flex",
-                  alignItems: "center",
-                }}
+                sx={{ ml: 3, mt: 1.5, fontWeight: "bold" }}
                 color="text.primary"
               >
-                &emsp; {"Positions:"}
+                {"Positions:"}
               </Typography>
               {project?.position_list.map((position, index) => (
                 <PositionListItem
@@ -284,7 +311,7 @@ const ProjectInfo = () => {
           </Grid>
         </Grid>
       )}
-      {!project?.id && (
+      {!!!project && (
         <Box
           id="logo placeholder container"
           sx={{

@@ -167,9 +167,9 @@ const PositionListItem = (props) => {
         square={true}
         expanded={expandState === "expandIt"}
         sx={{
-          border: 1,
-          borderRadius: 4,
-          borderColor: "text.secondary",
+          border: 1.5,
+          borderRadius: "10px",
+          borderColor: "#dbdbdb",
           boxShadow: 0,
           maxWidth: "100%",
           "&:hover": {
@@ -181,7 +181,12 @@ const PositionListItem = (props) => {
           expandIcon={<ExpandMoreIcon />}
           onClick={(e) => handleExpand(e)}
         >
-          <Typography color="text.primary">{title}</Typography>
+          <Typography
+            color="text.primary"
+            sx={{ display: "flex", alignItems: "center" }}
+          >
+            {title}
+          </Typography>
           {!isCreator && (
             <Tooltip title={currentUID ? "" : "Edit your profile first."}>
               <span>
@@ -196,21 +201,31 @@ const PositionListItem = (props) => {
                   }
                   disableElevation
                   size="small"
-                  sx={{ mr: 3, borderRadius: 4, backgroundColor: "#3e95c2" }}
+                  sx={{
+                    mr: 3,
+                    border: 1.5,
+                    borderColor: "#dbdbdb",
+                    borderRadius: "30px",
+                    backgroundColor: "#3e95c2",
+                    textTransform: "none",
+                    paddingX: 3,
+                  }}
                   variant="contained"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleJoinRequest();
                   }}
                 >
-                  &emsp; Join Request &emsp;
+                  {"Join Request"}
                 </Button>
               </span>
             </Tooltip>
           )}
         </StyledAccordionSummary>
         <AccordionDetails>
-          <Divider sx={{ mb: 3 }} />
+          <Divider
+            sx={{ mb: 3, borderBottomWidth: 1.5, borderColor: "#dbdbdb" }}
+          />
           <Grid
             container
             spacing={0}

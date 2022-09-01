@@ -80,7 +80,7 @@ const ChatAccordionContact = (props) => {
         handleUnread(chat, currentUser);
       }}
     >
-      <Avatar sx={{ m: "14px" }} src={contact?.photo_url} />
+      <Avatar sx={{ m: "14px" }} src={contact?.photo_url} referrerPolicy="no-referrer"/>
       <ChatInfo>
         {/* name & last timestamp */}
         <Box

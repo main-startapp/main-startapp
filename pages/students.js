@@ -8,7 +8,7 @@ import StudentPageBar from "../components/Header/StudentPageBar";
 import StudentProfile from "../components/Student/StudentProfile";
 import StudentGrid from "../components/Student/StudentGrid";
 
-export default function Students() {
+const Students = () => {
   // context
   const { setChat, setShowChat, setShowMsg } = useContext(GlobalContext);
   useEffect(() => {
@@ -51,4 +51,6 @@ export default function Students() {
       </Grid>
     </StudentContext.Provider>
   );
-}
+};
+
+export default Students;

@@ -47,6 +47,7 @@ const StudentGridCard = (props) => {
             border: "1px solid black",
           }}
           src={student.photo_url}
+          referrerPolicy="no-referrer"
         />
         {/* <CardContent
           sx={{

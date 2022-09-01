@@ -17,6 +17,8 @@ const DBListener = () => {
   const {
     setProjects,
     setProjectsExt,
+    setEvents,
+    setEventsExt,
     setStudents,
     setCurrentStudent,
     setChats,
@@ -75,6 +77,25 @@ const DBListener = () => {
       unsub;
     };
   }, [currentUser, setProjectsExt]);
+
+  // listen to realtime events collection
+  useEffect(() => {
+    // db query
+    const collectionRef = collection(db, "events");
+    const q = query(collectionRef, orderBy("last_timestamp", "desc"));
+
+    const unsub = onSnapshot(q, (querySnapshot) => {
+      setEvents(
+        querySnapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+          last_timestamp: doc.data().last_timestamp?.toDate(),
+        }))
+      );
+    });
+
+    return unsub;
+  }, [setEvents]);
 
   // listen to realtime students collection
   useEffect(() => {

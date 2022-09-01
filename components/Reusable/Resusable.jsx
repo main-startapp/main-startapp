@@ -1,6 +1,7 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   serverTimestamp,
   updateDoc,
@@ -76,4 +77,54 @@ export const handleUnread = async (chat, currentStudent) => {
     });
     await chatModRef;
   }
+};
+
+// change project's visibility
+export const handleVisibility = async (project) => {
+  const docRef = doc(db, "projects", project.id);
+  const projectRef = {
+    ...project,
+    isVisible: !project.isVisible,
+    last_timestamp: serverTimestamp(),
+  };
+  delete projectRef.id;
+  const projectModRef = updateDoc(docRef, projectRef).catch((err) => {
+    console.log("updateDoc() error: ", err);
+  });
+  await projectModRef;
+};
+
+// completely delete a project
+export const handleDeleteProject = async (projectID, currentStudent) => {
+  const docRef = doc(db, "projects", projectID);
+  const projectModRef = deleteDoc(docRef).catch((err) => {
+    console.log("deleteDoc() error: ", err);
+  });
+
+  // delete project ref from my_projects in student doc
+  const curStudentDocRef = doc(db, "students", currentStudent?.uid);
+  const curStudentMyProjects = currentStudent.my_projects.filter(
+    (my_proj) => my_proj !== projectID
+  );
+  const curStudentRef = {
+    ...currentStudent,
+    my_projects: curStudentMyProjects,
+  };
+  delete curStudentRef?.uid;
+  const curStudentModRef = updateDoc(curStudentDocRef, curStudentRef).catch(
+    (err) => {
+      console.log("updateDoc() error: ", err);
+    }
+  );
+
+  // delete from project_ext coll
+  const extDocRef = doc(db, "projects_ext", projectID);
+  const projectExtModRef = deleteDoc(extDocRef).catch((err) => {
+    console.log("deleteDoc() error: ", err);
+  });
+
+  // wait
+  await projectModRef;
+  await curStudentModRef;
+  await projectExtModRef;
 };

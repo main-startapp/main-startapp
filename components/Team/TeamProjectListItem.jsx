@@ -12,16 +12,15 @@ import { useContext, useState } from "react";
 import { GlobalContext, TeamContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { deleteDoc, doc, serverTimestamp, updateDoc } from "firebase/firestore";
-import { db } from "../../firebase";
+import { handleDeleteProject, handleVisibility } from "../Reusable/Resusable";
 
 const TeamProjectListItem = (props) => {
   const project = props.project;
   const projectExt = props.projectExt;
 
   // context
-  const { setProject, setProjectExt } = useContext(TeamContext);
   const { currentStudent } = useContext(GlobalContext);
+  const { setProject, setProjectExt } = useContext(TeamContext);
 
   // menu
   const [anchorEl, setAnchorEl] = useState(null);
@@ -31,55 +30,6 @@ const TeamProjectListItem = (props) => {
   };
   const handleMenuClose = () => {
     setAnchorEl(null);
-  };
-
-  // helper func
-  const handleVisibility = async (id, e) => {
-    const docRef = doc(db, "projects", id);
-    const projectRef = {
-      ...project,
-      isVisible: !project.isVisible,
-      last_timestamp: serverTimestamp(),
-    };
-    delete projectRef.id;
-    const projectModRef = updateDoc(docRef, projectRef).catch((err) => {
-      console.log("updateDoc() error: ", err);
-    });
-    await projectModRef;
-  };
-
-  const handleDeleteProj = async (id, e) => {
-    const docRef = doc(db, "projects", id);
-    const projectModRef = deleteDoc(docRef).catch((err) => {
-      console.log("deleteDoc() error: ", err);
-    });
-
-    // delete project ref from my_projects in student doc
-    const curStudentDocRef = doc(db, "students", currentStudent?.uid);
-    const curStudentMyProjects = currentStudent.my_projects.filter(
-      (my_proj) => my_proj !== id
-    );
-    const curStudentRef = {
-      ...currentStudent,
-      my_projects: curStudentMyProjects,
-    };
-    delete curStudentRef?.uid;
-    const curStudentModRef = updateDoc(curStudentDocRef, curStudentRef).catch(
-      (err) => {
-        console.log("updateDoc() error: ", err);
-      }
-    );
-
-    // delete from project_ext coll
-    const extDocRef = doc(db, "projects_ext", id);
-    const projectExtModRef = deleteDoc(extDocRef).catch((err) => {
-      console.log("deleteDoc() error: ", err);
-    });
-
-    // wait
-    await projectModRef;
-    await curStudentModRef;
-    await projectExtModRef;
   };
 
   // stop propagation
@@ -105,7 +55,7 @@ const TeamProjectListItem = (props) => {
             cursor: "default",
           },
           overflow: "hidden",
-          opacity: project.isVisible ? "100%" : "50%",
+          opacity: project?.isVisible ? "100%" : "50%",
         }}
       >
         <Box
@@ -124,14 +74,14 @@ const TeamProjectListItem = (props) => {
             <UploadFileIcon />
           </Avatar>
           <ListItemText
-            primary={project.title}
+            primary={project?.title}
             primaryTypographyProps={{ fontWeight: "bold" }}
             secondary={
               <>
                 {"Team size: "}
-                {project.cur_member_count}
+                {project?.cur_member_count}
                 {"/"}
-                {project.max_member_count}
+                {project?.max_member_count}
                 <br />
               </>
             }
@@ -158,18 +108,18 @@ const TeamProjectListItem = (props) => {
           >
             <MenuItem
               onClick={() => {
-                handleVisibility(project?.id);
+                handleVisibility(project);
                 handleMenuClose();
               }}
             >
-              {project.isVisible ? "Hide" : "Display"}
+              {project?.isVisible ? "Hide" : "Display"}
             </MenuItem>
 
             <MenuItem
               onClick={() => {
                 setProject(null);
                 setProjectExt(null);
-                handleDeleteProj(project?.id);
+                handleDeleteProject(project?.id, currentStudent);
                 handleMenuClose();
               }}
             >
@@ -192,7 +142,7 @@ const TeamProjectListItem = (props) => {
                 color: "rgba(0, 0, 0, 0.6)",
               }}
             >
-              {project.description}
+              {project?.description}
             </Typography>
           }
         />
@@ -200,12 +150,12 @@ const TeamProjectListItem = (props) => {
           secondary={
             <>
               {"Hiring: "}
-              {project.cur_member_count < project.max_member_count
+              {project?.cur_member_count < project?.max_member_count
                 ? "Yes"
                 : "No"}
               <br />
               {"Visible: "}
-              {project.isVisible ? "Yes" : "No"}
+              {project?.isVisible ? "Yes" : "No"}
             </>
           }
         />

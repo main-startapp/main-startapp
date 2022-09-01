@@ -167,7 +167,7 @@ const ChatAccordionMsg = () => {
                 borderBottom: 1,
               }}
             >
-              <Avatar sx={{ m: "12px" }} src={partner?.photo_url} />
+              <Avatar sx={{ m: "12px" }} src={partner?.photo_url} referrerPolicy="no-referrer"/>
               <Typography>{partner?.name}</Typography>
               <Box sx={{ flexGrow: 1 }} />
               {!isMaximized && (

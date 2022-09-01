@@ -55,6 +55,7 @@ const StudentProfile = () => {
               border: "1px solid black",
             }}
             src={student?.photo_url}
+            referrerPolicy="no-referrer"
           />
         )}
         {/* name */}
@@ -97,17 +98,15 @@ const StudentProfile = () => {
         )}
         <Box direction="row">
           {student?.awards?.length > 0 &&
-            student.awards.map((awardStr, index) => {
-              if (awardStr.toLowerCase() === "betauser") {
-                return (
-                  <Tooltip title="Beta User">
-                    <FaceRetouchingNaturalOutlinedIcon
-                      sx={{ fontSize: "3em", mr: 1 }}
-                    />
-                  </Tooltip>
-                );
-              }
-            })}
+            student.awards.some(
+              (award) => award.toLowerCase() === "betauser"
+            ) && (
+              <Tooltip title="Beta User">
+                <FaceRetouchingNaturalOutlinedIcon
+                  sx={{ fontSize: "3em", mr: 1 }}
+                />
+              </Tooltip>
+            )}
         </Box>
         {/* social media links */}
         {student?.social_media?.length > 0 && (

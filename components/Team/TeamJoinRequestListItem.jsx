@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Card,
+  Container,
   Dialog,
   DialogActions,
   DialogContent,
@@ -21,7 +22,7 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef, useMemo } from "react";
 import { db } from "../../firebase";
 import { GlobalContext } from "../Context/ShareContexts";
 import { handleConnect } from "../Reusable/Resusable";
@@ -127,6 +128,16 @@ const TeamJoinRequestListItem = (props) => {
   const handleStudentCardClose = () => {
     setIsStudentCardOpen(false);
   };
+
+  // ref to detect overflow
+  // !todo: optim
+  const cardRef = useRef();
+  const isOverflow = () => {
+    return cardRef?.current?.clientHeight < cardRef?.current?.scrollHeight
+      ? true
+      : false;
+  };
+
   return (
     <ReactCardFlip isFlipped={isFlipped}>
       <Card
@@ -155,6 +166,7 @@ const TeamJoinRequestListItem = (props) => {
             border: "1px solid black",
           }}
           src={requestingStudent?.photo_url}
+          referrerPolicy="no-referrer"
         />
 
         <Typography sx={{ fontWeight: "bold", fontSize: "1em" }}>
@@ -261,13 +273,15 @@ const TeamJoinRequestListItem = (props) => {
       >
         <Box
           sx={{
-            mx: 1.5,
-            my: 3,
+            mx: 2,
+            mt: 2,
+            mb: isOverflow ? 0 : 2,
             display: "flex",
             flexDirection: "column",
             // flexFlow: "column wrap",
             overflow: "hidden",
           }}
+          ref={cardRef}
         >
           <IconButton
             sx={{ position: "fixed", top: 0, right: 10 }}
@@ -525,6 +539,21 @@ const TeamJoinRequestListItem = (props) => {
               </Typography>
             ))}
         </Box>
+        {/* overflow */}
+        {isOverflow && (
+          <Typography
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignContent: "center",
+              fontWeight: "bold",
+              fontSize: "1.5em",
+              paddingBottom: 1.5,
+            }}
+          >
+            {"..."}
+          </Typography>
+        )}
       </Card>
     </ReactCardFlip>
   );

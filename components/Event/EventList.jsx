@@ -1,82 +1,73 @@
 import { useContext, useMemo } from "react";
 import NextLink from "next/link";
 import { Box, Button, Tooltip } from "@mui/material";
-import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
-import ProjectListItem from "./ProjectListItem";
+import { GlobalContext, EventContext } from "../Context/ShareContexts";
+import EventListItem from "./EventListItem";
 
-// link/router https://stackoverflow.com/questions/65086108/next-js-link-vs-router-push-vs-a-tag
-// description: a list of projects (project list items); a button to create new project (router.push)
-// behavior: filters projects based on the search term and/or search category
-const ProjectList = () => {
+const EventList = () => {
   // context
-  const { projects, currentStudent, onMedia } = useContext(GlobalContext);
-  const { searchTerm, searchCategory } = useContext(ProjectContext);
+  const { events, currentStudent, onMedia } = useContext(GlobalContext);
+  const { searchTerm, searchCategory } = useContext(EventContext);
 
   // local vars
   const currentUID = currentStudent?.uid;
 
-  const filteredProjects = useMemo(
+  const filteredEvents = useMemo(
     () =>
-      projects.filter((project) => {
-        if (!project.isVisible) return;
+      events.filter((event) => {
+        if (!event.isVisible) return;
 
         // !todo: is this optimized?
         const isInTitles =
           searchTerm !== "" && // lazy evaluation
-          (project.title.toLowerCase().includes(searchTerm.toLowerCase()) || // project title
-            project.position_list.some(
-              (position) =>
-                position.positionTitle
-                  .toLowerCase()
-                  .includes(searchTerm.toLowerCase()) // position title
-            ));
+          event.title.toLowerCase().includes(searchTerm.toLowerCase());
 
         const isInCategory =
           searchCategory !== "" && // lazy evaluation to avoid unnecessary expensive includes()
-          project.category.toLowerCase().includes(searchCategory.toLowerCase());
+          event.category.toLowerCase().includes(searchCategory.toLowerCase());
 
         if (searchTerm === "" && searchCategory === "") {
           // no search
-          return project;
+          return event;
         } else if (
           searchCategory === "" &&
           isInTitles // no Category, only search titles
         ) {
-          return project;
+          return event;
         } else if (
           searchTerm === "" &&
           isInCategory // no Term, only search category
         ) {
-          return project;
+          return event;
         } else if (
           isInTitles &&
           isInCategory // search both
         ) {
-          return project;
+          return event;
         }
       }),
-    [projects, searchTerm, searchCategory]
+    [events, searchTerm, searchCategory]
   );
 
   return (
     <Box
       sx={{
         backgroundColor: "#fafafa",
-        height: "calc(100vh - 64px - 64px - 1.5px)", // navbar; projectbar; border
+        height: "calc(100vh - 64px - 64px - 1.5px)", // navbar; eventbar; border
       }}
     >
       <Box
         sx={{
-          height: "calc(100vh - 64px - 64px - 1.5px - 36px - 24px)", // navbar; projectbar; border; button; y-margins
+          height: "calc(100vh - 64px - 64px - 1.5px - 36px - 24px)", // navbar; eventbar; border; button; y-margins
           overflow: "auto",
         }}
       >
-        {filteredProjects.map((project, index) => (
-          <ProjectListItem
-            key={project.id}
-            project={project}
+        {filteredEvents.map((event, index) => (
+          <EventListItem
+            key={event.id}
+            event={event}
             index={index}
-            last={filteredProjects.length - 1}
+            last={filteredEvents.length - 1}
           />
         ))}
       </Box>
@@ -93,10 +84,10 @@ const ProjectList = () => {
             <span>
               <NextLink
                 href={{
-                  pathname: "/project/create",
+                  pathname: "/event/create",
                   query: { isCreateStr: "true" },
                 }}
-                as="/project/create"
+                as="/event/create"
                 passHref
               >
                 <Button
@@ -116,7 +107,7 @@ const ProjectList = () => {
                   }}
                   variant="contained"
                 >
-                  {"Create Project"}
+                  {"Create Event"}
                 </Button>
               </NextLink>
             </span>
@@ -127,4 +118,4 @@ const ProjectList = () => {
   );
 };
 
-export default ProjectList;
+export default EventList;

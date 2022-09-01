@@ -12,7 +12,6 @@ import {
   FormControl,
   FormHelperText,
   Grid,
-  IconButton,
   InputLabel,
   MenuItem,
   Select,
@@ -20,8 +19,6 @@ import {
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import AddRoundedIcon from "@mui/icons-material/AddRounded";
-import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import {
   collection,
@@ -34,19 +31,22 @@ import {
 } from "firebase/firestore";
 import { useContext, useRef, useState } from "react";
 import { db } from "../../firebase";
-import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
-import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
+import { GlobalContext, EventContext } from "../Context/ShareContexts";
+import {
+  LocalizationProvider,
+  DesktopDateTimePicker,
+} from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+
 import moment from "moment";
 import { useRouter } from "next/router";
 
-const ProjectCreate = (props) => {
+const EventCreate = (props) => {
   // context
-  const { currentStudent, oldProject, setOldProject } =
-    useContext(GlobalContext);
+  const { currentStudent, oldEvent, setOldEvent } = useContext(GlobalContext);
   const currentUID = currentStudent?.uid;
 
-  const { showAlert } = useContext(ProjectContext);
+  const { showAlert } = useContext(EventContext);
 
   // props from push query
   const isCreate = props.isCreateStr === "false" ? false : true; // null, undefined, "true" are all true isCreate
@@ -55,37 +55,26 @@ const ProjectCreate = (props) => {
   const router = useRouter();
 
   // local vars
-  // Project State Initialization.
-  // https://stackoverflow.com/questions/68945060/react-make-usestate-initial-value-conditional
-  const [newProject, setNewProject] = useState(() =>
+  // Event State Initialization.
+  const [newEvent, setNewEvent] = useState(() =>
     isCreate
       ? {
           title: "",
           category: "",
-          completion_date: moment().toDate(),
+          starting_date: moment().toDate(),
+          location: "",
           details: "",
           description: "",
           creator_uid: currentUID,
           isVisible: true,
           icon_url: "",
-          application_form_url: "",
+          banner_url: "",
+          registration_form_url: "",
         }
-      : { ...oldProject, completion_date: oldProject.completion_date.toDate() }
+      : { ...oldEvent, starting_date: oldEvent.starting_date.toDate() }
   );
 
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
-
-  const emptyPositionField = {
-    positionID: Math.random().toString(16).slice(2),
-    positionTitle: "",
-    positionResp: "",
-    positionWeeklyHour: 1,
-    positionCount: 1,
-    positionAcceptUID: [], // < or = positionCount
-  };
-  const [positionFields, setPositionFields] = useState(() =>
-    isCreate ? [emptyPositionField] : oldProject.position_list
-  );
 
   // upload-icon dialog modal
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -97,7 +86,7 @@ const ProjectCreate = (props) => {
   };
 
   // check box
-  const [isChecked, setIsChecked] = useState(false);
+  const [isChecked, setIsChecked] = useState(true);
 
   // helper functions
   const handleSubmit = async (e) => {
@@ -106,193 +95,126 @@ const ProjectCreate = (props) => {
 
     // button is clickable & form is valid
     setIsClickable(false);
-    // calucalte the max members
-    let maxMemberCount = 1; // creator
-    positionFields.forEach(
-      (position) => (maxMemberCount += position.positionCount)
-    );
-    let projectModRef; // ref to addDoc() or updateDoc()
+    let eventModRef; // ref to addDoc() or updateDoc()
     if (isCreate) {
-      // create a new newProject
-      const collectionRef = collection(db, "projects");
-      const projectRef = {
-        ...newProject,
-        // update max num of members
-        max_member_count: maxMemberCount,
-        position_list: positionFields,
+      // create a new event
+      const collectionRef = collection(db, "events");
+      const eventRef = {
+        ...newEvent,
         create_timestamp: serverTimestamp(),
         last_timestamp: serverTimestamp(),
       };
-      projectModRef = addDoc(collectionRef, projectRef).catch((err) => {
+      eventModRef = addDoc(collectionRef, eventRef).catch((err) => {
         console.log("addDoc() error: ", err);
       });
     } else {
-      // update an existing newProject
-      const docRef = doc(db, "projects", newProject.id);
-      const projectRef = {
-        ...newProject,
-        // update max num of members
-        max_member_count: maxMemberCount,
-        position_list: positionFields,
+      // update an existing event
+      const docRef = doc(db, "events", newEvent.id);
+      const eventRef = {
+        ...newEvent,
         last_timestamp: serverTimestamp(),
       };
-      delete projectRef.id;
-      projectModRef = updateDoc(docRef, projectRef).catch((err) => {
+      delete eventRef.id;
+      eventModRef = updateDoc(docRef, eventRef).catch((err) => {
         console.log("updateDoc() error: ", err);
       });
     }
-    setOldProject(null);
+    setOldEvent(null);
     let retID;
-    await projectModRef.then((ret) => {
+    await eventModRef.then((ret) => {
       retID = ret?.id;
     });
 
     // retID: create; !retID: update
     if (retID) {
-      // add to my_projects in student data if create
-      const curStudentDocRef = doc(db, "students", currentUID);
-      const curStudentMyProjects = currentStudent?.my_projects
-        ? currentStudent.my_projects
-        : [];
-      curStudentMyProjects.push(retID);
-      const curStudentRef = {
-        ...currentStudent,
-        my_projects: curStudentMyProjects,
-      };
-      delete curStudentRef?.uid;
-      const curStudentModRef = updateDoc(curStudentDocRef, curStudentRef).catch(
-        (err) => {
-          console.log("updateDoc() error: ", err);
-        }
-      );
-
       // create extension doc for team management if create
-      const extDocRef = doc(db, "projects_ext", retID);
-      const projectExtRef = {
+      const extDocRef = doc(db, "events_ext", retID);
+      const eventExtRef = {
         members: [currentUID],
         admins: [currentUID],
         last_timestamp: serverTimestamp(),
       };
-      const projectExtModRef = setDoc(extDocRef, projectExtRef).catch((err) => {
+      const eventExtModRef = setDoc(extDocRef, eventExtRef).catch((err) => {
         console.log("setDoc() error: ", err);
       });
 
-      await curStudentModRef;
-      await projectExtModRef;
+      await eventExtModRef;
     }
 
     // !todo: since updateDoc return Promise<void>, we need other method to check the results
     showAlert(
       "success",
-      `"${newProject.title}" is updated successfully! Navigate to Projects page.`
+      `"${newEvent.title}" is updated successfully! Navigate to Events page.`
     );
 
     setTimeout(() => {
-      router.push(`/`); // can be customized
+      router.push(`/events`); // can be customized
     }, 2000); // wait 2 seconds then go to `projects` page
   };
 
   const handleDiscard = async () => {
-    setOldProject(null);
-    setNewProject({
+    setOldEvent(null);
+    setNewEvent({
       // only the fields on the screen
       title: "",
       category: "",
-      completion_date: moment().toDate(),
+      starting_date: moment().toDate(),
+      location: "",
       details: "",
       description: "",
       icon_url: "",
-      application_form_url: "",
+      banner_url: "",
+      registration_form_url: "",
     });
-    setPositionFields([emptyPositionField]);
 
-    showAlert("info", `Draft discarded! Navigate to Projects page.`);
+    showAlert("info", `Draft discarded! Navigate to Events page.`);
     setTimeout(() => {
-      router.push(`/`); // can be customized
+      router.push(`/events`); // can be customized
     }, 2000); // wait 2 seconds then go to `projects` page
   };
 
   const handleDelete = async (id, e) => {
-    const docRef = doc(db, "projects", id);
-    const projectModRef = deleteDoc(docRef).catch((err) => {
+    const docRef = doc(db, "events", id);
+    const eventModRef = deleteDoc(docRef).catch((err) => {
       console.log("deleteDoc() error: ", err);
     });
-    setOldProject(null);
-    setNewProject({
+    setOldEvent(null);
+    setNewEvent({
       title: "",
       category: "",
-      completion_date: moment().toDate(),
+      starting_date: moment().toDate(),
+      location: "",
       details: "",
       description: "",
       icon_url: "",
-      application_form_url: "",
+      banner_url: "",
+      registration_form_url: "",
     });
-    setPositionFields([emptyPositionField]);
-
-    // delete project ref from my_projects in student doc
-    const curStudentDocRef = doc(db, "students", currentUID);
-    const curStudentMyProjects = currentStudent.my_projects.filter(
-      (my_proj) => my_proj !== id
-    );
-    const curStudentRef = {
-      ...currentStudent,
-      my_projects: curStudentMyProjects,
-    };
-    delete curStudentRef?.uid;
-    const curStudentModRef = updateDoc(curStudentDocRef, curStudentRef).catch(
-      (err) => {
-        console.log("updateDoc() error: ", err);
-      }
-    );
 
     // delete from project_ext coll
-    const extDocRef = doc(db, "projects_ext", id);
-    const projectExtModRef = deleteDoc(extDocRef).catch((err) => {
+    const extDocRef = doc(db, "events_ext", id);
+    const eventExtModRef = deleteDoc(extDocRef).catch((err) => {
       console.log("deleteDoc() error: ", err);
     });
 
-    await projectModRef;
-    await curStudentModRef;
-    await projectExtModRef;
+    await eventModRef;
+    await eventExtModRef;
 
     showAlert(
       "success",
-      `"${newProject.title}" is deleted sucessfully! Navigate to Projects page.`
+      `"${newEvent.title}" is deleted sucessfully! Navigate to Events page.`
     );
 
     setTimeout(() => {
-      router.push(`/`); // can be customized
+      router.push(`/events`);
     }, 2000); // wait 2 seconds then go to `projects` page
   };
 
-  const handleChangePosInput = (index, e) => {
-    let pFields = [...positionFields];
-    let fieldValue =
-      e.target.name === "positionWeeklyHour" ||
-      e.target.name === "positionCount"
-        ? Number(e.target.value)
-        : e.target.value;
-    pFields[index][e.target.name] = fieldValue;
-    setPositionFields(pFields);
-  };
-
-  const handleAddPosField = () => {
-    setPositionFields([...positionFields, emptyPositionField]);
-  };
-
-  const handleRemovePosField = (index) => {
-    const pFields = [...positionFields];
-    pFields.splice(index, 1);
-    setPositionFields(pFields);
-  };
-
   const handleDateTimeChange = (e) => {
-    setNewProject({ ...newProject, completion_date: e?._d });
+    setNewEvent({ ...newEvent, starting_date: e?._d });
   };
 
   const formRef = useRef();
-
-  // debugging console logs if there's any
 
   return (
     <Grid
@@ -325,7 +247,7 @@ const ProjectCreate = (props) => {
             mb: 6,
           }}
         >
-          {isCreate ? "Create New Project" : "Update Project"}
+          {isCreate ? "Create New Event" : "Update Event"}
         </Typography>
         <form ref={formRef}>
           {/* Title textfield & Upload logo button */}
@@ -336,15 +258,15 @@ const ProjectCreate = (props) => {
               sx={{
                 mr: 5,
               }}
-              label="Project Title"
+              label="Event Title"
               margin="none"
               inputProps={{
                 maxLength: 50,
               }}
-              // helperText="The name of your newProject (limit: 50)"
-              value={newProject.title}
+              // helperText="The name of your newEvent (limit: 50)"
+              value={newEvent.title}
               onChange={(e) =>
-                setNewProject({ ...newProject, title: e.target.value })
+                setNewEvent({ ...newEvent, title: e.target.value })
               }
             />
             <Button
@@ -357,7 +279,7 @@ const ProjectCreate = (props) => {
 
                 height: "56px",
                 textTransform: "none",
-                width: "20%",
+                width: "30%",
                 paddingLeft: "30px",
               }}
               // variant="contained"
@@ -385,9 +307,9 @@ const ProjectCreate = (props) => {
                   type="url"
                   fullWidth
                   variant="standard"
-                  value={newProject.icon_url}
+                  value={newEvent.icon_url}
                   onChange={(e) =>
-                    setNewProject({ ...newProject, icon_url: e.target.value })
+                    setNewEvent({ ...newEvent, icon_url: e.target.value })
                   }
                 />
               </DialogContent>
@@ -396,7 +318,7 @@ const ProjectCreate = (props) => {
               </DialogActions>
             </Dialog>
           </Box>
-          {/* Category select & completion date*/}
+          {/* Category select & starting date*/}
           <Box
             display="flex"
             justifyContent="space-between"
@@ -430,9 +352,9 @@ const ProjectCreate = (props) => {
               <InputLabel>Category</InputLabel>
               <Select
                 label="Category"
-                value={newProject.category}
+                value={newEvent.category}
                 onChange={(e) =>
-                  setNewProject({ ...newProject, category: e.target.value })
+                  setNewEvent({ ...newEvent, category: e.target.value })
                 }
               >
                 <MenuItem value={"Startup"}>Startup</MenuItem>
@@ -443,30 +365,45 @@ const ProjectCreate = (props) => {
                 </MenuItem>
               </Select>
               <FormHelperText
-                id="pc-category-helper-text"
+                id="ec-category-helper-text"
                 sx={{ color: "lightgray", fontSize: "12px" }}
               >
-                {"A general category of your project"}
+                {"A general category of your event"}
               </FormHelperText>
             </FormControl>
 
             <LocalizationProvider dateAdapter={AdapterMoment}>
-              <DesktopDatePicker
+              <DesktopDateTimePicker
                 renderInput={(props) => (
                   <StyledTextField
-                    sx={{ width: "25%" }}
-                    helperText="Completion date"
+                    sx={{ width: "60%" }}
+                    helperText="Starting date and time"
                     {...props}
                   />
                 )}
-                // label="Completion Date"
-                value={newProject.completion_date}
+                // label="Starting Date"
+                value={newEvent.starting_date}
                 onChange={(e) => {
                   handleDateTimeChange(e);
                 }}
               />
             </LocalizationProvider>
           </Box>
+          {/* Location */}
+          {/* !todo: can use some services like google places or leaflet to autocomplete */}
+          <StyledTextField
+            sx={{
+              mt: 5,
+            }}
+            fullWidth
+            label="Location"
+            margin="none"
+            helperText="Full address with postal code / Access to virtual event"
+            value={newEvent.location}
+            onChange={(e) =>
+              setNewEvent({ ...newEvent, location: e.target.value })
+            }
+          />
           {/* Details */}
           <StyledTextField
             sx={{
@@ -475,20 +412,16 @@ const ProjectCreate = (props) => {
             fullWidth
             label="Details"
             margin="none"
-            // multiline
-            // minRows={2}
-            // maxRows={8}
-            helperText="Keywords to shortly describe the new project seperated by commas (e.g. tags)"
-            value={newProject.details}
+            helperText="Keywords to shortly describe the new event seperated by commas (e.g. tags)"
+            value={newEvent.details}
             onChange={(e) =>
-              setNewProject({ ...newProject, details: e.target.value })
+              setNewEvent({ ...newEvent, details: e.target.value })
             }
           />
           {/* Description */}
           <StyledTextField
             sx={{
               mt: 5,
-              mb: 2.5,
             }}
             fullWidth
             label="Description"
@@ -496,129 +429,38 @@ const ProjectCreate = (props) => {
             multiline
             minRows={4}
             maxRows={8}
-            // inputProps={{
-            //   maxLength: 200,
-            // }}
-            helperText="A brief description of the new project (e.g. scope, mission, work format, timeline)"
-            value={newProject.description}
+            helperText="A brief description of the new event (e.g. goal, content, format, timeline)"
+            value={newEvent.description}
             onChange={(e) =>
-              setNewProject({ ...newProject, description: e.target.value })
+              setNewEvent({ ...newEvent, description: e.target.value })
             }
           />
-          {/* firebase dynamic array: http://y2u.be/zgKH12s_95A */}
-          {positionFields.map((positionField, index) => {
-            return (
-              <div key={index}>
-                <Divider
-                  sx={{
-                    mt: 2.5,
-                    borderBottomWidth: 1.5,
-                    borderColor: "#dbdbdb",
-                  }}
-                />
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  mt={2.5}
-                >
-                  {/* Title */}
-                  <StyledTextField
-                    required
-                    sx={{ mr: 2.5 }}
-                    fullWidth
-                    margin="none"
-                    name="positionTitle" // has to be the same as key
-                    label="Position Title"
-                    value={positionField.positionTitle}
-                    onChange={(e) => {
-                      handleChangePosInput(index, e);
-                    }}
-                  />
-                  {/* Weekly hour */}
-                  <StyledTextField
-                    required
-                    sx={{ mr: 2.5 }}
-                    margin="none"
-                    type="number"
-                    name="positionWeeklyHour" // has to be the same as key
-                    label="Weekly Hour"
-                    inputProps={{
-                      min: 1,
-                    }}
-                    value={positionField.positionWeeklyHour}
-                    onChange={(e) => {
-                      e.target.value > 1
-                        ? e.target.value
-                        : (e.target.value = 1);
-                      handleChangePosInput(index, e);
-                    }}
-                  />
-                  {/* Number of people */}
-                  <StyledTextField
-                    required
-                    margin="none"
-                    type="number"
-                    name="positionCount" // has to be the same as key
-                    label="NO. of People"
-                    inputProps={{
-                      min: 1,
-                    }}
-                    value={positionField.positionCount}
-                    onChange={(e) => {
-                      e.target.value > 1
-                        ? e.target.value
-                        : (e.target.value = 1);
-                      handleChangePosInput(index, e);
-                    }}
-                  />
-                  {/* Add / Remove position button */}
+          {/* Optional Banner */}
+          <StyledTextField
+            sx={{
+              mt: 5,
+              mb: 2.5,
+            }}
+            required
+            fullWidth
+            label="Banner URL"
+            margin="none"
+            helperText="Optional banner shown on the event page"
+            value={newEvent.banner_url}
+            onChange={(e) =>
+              setNewEvent({
+                ...newEvent,
+                banner_url: e.target.value,
+              })
+            }
+          />
+          <Divider sx={{ borderBottomWidth: 1.5, borderColor: "#dbdbdb" }} />
 
-                  {index > 0 && (
-                    <IconButton
-                      sx={{ ml: 2.5, backgroundColor: "#f0f0f0" }}
-                      onClick={() => handleRemovePosField(index)}
-                    >
-                      <RemoveRoundedIcon />
-                    </IconButton>
-                  )}
-                </Box>
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  mt={2.5}
-                >
-                  {/* Responsibilities */}
-                  <StyledTextField
-                    fullWidth
-                    multiline
-                    minRows={2}
-                    maxRows={8}
-                    margin="none"
-                    name="positionResp"
-                    label="Responsibilities"
-                    value={positionField.positionResp}
-                    onChange={(e) => {
-                      handleChangePosInput(index, e);
-                    }}
-                  />
-                  {index === positionFields.length - 1 && (
-                    <IconButton
-                      sx={{ ml: 2.5, backgroundColor: "#f0f0f0" }}
-                      onClick={() => handleAddPosField()}
-                    >
-                      <AddRoundedIcon />
-                    </IconButton>
-                  )}
-                </Box>
-              </div>
-            );
-          })}
           {/* application form */}
           <Container
             sx={{
               mt: 2.5,
+              mx: 0,
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
@@ -626,17 +468,25 @@ const ProjectCreate = (props) => {
             disableGutters
           >
             <Checkbox
-              sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
+              sx={{
+                mr: 1.5,
+                color: "#dbdbdb",
+                padding: 0,
+                "&.Mui-checked": {
+                  color: "steelblue",
+                },
+              }}
+              defaultChecked
               value={isChecked}
               onChange={() => {
                 if (isChecked) {
-                  setNewProject({ ...newProject, application_form_url: "" });
+                  setNewEvent({ ...newEvent, registration_form_url: "" });
                 }
                 setIsChecked(!isChecked);
               }}
             />
             <Typography sx={{ color: "rgba(0,0,0,0.6)" }}>
-              {"I want to add my own application form"}
+              {"I want to add a registration form"}
             </Typography>
           </Container>
           {isChecked && (
@@ -646,13 +496,13 @@ const ProjectCreate = (props) => {
               }}
               required
               fullWidth
-              label="Application Form URL"
+              label="Registration Form URL"
               margin="none"
-              value={newProject.application_form_url}
+              value={newEvent.registration_form_url}
               onChange={(e) =>
-                setNewProject({
-                  ...newProject,
-                  application_form_url: e.target.value,
+                setNewEvent({
+                  ...newEvent,
+                  registration_form_url: e.target.value,
                 })
               }
             />
@@ -673,20 +523,12 @@ const ProjectCreate = (props) => {
                 }}
                 variant="contained"
                 disableElevation
-                onClick={(e) => handleDelete(newProject.id, e)}
+                onClick={(e) => handleDelete(newEvent.id, e)}
               >
                 {"Delete"}
               </Button>
             )}
             <Box sx={{ flexGrow: 1 }} />
-            {/* <Button
-              sx={{ mt: 5, mb: 5, backgroundColor: "#3e95c2" }}
-              variant="contained"
-              disableElevation
-              onClick={(e) => handleGoBack(e)}
-            >
-              {"Go Back"}
-            </Button> */}
             <Button
               sx={{
                 mt: 5,
@@ -732,7 +574,7 @@ const ProjectCreate = (props) => {
   );
 };
 
-export default ProjectCreate;
+export default EventCreate;
 
 // !todo: notchedOuline not working
 const StyledTextField = styled(TextField)(({ theme }) => ({
