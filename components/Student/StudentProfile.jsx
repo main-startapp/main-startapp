@@ -117,11 +117,6 @@ const StudentProfile = () => {
         <Box direction="row">
           {student?.social_media?.length > 0 &&
             student.social_media.map((link, index) => {
-              // todo!: too hacky, is there any library can do this properly?
-              if (!link.toLowerCase().includes("https://")) {
-                link = "https://" + link;
-              }
-
               if (link.toLowerCase().includes("linkedin")) {
                 return (
                   <a

@@ -56,22 +56,21 @@ const EventCreate = (props) => {
 
   // local vars
   // Event State Initialization.
+  const emptyEvent = {
+    title: "",
+    category: "",
+    starting_date: moment().toDate(),
+    location: "",
+    details: "",
+    description: "",
+    creator_uid: currentUID,
+    isVisible: true,
+    icon_url: "",
+    banner_url: "",
+    registration_form_url: "",
+  };
   const [newEvent, setNewEvent] = useState(() =>
-    isCreate
-      ? {
-          title: "",
-          category: "",
-          starting_date: moment().toDate(),
-          location: "",
-          details: "",
-          description: "",
-          creator_uid: currentUID,
-          isVisible: true,
-          icon_url: "",
-          banner_url: "",
-          registration_form_url: "",
-        }
-      : { ...oldEvent, starting_date: oldEvent.starting_date.toDate() }
+    isCreate ? emptyEvent : oldEvent
   );
 
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
@@ -154,18 +153,7 @@ const EventCreate = (props) => {
 
   const handleDiscard = async () => {
     setOldEvent(null);
-    setNewEvent({
-      // only the fields on the screen
-      title: "",
-      category: "",
-      starting_date: moment().toDate(),
-      location: "",
-      details: "",
-      description: "",
-      icon_url: "",
-      banner_url: "",
-      registration_form_url: "",
-    });
+    setNewEvent(emptyEvent);
 
     showAlert("info", `Draft discarded! Navigate to Events page.`);
     setTimeout(() => {
@@ -179,17 +167,7 @@ const EventCreate = (props) => {
       console.log("deleteDoc() error: ", err);
     });
     setOldEvent(null);
-    setNewEvent({
-      title: "",
-      category: "",
-      starting_date: moment().toDate(),
-      location: "",
-      details: "",
-      description: "",
-      icon_url: "",
-      banner_url: "",
-      registration_form_url: "",
-    });
+    setNewEvent(emptyEvent);
 
     // delete from project_ext coll
     const extDocRef = doc(db, "events_ext", id);
@@ -298,7 +276,9 @@ const EventCreate = (props) => {
               <DialogTitle>Upload Logo from URL</DialogTitle>
               <DialogContent>
                 <DialogContentText>
-                  Please enter the URL of your icon here.
+                  {
+                    "Please enter the URL of your icon here. Imgur is a good image hosting service to start with."
+                  }
                 </DialogContentText>
                 <TextField
                   autoFocus
@@ -345,7 +325,7 @@ const EventCreate = (props) => {
                 ".MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                   {
                     border: 1.5,
-                    borderColor: "steelblue",
+                    borderColor: "#3e95c2",
                   },
               }}
             >
@@ -357,12 +337,13 @@ const EventCreate = (props) => {
                   setNewEvent({ ...newEvent, category: e.target.value })
                 }
               >
-                <MenuItem value={"Startup"}>Startup</MenuItem>
-                <MenuItem value={"PersonalProject"}>Personal Project</MenuItem>
-                <MenuItem value={"Event"}>Event</MenuItem>
-                <MenuItem value={"CharityInitiative"}>
-                  Charity Initiative
-                </MenuItem>
+                <MenuItem value={"Community Event"}>Community Event</MenuItem>
+                <MenuItem value={"Concert"}>Concert</MenuItem>
+                <MenuItem value={"Conference"}>Conference</MenuItem>
+                <MenuItem value={"Expo"}>Expo</MenuItem>
+                <MenuItem value={"Festival"}>Festival</MenuItem>
+                <MenuItem value={"Performance"}>Performance</MenuItem>
+                <MenuItem value={"Sports"}>Sports</MenuItem>
               </Select>
               <FormHelperText
                 id="ec-category-helper-text"
@@ -444,6 +425,7 @@ const EventCreate = (props) => {
             required
             fullWidth
             label="Banner URL"
+            type="url"
             margin="none"
             helperText="Optional banner shown on the event page"
             value={newEvent.banner_url}
@@ -467,13 +449,13 @@ const EventCreate = (props) => {
             }}
             disableGutters
           >
-            <Checkbox
+            {/* <Checkbox
               sx={{
                 mr: 1.5,
                 color: "#dbdbdb",
                 padding: 0,
                 "&.Mui-checked": {
-                  color: "steelblue",
+                  color: "#3e95c2",
                 },
               }}
               defaultChecked
@@ -487,7 +469,7 @@ const EventCreate = (props) => {
             />
             <Typography sx={{ color: "rgba(0,0,0,0.6)" }}>
               {"I want to add a registration form"}
-            </Typography>
+            </Typography> */}
           </Container>
           {isChecked && (
             <StyledTextField
@@ -497,7 +479,9 @@ const EventCreate = (props) => {
               required
               fullWidth
               label="Registration Form URL"
+              type="url"
               margin="none"
+              helperText="Users will be redirect to this URL when they click Attend"
               value={newEvent.registration_form_url}
               onChange={(e) =>
                 setNewEvent({
@@ -563,6 +547,7 @@ const EventCreate = (props) => {
               }}
               variant="contained"
               disableElevation
+              disabled={!isClickable}
               onClick={(e) => handleSubmit(e)}
             >
               {"Confirm"}
@@ -592,7 +577,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   },
   "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
     borderWidth: 1.5,
-    borderColor: "steelblue !important",
+    borderColor: "#3e95c2 !important",
   },
   "& .MuiFormHelperText-root": {
     color: "lightgray",

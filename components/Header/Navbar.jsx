@@ -75,11 +75,10 @@ const Navbar = () => {
           }}
         >
           <ExportedImage
-            src="/images/EDIUM Platform Logo 256.png"
+            src="/images/EDIUMPlatformLogo256.png"
             placeholder=""
             width={48}
             height={48}
-            unoptimized={true}
           />
           {/* <Typography variant="edium" sx={{ fontSize: "2em", ml: 1 }}>
             Edium
@@ -104,8 +103,8 @@ const Navbar = () => {
               sx={{
                 ml: 3,
                 mr: 3,
-                borderBottomWidth: 1.5,
-                borderColor: "dimgray",
+                borderRightWidth: 1.5,
+                borderColor: "black",
               }}
               orientation="vertical"
               flexItem
@@ -119,8 +118,8 @@ const Navbar = () => {
               sx={{
                 ml: 3,
                 mr: 3,
-                borderBottomWidth: 1.5,
-                borderColor: "dimgray",
+                borderRightWidth: 1.5,
+                borderColor: "black",
               }}
               orientation="vertical"
               flexItem
@@ -178,11 +177,11 @@ const Navbar = () => {
                 <MenuItemLink>Edit Profile</MenuItemLink>
               </NextLink>
             </MenuItem>
-            <MenuItem onClick={handleUserMenuClose}>
+            {/* <MenuItem onClick={handleUserMenuClose}>
               <NextLink href="/team/management" passHref>
                 <MenuItemLink>Team Management</MenuItemLink>
               </NextLink>
-            </MenuItem>
+            </MenuItem> */}
             <MenuItem onClick={handleUserMenuLogout}>Log Out</MenuItem>
           </Menu>
         </Box>

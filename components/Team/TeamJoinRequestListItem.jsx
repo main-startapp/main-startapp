@@ -10,6 +10,7 @@ import {
   DialogContentText,
   DialogTitle,
   IconButton,
+  Link,
   Modal,
   TextField,
   Tooltip,
@@ -354,14 +355,9 @@ const TeamJoinRequestListItem = (props) => {
                 )}
                 {requestingStudent?.social_media?.length > 0 &&
                   requestingStudent.social_media.map((link, index) => {
-                    // todo!: too hacky, is there any library can do this properly?
-                    if (!link.toLowerCase().includes("https://")) {
-                      link = "https://" + link;
-                    }
-
                     if (link.toLowerCase().includes("linkedin")) {
                       return (
-                        <a
+                        <Link
                           key={index}
                           target="_blank"
                           href={link}
@@ -370,11 +366,11 @@ const TeamJoinRequestListItem = (props) => {
                           <LinkedInIcon
                             sx={{ fontSize: "2em", mr: 1, color: "black" }}
                           />
-                        </a>
+                        </Link>
                       );
                     } else if (link.toLowerCase().includes("facebook")) {
                       return (
-                        <a
+                        <Link
                           key={index}
                           target="_blank"
                           href={link}
@@ -383,11 +379,11 @@ const TeamJoinRequestListItem = (props) => {
                           <FacebookIcon
                             sx={{ fontSize: "2em", mr: 1, color: "black" }}
                           />
-                        </a>
+                        </Link>
                       );
                     } else if (link.toLowerCase().includes("instagram")) {
                       return (
-                        <a
+                        <Link
                           key={index}
                           target="_blank"
                           href={link}
@@ -396,11 +392,11 @@ const TeamJoinRequestListItem = (props) => {
                           <InstagramIcon
                             sx={{ fontSize: "2em", mr: 1, color: "black" }}
                           />
-                        </a>
+                        </Link>
                       );
                     } else {
                       return (
-                        <a
+                        <Link
                           key={index}
                           target="_blank"
                           href={link}
@@ -409,7 +405,7 @@ const TeamJoinRequestListItem = (props) => {
                           <LinkIcon
                             sx={{ fontSize: "2em", mr: 1, color: "black" }}
                           />
-                        </a>
+                        </Link>
                       );
                     }
                   })}
@@ -464,13 +460,9 @@ const TeamJoinRequestListItem = (props) => {
           {requestingStudent?.social_media?.length > 0 &&
             requestingStudent.social_media.map((link, index) => {
               // todo!: too hacky, is there any library can do this properly?
-              if (!link.toLowerCase().includes("https://")) {
-                link = "https://" + link;
-              }
-
               if (link.toLowerCase().includes("linkedin")) {
                 return (
-                  <a
+                  <Link
                     key={index}
                     target="_blank"
                     href={link}
@@ -479,11 +471,11 @@ const TeamJoinRequestListItem = (props) => {
                     <LinkedInIcon
                       sx={{ fontSize: "2em", mr: 1, color: "black" }}
                     />
-                  </a>
+                  </Link>
                 );
               } else if (link.toLowerCase().includes("facebook")) {
                 return (
-                  <a
+                  <Link
                     key={index}
                     target="_blank"
                     href={link}
@@ -492,11 +484,11 @@ const TeamJoinRequestListItem = (props) => {
                     <FacebookIcon
                       sx={{ fontSize: "2em", mr: 1, color: "black" }}
                     />
-                  </a>
+                  </Link>
                 );
               } else if (link.toLowerCase().includes("instagram")) {
                 return (
-                  <a
+                  <Link
                     key={index}
                     target="_blank"
                     href={link}
@@ -505,18 +497,18 @@ const TeamJoinRequestListItem = (props) => {
                     <InstagramIcon
                       sx={{ fontSize: "2em", mr: 1, color: "black" }}
                     />
-                  </a>
+                  </Link>
                 );
               } else {
                 return (
-                  <a
+                  <Link
                     key={index}
                     target="_blank"
                     href={link}
                     rel="noopener noreferrer"
                   >
                     <LinkIcon sx={{ fontSize: "2em", mr: 1, color: "black" }} />
-                  </a>
+                  </Link>
                 );
               }
             })}

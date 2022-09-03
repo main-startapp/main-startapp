@@ -45,20 +45,18 @@ const TeamInfo = () => {
           <Box sx={{ display: "flex", flexDirection: "row", mt: 3 }}>
             <Box
               sx={{
-                width: "60%",
-                backgroundColor: "lightyellow",
+                width: "100%",
               }}
             >
               <TeamCommPanel />
             </Box>
-            <Box
+            {/* <Box
               sx={{
                 width: "40%",
-                backgroundColor: "lightblue",
               }}
             >
               <TeamScheduler />
-            </Box>
+            </Box> */}
           </Box>
         </Box>
       )}

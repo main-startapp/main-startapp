@@ -1,5 +1,4 @@
 import { useContext, useState } from "react";
-import { useRouter } from "next/router";
 import {
   Avatar,
   Box,
@@ -8,7 +7,6 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-  Typography,
 } from "@mui/material";
 import moment from "moment";
 import { GlobalContext, EventContext } from "../Context/ShareContexts";
@@ -25,6 +23,16 @@ const EventListItem = (props) => {
   const { currentUser } = useAuth();
   const { currentStudent, onMedia } = useContext(GlobalContext);
   const { setEvent } = useContext(EventContext);
+
+  // menu
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleMenuClick = (e) => {
+    setAnchorEl(e.currentTarget);
+  };
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <Box
@@ -60,39 +68,79 @@ const EventListItem = (props) => {
             alignItems: "center",
             width: "100%",
           }}
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
+          // onClick={(e) => {
+          //   e.stopPropagation();
+          // }}
         >
           {/* event icon uploaded by users*/}
-          <Avatar sx={{ mr: 2 }}>
+          <Avatar
+            sx={{
+              my: 2,
+              ml: 2,
+              mr: 4,
+              height: "96px",
+              width: "96px",
+            }}
+            src={event?.icon_url}
+          >
             <UploadFileIcon />
           </Avatar>
           <ListItemText
             primary={event.title}
             primaryTypographyProps={{ fontWeight: "bold" }}
-            secondary={event.category}
+            secondary={
+              <>
+                {event.category}
+                <br />
+                {moment(event.starting_date).format("MMMM Do h:mm a")}
+              </>
+            }
           />
+          <IconButton
+            id="PLI-menu-button"
+            aria-controls={open ? "PLI-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
+            sx={{ position: "absolute", top: "11%", right: "3.5%" }}
+            // onClick={(e) => {
+            //   handleMenuClick(e);
+            // }}
+          >
+            <MoreVertIcon />
+          </IconButton>
+          <Menu
+            id="PLI-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleMenuClose}
+            MenuListProps={{
+              "aria-labelledby": "PLI-menu-button",
+            }}
+          >
+            {currentUser?.uid === 1 && (
+              <MenuItem
+                onClick={() => {
+                  handleVisibility(project);
+                  handleMenuClose();
+                }}
+              >
+                {project?.isVisible ? "Hide" : "Display"}
+              </MenuItem>
+            )}
+
+            {currentUser?.uid === 1 && (
+              <MenuItem
+                onClick={() => {
+                  setProject(null);
+                  handleDeleteProject(project?.id, currentStudent);
+                  handleMenuClose();
+                }}
+              >
+                Delete
+              </MenuItem>
+            )}
+          </Menu>
         </Box>
-        <ListItemText
-          secondary={
-            <Typography
-              sx={{
-                display: "-webkit-box",
-                overflow: "hidden",
-                WebkitBoxOrient: "vertical",
-                WebkitLineClamp: 2,
-                // is there a better way to directly ref to ListItemText Secondary style?
-                fontSize: "0.875rem",
-                lineHeight: 1.43,
-                letterSpacing: "0.01071em",
-                color: "rgba(0, 0, 0, 0.6)",
-              }}
-            >
-              {event.description}
-            </Typography>
-          }
-        />
       </ListItem>
     </Box>
   );

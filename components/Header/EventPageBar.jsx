@@ -9,23 +9,22 @@ import SearchIcon from "@mui/icons-material/Search";
 import {
   Button,
   FormControl,
+  IconButton,
   InputLabel,
   Menu,
   MenuItem,
   Select,
   Tooltip,
 } from "@mui/material";
-import ClickAwayListener from "@mui/material/ClickAwayListener";
-import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
 
-const ProjectPageBar = () => {
+const EventPageBar = () => {
   // context
   const { onMedia } = useContext(GlobalContext);
-  const { project, setProject, setSearchTerm, setSearchCategory } =
-    useContext(ProjectContext);
+  const { event, setEvent, setSearchTerm, setSearchCategory } =
+    useContext(EventContext);
 
   // menu
   const [anchorEl, setAnchorEl] = useState(null);
@@ -41,15 +40,15 @@ const ProjectPageBar = () => {
   const textRef = useRef();
 
   // reuseable comp
-  const ppSearchComp = (
+  const ekSearchComp = (
     <Search sx={{ width: onMedia.onDesktop ? "300px" : "80%" }}>
       <SearchIconWrapper>
         <SearchIcon />
       </SearchIconWrapper>
-      <Tooltip title="Search for projects or positions...">
+      <Tooltip title="Search for event or keywords...">
         <StyledInputBase
           fullWidth={true}
-          placeholder="Project or Position…"
+          placeholder="Event or Keywords…"
           inputProps={{ "aria-label": "search" }}
           inputRef={textRef}
           // onChange={(e) => setSearchTerm(e.target.value)}
@@ -98,10 +97,13 @@ const ProjectPageBar = () => {
         }}
       >
         <MenuItem value={""}>None</MenuItem>
-        <MenuItem value={"Startup"}>Startup</MenuItem>
-        <MenuItem value={"Learning Project"}>Learning Project</MenuItem>
-        <MenuItem value={"Charity Initiative"}>Charity Initiative</MenuItem>
-        <MenuItem value={"Fun Project"}>Fun Project</MenuItem>
+        <MenuItem value={"Community Event"}>Community Event</MenuItem>
+        <MenuItem value={"Concert"}>Concert</MenuItem>
+        <MenuItem value={"Conference"}>Conference</MenuItem>
+        <MenuItem value={"Expo"}>Expo</MenuItem>
+        <MenuItem value={"Festival"}>Festival</MenuItem>
+        <MenuItem value={"Performance"}>Performance</MenuItem>
+        <MenuItem value={"Sports"}>Sports</MenuItem>
       </Select>
     </FormControl>
   );
@@ -126,7 +128,7 @@ const ProjectPageBar = () => {
           }}
           disableGutters // will be customozied in sx
         >
-          {ppSearchComp}
+          {ekSearchComp}
           {categoryComp}
           <Box sx={{ flexGrow: 1 }} />
           <Search>
@@ -144,13 +146,13 @@ const ProjectPageBar = () => {
       {/* mobile version */}
       {!onMedia.onDesktop && (
         <Toolbar
-          sx={{ height: "64px", paddingX: 1.5 }} // 1.5 to match navbar icon and projectlistitem
+          sx={{ height: "64px", paddingX: 1.5 }} // 1.5 to match navbar icon and listitem
           disableGutters // disable auto padding
         >
-          {project === null ? (
-            // projectList version
+          {event === null ? (
+            // list version
             <Box sx={{ width: "100%", display: "flex" }}>
-              {ppSearchComp}
+              {ekSearchComp}
               <Button
                 sx={{
                   width: "20%",
@@ -159,8 +161,8 @@ const ProjectPageBar = () => {
                   borderRadius: "10px",
                   ml: 1.5,
                 }}
-                id="ppb-menu-button"
-                aria-controls={open ? "ppb-menu" : undefined}
+                id="epb-menu-button"
+                aria-controls={open ? "epb-menu" : undefined}
                 aria-haspopup="true"
                 aria-expanded={open ? "true" : undefined}
                 onClick={(e) => {
@@ -169,13 +171,13 @@ const ProjectPageBar = () => {
               >
                 <TuneRoundedIcon />
                 <Menu
-                  id="ppb-menu"
+                  id="epb-menu"
                   anchorEl={anchorEl}
                   // anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                   open={open}
                   onClose={handleUserMenuClose}
                   MenuListProps={{
-                    "aria-labelledby": "ppb-menu-button",
+                    "aria-labelledby": "epb-menu-button",
                   }}
                   onClick={(e) => e.stopPropagation()}
                 >
@@ -192,7 +194,7 @@ const ProjectPageBar = () => {
               </Button>
             </Box>
           ) : (
-            // projectInfo version
+            // info version
             <Box>
               <Button
                 sx={{
@@ -200,7 +202,7 @@ const ProjectPageBar = () => {
                   color: "gray",
                   borderRadius: "10px",
                 }}
-                onClick={() => setProject(null)}
+                onClick={() => setEvent(null)}
               >
                 <ArrowBackIosRoundedIcon />
               </Button>
@@ -212,7 +214,7 @@ const ProjectPageBar = () => {
   );
 };
 
-export default ProjectPageBar;
+export default EventPageBar;
 
 const Search = styled(Box)(({ theme }) => ({
   // position: "relative",

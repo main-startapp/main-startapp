@@ -69,7 +69,7 @@ const TeamScheduler = () => {
           height: "100%",
           width: "100%",
           "&:hover": {
-            backgroundColor: "steelblue",
+            backgroundColor: "#3e95c2",
           },
         }}
       />

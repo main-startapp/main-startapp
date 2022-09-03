@@ -3,23 +3,25 @@ import {
   Avatar,
   Box,
   Button,
+  Container,
   Divider,
   Grid,
   IconButton,
+  Link,
   Tooltip,
   Typography,
 } from "@mui/material";
-import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
-import PositionListItem from "./PositionListItem";
+import { EventContext, GlobalContext } from "../Context/ShareContexts";
 import ExportedImage from "next-image-export-optimizer";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import NextLink from "next/link";
 import { handleConnect } from "../Reusable/Resusable";
+import moment from "moment";
 
-const ProjectInfo = () => {
+const EventInfo = () => {
   // context
   const {
-    setOldProject,
+    setOldEvent,
     chats,
     currentStudent,
     students,
@@ -27,37 +29,20 @@ const ProjectInfo = () => {
     setForceChatExpand,
     onMedia,
   } = useContext(GlobalContext);
-  const { project } = useContext(ProjectContext);
+  const { event } = useContext(EventContext);
 
   // local vars
   const currentUID = currentStudent?.uid;
 
-  // hook to find is the currentStudent the project creator
+  // hook to find is the currentStudent the event creator
   const isCreator = useMemo(() => {
-    return currentUID === project?.creator_uid ? true : false;
-  }, [currentUID, project]);
+    return currentUID === event?.creator_uid ? true : false;
+  }, [currentUID, event]);
 
+  // hook to get event creator student data
   const creatorStudent = useMemo(() => {
-    return students.find((student) => student.uid === project?.creator_uid);
-  }, [students, project]);
-
-  // hook to get requesting positions
-  const [reqPositions, setReqPositions] = useState([]);
-  useEffect(() => {
-    const positions = [];
-    chats.forEach((chat) => {
-      chat?.join_requests?.forEach((joinRequest) => {
-        if (joinRequest.requester_uid === currentUID) {
-          positions.push({
-            project_id: joinRequest.project_id,
-            position_id: joinRequest.position_id,
-          });
-        }
-      });
-    });
-    setReqPositions(positions);
-    return positions;
-  }, [chats, currentUID]);
+    return students.find((student) => student.uid === event?.creator_uid);
+  }, [students, event]);
 
   // box ref to used by useEffect
   const boxRef = useRef();
@@ -65,7 +50,7 @@ const ProjectInfo = () => {
   // useEffect to reset box scrollbar position
   useEffect(() => {
     boxRef.current.scrollTop = 0;
-  }, [project]); // every time project changes, this forces each accordion to collapse
+  }, [event]);
 
   return (
     <Box
@@ -76,7 +61,7 @@ const ProjectInfo = () => {
         backgroundColor: "#fafafa",
       }}
     >
-      {!!project && (
+      {!!event && (
         <Grid container>
           {/* Top left info box */}
           <Grid item xs={onMedia.onDesktop ? 9 : 12}>
@@ -91,12 +76,12 @@ const ProjectInfo = () => {
                 {/* default unit is px */}
                 <Avatar
                   sx={{ mr: 2, height: "72px", width: "72px" }}
-                  src={project?.icon_url}
+                  src={event?.icon_url}
                 >
                   <UploadFileIcon />
                 </Avatar>
                 <Typography sx={{ fontWeight: "bold", fontSize: "2.5em" }}>
-                  {project?.title}
+                  {event?.title}
                 </Typography>
               </Box>
               <Divider
@@ -107,21 +92,29 @@ const ProjectInfo = () => {
                   borderColor: "#dbdbdb",
                 }}
               />
+              {/* details */}
               <Typography sx={{ fontWeight: "bold" }} color="text.primary">
                 {"Details: "}
               </Typography>
-              <Typography color="text.secondary">{project?.details}</Typography>
+              <Typography color="text.secondary">{event?.details}</Typography>
+              {/* time */}
               <Typography
                 sx={{ mt: 3, fontWeight: "bold" }}
                 color="text.primary"
               >
-                {"Team size: "}
+                {"Time: "}
               </Typography>
               <Typography color="text.secondary">
-                {project?.cur_member_count}
-                {"/"}
-                {project?.max_member_count}
+                {moment(event?.starting_date).format("MMMM Do YYYY h:mm a")}
               </Typography>
+              {/* location */}
+              <Typography
+                sx={{ mt: 3, fontWeight: "bold" }}
+                color="text.primary"
+              >
+                {"Location: "}
+              </Typography>
+              <Typography color="text.secondary">{event?.location}</Typography>
             </Box>
           </Grid>
 
@@ -161,7 +154,7 @@ const ProjectInfo = () => {
                     mt: 1,
                   }}
                 >
-                  {creatorStudent?.name || "Founder"}
+                  {creatorStudent?.name || "Organizer"}
                 </Typography>
 
                 {!isCreator && (
@@ -204,14 +197,14 @@ const ProjectInfo = () => {
                 {isCreator && (
                   <NextLink
                     href={{
-                      pathname: "/project/create",
+                      pathname: "/event/create",
                       query: { isCreateStr: "false" },
                     }}
-                    as="/project/create"
+                    as="/event/create"
                     passHref
                   >
                     <Button
-                      onClick={() => setOldProject(project)}
+                      onClick={() => setOldEvent(event)}
                       variant="contained"
                       sx={{
                         mt: 1,
@@ -237,7 +230,7 @@ const ProjectInfo = () => {
             </Grid>
           )}
 
-          {/* Bottom description and position boxes */}
+          {/* Bottom description and button */}
           <Grid item xs={12}>
             <Box sx={{ mt: 3, mx: 3 }}>
               <Typography sx={{ fontWeight: "bold" }} color="text.primary">
@@ -255,46 +248,53 @@ const ProjectInfo = () => {
                     display: "inline",
                   }}
                 >
-                  {project?.description}
+                  {event?.description}
                 </pre>
+                <br />
               </Typography>
-            </Box>
-            {/* position details */}
-            <Box
-              sx={{
-                mt: 3,
-                ml: 3,
-                mr: 3,
-                mb: "64px",
-                border: 1.5,
-                borderColor: "#dbdbdb",
-                borderRadius: "10px",
-                backgroundColor: "#ffffff",
-              }}
-            >
-              <Typography
-                sx={{ ml: 3, mt: 1.5, fontWeight: "bold" }}
-                color="text.primary"
+              <Link
+                target="_blank"
+                href={event?.registration_form_url}
+                rel="noopener noreferrer"
               >
-                {"Positions:"}
-              </Typography>
-              {project?.position_list.map((position, index) => (
-                <PositionListItem
-                  key={index}
-                  posID={position.positionID}
-                  title={position.positionTitle}
-                  resp={position.positionResp}
-                  weeklyHour={position.positionWeeklyHour}
-                  reqPositions={reqPositions}
-                  isCreator={isCreator}
-                  creator={creatorStudent}
-                />
-              ))}
+                <Button
+                  disableElevation
+                  sx={{
+                    mt: 3,
+                    border: 1.5,
+                    borderColor: "#dbdbdb",
+                    borderRadius: "30px",
+                    color: "white",
+                    backgroundColor: "#3e95c2",
+                    fontWeight: "bold",
+                    fontSize: "0.8em",
+                    textTransform: "none",
+                    paddingX: 5,
+                  }}
+                  variant="contained"
+                >
+                  {"Attend"}
+                </Button>
+              </Link>
+            </Box>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <Box
+                sx={{
+                  mt: 3,
+                  mx: 3,
+                  maxWidth: "100%",
+                }}
+                component="img"
+                src={event?.banner_url}
+              />
             </Box>
           </Grid>
         </Grid>
       )}
-      {!!!project && (
+      {!!!event && (
         <Box
           id="logo placeholder container"
           sx={{
@@ -325,4 +325,4 @@ const ProjectInfo = () => {
   );
 };
 
-export default ProjectInfo;
+export default EventInfo;

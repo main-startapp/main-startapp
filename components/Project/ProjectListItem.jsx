@@ -71,12 +71,15 @@ const ProjectListItem = (props) => {
             alignItems: "center",
             width: "100%",
           }}
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
+          // onClick={(e) => {
+          //   e.stopPropagation();
+          // }}
         >
           {/* project icon uploaded by users*/}
-          <Avatar sx={{ mr: 2 }}>
+          <Avatar
+            sx={{ mr: 2, height: "48px", width: "48px" }}
+            src={project?.icon_url}
+          >
             <UploadFileIcon />
           </Avatar>
           <ListItemText

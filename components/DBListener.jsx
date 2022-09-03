@@ -11,6 +11,8 @@ import { db } from "../firebase";
 import { useAuth } from "./Context/AuthContext";
 import { GlobalContext } from "./Context/ShareContexts";
 
+// purpose: Firebase prefer consistent subscription. This comp serves this purpose by subscribing the essential db and also providing the derived data required by other comps.
+
 const DBListener = () => {
   // context
   const { currentUser } = useAuth();
@@ -23,6 +25,10 @@ const DBListener = () => {
     setCurrentStudent,
     setChats,
   } = useContext(GlobalContext);
+
+  {
+    /* db listeners */
+  }
 
   // listen to realtime projects collection
   // https://stackoverflow.com/questions/59841800/react-useeffect-in-depth-use-of-useeffect
@@ -37,6 +43,8 @@ const DBListener = () => {
         querySnapshot.docs.map((doc) => ({
           ...doc.data(),
           id: doc.id,
+          completion_date: doc.data().completion_date?.toDate(),
+          create_timestamp: doc.data().create_timestamp?.toDate(),
           last_timestamp: doc.data().last_timestamp?.toDate(),
         }))
       );
@@ -89,7 +97,9 @@ const DBListener = () => {
         querySnapshot.docs.map((doc) => ({
           ...doc.data(),
           id: doc.id,
+          create_timestamp: doc.data().create_timestamp?.toDate(),
           last_timestamp: doc.data().last_timestamp?.toDate(),
+          starting_date: doc.data().starting_date?.toDate(),
         }))
       );
     });
@@ -144,6 +154,12 @@ const DBListener = () => {
 
     return unsub;
   }, [currentUser, setChats]);
+
+  {
+    /* derived data */
+  }
+
+  // traverse the chats to my joined projects,
 
   return null;
 };

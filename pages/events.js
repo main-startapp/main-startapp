@@ -5,8 +5,8 @@ import {
   EventContext,
 } from "../components/Context/ShareContexts";
 import EventList from "../components/Event/EventList";
-// import ProjectPageBar from "../components/Header/ProjectPageBar";
-//import ProjectInfo from "../components/Project/ProjectInfo";
+import EventPageBar from "../components/Header/EventPageBar";
+import EventInfo from "../components/Event/EventInfo";
 
 const Events = () => {
   // global context
@@ -35,6 +35,7 @@ const Events = () => {
       }}
     >
       {/* Toolbar for searching keywords, category and filter */}
+      <EventPageBar />
 
       <Grid
         container
@@ -43,7 +44,7 @@ const Events = () => {
         alignItems="start"
         justifyContent="center"
       >
-        {/* left part: event list */}
+        {/* left part: list */}
         {onMedia.onDesktop ? (
           <Grid item xs={4}>
             <EventList />
@@ -55,18 +56,18 @@ const Events = () => {
             </Grid>
           )
         )}
-        {/* right part: project info */}
-        {/* {onMedia.onDesktop ? (
+        {/* right part: info */}
+        {onMedia.onDesktop ? (
           <Grid item xs={8}>
-            <ProjectInfo />
+            <EventInfo />
           </Grid>
         ) : (
-          project !== null && (
+          event !== null && (
             <Grid item>
-              <ProjectInfo />
+              <EventInfo />
             </Grid>
           )
-        )} */}
+        )}
       </Grid>
     </EventContext.Provider>
   );

@@ -18,12 +18,16 @@ import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
 import { useAuth } from "../Context/AuthContext";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
+import { useRouter } from "next/router";
 
 const StudentCreate = () => {
   // context & hooks
   const { currentUser } = useAuth();
   const { currentStudent } = useContext(GlobalContext);
   const { showAlert } = useContext(StudentContext);
+
+  // router
+  const router = useRouter();
 
   const [student, setStudent] = useState({
     name: "",
@@ -96,8 +100,12 @@ const StudentCreate = () => {
     // !todo: check return
     showAlert(
       "success",
-      `"${student.name}" is updated successfully!` // success -> green
+      `"${student.name}" is updated successfully! Navigate to Students page.` // success -> green
     );
+
+    setTimeout(() => {
+      router.push(`/students`); // can be customized
+    }, 2000); // wait 2 seconds then go to `projects` page
   };
 
   const handleRemoveSocialMedia = (index) => {
@@ -144,7 +152,6 @@ const StudentCreate = () => {
               value={student.name}
               onChange={(e) => {
                 setStudent({ ...student, name: e.target.value });
-                setIsChanged(true);
               }}
             />
             <TextField
@@ -160,7 +167,6 @@ const StudentCreate = () => {
               }}
               onChange={(e) => {
                 setStudent({ ...student, year_of_ed: e.target.value });
-                setIsChanged(true);
               }}
             />
           </Box>
@@ -183,7 +189,6 @@ const StudentCreate = () => {
               helperText="Project position you would like to try. Doesn't have to be related to your major."
               onChange={(e) => {
                 setStudent({ ...student, desired_position: e.target.value });
-                setIsChanged(true);
               }}
             />
             <FormControl sx={{ width: "50%" }} size="medium">
@@ -194,7 +199,6 @@ const StudentCreate = () => {
                 value={student.field_of_interest}
                 onChange={(e) => {
                   setStudent({ ...student, field_of_interest: e.target.value });
-                  setIsChanged(true);
                 }}
               >
                 <MenuItem value={"Accounting"}>Accounting</MenuItem>
@@ -225,7 +229,8 @@ const StudentCreate = () => {
                   <TextField
                     fullWidth
                     margin="none"
-                    label="Website or Social Media link"
+                    label="Website or Social Media URL"
+                    type="url"
                     value={link}
                     onChange={(e) => {
                       let cur_social_media = student.social_media;
@@ -234,7 +239,6 @@ const StudentCreate = () => {
                         ...student,
                         social_media: cur_social_media,
                       });
-                      setIsChanged(true);
                     }}
                   />
                   {/* Add / Remove buttons */}
@@ -242,7 +246,6 @@ const StudentCreate = () => {
                     <IconButton
                       onClick={() => {
                         handleRemoveSocialMedia(index);
-                        setIsChanged(true);
                       }}
                     >
                       <RemoveRoundedIcon />
@@ -255,7 +258,6 @@ const StudentCreate = () => {
                           ...student,
                           social_media: [...student.social_media, ""],
                         });
-                        setIsChanged(true);
                       }}
                     >
                       <AddRoundedIcon />
@@ -299,7 +301,6 @@ const StudentCreate = () => {
                     <IconButton
                       onClick={() => {
                         handleRemovePastExp(index);
-                        setIsChanged(true);
                       }}
                     >
                       <RemoveRoundedIcon />
@@ -312,7 +313,6 @@ const StudentCreate = () => {
                           ...student,
                           past_exp: [...student.past_exp, ""],
                         });
-                        setIsChanged(true);
                       }}
                     >
                       <AddRoundedIcon />
@@ -331,7 +331,7 @@ const StudentCreate = () => {
               onClick={(e) => handleSubmit(e)}
               disabled={!isClickable}
             >
-              {isClickable ? "Submit" : "Submitted"}
+              {"Confirm"}
             </Button>
           </Box>
         </form>

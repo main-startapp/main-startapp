@@ -6,11 +6,10 @@ const Filler = () => {
   return (
     <Container>
       <ExportedImage
-        src="/images/EDIUM Logo.png"
+        src="/images/EDIUMLogo.png"
         placeholder=""
         width={512}
         height={512}
-        unoptimized={true}
       />
       <Typography variant="edium" sx={{ fontSize: "32px", padding: "32px" }}>
         Coming soon

@@ -1,6 +1,6 @@
 import { Button, Typography } from "@mui/material";
 import GoogleIcon from "@mui/icons-material/Google";
-import { auth, provider } from "../firebase";
+import { auth, googleProvider } from "../../firebase";
 import { signInWithPopup } from "firebase/auth";
 import { styled } from "@mui/material/styles";
 import ExportedImage from "next-image-export-optimizer";
@@ -8,9 +8,9 @@ import ExportedImage from "next-image-export-optimizer";
 // sign in, sign up, log in
 // https://ux.stackexchange.com/questions/1080/using-sign-in-vs-using-log-in
 
-const Login = ({ type, color }) => {
+const BetaLogin = ({ type, color }) => {
   const loginWithGoogle = () => {
-    signInWithPopup(auth, provider).catch((err) => {
+    signInWithPopup(auth, googleProvider).catch((err) => {
       console.log("signInWithPopup() error: ", err);
     });
   };
@@ -18,11 +18,10 @@ const Login = ({ type, color }) => {
   return (
     <Container>
       <ExportedImage
-        src="/images/EDIUM Logo.png"
+        src="/images/EDIUMLogo.png"
         placeholder=""
         width="512px"
         height="512px"
-        unoptimized={true}
       />
       <Typography
         sx={{
@@ -46,11 +45,11 @@ const Login = ({ type, color }) => {
         Thank you for your contribution.
       </Typography>
       <Button
-        sx={{ color: "white", mt: "5vmin" }}
+        sx={{ color: "white", mt: "5vmin", backgroundColor: "#3e95c2" }}
         variant="contained"
-        color="SteelBlue"
         startIcon={<GoogleIcon />}
         onClick={loginWithGoogle}
+        disableElevation
       >
         Sign in with Google
       </Button>
@@ -58,7 +57,7 @@ const Login = ({ type, color }) => {
   );
 };
 
-export default Login;
+export default BetaLogin;
 
 const Container = styled("div")(({ theme }) => ({
   display: "flex",

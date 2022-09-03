@@ -17,6 +17,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -57,20 +58,20 @@ const ProjectCreate = (props) => {
   // local vars
   // Project State Initialization.
   // https://stackoverflow.com/questions/68945060/react-make-usestate-initial-value-conditional
+
+  const emptyProject = {
+    title: "",
+    category: "",
+    completion_date: moment().toDate(),
+    details: "",
+    description: "",
+    creator_uid: currentUID,
+    isVisible: true,
+    icon_url: "",
+    application_form_url: "",
+  };
   const [newProject, setNewProject] = useState(() =>
-    isCreate
-      ? {
-          title: "",
-          category: "",
-          completion_date: moment().toDate(),
-          details: "",
-          description: "",
-          creator_uid: currentUID,
-          isVisible: true,
-          icon_url: "",
-          application_form_url: "",
-        }
-      : { ...oldProject, completion_date: oldProject.completion_date.toDate() }
+    isCreate ? emptyProject : oldProject
   );
 
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
@@ -81,7 +82,6 @@ const ProjectCreate = (props) => {
     positionResp: "",
     positionWeeklyHour: 1,
     positionCount: 1,
-    positionAcceptUID: [], // < or = positionCount
   };
   const [positionFields, setPositionFields] = useState(() =>
     isCreate ? [emptyPositionField] : oldProject.position_list
@@ -194,16 +194,7 @@ const ProjectCreate = (props) => {
 
   const handleDiscard = async () => {
     setOldProject(null);
-    setNewProject({
-      // only the fields on the screen
-      title: "",
-      category: "",
-      completion_date: moment().toDate(),
-      details: "",
-      description: "",
-      icon_url: "",
-      application_form_url: "",
-    });
+    setNewProject(emptyProject);
     setPositionFields([emptyPositionField]);
 
     showAlert("info", `Draft discarded! Navigate to Projects page.`);
@@ -218,15 +209,7 @@ const ProjectCreate = (props) => {
       console.log("deleteDoc() error: ", err);
     });
     setOldProject(null);
-    setNewProject({
-      title: "",
-      category: "",
-      completion_date: moment().toDate(),
-      details: "",
-      description: "",
-      icon_url: "",
-      application_form_url: "",
-    });
+    setNewProject(emptyProject);
     setPositionFields([emptyPositionField]);
 
     // delete project ref from my_projects in student doc
@@ -376,7 +359,9 @@ const ProjectCreate = (props) => {
               <DialogTitle>Upload Logo from URL</DialogTitle>
               <DialogContent>
                 <DialogContentText>
-                  Please enter the URL of your icon here.
+                  {
+                    "Please enter the URL of your icon here. Imgur is a good image hosting service to start with."
+                  }
                 </DialogContentText>
                 <TextField
                   autoFocus
@@ -423,7 +408,7 @@ const ProjectCreate = (props) => {
                 ".MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                   {
                     border: 1.5,
-                    borderColor: "steelblue",
+                    borderColor: "#3e95c2",
                   },
               }}
             >
@@ -436,11 +421,11 @@ const ProjectCreate = (props) => {
                 }
               >
                 <MenuItem value={"Startup"}>Startup</MenuItem>
-                <MenuItem value={"PersonalProject"}>Personal Project</MenuItem>
-                <MenuItem value={"Event"}>Event</MenuItem>
-                <MenuItem value={"CharityInitiative"}>
+                <MenuItem value={"Learning Project"}>Learning Project</MenuItem>
+                <MenuItem value={"Charity Initiative"}>
                   Charity Initiative
                 </MenuItem>
+                <MenuItem value={"Fun Project"}>Fun Project</MenuItem>
               </Select>
               <FormHelperText
                 id="pc-category-helper-text"
@@ -647,6 +632,7 @@ const ProjectCreate = (props) => {
               required
               fullWidth
               label="Application Form URL"
+              type="url"
               margin="none"
               value={newProject.application_form_url}
               onChange={(e) =>
@@ -721,6 +707,7 @@ const ProjectCreate = (props) => {
               }}
               variant="contained"
               disableElevation
+              disabled={!isClickable}
               onClick={(e) => handleSubmit(e)}
             >
               {"Confirm"}
@@ -734,7 +721,7 @@ const ProjectCreate = (props) => {
 
 export default ProjectCreate;
 
-// !todo: notchedOuline not working
+// border is not working but borderWidth is
 const StyledTextField = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
     borderRadius: "10px",
@@ -750,7 +737,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   },
   "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
     borderWidth: 1.5,
-    borderColor: "steelblue !important",
+    borderColor: "#3e95c2 !important",
   },
   "& .MuiFormHelperText-root": {
     color: "lightgray",
