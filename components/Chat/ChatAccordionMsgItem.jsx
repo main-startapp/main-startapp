@@ -7,14 +7,14 @@ import moment from "moment";
 const ChatAccordionMsgItem = (props) => {
   const message = props.message;
   const isSameAuthor = props.isSameAuthor;
+  const chatPartner = props.chatPartner;
 
   // context
   const { currentUser } = useAuth();
-  const { partner } = useContext(GlobalContext);
 
   return (
     <>
-      {!isSameAuthor && message.sent_by === partner?.uid && (
+      {!isSameAuthor && message.sent_by === chatPartner?.uid && (
         <Box
           sx={{
             padding: "5px",
@@ -26,7 +26,7 @@ const ChatAccordionMsgItem = (props) => {
           }}
         >
           <Typography sx={{ display: "inline", fontWeight: "bold" }}>
-            {partner?.name}
+            {chatPartner?.name}
           </Typography>
           <Typography
             sx={{ display: "inline", color: "gray", fontSize: "0.9em" }}

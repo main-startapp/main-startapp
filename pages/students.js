@@ -10,12 +10,14 @@ import StudentGrid from "../components/Student/StudentGrid";
 
 const Students = () => {
   // context
-  const { setChat, setShowChat, setShowMsg } = useContext(GlobalContext);
+  const { setChat, setChatPartner, setShowChat, setShowMsg } =
+    useContext(GlobalContext);
   useEffect(() => {
     setShowChat(true);
     setShowMsg(false);
     setChat(null);
-  }, [setChat, setShowChat, setShowMsg]);
+    setChatPartner(null);
+  }, [setChat, setChatPartner, setShowChat, setShowMsg]);
 
   // local
   const [student, setStudent] = useState(null); // the selected student by clicking the student card in the StudentGrid
@@ -37,10 +39,10 @@ const Students = () => {
       <Grid
         container
         spaceing={0}
-        mt={1}
         direction="row"
         // alignItems="center"
         justifyContent="center"
+        sx={{ backgroundColor: "#fafafa" }}
       >
         <Grid item xs={7}>
           <StudentGrid />

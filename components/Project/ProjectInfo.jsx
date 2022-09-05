@@ -23,7 +23,7 @@ const ProjectInfo = () => {
     chats,
     currentStudent,
     students,
-    setPartner,
+    setChatPartner,
     setForceChatExpand,
     onMedia,
   } = useContext(GlobalContext);
@@ -40,24 +40,6 @@ const ProjectInfo = () => {
   const creatorStudent = useMemo(() => {
     return students.find((student) => student.uid === project?.creator_uid);
   }, [students, project]);
-
-  // hook to get requesting positions
-  const [reqPositions, setReqPositions] = useState([]);
-  useEffect(() => {
-    const positions = [];
-    chats.forEach((chat) => {
-      chat?.join_requests?.forEach((joinRequest) => {
-        if (joinRequest.requester_uid === currentUID) {
-          positions.push({
-            project_id: joinRequest.project_id,
-            position_id: joinRequest.position_id,
-          });
-        }
-      });
-    });
-    setReqPositions(positions);
-    return positions;
-  }, [chats, currentUID]);
 
   // box ref to used by useEffect
   const boxRef = useRef();
@@ -118,8 +100,8 @@ const ProjectInfo = () => {
                 {"Team size: "}
               </Typography>
               <Typography color="text.secondary">
-                {project?.cur_member_count}
-                {"/"}
+                {/* {project?.cur_member_count}
+                {"/"} */}
                 {project?.max_member_count}
               </Typography>
             </Box>
@@ -144,8 +126,10 @@ const ProjectInfo = () => {
                     sx={{
                       width: "5em",
                       height: "5em",
-                      border: 1.5,
+                      border: 1,
                       borderColor: "#dbdbdb",
+                      color: "#dbdbdb",
+                      backgroundColor: "#ffffff",
                     }}
                     src={creatorStudent?.photo_url}
                     referrerPolicy="no-referrer"
@@ -191,7 +175,7 @@ const ProjectInfo = () => {
                             chats,
                             creatorStudent,
                             currentStudent,
-                            setPartner,
+                            setChatPartner,
                             setForceChatExpand
                           );
                         }}
@@ -260,37 +244,38 @@ const ProjectInfo = () => {
               </Typography>
             </Box>
             {/* position details */}
-            <Box
-              sx={{
-                mt: 3,
-                ml: 3,
-                mr: 3,
-                mb: "64px",
-                border: 1.5,
-                borderColor: "#dbdbdb",
-                borderRadius: "10px",
-                backgroundColor: "#ffffff",
-              }}
-            >
-              <Typography
-                sx={{ ml: 3, mt: 1.5, fontWeight: "bold" }}
-                color="text.primary"
+            {project?.position_list?.length > 0 && (
+              <Box
+                sx={{
+                  mt: 3,
+                  ml: 3,
+                  mr: 3,
+                  mb: "64px",
+                  border: 1.5,
+                  borderColor: "#dbdbdb",
+                  borderRadius: "10px",
+                  backgroundColor: "#ffffff",
+                }}
               >
-                {"Positions:"}
-              </Typography>
-              {project?.position_list.map((position, index) => (
-                <PositionListItem
-                  key={index}
-                  posID={position.positionID}
-                  title={position.positionTitle}
-                  resp={position.positionResp}
-                  weeklyHour={position.positionWeeklyHour}
-                  reqPositions={reqPositions}
-                  isCreator={isCreator}
-                  creator={creatorStudent}
-                />
-              ))}
-            </Box>
+                <Typography
+                  sx={{ ml: 3, mt: 1.5, fontWeight: "bold" }}
+                  color="text.primary"
+                >
+                  {"Positions:"}
+                </Typography>
+                {project?.position_list.map((position, index) => (
+                  <PositionListItem
+                    key={index}
+                    posID={position.id}
+                    posTitle={position.title}
+                    posResp={position.responsibility}
+                    posWeeklyHour={position.weekly_hour}
+                    isCreator={isCreator}
+                    creator={creatorStudent}
+                  />
+                ))}
+              </Box>
+            )}
           </Grid>
         </Grid>
       )}
@@ -317,6 +302,7 @@ const ProjectInfo = () => {
               placeholder=""
               width={256}
               height={256}
+              priority
             />
           </Box>
         </Box>

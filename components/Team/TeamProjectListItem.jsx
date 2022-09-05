@@ -19,7 +19,7 @@ const TeamProjectListItem = (props) => {
   const projectExt = props.projectExt;
 
   // context
-  const { currentStudent } = useContext(GlobalContext);
+  const { currentStudentExt, setCurrentStudentExt } = useContext(GlobalContext);
   const { setProject, setProjectExt } = useContext(TeamContext);
 
   // menu
@@ -55,7 +55,7 @@ const TeamProjectListItem = (props) => {
             cursor: "default",
           },
           overflow: "hidden",
-          opacity: project?.isVisible ? "100%" : "50%",
+          opacity: project?.is_visible ? "100%" : "50%",
         }}
       >
         <Box
@@ -79,8 +79,8 @@ const TeamProjectListItem = (props) => {
             secondary={
               <>
                 {"Team size: "}
-                {project?.cur_member_count}
-                {"/"}
+                {/* {project?.cur_member_count}
+                {"/"} */}
                 {project?.max_member_count}
                 <br />
               </>
@@ -112,14 +112,18 @@ const TeamProjectListItem = (props) => {
                 handleMenuClose();
               }}
             >
-              {project?.isVisible ? "Hide" : "Display"}
+              {project?.is_visible ? "Hide" : "Display"}
             </MenuItem>
 
             <MenuItem
               onClick={() => {
                 setProject(null);
                 setProjectExt(null);
-                handleDeleteProject(project?.id, currentStudent);
+                handleDeleteProject(
+                  project?.id,
+                  currentStudentExt,
+                  setCurrentStudentExt
+                );
                 handleMenuClose();
               }}
             >
@@ -149,13 +153,13 @@ const TeamProjectListItem = (props) => {
         <ListItemText
           secondary={
             <>
-              {"Hiring: "}
+              {/* {"Hiring: "}
               {project?.cur_member_count < project?.max_member_count
                 ? "Yes"
                 : "No"}
-              <br />
+              <br /> */}
               {"Visible: "}
-              {project?.isVisible ? "Yes" : "No"}
+              {project?.is_visible ? "Yes" : "No"}
             </>
           }
         />

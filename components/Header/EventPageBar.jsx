@@ -45,13 +45,16 @@ const EventPageBar = () => {
       <SearchIconWrapper>
         <SearchIcon />
       </SearchIconWrapper>
-      <Tooltip title="Search for event or keywords...">
+      <Tooltip title="Search for events or keywords...">
         <StyledInputBase
           fullWidth={true}
-          placeholder="Event or Keywords…"
+          placeholder="Event or Keyword…"
           inputProps={{ "aria-label": "search" }}
           inputRef={textRef}
-          // onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            if (e.target.value.length !== 0) return;
+            setSearchTerm("");
+          }}
           onKeyPress={(e) => {
             if (e.key === "Enter") {
               setSearchTerm(e.target.value);
@@ -179,7 +182,7 @@ const EventPageBar = () => {
                   MenuListProps={{
                     "aria-labelledby": "epb-menu-button",
                   }}
-                  onClick={(e) => e.stopPropagation()}
+                  //onClick={(e) => e.stopPropagation()}
                 >
                   <MenuItem
                     sx={{

@@ -52,7 +52,10 @@ const ProjectPageBar = () => {
           placeholder="Project or Position…"
           inputProps={{ "aria-label": "search" }}
           inputRef={textRef}
-          // onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            if (e.target.value.length !== 0) return;
+            setSearchTerm("");
+          }}
           onKeyPress={(e) => {
             if (e.key === "Enter") {
               setSearchTerm(e.target.value);
@@ -98,10 +101,11 @@ const ProjectPageBar = () => {
         }}
       >
         <MenuItem value={""}>None</MenuItem>
-        <MenuItem value={"Startup"}>Startup</MenuItem>
-        <MenuItem value={"Learning Project"}>Learning Project</MenuItem>
         <MenuItem value={"Charity Initiative"}>Charity Initiative</MenuItem>
+        <MenuItem value={"Club"}>Club</MenuItem>
         <MenuItem value={"Fun Project"}>Fun Project</MenuItem>
+        <MenuItem value={"Learning Project"}>Learning Project</MenuItem>
+        <MenuItem value={"Startup"}>Startup</MenuItem>
       </Select>
     </FormControl>
   );
@@ -177,7 +181,7 @@ const ProjectPageBar = () => {
                   MenuListProps={{
                     "aria-labelledby": "ppb-menu-button",
                   }}
-                  onClick={(e) => e.stopPropagation()}
+                  //onClick={(e) => e.stopPropagation()}
                 >
                   <MenuItem
                     sx={{

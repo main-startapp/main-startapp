@@ -39,24 +39,22 @@ const StudentCreate = () => {
     social_media: [""],
     past_exp: [""],
     awards: [],
-    connections: [],
-    my_projects: [],
-    photo_url: currentUser.photoURL,
+    photo_url: currentUser.photoURL || "",
   });
 
-  // update currentStudent state
+  // update student data if currentStudent exists
   useEffect(() => {
-    if (!currentStudent?.uid) return; // !todo: what's the RoT to check existence? what if uid = 0 (not possible?)
+    if (!!!currentStudent) return;
 
-    // currentStudent exists
-    const currentStudentRef = { ...currentStudent };
+    const currentStudentRef = currentStudent;
+    // add empty string to the array to should textfiled
     if (!currentStudent.social_media.length) {
       currentStudentRef.social_media = [""];
     }
     if (!currentStudent.past_exp.length) {
       currentStudentRef.past_exp = [""];
     }
-    setStudent({ ...currentStudentRef });
+    setStudent(currentStudentRef);
   }, [currentStudent]);
 
   // local vars
@@ -83,6 +81,7 @@ const StudentCreate = () => {
     let studentModRef;
     if (student.create_timestamp) {
       // update
+      // can't update partially
       studentModRef = updateDoc(docRef, studentRef).catch((err) => {
         console.log("updateDoc() error: ", err);
       });
@@ -95,8 +94,23 @@ const StudentCreate = () => {
       studentModRef = setDoc(docRef, studentRef).catch((err) => {
         console.log("setDoc() error: ", err);
       });
+
+      const extDocRef = doc(db, "students_ext", uid);
+      const studentExtRef = {
+        my_project_ids: [],
+        joined_project_ids: [],
+        join_requests: [],
+        last_timestamp: serverTimestamp(),
+      };
+      const studentExtModRef = setDoc(extDocRef, studentExtRef).catch((err) => {
+        console.log("setDoc() error: ", err);
+      });
+
+      await studentExtModRef;
     }
+
     await studentModRef;
+
     // !todo: check return
     showAlert(
       "success",
@@ -288,11 +302,11 @@ const StudentCreate = () => {
                     helperText="One sentence description of your past experience (limit: 150)"
                     value={exp_desc}
                     onChange={(e) => {
-                      let cur_past_exp = student.past_exp;
-                      cur_past_exp[index] = e.target.value;
+                      let newPastExp = student.past_exp;
+                      newPastExp[index] = e.target.value;
                       setStudent({
                         ...student,
-                        past_exp: cur_past_exp,
+                        past_exp: newPastExp,
                       });
                     }}
                   />

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { Avatar, Badge, Box, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import moment from "moment";
@@ -11,26 +11,17 @@ const ChatAccordionContact = (props) => {
 
   // context
   const { currentUser } = useAuth();
-  const { projects, setChat, setPartner, showMsg, setShowMsg, students } =
+  const { projects, setChat, setChatPartner, showMsg, setShowMsg, students } =
     useContext(GlobalContext);
 
   // local states and vars
-  const [contact, setContact] = useState(null);
-  const contactUID = chat.chat_user_ids.filter((chat_user_id) => {
-    return chat_user_id !== currentUser.uid;
-  })[0]; // get the first ele of the returned array which will always contain 1 ele
-  // required: students data should be complete (not partial)
-  useEffect(() => {
-    const found = students.find((student) => student.uid === contactUID);
-
-    if (found) {
-      setContact({ ...found });
-    }
-
-    return () => {
-      found;
-    };
-  }, [contactUID, students]);
+  const contact = useMemo(() => {
+    const contactUID =
+      chat.chat_user_ids[0] === currentUser?.uid
+        ? chat.chat_user_ids[1]
+        : chat.chat_user_ids[0];
+    return students.find((student) => student.uid === contactUID);
+  }, [chat.chat_user_ids, currentUser?.uid, students]);
 
   const my_unread_key = currentUser.uid + "_unread"; // the key to get unread msg no.
 
@@ -38,11 +29,7 @@ const ChatAccordionContact = (props) => {
   // !todo: use a map to reduce searching
   const [lastJR, setLastJR] = useState(null);
   useEffect(() => {
-    if (
-      typeof chat?.join_requests?.length !== "number" ||
-      chat?.join_requests?.length <= 0
-    )
-      return;
+    if (!(chat?.join_requests?.length > 0)) return;
 
     const tempLastJR = chat.join_requests[chat.join_requests.length - 1];
     const tempLastJRProject = projects.find(
@@ -52,14 +39,14 @@ const ChatAccordionContact = (props) => {
     if (!tempLastJRProject) return;
 
     const tempLastJRPosition = tempLastJRProject.position_list.find(
-      (position) => position.positionID === tempLastJR.position_id
+      (position) => position.id === tempLastJR.position_id
     );
 
     if (!tempLastJRPosition) return;
 
     setLastJR({
       projectTitle: tempLastJRProject.title,
-      positionTitle: tempLastJRPosition.positionTitle,
+      positionTitle: tempLastJRPosition.title,
     });
 
     return () => {
@@ -73,14 +60,18 @@ const ChatAccordionContact = (props) => {
     <Container
       onClick={() => {
         setChat(chat);
-        setPartner(contact);
+        setChatPartner(contact);
         if (!showMsg) {
           setShowMsg(true);
         }
-        handleUnread(chat, currentUser);
+        handleUnread(chat, setChat, currentUser);
       }}
     >
-      <Avatar sx={{ m: "14px" }} src={contact?.photo_url} referrerPolicy="no-referrer"/>
+      <Avatar
+        sx={{ m: "14px", color: "#dbdbdb", backgroundColor: "#ffffff" }}
+        src={contact?.photo_url}
+        referrerPolicy="no-referrer"
+      />
       <ChatInfo>
         {/* name & last timestamp */}
         <Box

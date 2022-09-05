@@ -1,6 +1,7 @@
 import { Box, Grid } from "@mui/material";
 import { useContext, useEffect } from "react";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
+import useWindowDimensions from "../Reusable/WindowDimensions";
 import StudentGridCard from "./StudentGridCard";
 
 const StudentGrid = () => {
@@ -8,33 +9,39 @@ const StudentGrid = () => {
   const { students } = useContext(GlobalContext);
   const { searchTerm } = useContext(StudentContext);
 
+  const { height, width } = useWindowDimensions();
+
   return (
     <Box
       sx={{
-        height: "calc(99vh - 128px)",
+        height: "calc(100vh - 64px - 64px - 1.5px)",
         overflow: "auto",
       }}
     >
-      <Grid container spacing={4} padding={4}>
+      <Grid container spacing={1.5} padding={1.5}>
         {students
           .filter((student) => {
-            const isInName = student.name
+            const isInPosition = student.desired_position
               .toLowerCase()
               .includes(searchTerm.toLowerCase());
-            const isInPosition = student.desired_position
+            const isInFoI = student.field_of_interest
               .toLowerCase()
               .includes(searchTerm.toLowerCase());
             if (searchTerm === "") {
               // no search
               return student;
             }
-            if (isInName || isInPosition) {
-              // in name or in position title
+            if (isInPosition || isInFoI) {
+              // in position title or in field of interest
               return student;
             }
           })
           .map((student, index) => (
-            <Grid key={index} item xs={3}>
+            <Grid
+              key={index}
+              item
+              xs={width < 1333 ? 4 : width < 1770 ? 3 : width < 2207 ? 2.4 : 2}
+            >
               <StudentGridCard key={student.uid} student={student} />
             </Grid>
           ))}

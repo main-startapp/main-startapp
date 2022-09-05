@@ -1,4 +1,11 @@
-import { Box, Button, Divider, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Divider,
+  TextField,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
 import {
   createUserWithEmailAndPassword,
@@ -96,57 +103,68 @@ const Signup = (props) => {
 
   return (
     <>
-      <Divider sx={{ mt: "2vmin", width: "38vmin", color: "lightgray" }}>
+      <Divider sx={{ mt: "1vmin", width: "38vmin", color: "lightgray" }}>
         {"Create an account"}
       </Divider>
-      <Box sx={{ width: "38vmin" }}>
+      <Box sx={{ mt: "2vmin", width: "38vmin" }}>
         <form ref={formRef}>
-          <StyledTextField
-            sx={{ mt: "1vmin", paddingY: 0 }}
-            fullWidth
-            margin="none"
-            label="Email"
-            name="email"
-            type="email"
-            variant="outlined"
-            value={input.email}
-            onChange={(e) => handleInputChange(e)}
-            onBlur={(e) => validateInput(e)}
-            error={!!error.email}
-            helperText={error.email || " "}
-          />
-          <StyledTextField
-            sx={{ mt: "1vmin", paddingY: 0 }}
-            fullWidth
-            margin="none"
-            label="Password (6 or more characters)"
-            name="password"
-            type="password"
-            variant="outlined"
-            value={input.password}
-            onChange={(e) => handleInputChange(e)}
-            onBlur={(e) => validateInput(e)}
-            error={!!error.password}
-            helperText={error.password || " "}
-          />
-          <StyledTextField
-            sx={{ mt: "1vmin", paddingY: 0 }}
-            fullWidth
-            margin="none"
-            label="Password Confirmation"
-            name="confirmPassword"
-            type="password"
-            variant="outlined"
-            value={input.confirmPassword}
-            onChange={(e) => handleInputChange(e)}
-            onBlur={(e) => validateInput(e)}
-            error={!!error.confirmPassword}
-            helperText={error.confirmPassword || " "}
-          />
+          <Tooltip title={error.email} placement="left">
+            <StyledTextField
+              sx={{ paddingY: 0 }}
+              fullWidth
+              margin="none"
+              label="Email"
+              name="email"
+              type="email"
+              variant="outlined"
+              value={input.email}
+              onChange={(e) => handleInputChange(e)}
+              onBlur={(e) => validateInput(e)}
+              error={!!error.email}
+              //helperText={error.email || " "}
+            />
+          </Tooltip>
+          <Tooltip title={error.password} placement="left">
+            <StyledTextField
+              sx={{ mt: "1.5vmin", paddingY: 0 }}
+              fullWidth
+              margin="none"
+              label="Password (6 or more characters)"
+              name="password"
+              type="password"
+              variant="outlined"
+              value={input.password}
+              onChange={(e) => handleInputChange(e)}
+              onBlur={(e) => validateInput(e)}
+              error={!!error.password}
+              //helperText={error.password || " "}
+            />
+          </Tooltip>
+          <Tooltip title={error.confirmPassword} placement="left">
+            <StyledTextField
+              sx={{ mt: "1.5vmin", paddingY: 0 }}
+              fullWidth
+              margin="none"
+              label="Password Confirmation"
+              name="confirmPassword"
+              type="password"
+              variant="outlined"
+              value={input.confirmPassword}
+              onChange={(e) => handleInputChange(e)}
+              onBlur={(e) => validateInput(e)}
+              error={!!error.confirmPassword}
+              //helperText={error.confirmPassword || " "}
+            />
+          </Tooltip>
         </form>
       </Box>
       <Box
-        sx={{ width: "38vmin", display: "flex", justifyContent: "flex-end" }}
+        sx={{
+          mt: "1.5vmin",
+          width: "38vmin",
+          display: "flex",
+          justifyContent: "flex-end",
+        }}
       >
         <Button
           disableElevation
@@ -192,9 +210,9 @@ export default Signup;
 const StyledTextField = styled(TextField)(({ theme }) => ({
   "& .MuiInputBase-input": { padding: theme.spacing(1, 2) },
 
-  "& .MuiFormLabel-root": { top: "-0.7vmin" },
-  "& .MuiInputLabel-shrink": { top: "0vmin" }, // to counter root adjustment
-  "& .MuiFormLabel-root.Mui-focused": { top: "0vmin" }, // to counter root adjustment
+  "& .MuiFormLabel-root": { top: "-0.4em", fontSize: "0.9em" },
+  "& .MuiInputLabel-shrink": { top: "0" }, // to counter root adjustment
+  "& .MuiFormLabel-root.Mui-focused": { top: "0" }, // to counter root adjustment
 
   "& .MuiOutlinedInput-root": {
     borderRadius: "10px",

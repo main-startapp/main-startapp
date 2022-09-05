@@ -31,7 +31,7 @@ const TeamInfo = () => {
             }}
           >
             {/* default unit is px */}
-            <Avatar sx={{ mr: 2, height: 75, width: "75px" }}>
+            <Avatar sx={{ mr: 2, height: "72px", width: "72px" }}>
               <UploadFileIcon />
             </Avatar>
             <Typography sx={{ fontWeight: "bold", fontSize: "2.5em" }}>

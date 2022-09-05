@@ -23,19 +23,21 @@ const ChatAccordion = () => {
     setShowMsg,
     forceChatExpand,
     setForceChatExpand,
-    partner,
+    chatPartner,
+    setChatPartner,
   } = useContext(GlobalContext);
 
   // local
   const [expandState, setExpandState] = useState("collapseIt");
   const [hasUnread, setHasUnread] = useState(false);
 
-  // handle chat expansion called by handleConnect
+  // handle chat expansion called by handleConnect/handleJoinRequest
+  // connect or join request might create a new chat, this new chat must be found by this hook
   useEffect(() => {
     if (!forceChatExpand) return;
 
     const foundChat = chats.find((chat) =>
-      chat.chat_user_ids.some((uid) => uid === partner.uid)
+      chat.chat_user_ids.some((uid) => uid === chatPartner?.uid)
     );
 
     if (!foundChat) return;
@@ -52,7 +54,7 @@ const ChatAccordion = () => {
     }, timeout); // delayed msg window
 
     setTimeout(() => {
-      handleUnread(foundChat, currentUser);
+      handleUnread(foundChat, setChat, currentUser);
     }, 1000); // delayed reset unread
 
     setForceChatExpand(false);
@@ -65,7 +67,7 @@ const ChatAccordion = () => {
     expandState,
     setForceChatExpand,
     chats,
-    partner,
+    chatPartner,
     setChat,
     setShowMsg,
     currentUser,
@@ -78,6 +80,7 @@ const ChatAccordion = () => {
       : setExpandState("expandIt");
     setShowMsg(false);
     setChat(null);
+    setChatPartner(null);
   };
 
   // unread signal

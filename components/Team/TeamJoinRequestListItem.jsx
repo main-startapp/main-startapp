@@ -45,8 +45,13 @@ const TeamJoinRequestListItem = (props) => {
   const status = request.status;
 
   // context
-  const { students, chats, currentStudent, setPartner, setForceChatExpand } =
-    useContext(GlobalContext);
+  const {
+    students,
+    chats,
+    currentStudent,
+    setChatPartner,
+    setForceChatExpand,
+  } = useContext(GlobalContext);
 
   // local vars
   const currentUID = currentStudent?.uid;
@@ -79,6 +84,7 @@ const TeamJoinRequestListItem = (props) => {
   };
   const handleReply = async (newStatus) => {
     // 1. find chat and send msg
+    // !todo: update to newer infastructure
     const foundChat = chats.find((chat) => chat.id === chatID);
     if (!foundChat) return;
     const msgStr = declineMsg
@@ -164,7 +170,10 @@ const TeamJoinRequestListItem = (props) => {
             mb: 1.5,
             width: "5em",
             height: "5em",
-            border: "1px solid black",
+            border: 1,
+            borderColor: "#dbdbdb",
+            color: "#dbdbdb",
+            backgroundColor: "#ffffff",
           }}
           src={requestingStudent?.photo_url}
           referrerPolicy="no-referrer"
@@ -198,7 +207,7 @@ const TeamJoinRequestListItem = (props) => {
               chats,
               requestingStudent,
               currentStudent,
-              setPartner,
+              setChatPartner,
               setForceChatExpand
             );
           }}

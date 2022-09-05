@@ -25,7 +25,7 @@ const EventInfo = () => {
     chats,
     currentStudent,
     students,
-    setPartner,
+    setChatPartner,
     setForceChatExpand,
     onMedia,
   } = useContext(GlobalContext);
@@ -75,7 +75,11 @@ const EventInfo = () => {
               >
                 {/* default unit is px */}
                 <Avatar
-                  sx={{ mr: 2, height: "72px", width: "72px" }}
+                  sx={{
+                    mr: 2,
+                    height: "72px",
+                    width: "72px",
+                  }}
                   src={event?.icon_url}
                 >
                   <UploadFileIcon />
@@ -137,8 +141,10 @@ const EventInfo = () => {
                     sx={{
                       width: "5em",
                       height: "5em",
-                      border: 1.5,
+                      border: 1,
                       borderColor: "#dbdbdb",
+                      color: "#dbdbdb",
+                      backgroundColor: "#ffffff",
                     }}
                     src={creatorStudent?.photo_url}
                     referrerPolicy="no-referrer"
@@ -184,7 +190,7 @@ const EventInfo = () => {
                             chats,
                             creatorStudent,
                             currentStudent,
-                            setPartner,
+                            setChatPartner,
                             setForceChatExpand
                           );
                         }}
@@ -283,8 +289,8 @@ const EventInfo = () => {
             <Box sx={{ display: "flex", justifyContent: "center" }}>
               <Box
                 sx={{
-                  mt: 3,
-                  mx: 3,
+                  paddingY: 3,
+                  paddingX: 3,
                   maxWidth: "100%",
                 }}
                 component="img"
@@ -317,6 +323,7 @@ const EventInfo = () => {
               placeholder=""
               width={256}
               height={256}
+              priority
             />
           </Box>
         </Box>

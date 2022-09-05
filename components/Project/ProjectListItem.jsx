@@ -24,7 +24,8 @@ const ProjectListItem = (props) => {
 
   // context
   const { currentUser } = useAuth();
-  const { currentStudent, onMedia } = useContext(GlobalContext);
+  const { currentStudentExt, setCurrentStudentExt, onMedia } =
+    useContext(GlobalContext);
   const { setProject } = useContext(ProjectContext);
 
   // menu
@@ -77,7 +78,13 @@ const ProjectListItem = (props) => {
         >
           {/* project icon uploaded by users*/}
           <Avatar
-            sx={{ mr: 2, height: "48px", width: "48px" }}
+            sx={{
+              mr: 2,
+              height: "48px",
+              width: "48px",
+              border: 1,
+              borderColor: "#dbdbdb",
+            }}
             src={project?.icon_url}
           >
             <UploadFileIcon />
@@ -88,8 +95,8 @@ const ProjectListItem = (props) => {
             secondary={
               <>
                 {"Team size: "}
-                {project.cur_member_count}
-                {"/"}
+                {/* {project.cur_member_count}
+                {"/"} */}
                 {project.max_member_count}
                 <br />
               </>
@@ -122,7 +129,7 @@ const ProjectListItem = (props) => {
                   handleMenuClose();
                 }}
               >
-                {project?.isVisible ? "Hide" : "Display"}
+                {project?.is_visible ? "Hide" : "Display"}
               </MenuItem>
             )}
 
@@ -130,7 +137,11 @@ const ProjectListItem = (props) => {
               <MenuItem
                 onClick={() => {
                   setProject(null);
-                  handleDeleteProject(project?.id, currentStudent);
+                  handleDeleteProject(
+                    project?.id,
+                    currentStudentExt,
+                    setCurrentStudentExt
+                  );
                   handleMenuClose();
                 }}
               >
@@ -162,7 +173,7 @@ const ProjectListItem = (props) => {
           <ListItemText
             sx={{ ml: "5%" }}
             key={index}
-            secondary={<span>&bull; &nbsp; {position.positionTitle}</span>}
+            secondary={<span>&bull; &nbsp; {position.title}</span>}
           />
         ))}
         <ListItemText

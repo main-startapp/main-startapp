@@ -6,7 +6,7 @@ import TeamProjectListItemEmpty from "./TeamProjectListItemEmpty";
 
 const TeamProjectList = () => {
   // contexts
-  const { projects, projectsExt, currentStudent, chats } =
+  const { projects, projectsExt, currentStudentExt, chats } =
     useContext(GlobalContext);
 
   // local vars
@@ -15,9 +15,9 @@ const TeamProjectList = () => {
     // if no currentStudent data, don't show the project creation slot
     // if no length or 0, treat it as 0
     // if number > 0, use it
-    if (!currentStudent) return maxProjectCount;
-    return currentStudent?.my_projects?.length || 0;
-  }, [currentStudent]);
+    if (!currentStudentExt) return maxProjectCount;
+    return currentStudentExt?.my_project_ids?.length || 0;
+  }, [currentStudentExt]);
 
   // helper fun
   const getProject = (id) => {
@@ -36,7 +36,7 @@ const TeamProjectList = () => {
       }}
     >
       {/* my projects */}
-      {currentStudent?.my_projects.map((myProjectID) => {
+      {currentStudentExt?.my_project_ids.map((myProjectID) => {
         return (
           <TeamProjectListItem
             key={myProjectID}

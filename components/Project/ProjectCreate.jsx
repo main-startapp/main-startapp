@@ -14,10 +14,10 @@ import {
   Grid,
   IconButton,
   InputLabel,
+  Link,
   MenuItem,
   Select,
   TextField,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -30,21 +30,27 @@ import {
   addDoc,
   serverTimestamp,
   updateDoc,
-  deleteDoc,
   setDoc,
+  arrayUnion,
 } from "firebase/firestore";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { db } from "../../firebase";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
 import { useRouter } from "next/router";
+import { handleDeleteProject } from "../Reusable/Resusable";
 
 const ProjectCreate = (props) => {
   // context
-  const { currentStudent, oldProject, setOldProject } =
-    useContext(GlobalContext);
+  const {
+    currentStudent,
+    currentStudentExt,
+    setCurrentStudentExt,
+    oldProject,
+    setOldProject,
+  } = useContext(GlobalContext);
   const currentUID = currentStudent?.uid;
 
   const { showAlert } = useContext(ProjectContext);
@@ -58,17 +64,16 @@ const ProjectCreate = (props) => {
   // local vars
   // Project State Initialization.
   // https://stackoverflow.com/questions/68945060/react-make-usestate-initial-value-conditional
-
   const emptyProject = {
     title: "",
     category: "",
     completion_date: moment().toDate(),
     details: "",
     description: "",
-    creator_uid: currentUID,
-    isVisible: true,
+    is_visible: true,
     icon_url: "",
     application_form_url: "",
+    is_deleted: false,
   };
   const [newProject, setNewProject] = useState(() =>
     isCreate ? emptyProject : oldProject
@@ -77,14 +82,18 @@ const ProjectCreate = (props) => {
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
 
   const emptyPositionField = {
-    positionID: Math.random().toString(16).slice(2),
-    positionTitle: "",
-    positionResp: "",
-    positionWeeklyHour: 1,
-    positionCount: 1,
+    id: Math.random().toString(16).slice(2),
+    title: "",
+    responsibility: "",
+    weekly_hour: 1,
+    count: 1,
   };
   const [positionFields, setPositionFields] = useState(() =>
-    isCreate ? [emptyPositionField] : oldProject.position_list
+    isCreate
+      ? [emptyPositionField]
+      : oldProject?.position_list?.length > 0
+      ? oldProject.position_list
+      : [emptyPositionField]
   );
 
   // upload-icon dialog modal
@@ -97,20 +106,34 @@ const ProjectCreate = (props) => {
   };
 
   // check box
-  const [isChecked, setIsChecked] = useState(false);
+  const [isCheckedPosition, setIsCheckedPosition] = useState(false);
+  const [isCheckedAppForm, setIsCheckedAppForm] = useState(false);
+
+  useEffect(() => {
+    if (isCreate) {
+      setIsCheckedPosition(true);
+    } else {
+      // update, checked value depends on oldProject
+      if (oldProject?.position_list?.length > 0) {
+        setIsCheckedPosition(true);
+      }
+      if (oldProject?.application_form_url?.length > 0) {
+        setIsCheckedAppForm(true);
+      }
+    }
+  }, [isCreate, oldProject]);
 
   // helper functions
   const handleSubmit = async (e) => {
     if (!isClickable) return;
+    if (!!!currentUID) return;
     if (!formRef.current.reportValidity()) return;
 
     // button is clickable & form is valid
     setIsClickable(false);
     // calucalte the max members
     let maxMemberCount = 1; // creator
-    positionFields.forEach(
-      (position) => (maxMemberCount += position.positionCount)
-    );
+    positionFields.forEach((position) => (maxMemberCount += position.count));
     let projectModRef; // ref to addDoc() or updateDoc()
     if (isCreate) {
       // create a new newProject
@@ -119,7 +142,8 @@ const ProjectCreate = (props) => {
         ...newProject,
         // update max num of members
         max_member_count: maxMemberCount,
-        position_list: positionFields,
+        position_list: isCheckedPosition ? positionFields : [],
+        creator_uid: currentUID,
         create_timestamp: serverTimestamp(),
         last_timestamp: serverTimestamp(),
       };
@@ -128,12 +152,16 @@ const ProjectCreate = (props) => {
       });
     } else {
       // update an existing newProject
+      // since all changes are in newProject, can't just update partially
       const docRef = doc(db, "projects", newProject.id);
       const projectRef = {
         ...newProject,
         // update max num of members
         max_member_count: maxMemberCount,
-        position_list: positionFields,
+        position_list: isCheckedPosition ? positionFields : [],
+        application_form_url: isCheckedAppForm
+          ? newProject.application_form_url
+          : "",
         last_timestamp: serverTimestamp(),
       };
       delete projectRef.id;
@@ -149,26 +177,23 @@ const ProjectCreate = (props) => {
 
     // retID: create; !retID: update
     if (retID) {
-      // add to my_projects in student data if create
-      const curStudentDocRef = doc(db, "students", currentUID);
-      const curStudentMyProjects = currentStudent?.my_projects
-        ? currentStudent.my_projects
-        : [];
-      curStudentMyProjects.push(retID);
-      const curStudentRef = {
-        ...currentStudent,
-        my_projects: curStudentMyProjects,
+      // add to my_project_ids in student ext data if create
+      const curStudentExtDocRef = doc(db, "students_ext", currentUID);
+      const curStudentExtUpdateRef = {
+        my_project_ids: arrayUnion(retID),
+        last_timestamp: serverTimestamp(),
       };
-      delete curStudentRef?.uid;
-      const curStudentModRef = updateDoc(curStudentDocRef, curStudentRef).catch(
-        (err) => {
-          console.log("updateDoc() error: ", err);
-        }
-      );
+      const curStudentExtModRef = updateDoc(
+        curStudentExtDocRef,
+        curStudentExtUpdateRef
+      ).catch((err) => {
+        console.log("updateDoc() error: ", err);
+      });
 
       // create extension doc for team management if create
       const extDocRef = doc(db, "projects_ext", retID);
       const projectExtRef = {
+        is_deleted: false,
         members: [currentUID],
         admins: [currentUID],
         last_timestamp: serverTimestamp(),
@@ -177,7 +202,7 @@ const ProjectCreate = (props) => {
         console.log("setDoc() error: ", err);
       });
 
-      await curStudentModRef;
+      await curStudentExtModRef;
       await projectExtModRef;
     }
 
@@ -204,39 +229,7 @@ const ProjectCreate = (props) => {
   };
 
   const handleDelete = async (id, e) => {
-    const docRef = doc(db, "projects", id);
-    const projectModRef = deleteDoc(docRef).catch((err) => {
-      console.log("deleteDoc() error: ", err);
-    });
-    setOldProject(null);
-    setNewProject(emptyProject);
-    setPositionFields([emptyPositionField]);
-
-    // delete project ref from my_projects in student doc
-    const curStudentDocRef = doc(db, "students", currentUID);
-    const curStudentMyProjects = currentStudent.my_projects.filter(
-      (my_proj) => my_proj !== id
-    );
-    const curStudentRef = {
-      ...currentStudent,
-      my_projects: curStudentMyProjects,
-    };
-    delete curStudentRef?.uid;
-    const curStudentModRef = updateDoc(curStudentDocRef, curStudentRef).catch(
-      (err) => {
-        console.log("updateDoc() error: ", err);
-      }
-    );
-
-    // delete from project_ext coll
-    const extDocRef = doc(db, "projects_ext", id);
-    const projectExtModRef = deleteDoc(extDocRef).catch((err) => {
-      console.log("deleteDoc() error: ", err);
-    });
-
-    await projectModRef;
-    await curStudentModRef;
-    await projectExtModRef;
+    handleDeleteProject(id, currentStudentExt, setCurrentStudentExt);
 
     showAlert(
       "success",
@@ -251,8 +244,7 @@ const ProjectCreate = (props) => {
   const handleChangePosInput = (index, e) => {
     let pFields = [...positionFields];
     let fieldValue =
-      e.target.name === "positionWeeklyHour" ||
-      e.target.name === "positionCount"
+      e.target.name === "weekly_hour" || e.target.name === "count"
         ? Number(e.target.value)
         : e.target.value;
     pFields[index][e.target.name] = fieldValue;
@@ -359,9 +351,15 @@ const ProjectCreate = (props) => {
               <DialogTitle>Upload Logo from URL</DialogTitle>
               <DialogContent>
                 <DialogContentText>
-                  {
-                    "Please enter the URL of your icon here. Imgur is a good image hosting service to start with."
-                  }
+                  {"Please enter the URL of your icon here. "}
+                  <Link
+                    target="_blank"
+                    href={"https://imgur.com/upload"}
+                    rel="noopener noreferrer"
+                  >
+                    Imgur
+                  </Link>
+                  {" is a good image hosting service to start with."}
                 </DialogContentText>
                 <TextField
                   autoFocus
@@ -420,12 +418,13 @@ const ProjectCreate = (props) => {
                   setNewProject({ ...newProject, category: e.target.value })
                 }
               >
-                <MenuItem value={"Startup"}>Startup</MenuItem>
-                <MenuItem value={"Learning Project"}>Learning Project</MenuItem>
                 <MenuItem value={"Charity Initiative"}>
                   Charity Initiative
                 </MenuItem>
+                <MenuItem value={"Club"}>Club</MenuItem>
                 <MenuItem value={"Fun Project"}>Fun Project</MenuItem>
+                <MenuItem value={"Learning Project"}>Learning Project</MenuItem>
+                <MenuItem value={"Startup"}>Startup</MenuItem>
               </Select>
               <FormHelperText
                 id="pc-category-helper-text"
@@ -490,141 +489,157 @@ const ProjectCreate = (props) => {
               setNewProject({ ...newProject, description: e.target.value })
             }
           />
-          {/* firebase dynamic array: http://y2u.be/zgKH12s_95A */}
-          {positionFields.map((positionField, index) => {
-            return (
-              <div key={index}>
-                <Divider
-                  sx={{
-                    mt: 2.5,
-                    borderBottomWidth: 1.5,
-                    borderColor: "#dbdbdb",
-                  }}
-                />
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  mt={2.5}
-                >
-                  {/* Title */}
-                  <StyledTextField
-                    required
-                    sx={{ mr: 2.5 }}
-                    fullWidth
-                    margin="none"
-                    name="positionTitle" // has to be the same as key
-                    label="Position Title"
-                    value={positionField.positionTitle}
-                    onChange={(e) => {
-                      handleChangePosInput(index, e);
-                    }}
-                  />
-                  {/* Weekly hour */}
-                  <StyledTextField
-                    required
-                    sx={{ mr: 2.5 }}
-                    margin="none"
-                    type="number"
-                    name="positionWeeklyHour" // has to be the same as key
-                    label="Weekly Hour"
-                    inputProps={{
-                      min: 1,
-                    }}
-                    value={positionField.positionWeeklyHour}
-                    onChange={(e) => {
-                      e.target.value > 1
-                        ? e.target.value
-                        : (e.target.value = 1);
-                      handleChangePosInput(index, e);
-                    }}
-                  />
-                  {/* Number of people */}
-                  <StyledTextField
-                    required
-                    margin="none"
-                    type="number"
-                    name="positionCount" // has to be the same as key
-                    label="NO. of People"
-                    inputProps={{
-                      min: 1,
-                    }}
-                    value={positionField.positionCount}
-                    onChange={(e) => {
-                      e.target.value > 1
-                        ? e.target.value
-                        : (e.target.value = 1);
-                      handleChangePosInput(index, e);
-                    }}
-                  />
-                  {/* Add / Remove position button */}
-
-                  {index > 0 && (
-                    <IconButton
-                      sx={{ ml: 2.5, backgroundColor: "#f0f0f0" }}
-                      onClick={() => handleRemovePosField(index)}
-                    >
-                      <RemoveRoundedIcon />
-                    </IconButton>
-                  )}
-                </Box>
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  mt={2.5}
-                >
-                  {/* Responsibilities */}
-                  <StyledTextField
-                    fullWidth
-                    multiline
-                    minRows={2}
-                    maxRows={8}
-                    margin="none"
-                    name="positionResp"
-                    label="Responsibilities"
-                    value={positionField.positionResp}
-                    onChange={(e) => {
-                      handleChangePosInput(index, e);
-                    }}
-                  />
-                  {index === positionFields.length - 1 && (
-                    <IconButton
-                      sx={{ ml: 2.5, backgroundColor: "#f0f0f0" }}
-                      onClick={() => handleAddPosField()}
-                    >
-                      <AddRoundedIcon />
-                    </IconButton>
-                  )}
-                </Box>
-              </div>
-            );
-          })}
-          {/* application form */}
-          <Container
+          <Box
             sx={{
               mt: 2.5,
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
             }}
-            disableGutters
           >
             <Checkbox
               sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
-              value={isChecked}
+              checked={isCheckedPosition}
               onChange={() => {
-                if (isChecked) {
-                  setNewProject({ ...newProject, application_form_url: "" });
-                }
-                setIsChecked(!isChecked);
+                setIsCheckedPosition(!isCheckedPosition);
+              }}
+            />
+            <Typography sx={{ color: "rgba(0,0,0,0.6)" }}>
+              {"I want to add positions"}
+            </Typography>
+          </Box>
+          {/* firebase dynamic array: http://y2u.be/zgKH12s_95A */}
+          {isCheckedPosition &&
+            positionFields.map((positionField, index) => {
+              return (
+                <div key={index}>
+                  <Divider
+                    sx={{
+                      mt: index === 0 ? 1.5 : 2.5,
+                      borderBottomWidth: 1.5,
+                      borderColor: "#dbdbdb",
+                    }}
+                  />
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    mt={2.5}
+                  >
+                    {/* Title */}
+                    <StyledTextField
+                      required
+                      sx={{ mr: 2.5 }}
+                      fullWidth
+                      margin="none"
+                      name="title" // has to be the same as key
+                      label="Position Title"
+                      value={positionField.title}
+                      onChange={(e) => {
+                        handleChangePosInput(index, e);
+                      }}
+                    />
+                    {/* Weekly hour */}
+                    <StyledTextField
+                      required
+                      sx={{ mr: 2.5 }}
+                      margin="none"
+                      type="number"
+                      name="weekly_hour" // has to be the same as key
+                      label="Weekly Hour"
+                      inputProps={{
+                        min: 1,
+                      }}
+                      value={positionField.weekly_hour}
+                      onChange={(e) => {
+                        e.target.value > 1
+                          ? e.target.value
+                          : (e.target.value = 1);
+                        handleChangePosInput(index, e);
+                      }}
+                    />
+                    {/* Number of people */}
+                    <StyledTextField
+                      required
+                      margin="none"
+                      type="number"
+                      name="count" // has to be the same as key
+                      label="NO. of People"
+                      inputProps={{
+                        min: 1,
+                      }}
+                      value={positionField.count}
+                      onChange={(e) => {
+                        e.target.value > 1
+                          ? e.target.value
+                          : (e.target.value = 1);
+                        handleChangePosInput(index, e);
+                      }}
+                    />
+                    {/* Add / Remove position button */}
+
+                    {index > 0 && (
+                      <IconButton
+                        sx={{ ml: 2.5, backgroundColor: "#f0f0f0" }}
+                        onClick={() => handleRemovePosField(index)}
+                      >
+                        <RemoveRoundedIcon />
+                      </IconButton>
+                    )}
+                  </Box>
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    mt={2.5}
+                  >
+                    {/* Responsibilities */}
+                    <StyledTextField
+                      fullWidth
+                      multiline
+                      minRows={2}
+                      maxRows={8}
+                      margin="none"
+                      name="responsibility"
+                      label="Responsibilities"
+                      value={positionField.responsibility}
+                      onChange={(e) => {
+                        handleChangePosInput(index, e);
+                      }}
+                    />
+                    {index === positionFields.length - 1 && (
+                      <IconButton
+                        sx={{ ml: 2.5, backgroundColor: "#f0f0f0" }}
+                        onClick={() => handleAddPosField()}
+                      >
+                        <AddRoundedIcon />
+                      </IconButton>
+                    )}
+                  </Box>
+                </div>
+              );
+            })}
+          {/* application form */}
+          <Box
+            sx={{
+              mt: 5,
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Checkbox
+              sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
+              checked={isCheckedAppForm}
+              onChange={() => {
+                setIsCheckedAppForm(!isCheckedAppForm);
               }}
             />
             <Typography sx={{ color: "rgba(0,0,0,0.6)" }}>
               {"I want to add my own application form"}
             </Typography>
-          </Container>
-          {isChecked && (
+          </Box>
+          {isCheckedAppForm && (
             <StyledTextField
               sx={{
                 mt: 2.5,

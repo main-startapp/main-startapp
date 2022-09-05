@@ -21,7 +21,7 @@ const EventListItem = (props) => {
 
   // context
   const { currentUser } = useAuth();
-  const { currentStudent, onMedia } = useContext(GlobalContext);
+  const { currentStudentExt, onMedia } = useContext(GlobalContext);
   const { setEvent } = useContext(EventContext);
 
   // menu
@@ -120,19 +120,16 @@ const EventListItem = (props) => {
             {currentUser?.uid === 1 && (
               <MenuItem
                 onClick={() => {
-                  handleVisibility(project);
                   handleMenuClose();
                 }}
               >
-                {project?.isVisible ? "Hide" : "Display"}
+                {project?.is_visible ? "Hide" : "Display"}
               </MenuItem>
             )}
 
             {currentUser?.uid === 1 && (
               <MenuItem
                 onClick={() => {
-                  setProject(null);
-                  handleDeleteProject(project?.id, currentStudent);
                   handleMenuClose();
                 }}
               >

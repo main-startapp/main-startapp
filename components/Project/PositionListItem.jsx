@@ -24,16 +24,21 @@ import {
 
 const PositionListItem = (props) => {
   // context
-  const { chats, currentStudent, setPartner, setForceChatExpand } =
-    useContext(GlobalContext);
+  const {
+    chats,
+    currentStudent,
+    currentStudentExt,
+    setCurrentStudentExt,
+    setChatPartner,
+    setForceChatExpand,
+  } = useContext(GlobalContext);
   const { project } = useContext(ProjectContext);
 
   // args
   const posID = props.posID;
-  const title = props.title;
-  const resp = props.resp;
-  const weeklyHour = props.weeklyHour;
-  const reqPositions = props.reqPositions; // a list of currentStudent's requesting positions
+  const posTitle = props.posTitle;
+  const posResp = props.posResp;
+  const posWeeklyHour = props.posWeeklyHour;
   const isCreator = props.isCreator; // whether currentStudent is the creator
   const creator = props.creator;
 
@@ -54,19 +59,58 @@ const PositionListItem = (props) => {
 
   // !todo: handleJoinRequest; function is bloated, might need an external lib to hold these func
   const handleJoinRequest = async () => {
-    // chat accordion related
-    setPartner(creator);
-    setForceChatExpand(true);
-    //
-    const foundChat = chats.find((chat) =>
-      chat.chat_user_ids.some((uid) => uid === project.creator_uid)
+    // mod ref
+    let jrModRef;
+    let curStudentExtModRef;
+    let chatModRef;
+
+    // add it to project ext join requests subcollection
+    const jrCollectionRef = collection(
+      db,
+      "projects_ext",
+      project.id,
+      "join_requests"
     );
+    const jrDocRef = {
+      position_id: posID,
+      requester_uid: currentUID,
+      status: "requesting",
+      last_timestamp: serverTimestamp(),
+    };
+    jrModRef = addDoc(jrCollectionRef, jrDocRef).catch((err) => {
+      console.log("addDoc() error: ", err);
+    });
+    let jrRetID;
+    await jrModRef.then((ret) => {
+      jrRetID = ret?.id;
+    });
+
+    // add it to my student ext
+    const curStudentExtDocRef = doc(db, "students_ext", currentUID);
+    const curStudentExtJoinRequests = currentStudentExt.join_requests;
+    curStudentExtJoinRequests.push({
+      project_id: project.id,
+      position_id: posID,
+      join_request_doc_id: jrRetID || -1,
+    });
+    const curStudentExtUpdateRef = {
+      join_requests: curStudentExtJoinRequests,
+      last_timestamp: serverTimestamp(),
+    };
+    curStudentExtModRef = updateDoc(
+      curStudentExtDocRef,
+      curStudentExtUpdateRef
+    ).catch((err) => {
+      console.log("updateDoc() error: ", err);
+    });
+
+    // add it to chat or create a chat
     const msgStr =
       currentStudent.name +
       " requested to join " +
       project.title +
       " as " +
-      title;
+      posTitle;
     const messageRef = {
       text: msgStr,
       sent_by: currentUID,
@@ -74,29 +118,30 @@ const PositionListItem = (props) => {
     };
     const my_unread_key = currentUID + "_unread";
     const creator_unread_key = project?.creator_uid + "_unread";
-    let chatModRef;
+    const foundChat = chats.find((chat) =>
+      chat.chat_user_ids.some((uid) => uid === project.creator_uid)
+    );
+    const chatJR = {
+      project_id: project.id,
+      position_id: posID,
+      requester_uid: currentUID,
+      join_request_doc_id: jrRetID || -1,
+    };
     if (foundChat) {
       // update
       const chatDocRef = doc(db, "chats", foundChat.id);
-      let joinRequests = foundChat?.join_requests
+      let newChatJoinRequests = foundChat?.join_requests
         ? foundChat.join_requests
         : [];
-      joinRequests.push({
-        project_id: project?.id,
-        position_id: posID,
-        creator_uid: project?.creator_uid,
-        requester_uid: currentUID,
-        status: "requesting",
-      });
-      const chatRef = {
-        ...foundChat,
+      newChatJoinRequests.push(chatJR);
+      const chatUpdateRef = {
         [creator_unread_key]: foundChat[creator_unread_key] + 1, // dont use ++foundChat[creator_unread_key]; dont directly mutate the state
-        join_requests: joinRequests,
+        join_requests: newChatJoinRequests,
         last_text: msgStr,
         last_timestamp: serverTimestamp(),
       };
-      delete chatRef.id;
-      chatModRef = updateDoc(chatDocRef, chatRef).catch((err) => {
+      // don't need to setChat, as this will be done by hook in ChatAccordion
+      chatModRef = updateDoc(chatDocRef, chatUpdateRef).catch((err) => {
         console.log("updateDoc() error: ", err);
       });
     } else {
@@ -104,18 +149,10 @@ const PositionListItem = (props) => {
       const collectionRef = collection(db, "chats");
       const chatRef = {
         // new
-        chat_user_ids: [currentStudent?.uid, project?.creator_uid],
+        chat_user_ids: [currentUID, project.creator_uid],
         [my_unread_key]: 0,
         [creator_unread_key]: 1,
-        join_requests: [
-          {
-            project_id: project?.id,
-            position_id: posID,
-            creator_uid: project?.creator_uid,
-            requester_uid: currentUID,
-            status: "requesting",
-          },
-        ],
+        join_requests: [chatJR],
         last_text: msgStr,
         last_timestamp: serverTimestamp(),
       };
@@ -123,42 +160,25 @@ const PositionListItem = (props) => {
         console.log("addDoc() error: ", err);
       });
     }
-    {
-      /* awiat chat and add message */
-    }
-    let retID;
+
+    // await chat and add message
+    let chatRetID;
     await chatModRef.then((ret) => {
-      retID = ret?.id;
+      chatRetID = ret?.id;
     }); // only addDoc will return, updateDoc returns undefined
-    let chatID;
-    if (foundChat) {
-      chatID = foundChat.id;
-    } else {
-      chatID = retID;
-    }
+    const chatID = !!foundChat ? foundChat.id : chatRetID || -1;
     const msgCollectionRef = collection(db, "chats", chatID, "messages");
     const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
       console.log("addDoc() error: ", err);
     });
+
+    // await the rest
+    await curStudentExtModRef;
     await msgModRef;
-    /* 
-    const curStudentDocRef = doc(db, "students", currentUID);
-    const curStudentReqPos = currentStudent.requested_positions;
-    curStudentReqPos.push({
-      project_id: project.id,
-      position_id: posID,
-    });
-    const curStudentRef = {
-      ...currentStudent,
-      requested_positions: curStudentReqPos,
-    };
-    delete curStudentRef?.uid;
-    const curStudentModRef = updateDoc(curStudentDocRef, curStudentRef).catch(
-      (err) => {
-        console.log("updateDoc() error: ", err);
-      }
-    );
-    await curStudentModRef; */
+
+    // open chat accordion
+    setChatPartner(creator);
+    setForceChatExpand(true);
   };
 
   return (
@@ -185,7 +205,7 @@ const PositionListItem = (props) => {
             color="text.primary"
             sx={{ display: "flex", alignItems: "center" }}
           >
-            {title}
+            {posTitle}
           </Typography>
           {!isCreator && (
             <Tooltip title={currentUID ? "" : "Edit your profile first."}>
@@ -193,10 +213,9 @@ const PositionListItem = (props) => {
                 <Button
                   disabled={
                     !currentUID ||
-                    reqPositions.some(
-                      (pos) =>
-                        pos.project_id === project.id &&
-                        pos.position_id === posID
+                    currentStudentExt?.join_requests?.some(
+                      (jr) =>
+                        jr.project_id === project.id && jr.position_id === posID
                     )
                   }
                   disableElevation
@@ -245,7 +264,7 @@ const PositionListItem = (props) => {
                     display: "inline",
                   }}
                 >
-                  {resp}
+                  {posResp}
                 </pre>
               </Typography>
             </Grid>
@@ -253,7 +272,7 @@ const PositionListItem = (props) => {
             <Grid item xs={2}>
               <Typography>
                 {"Weekly Hours: "}
-                {weeklyHour}
+                {posWeeklyHour}
               </Typography>
             </Grid>
           </Grid>

@@ -11,13 +11,14 @@ import ProjectInfo from "../components/Project/ProjectInfo";
 // this page is also project homepage. Is this a good practice?
 export default function Home() {
   // global context
-  const { setChat, setShowChat, setShowMsg, onMedia } =
+  const { setChat, setChatPartner, setShowChat, setShowMsg, onMedia } =
     useContext(GlobalContext);
   useEffect(() => {
     setShowChat(true);
     setShowMsg(false);
     setChat(null);
-  }, [setChat, setShowChat, setShowMsg]);
+    setChatPartner(null);
+  }, [setChat, setChatPartner, setShowChat, setShowMsg]);
 
   // project state init
   const [project, setProject] = useState(null); // thec selected project

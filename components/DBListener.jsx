@@ -23,6 +23,7 @@ const DBListener = () => {
     setEventsExt,
     setStudents,
     setCurrentStudent,
+    setCurrentStudentExt,
     setChats,
   } = useContext(GlobalContext);
 
@@ -35,7 +36,11 @@ const DBListener = () => {
   useEffect(() => {
     // db query
     const collectionRef = collection(db, "projects");
-    const q = query(collectionRef, orderBy("last_timestamp", "desc"));
+    const q = query(
+      collectionRef,
+      where("is_deleted", "==", false),
+      orderBy("last_timestamp", "desc")
+    );
 
     // https://firebase.google.com/docs/firestore/query-data/listen
     const unsub = onSnapshot(q, (querySnapshot) => {
@@ -138,6 +143,20 @@ const DBListener = () => {
     return unsub;
   }, [currentUser, setCurrentStudent]);
 
+  // listen to realtime currentUser's student ext doc
+  useEffect(() => {
+    const docID = currentUser?.uid;
+    if (!docID) return;
+
+    const unsub = onSnapshot(doc(db, "students_ext", docID), (doc) => {
+      if (doc.exists()) {
+        setCurrentStudentExt({ ...doc.data(), uid: docID });
+      }
+    });
+
+    return unsub;
+  }, [currentUser, setCurrentStudentExt]);
+
   // listen to realtime chats collection
   useEffect(() => {
     const chatsRef = collection(db, "chats");
@@ -154,12 +173,6 @@ const DBListener = () => {
 
     return unsub;
   }, [currentUser, setChats]);
-
-  {
-    /* derived data */
-  }
-
-  // traverse the chats to my joined projects,
 
   return null;
 };

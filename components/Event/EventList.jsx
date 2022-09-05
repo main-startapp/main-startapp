@@ -15,7 +15,7 @@ const EventList = () => {
   const filteredEvents = useMemo(
     () =>
       events.filter((event) => {
-        if (!event.isVisible) return;
+        if (!event.is_visible) return;
 
         // !todo: is this optimized?
         const isInTitles =

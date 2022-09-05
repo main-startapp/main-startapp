@@ -37,7 +37,7 @@ function MyApp({ Component, pageProps }) {
   const [projects, setProjects] = useState([]); // list of project
   const [oldProject, setOldProject] = useState(null); // the project that needs to be updated
   // projects ext related
-  const [projectsExt, setProjectsExt] = useState([]); // list of ext of project
+  const [projectsExt, setProjectsExt] = useState([]); // list of project exts that currentUser involves in
   // events related
   const [events, setEvents] = useState([]); // list of event
   const [oldEvent, setOldEvent] = useState(null); // the event that needs to be updated
@@ -45,16 +45,16 @@ function MyApp({ Component, pageProps }) {
   const [eventsExt, setEventsExt] = useState([]); // list of ext of event
   // students related
   const [students, setStudents] = useState([]); // all students data
-  const [currentStudent, setCurrentStudent] = useState(null); // currentUser's student data. Can't be listened here. Requires login.
+  const [currentStudent, setCurrentStudent] = useState(null); // currentUser's student data, not conflict with student as the selected student
+  const [currentStudentExt, setCurrentStudentExt] = useState(null); // currentUser's student ext data
   // chats related
   const [chat, setChat] = useState(null);
   const [chats, setChats] = useState([]);
-  const [partner, setPartner] = useState(null);
+  const [chatPartner, setChatPartner] = useState(null);
   const [showMsg, setShowMsg] = useState(false);
   const [showChat, setShowChat] = useState(true);
   const [forceChatExpand, setForceChatExpand] = useState(false);
 
-  // media query
   // media query
   const onMedia = { onDesktop: false, onTablet: false, onMobile: false };
   onMedia.onDesktop = useMediaQuery("(min-width:1024px)");
@@ -83,12 +83,14 @@ function MyApp({ Component, pageProps }) {
               setStudents,
               currentStudent,
               setCurrentStudent,
+              currentStudentExt,
+              setCurrentStudentExt,
               chats,
               setChats,
               chat,
               setChat,
-              partner,
-              setPartner,
+              chatPartner,
+              setChatPartner,
               showMsg,
               setShowMsg,
               showChat,

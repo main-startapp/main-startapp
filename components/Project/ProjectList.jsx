@@ -18,7 +18,7 @@ const ProjectList = () => {
   const filteredProjects = useMemo(
     () =>
       projects.filter((project) => {
-        if (!project.isVisible) return;
+        if (!project.is_visible) return;
 
         // !todo: is this optimized?
         const isInTitles =
@@ -26,9 +26,7 @@ const ProjectList = () => {
           (project.title.toLowerCase().includes(searchTerm.toLowerCase()) || // project title
             project.position_list.some(
               (position) =>
-                position.positionTitle
-                  .toLowerCase()
-                  .includes(searchTerm.toLowerCase()) // position title
+                position.title.toLowerCase().includes(searchTerm.toLowerCase()) // position title
             ));
 
         const isInCategory =

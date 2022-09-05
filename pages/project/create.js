@@ -9,12 +9,14 @@ import ProjectCreate from "../../components/Project/ProjectCreate";
 
 const Create = () => {
   // context
-  const { setChat, setShowChat, setShowMsg } = useContext(GlobalContext);
+  const { setChat, setChatPartner, setShowChat, setShowMsg } =
+    useContext(GlobalContext);
   useEffect(() => {
     setShowChat(false);
     setShowMsg(false);
     setChat(null);
-  }, [setChat, setShowChat, setShowMsg]);
+    setChatPartner(null);
+  }, [setChat, setChatPartner, setShowChat, setShowMsg]);
 
   // local
   const { query } = useRouter();

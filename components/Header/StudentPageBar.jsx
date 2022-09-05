@@ -27,13 +27,16 @@ const StudentPageBar = () => {
         <SearchIcon />
       </SearchIconWrapper>
 
-      <Tooltip title="Search for students or positions...">
+      <Tooltip title="Search for positions or fields of interest...">
         <StyledInputBase
-          placeholder="Name or Position…"
+          placeholder="Position or Field of Interest…"
           inputProps={{ "aria-label": "search" }}
           inputRef={textRef}
           fullWidth={true}
-          // onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            if (e.target.value.length !== 0) return;
+            setSearchTerm("");
+          }}
           onKeyPress={(e) => {
             if (e.key === "Enter") {
               setSearchTerm(e.target.value);

@@ -9,13 +9,20 @@ import TeamProjectList from "../../components/Team/TeamProjectList";
 
 const TeamManagement = () => {
   // context
-  const { setChat, setShowChat, setShowMsg, chats, currentStudent } =
-    useContext(GlobalContext);
+  const {
+    setChat,
+    setChatPartner,
+    setShowChat,
+    setShowMsg,
+    chats,
+    currentStudent,
+  } = useContext(GlobalContext);
   useEffect(() => {
     setShowChat(true);
     setShowMsg(false);
     setChat(null);
-  }, [setChat, setShowChat, setShowMsg]);
+    setChatPartner(null);
+  }, [setChat, setChatPartner, setShowChat, setShowMsg]);
 
   // local vars
   const currentUID = currentStudent?.uid;

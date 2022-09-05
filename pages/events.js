@@ -10,13 +10,14 @@ import EventInfo from "../components/Event/EventInfo";
 
 const Events = () => {
   // global context
-  const { setChat, setShowChat, setShowMsg, onMedia } =
+  const { setChat, setChatPartner, setShowChat, setShowMsg, onMedia } =
     useContext(GlobalContext);
   useEffect(() => {
     setShowChat(true);
     setShowMsg(false);
     setChat(null);
-  }, [setChat, setShowChat, setShowMsg]);
+    setChatPartner(null);
+  }, [setChat, setChatPartner, setShowChat, setShowMsg]);
 
   // event state init
   const [event, setEvent] = useState(null); // thec selected project

@@ -22,6 +22,7 @@ const BetaLogin = ({ type, color }) => {
         placeholder=""
         width="512px"
         height="512px"
+        priority
       />
       <Typography
         sx={{

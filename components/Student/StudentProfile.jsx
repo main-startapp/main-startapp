@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   IconButton,
+  Link,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -13,11 +14,13 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import LinkIcon from "@mui/icons-material/Link";
 import { handleConnect } from "../Reusable/Resusable";
+import ExportedImage from "next-image-export-optimizer";
 import FaceRetouchingNaturalOutlinedIcon from "@mui/icons-material/FaceRetouchingNaturalOutlined";
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 
 const StudentProfile = () => {
   // context
-  const { chats, currentStudent, setForceChatExpand, setPartner, setShowMsg } =
+  const { chats, currentStudent, setForceChatExpand, setChatPartner } =
     useContext(GlobalContext);
   const { student } = useContext(StudentContext);
 
@@ -35,8 +38,14 @@ const StudentProfile = () => {
   return (
     <Box
       ref={boxRef}
-      backgroundColor="#fafafa"
-      sx={{ height: "calc(99vh - 128px)", overflow: "auto" }}
+      backgroundColor="#ffffff"
+      sx={{
+        height: "calc(100vh - 64px - 64px - 1.5px)",
+        overflow: "auto",
+        borderLeft: 1.5,
+        borderRight: 1.5,
+        borderColor: "#dbdbdb",
+      }}
     >
       {/* 1st box; center; avatar and student info */}
       <Box
@@ -46,36 +55,39 @@ const StudentProfile = () => {
           alignItems: "center",
         }}
       >
-        {student?.uid && (
+        {!!student && (
           <Avatar
             sx={{
               m: 6,
               width: "10em",
               height: "10em",
-              border: "1px solid black",
+              border: 1,
+              borderColor: "#dbdbdb",
+              color: "#dbdbdb",
+              backgroundColor: "#ffffff",
             }}
             src={student?.photo_url}
             referrerPolicy="no-referrer"
           />
         )}
         {/* name */}
-        <Typography sx={{ fontWeight: "bold", fontSize: "1.2em" }}>
+        <Typography sx={{ mb: 1, fontWeight: "bold", fontSize: "2em" }}>
           {student?.name}
         </Typography>
 
         {/* position */}
-        <Typography sx={{ fontSize: "1em" }}>
+        <Typography sx={{ fontSize: "1.25em" }}>
           {student?.desired_position}
         </Typography>
 
         {/* field of interest */}
-        <Typography sx={{ fontSize: "1em" }}>
+        <Typography sx={{ fontSize: "1.25em" }}>
           {student?.field_of_interest}
         </Typography>
 
         {/* education year */}
         {student?.year_of_ed && (
-          <Typography sx={{ fontSize: "1em" }}>
+          <Typography sx={{ fontSize: "1.25em" }}>
             {"Education year: "}
             {student.year_of_ed}
           </Typography>
@@ -92,7 +104,7 @@ const StudentProfile = () => {
       >
         {/* awards */}
         {student?.awards?.length > 0 && (
-          <Typography sx={{ fontWeight: "bold", fontSize: "1.2em" }}>
+          <Typography sx={{ fontWeight: "bold", fontSize: "1.5em" }}>
             {"Awards"}
           </Typography>
         )}
@@ -110,7 +122,7 @@ const StudentProfile = () => {
         </Box>
         {/* social media links */}
         {student?.social_media?.length > 0 && (
-          <Typography sx={{ fontWeight: "bold", fontSize: "1.2em", mt: 1 }}>
+          <Typography sx={{ fontWeight: "bold", fontSize: "1.5em", mt: 1 }}>
             {"Social media"}
           </Typography>
         )}
@@ -119,7 +131,7 @@ const StudentProfile = () => {
             student.social_media.map((link, index) => {
               if (link.toLowerCase().includes("linkedin")) {
                 return (
-                  <a
+                  <Link
                     key={index}
                     target="_blank"
                     href={link}
@@ -128,11 +140,11 @@ const StudentProfile = () => {
                     <LinkedInIcon
                       sx={{ fontSize: "3em", mr: 1, color: "black" }}
                     />
-                  </a>
+                  </Link>
                 );
               } else if (link.toLowerCase().includes("facebook")) {
                 return (
-                  <a
+                  <Link
                     key={index}
                     target="_blank"
                     href={link}
@@ -141,11 +153,11 @@ const StudentProfile = () => {
                     <FacebookIcon
                       sx={{ fontSize: "3em", mr: 1, color: "black" }}
                     />
-                  </a>
+                  </Link>
                 );
               } else if (link.toLowerCase().includes("instagram")) {
                 return (
-                  <a
+                  <Link
                     key={index}
                     target="_blank"
                     href={link}
@@ -154,31 +166,34 @@ const StudentProfile = () => {
                     <InstagramIcon
                       sx={{ fontSize: "3em", mr: 1, color: "black" }}
                     />
-                  </a>
+                  </Link>
                 );
               } else {
                 return (
-                  <a
+                  <Link
                     key={index}
                     target="_blank"
                     href={link}
                     rel="noopener noreferrer"
                   >
                     <LinkIcon sx={{ fontSize: "3em", mr: 1, color: "black" }} />
-                  </a>
+                  </Link>
                 );
               }
             })}
         </Box>
         {/* past experience */}
         {student?.past_exp?.length > 0 && (
-          <Typography sx={{ fontWeight: "bold", fontSize: "1.2em", mt: 1 }}>
+          <Typography sx={{ fontWeight: "bold", fontSize: "1.5em", mt: 1 }}>
             {"Past experience"}
           </Typography>
         )}
         {student?.past_exp?.length > 0 &&
           student.past_exp.map((exp, index) => (
-            <Typography key={index} sx={{ ml: "1em", mb: "1em" }}>
+            <Typography
+              key={index}
+              sx={{ ml: "1em", mt: "1em", fontSize: "1.1em" }}
+            >
               &bull; &nbsp; {exp}
             </Typography>
           ))}
@@ -193,7 +208,7 @@ const StudentProfile = () => {
         }}
       >
         {/* connect button */}
-        {student?.uid && (
+        {!!student && (
           <Tooltip title={currentUID ? "" : "Edit your profile first."}>
             <span>
               <Button
@@ -203,9 +218,19 @@ const StudentProfile = () => {
                 disableElevation
                 size="large"
                 sx={{
-                  m: 3,
-                  borderRadius: 4,
+                  my: 2,
+                  border: 1.5,
+                  borderColor: "#dbdbdb",
+                  borderRadius: "30px",
+                  color: "#ffffff",
                   backgroundColor: "#3e95c2",
+                  fontSize: "1.1em",
+                  "&:hover": {
+                    backgroundColor: "#f6f6f6",
+                  },
+                  paddingY: 0.5,
+                  paddingX: 5,
+                  textTransform: "none",
                 }}
                 variant="contained"
                 onClick={(e) => {
@@ -214,19 +239,37 @@ const StudentProfile = () => {
                     chats,
                     student,
                     currentStudent,
-                    setPartner,
+                    setChatPartner,
                     setForceChatExpand
                   );
                 }}
               >
-                <Typography sx={{ fontSize: "0.9em" }}>
-                  &emsp; {"Connect"} &emsp;
-                </Typography>
+                {"Connect"}
               </Button>
             </span>
           </Tooltip>
         )}
       </Box>
+
+      {!!!student && (
+        <Box
+          id="logo placeholder wrapper"
+          sx={{
+            height: "50%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <ExportedImage
+            src="/images/EDIUMLogo.png"
+            placeholder=""
+            width={256}
+            height={256}
+            priority
+          />
+        </Box>
+      )}
     </Box>
   );
 };

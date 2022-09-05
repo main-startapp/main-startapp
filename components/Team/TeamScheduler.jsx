@@ -82,6 +82,7 @@ const TeamScheduler = () => {
     setSchedule([]);
   };
   const handleSubmitSchedule = async () => {
+    // !todo: update to newer infastructure
     if (!isClickable) return;
     // ready
     setIsClickable(false);

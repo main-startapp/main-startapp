@@ -4,6 +4,7 @@ import {
   Divider,
   Grid,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
@@ -11,7 +12,6 @@ import { styled } from "@mui/material/styles";
 import ExportedImage from "next-image-export-optimizer";
 import { useState } from "react";
 import { auth, googleProvider } from "../../firebase";
-import NextLink from "next/link";
 import GoogleIcon from "@mui/icons-material/Google";
 import AppleIcon from "@mui/icons-material/Apple";
 import FacebookIcon from "@mui/icons-material/Facebook";
@@ -23,11 +23,35 @@ import Signup from "./Signup";
 const Signin = () => {
   const [isSignup, setIsSignup] = useState(false);
   const [input, setInput] = useState({ email: "", password: "" });
+  const [errorMsg, setErrorMsg] = useState({ email: "", password: "" });
 
   const handleSignIn = () => {
     signInWithEmailAndPassword(auth, input.email, input.password).catch(
       (err) => {
-        console.log("signInWithEmailAndPassword() error: ", err);
+        let emailMsg = "";
+        let passwordMsg = "";
+        switch (err.code) {
+          case "auth/user-not-found":
+            emailMsg = "User not found";
+            passwordMsg = "";
+            break;
+
+          case "auth/invalid-email":
+            emailMsg = "Email is invalid";
+            passwordMsg = "";
+            break;
+
+          case "auth/wrong-password":
+            emailMsg = "";
+            passwordMsg = "Wrong password";
+            break;
+
+          default:
+            emailMsg = "Double check your Email";
+            passwordMsg = "Double check your Password";
+            break;
+        }
+        setErrorMsg({ email: emailMsg, password: passwordMsg });
       }
     );
   };
@@ -86,33 +110,43 @@ const Signin = () => {
       <Divider sx={{ mt: "2vmin", width: "38vmin", color: "lightgray" }}>
         {"or Sign in with Email"}
       </Divider>
-      <StyledTextField
-        sx={{ mt: "2vmin", width: "38vmin", paddingY: 0 }}
-        margin="none"
-        label="Email"
-        name="email"
-        type="email"
-        variant="outlined"
-        value={input.email}
-        onChange={(e) => setInput({ ...input, email: e.target.value })}
-      />
-      <StyledTextField
-        sx={{ mt: "1vmin", width: "38vmin", paddingY: 0 }}
-        margin="none"
-        label="Password"
-        name="password"
-        type="password"
-        variant="outlined"
-        value={input.password}
-        onChange={(e) => setInput({ ...input, password: e.target.value })}
-      />
+      <Box sx={{ mt: "2vmin", width: "38vmin" }}>
+        <Tooltip title={errorMsg.email} placement="left">
+          <StyledTextField
+            sx={{ paddingY: 0 }}
+            fullWidth
+            margin="none"
+            label="Email"
+            name="email"
+            type="email"
+            variant="outlined"
+            value={input.email}
+            onChange={(e) => setInput({ ...input, email: e.target.value })}
+            error={!!errorMsg.email}
+          />
+        </Tooltip>
+        <Tooltip title={errorMsg.password} placement="left">
+          <StyledTextField
+            sx={{ mt: "1.5vmin", paddingY: 0 }}
+            fullWidth
+            margin="none"
+            label="Password"
+            name="password"
+            type="password"
+            variant="outlined"
+            value={input.password}
+            onChange={(e) => setInput({ ...input, password: e.target.value })}
+            error={!!errorMsg.password}
+          />
+        </Tooltip>
+      </Box>
       <Box
         sx={{ width: "38vmin", display: "flex", justifyContent: "flex-end" }}
       >
         <Button
           disableElevation
           sx={{
-            mt: "1vmin",
+            mt: "1.5vmin",
             border: 1.5,
             borderColor: "#dbdbdb",
             borderRadius: "30px",
@@ -216,16 +250,15 @@ const StyledButton = styled(Button)(({ theme }) => ({
   width: "38vmin",
   textTransform: "none",
   display: "flex",
-  justifyContent: "flex-start",
-  paddingLeft: "12vmin",
+  justifyContent: "center",
 }));
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
   "& .MuiInputBase-input": { padding: theme.spacing(1, 2) },
 
-  "& .MuiFormLabel-root": { top: "-0.7vmin" },
-  "& .MuiInputLabel-shrink": { top: "0vmin" }, // to counter root adjustment
-  "& .MuiFormLabel-root.Mui-focused": { top: "0vmin" }, // to counter root adjustment
+  "& .MuiFormLabel-root": { top: "-0.4em", fontSize: "0.9em" },
+  "& .MuiInputLabel-shrink": { top: "0" }, // to counter root adjustment
+  "& .MuiFormLabel-root.Mui-focused": { top: "0" }, // to counter root adjustment
 
   "& .MuiOutlinedInput-root": {
     borderRadius: "10px",
@@ -239,10 +272,19 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
     borderWidth: 1.5,
     borderColor: "#dbdbdb !important",
   },
+  "&:hover .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline": {
+    borderWidth: 1.5,
+    borderColor: "#d32f2f !important",
+  },
   "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
     borderWidth: 1.5,
     borderColor: "#3e95c2 !important",
   },
+  "& .MuiOutlinedInput-root.Mui-focused.Mui-error .MuiOutlinedInput-notchedOutline":
+    {
+      borderWidth: 1.5,
+      borderColor: "#d32f2f !important",
+    },
   "& .MuiFormHelperText-root": {
     color: "lightgray",
     fontSize: "12px",

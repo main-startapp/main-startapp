@@ -93,15 +93,15 @@ const TeamCommPanel = () => {
       url_text: "Link",
       url: "",
     };
-    let links = projectExt?.links ? projectExt.links : [];
-    links.push(linkObj);
-    setProjectExt({ ...projectExt, links });
+    let newLinks = projectExt?.links ? projectExt.links : [];
+    newLinks.push(linkObj);
+    setProjectExt({ ...projectExt, links: newLinks });
   };
 
   const handleDeleteLink = (index) => {
-    let links = projectExt.links;
-    links.splice(index, 1);
-    setProjectExt({ ...projectExt, links });
+    let newLinks = projectExt.links;
+    newLinks.splice(index, 1);
+    setProjectExt({ ...projectExt, links: newLinks });
   };
 
   const handleOnChangeLink = (key, value, index) => {
@@ -115,7 +115,7 @@ const TeamCommPanel = () => {
     });
   };
 
-  // project_ext was created with project, don't add only update
+  // project_ext was created with project
   const handleSubmit = async (e) => {
     if (!isClickable) return;
     if (!formRef.current.reportValidity()) return;

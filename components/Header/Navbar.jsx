@@ -155,8 +155,10 @@ const Navbar = () => {
               sx={{
                 width: "48px",
                 height: "48px",
-                border: 1.5,
+                border: 1,
                 borderColor: "black",
+                color: "#dbdbdb",
+                backgroundColor: "#ffffff",
               }}
               src={currentUser.photoURL}
               referrerPolicy="no-referrer"

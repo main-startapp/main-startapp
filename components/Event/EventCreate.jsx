@@ -13,6 +13,7 @@ import {
   FormHelperText,
   Grid,
   InputLabel,
+  Link,
   MenuItem,
   Select,
   TextField,
@@ -64,7 +65,7 @@ const EventCreate = (props) => {
     details: "",
     description: "",
     creator_uid: currentUID,
-    isVisible: true,
+    is_visible: true,
     icon_url: "",
     banner_url: "",
     registration_form_url: "",
@@ -90,6 +91,7 @@ const EventCreate = (props) => {
   // helper functions
   const handleSubmit = async (e) => {
     if (!isClickable) return;
+    if (!!!currentUID) return;
     if (!formRef.current.reportValidity()) return;
 
     // button is clickable & form is valid
@@ -108,6 +110,7 @@ const EventCreate = (props) => {
       });
     } else {
       // update an existing event
+      // since all the changes are in newEvent, can't just update partially
       const docRef = doc(db, "events", newEvent.id);
       const eventRef = {
         ...newEvent,
@@ -169,7 +172,7 @@ const EventCreate = (props) => {
     setOldEvent(null);
     setNewEvent(emptyEvent);
 
-    // delete from project_ext coll
+    // delete event_ext
     const extDocRef = doc(db, "events_ext", id);
     const eventExtModRef = deleteDoc(extDocRef).catch((err) => {
       console.log("deleteDoc() error: ", err);
@@ -276,9 +279,15 @@ const EventCreate = (props) => {
               <DialogTitle>Upload Logo from URL</DialogTitle>
               <DialogContent>
                 <DialogContentText>
-                  {
-                    "Please enter the URL of your icon here. Imgur is a good image hosting service to start with."
-                  }
+                  {"Please enter the URL of your icon here. "}
+                  <Link
+                    target="_blank"
+                    href={"https://imgur.com/upload"}
+                    rel="noopener noreferrer"
+                  >
+                    Imgur
+                  </Link>
+                  {" is a good image hosting service to start with."}
                 </DialogContentText>
                 <TextField
                   autoFocus
