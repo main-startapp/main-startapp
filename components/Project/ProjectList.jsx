@@ -60,12 +60,16 @@ const ProjectList = () => {
     <Box
       sx={{
         backgroundColor: "#fafafa",
-        height: "calc(100vh - 64px - 64px - 1.5px)", // navbar; projectbar; border
+        height: onMedia.onDesktop
+          ? "calc(100vh - 64px - 64px - 1.5px)"
+          : "calc(100vh - 48px - 48px - 1.5px)", // navbar; projectbar; border
       }}
     >
       <Box
         sx={{
-          height: "calc(100vh - 64px - 64px - 1.5px - 36px - 24px)", // navbar; projectbar; border; button; y-margins
+          height: onMedia.onDesktop
+            ? "calc(100vh - 64px - 64px - 1.5px - 36px - 24px)"
+            : "calc(100vh - 48px - 48px - 1.5px - 36px - 24px)", // navbar; projectbar; border; button; y-margins
           overflow: "auto",
         }}
       >
@@ -87,7 +91,7 @@ const ProjectList = () => {
             mt: "12px",
           }}
         >
-          <Tooltip title={currentUID ? "" : "Edit your profile first."}>
+          <Tooltip title={currentUID ? "" : "Edit your profile first"}>
             <span>
               <NextLink
                 href={{

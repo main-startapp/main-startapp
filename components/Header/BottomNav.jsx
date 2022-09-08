@@ -23,7 +23,9 @@ const BottomNav = () => {
         "&:hover": {
           cursor: "default",
         },
+        zIndex: 100,
       }}
+
       //   value={destination}
       //   onChange={(event, newDestination) => {
       //     setDestination(newDestination);

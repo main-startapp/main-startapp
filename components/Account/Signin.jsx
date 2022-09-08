@@ -6,6 +6,7 @@ import {
   TextField,
   Tooltip,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { styled } from "@mui/material/styles";
@@ -24,6 +25,9 @@ const Signin = () => {
   const [isSignup, setIsSignup] = useState(false);
   const [input, setInput] = useState({ email: "", password: "" });
   const [errorMsg, setErrorMsg] = useState({ email: "", password: "" });
+
+  // independent media query
+  const isMobile = useMediaQuery("(max-width:767px)");
 
   const handleSignIn = () => {
     signInWithEmailAndPassword(auth, input.email, input.password).catch(
@@ -66,7 +70,9 @@ const Signin = () => {
     <>
       <StyledButton
         sx={{
-          mt: "1vmin",
+          mt: "1vh",
+          width: isMobile ? "68vmin" : "38vmin",
+          fontSize: "0.9em",
           border: 1.5,
           borderColor: "#dbdbdb",
           ":hover": { backgroundColor: "#3e95c2", color: "white" },
@@ -81,7 +87,8 @@ const Signin = () => {
 
       {/* <StyledButton
           sx={{
-            mt: "1vmin",
+            mt: "1vh",
+            width: isMobile ? "68vmin" : "38vmin",
             border: 1.5,
             borderColor: "#dbdbdb",
           }}
@@ -95,7 +102,8 @@ const Signin = () => {
 
         <StyledButton
           sx={{
-            mt: "1vmin",
+            mt: "1vh",
+            width: isMobile ? "68vmin" : "38vmin",
             border: 1.5,
             borderColor: "#dbdbdb",
           }}
@@ -107,13 +115,19 @@ const Signin = () => {
           Sign in with Facebook
         </StyledButton> */}
 
-      <Divider sx={{ mt: "2vmin", width: "38vmin", color: "lightgray" }}>
+      <Divider
+        sx={{
+          mt: "2vh",
+          width: isMobile ? "68vmin" : "38vmin",
+          color: "lightgray",
+        }}
+      >
         {"or Sign in with Email"}
       </Divider>
-      <Box sx={{ mt: "2vmin", width: "38vmin" }}>
+      <Box sx={{ mt: "2vh", width: isMobile ? "68vmin" : "38vmin" }}>
         <Tooltip title={errorMsg.email} placement="left">
           <StyledTextField
-            sx={{ paddingY: 0 }}
+            sx={{ paddingY: 0, fontSize: "0.9em" }}
             fullWidth
             margin="none"
             label="Email"
@@ -127,7 +141,7 @@ const Signin = () => {
         </Tooltip>
         <Tooltip title={errorMsg.password} placement="left">
           <StyledTextField
-            sx={{ mt: "1.5vmin", paddingY: 0 }}
+            sx={{ mt: "1.5vh", paddingY: 0, fontSize: "0.9em" }}
             fullWidth
             margin="none"
             label="Password"
@@ -141,12 +155,16 @@ const Signin = () => {
         </Tooltip>
       </Box>
       <Box
-        sx={{ width: "38vmin", display: "flex", justifyContent: "flex-end" }}
+        sx={{
+          width: isMobile ? "68vmin" : "38vmin",
+          display: "flex",
+          justifyContent: "flex-end",
+        }}
       >
         <Button
           disableElevation
           sx={{
-            mt: "1.5vmin",
+            mt: "1.5vh",
             border: 1.5,
             borderColor: "#dbdbdb",
             borderRadius: "30px",
@@ -163,11 +181,14 @@ const Signin = () => {
           {"Sign in"}
         </Button>
       </Box>
-      <Box sx={{ mt: "2vmin", display: "flex" }}>
-        <Typography>{"Not registered yet? "} &nbsp;</Typography>
+      <Box sx={{ mt: "2vh", display: "flex" }}>
+        <Typography sx={{ fontSize: "0.9em" }}>
+          {"Not registered yet? "} &nbsp;
+        </Typography>
         <Typography
           sx={{
             color: "#3e95c2",
+            fontSize: "0.9em",
             ":hover": {
               cursor: "pointer",
             },
@@ -189,13 +210,11 @@ const Signin = () => {
       justifyContent="center"
       sx={{
         backgroundColor: "#fafafa",
-        minHeight: "100vh",
-        maxHeight: "100vh",
       }}
     >
       <Grid
         item
-        xs={6}
+        xs={isMobile ? 10 : 6}
         sx={{
           backgroundColor: "#ffffff",
           borderLeft: 1.5,
@@ -213,8 +232,8 @@ const Signin = () => {
         <Box
           sx={{
             position: "relative",
-            height: "40vmin",
-            width: "40vmin",
+            height: isMobile ? "60vmin" : "40vmin",
+            width: isMobile ? "60vmin" : "40vmin",
           }}
         >
           <ExportedImage
@@ -227,15 +246,19 @@ const Signin = () => {
 
         <Typography
           sx={{
-            fontSize: "4vmin",
+            mt: "1vh",
+            fontSize: isMobile ? "1.5em" : "2.5em",
             fontWeight: "bold",
-            mt: "1vmin",
           }}
         >
           Welcome to EDIUM!
         </Typography>
 
-        {isSignup ? <Signup setIsSignup={setIsSignup} /> : signinComp}
+        {isSignup ? (
+          <Signup setIsSignup={setIsSignup} isMobile={isMobile} />
+        ) : (
+          signinComp
+        )}
       </Grid>
     </Grid>
   );
@@ -247,7 +270,6 @@ const StyledButton = styled(Button)(({ theme }) => ({
   color: "black",
   backgroundColor: "white",
   borderRadius: "30px",
-  width: "38vmin",
   textTransform: "none",
   display: "flex",
   justifyContent: "center",

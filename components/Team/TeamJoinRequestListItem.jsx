@@ -89,7 +89,7 @@ const TeamJoinRequestListItem = (props) => {
     if (!foundChat) return;
     const msgStr = declineMsg
       ? declineMsg
-      : "Sorry. Creator didn't leave a note.";
+      : "Sorry. Creator didn't leave a note";
     const messageRef = {
       text: msgStr,
       sent_by: currentUID,
@@ -370,7 +370,7 @@ const TeamJoinRequestListItem = (props) => {
                           key={index}
                           target="_blank"
                           href={link}
-                          rel="noopener noreferrer"
+                          rel="noreferrer"
                         >
                           <LinkedInIcon
                             sx={{ fontSize: "2em", mr: 1, color: "black" }}
@@ -383,7 +383,7 @@ const TeamJoinRequestListItem = (props) => {
                           key={index}
                           target="_blank"
                           href={link}
-                          rel="noopener noreferrer"
+                          rel="noreferrer"
                         >
                           <FacebookIcon
                             sx={{ fontSize: "2em", mr: 1, color: "black" }}
@@ -396,7 +396,7 @@ const TeamJoinRequestListItem = (props) => {
                           key={index}
                           target="_blank"
                           href={link}
-                          rel="noopener noreferrer"
+                          rel="noreferrer"
                         >
                           <InstagramIcon
                             sx={{ fontSize: "2em", mr: 1, color: "black" }}
@@ -409,7 +409,7 @@ const TeamJoinRequestListItem = (props) => {
                           key={index}
                           target="_blank"
                           href={link}
-                          rel="noopener noreferrer"
+                          rel="noreferrer"
                         >
                           <LinkIcon
                             sx={{ fontSize: "2em", mr: 1, color: "black" }}
@@ -475,7 +475,7 @@ const TeamJoinRequestListItem = (props) => {
                     key={index}
                     target="_blank"
                     href={link}
-                    rel="noopener noreferrer"
+                    rel="noreferrer"
                   >
                     <LinkedInIcon
                       sx={{ fontSize: "2em", mr: 1, color: "black" }}
@@ -488,7 +488,7 @@ const TeamJoinRequestListItem = (props) => {
                     key={index}
                     target="_blank"
                     href={link}
-                    rel="noopener noreferrer"
+                    rel="noreferrer"
                   >
                     <FacebookIcon
                       sx={{ fontSize: "2em", mr: 1, color: "black" }}
@@ -501,7 +501,7 @@ const TeamJoinRequestListItem = (props) => {
                     key={index}
                     target="_blank"
                     href={link}
-                    rel="noopener noreferrer"
+                    rel="noreferrer"
                   >
                     <InstagramIcon
                       sx={{ fontSize: "2em", mr: 1, color: "black" }}
@@ -514,7 +514,7 @@ const TeamJoinRequestListItem = (props) => {
                     key={index}
                     target="_blank"
                     href={link}
-                    rel="noopener noreferrer"
+                    rel="noreferrer"
                   >
                     <LinkIcon sx={{ fontSize: "2em", mr: 1, color: "black" }} />
                   </Link>

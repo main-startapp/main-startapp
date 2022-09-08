@@ -8,7 +8,6 @@ const StudentGrid = () => {
   // context
   const { students } = useContext(GlobalContext);
   const { searchTerm } = useContext(StudentContext);
-
   const { height, width } = useWindowDimensions();
 
   return (
@@ -27,11 +26,19 @@ const StudentGrid = () => {
             const isInFoI = student.field_of_interest
               .toLowerCase()
               .includes(searchTerm.toLowerCase());
-            if (searchTerm === "") {
+            if (
+              searchTerm === "" &&
+              !!!student?.is_club &&
+              student?.uid !== "T5q6FqwJFcRTKxm11lu0zmaXl8x2"
+            ) {
               // no search
               return student;
             }
-            if (isInPosition || isInFoI) {
+            if (
+              !!!student?.is_club &&
+              student?.uid !== "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
+              (isInPosition || isInFoI)
+            ) {
               // in position title or in field of interest
               return student;
             }

@@ -53,7 +53,7 @@ export default function Home() {
           </Grid>
         ) : (
           project === null && (
-            <Grid item>
+            <Grid item xs={12}>
               <ProjectList />
             </Grid>
           )
@@ -65,7 +65,7 @@ export default function Home() {
           </Grid>
         ) : (
           project !== null && (
-            <Grid item>
+            <Grid item xs={12}>
               <ProjectInfo />
             </Grid>
           )

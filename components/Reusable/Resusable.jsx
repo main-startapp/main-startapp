@@ -3,7 +3,10 @@ import {
   arrayRemove,
   collection,
   doc,
+  getDoc,
+  getDocs,
   serverTimestamp,
+  setDoc,
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase";
@@ -138,8 +141,39 @@ export const handleDeleteProject = async (projectID, currentStudentExt) => {
 };
 
 //============================================================
-// find data from id
+// get specific doc from db assumed permission
 //============================================================
-export const findListItem = (itemID, key, list) => {
+export const getDocFromDB = async (dbName, docID) => {
+  const docRef = doc(db, dbName, docID);
+  const docSnap = await getDoc(docRef).catch((err) => {
+    console.log("getDoc() error: ", err);
+  });
+
+  return !!docSnap?.data() ? docSnap.data() : null;
+};
+
+//============================================================
+// find item from list using id
+//============================================================
+export const findListItem = (list, key, itemID) => {
   return list.find((listItem) => listItem[key] === itemID);
+};
+
+//============================================================
+// change google url photo resolution
+//============================================================
+export const getGooglePhotoURLwithRes = (photo_url, res) => {
+  const newRes = "=s" + res + "-c";
+  return photo_url.replace("=s96-c", newRes);
+};
+
+//============================================================
+// ADMIN: Duplicate Collections With New Name
+//============================================================
+export const exportCollections = async (collection, newCollectionName) => {
+  collection.forEach(async (data) => {
+    const uid = data.uid;
+    delete data.uid;
+    await setDoc(doc(db, newCollectionName, uid), { ...data });
+  });
 };

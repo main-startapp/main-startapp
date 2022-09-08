@@ -55,7 +55,6 @@ const ProjectListItem = (props) => {
           border: 1.5,
           borderRadius: "30px",
           borderColor: "#dbdbdb",
-          boxShadow: 0,
           backgroundColor: "#ffffff",
           "&:hover": {
             backgroundColor: "#f6f6f6",
@@ -82,8 +81,6 @@ const ProjectListItem = (props) => {
               mr: 2,
               height: "48px",
               width: "48px",
-              border: 1,
-              borderColor: "#dbdbdb",
             }}
             src={project?.icon_url}
           >
@@ -150,40 +147,44 @@ const ProjectListItem = (props) => {
             )}
           </Menu>
         </Box>
-        <ListItemText
-          secondary={
-            <Typography
-              sx={{
-                display: "-webkit-box",
-                overflow: "hidden",
-                WebkitBoxOrient: "vertical",
-                WebkitLineClamp: 2,
-                // is there a better way to directly ref to ListItemText Secondary style?
-                fontSize: "0.875rem",
-                lineHeight: 1.43,
-                letterSpacing: "0.01071em",
-                color: "rgba(0, 0, 0, 0.6)",
-              }}
-            >
-              {project.description}
-            </Typography>
-          }
-        />
-        {project.position_list.map((position, index) => (
+        <Box sx={{ width: "100%" }}>
           <ListItemText
-            sx={{ ml: "5%" }}
-            key={index}
-            secondary={<span>&bull; &nbsp; {position.title}</span>}
+            secondary={
+              <Typography
+                sx={{
+                  display: "-webkit-box",
+                  overflow: "hidden",
+                  WebkitBoxOrient: "vertical",
+                  WebkitLineClamp: 2,
+                  // is there a better way to directly ref to ListItemText Secondary style?
+                  fontSize: "0.875rem",
+                  lineHeight: 1.43,
+                  letterSpacing: "0.01071em",
+                  color: "rgba(0, 0, 0, 0.6)",
+                }}
+              >
+                {project.description}
+              </Typography>
+            }
           />
-        ))}
-        <ListItemText
-          secondary={
-            <>
-              {"Last Update: "}
-              {moment(project.last_timestamp).format("MMMM Do, YYYY")}
-            </>
-          }
-        />
+          {project.position_list.map((position, index) => (
+            <ListItemText
+              sx={{ ml: "5%" }}
+              key={index}
+              secondary={<span>&bull; &nbsp; {position.title}</span>}
+            />
+          ))}
+          {onMedia.onDesktop && (
+            <ListItemText
+              secondary={
+                <>
+                  {"Last Update: "}
+                  {moment(project.last_timestamp).format("MMMM Do, YYYY")}
+                </>
+              }
+            />
+          )}
+        </Box>
       </ListItem>
     </Box>
   );

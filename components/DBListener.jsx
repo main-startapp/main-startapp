@@ -12,6 +12,8 @@ import { useAuth } from "./Context/AuthContext";
 import { GlobalContext } from "./Context/ShareContexts";
 
 // purpose: Firebase prefer consistent subscription. This comp serves this purpose by subscribing the essential db and also providing the derived data required by other comps.
+// https://stackoverflow.com/questions/61094496/how-can-i-secure-my-component-state-details-from-react-dev-tool-on-production
+// tldr; you can't. don't pass sensitive data to client
 
 const DBListener = () => {
   // context
@@ -31,7 +33,7 @@ const DBListener = () => {
     /* db listeners */
   }
 
-  // listen to realtime projects collection
+  // listen to realtime projects collection, public
   // https://stackoverflow.com/questions/59841800/react-useeffect-in-depth-use-of-useeffect
   useEffect(() => {
     // db query
@@ -39,7 +41,7 @@ const DBListener = () => {
     const q = query(
       collectionRef,
       where("is_deleted", "==", false),
-      orderBy("last_timestamp", "desc")
+      orderBy("create_timestamp", "desc")
     );
 
     // https://firebase.google.com/docs/firestore/query-data/listen
@@ -58,7 +60,7 @@ const DBListener = () => {
     return unsub;
   }, [setProjects]);
 
-  // listen to realtime projects ext collection
+  // listen to realtime projects ext collection, only doc's field: memebers contains currentUser will be pulled
   useEffect(() => {
     const collectionRef = collection(db, "projects_ext");
     const q = query(
@@ -91,11 +93,11 @@ const DBListener = () => {
     };
   }, [currentUser, setProjectsExt]);
 
-  // listen to realtime events collection
+  // listen to realtime events collection, public
   useEffect(() => {
     // db query
     const collectionRef = collection(db, "events");
-    const q = query(collectionRef, orderBy("last_timestamp", "desc"));
+    const q = query(collectionRef, orderBy("create_timestamp", "desc"));
 
     const unsub = onSnapshot(q, (querySnapshot) => {
       setEvents(
@@ -112,7 +114,7 @@ const DBListener = () => {
     return unsub;
   }, [setEvents]);
 
-  // listen to realtime students collection
+  // listen to realtime students collection, public
   useEffect(() => {
     // db query
     const collectionRef = collection(db, "students");
@@ -157,7 +159,7 @@ const DBListener = () => {
     return unsub;
   }, [currentUser, setCurrentStudentExt]);
 
-  // listen to realtime chats collection
+  // listen to realtime chats collection, only doc's field: chat_user_ids contains currentUser will be pulled
   useEffect(() => {
     const chatsRef = collection(db, "chats");
     const q = query(

@@ -15,11 +15,16 @@ import { EventContext, GlobalContext } from "../Context/ShareContexts";
 import ExportedImage from "next-image-export-optimizer";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import NextLink from "next/link";
-import { handleConnect } from "../Reusable/Resusable";
+import { getDocFromDB, handleConnect } from "../Reusable/Resusable";
 import moment from "moment";
+import { useAuth } from "../Context/AuthContext";
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import { useRouter } from "next/router";
 
 const EventInfo = () => {
   // context
+  const { currentUser } = useAuth();
   const {
     setOldEvent,
     chats,
@@ -33,11 +38,17 @@ const EventInfo = () => {
 
   // local vars
   const currentUID = currentStudent?.uid;
+  const router = useRouter();
+  const [tCode, setTCode] = useState("");
 
   // hook to find is the currentStudent the event creator
   const isCreator = useMemo(() => {
     return currentUID === event?.creator_uid ? true : false;
-  }, [currentUID, event]);
+  }, [currentUID, event?.creator_uid]);
+
+  const isCreatorAdmin = useMemo(() => {
+    return event?.creator_uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2";
+  }, [event?.creator_uid]);
 
   // hook to get event creator student data
   const creatorStudent = useMemo(() => {
@@ -56,7 +67,9 @@ const EventInfo = () => {
     <Box
       ref={boxRef}
       sx={{
-        height: "calc(99.5vh - 128px)",
+        height: onMedia.onDesktop
+          ? "calc(100vh - 2*64px - 1.5px)"
+          : "calc(100vh - 2*48px - 1.5px - 60px)",
         overflow: "auto",
         backgroundColor: "#fafafa",
       }}
@@ -65,7 +78,13 @@ const EventInfo = () => {
         <Grid container>
           {/* Top left info box */}
           <Grid item xs={onMedia.onDesktop ? 9 : 12}>
-            <Box mt={3} ml={3} mr={1.5}>
+            <Box
+              sx={
+                onMedia.onDesktop
+                  ? { mt: 3, ml: 3, mr: 1.5 }
+                  : { mt: 1.5, mx: 1.5 }
+              }
+            >
               <Box
                 sx={{
                   display: "flex",
@@ -76,7 +95,7 @@ const EventInfo = () => {
                 {/* default unit is px */}
                 <Avatar
                   sx={{
-                    mr: 2,
+                    mr: onMedia.onDesktop ? 3 : 1.5,
                     height: "72px",
                     width: "72px",
                   }}
@@ -84,14 +103,19 @@ const EventInfo = () => {
                 >
                   <UploadFileIcon />
                 </Avatar>
-                <Typography sx={{ fontWeight: "bold", fontSize: "2.5em" }}>
+                <Typography
+                  sx={{
+                    fontWeight: "bold",
+                    fontSize: onMedia.onDesktop ? "2em" : "1em",
+                  }}
+                >
                   {event?.title}
                 </Typography>
               </Box>
               <Divider
                 sx={{
-                  mt: 3,
-                  mb: 3,
+                  mt: onMedia.onDesktop ? 3 : 1.5,
+                  mb: onMedia.onDesktop ? 3 : 1.5,
                   borderBottomWidth: 1.5,
                   borderColor: "#dbdbdb",
                 }}
@@ -103,7 +127,7 @@ const EventInfo = () => {
               <Typography color="text.secondary">{event?.details}</Typography>
               {/* time */}
               <Typography
-                sx={{ mt: 3, fontWeight: "bold" }}
+                sx={{ mt: onMedia.onDesktop ? 3 : 1.5, fontWeight: "bold" }}
                 color="text.primary"
               >
                 {"Time: "}
@@ -113,7 +137,7 @@ const EventInfo = () => {
               </Typography>
               {/* location */}
               <Typography
-                sx={{ mt: 3, fontWeight: "bold" }}
+                sx={{ mt: onMedia.onDesktop ? 3 : 1.5, fontWeight: "bold" }}
                 color="text.primary"
               >
                 {"Location: "}
@@ -123,7 +147,7 @@ const EventInfo = () => {
           </Grid>
 
           {/* Top right founder box */}
-          {onMedia.onDesktop && (
+          {onMedia.onDesktop && !isCreatorAdmin && (
             <Grid item xs={3}>
               <Box
                 sx={{
@@ -139,12 +163,12 @@ const EventInfo = () => {
                 <IconButton>
                   <Avatar
                     sx={{
-                      width: "5em",
-                      height: "5em",
-                      border: 1,
-                      borderColor: "#dbdbdb",
-                      color: "#dbdbdb",
-                      backgroundColor: "#ffffff",
+                      width: "96px",
+                      height: "96px",
+                      // color: "#dbdbdb",
+                      // backgroundColor: "#ffffff",
+                      // border: 1,
+                      // borderColor: "#dbdbdb",
                     }}
                     src={creatorStudent?.photo_url}
                     referrerPolicy="no-referrer"
@@ -164,7 +188,7 @@ const EventInfo = () => {
                 </Typography>
 
                 {!isCreator && (
-                  <Tooltip title={currentUID ? "" : "Edit your profile first."}>
+                  <Tooltip title={currentUID ? "" : "Edit your profile first"}>
                     <span>
                       <Button
                         disabled={!currentUID}
@@ -236,21 +260,120 @@ const EventInfo = () => {
             </Grid>
           )}
 
+          {onMedia.onDesktop &&
+            isCreatorAdmin &&
+            currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" && (
+              // !currentStudentExt.my_event_ids.includes(event?.id) &&
+              <Grid item xs={3}>
+                <Box
+                  sx={{
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    mt: 3,
+                    mr: 3,
+                    ml: 1.5,
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    disableElevation
+                    color="AdminOrange"
+                    sx={{
+                      borderRadius: "0px",
+                      color: "white",
+                      mb: 1.5,
+                      width: "200px",
+                      height: "64px",
+                      textTransform: "none",
+                      fontWeight: "bold",
+                    }}
+                    onClick={() => {
+                      getDocFromDB("events_ext", event?.id).then((ret) => {
+                        setTCode(ret?.transfer_code);
+                        navigator.clipboard.writeText(
+                          ret?.transfer_code || "null"
+                        );
+                      });
+                    }}
+                  >
+                    {"ADMIN"}
+                    <br />
+                    {"Get Transfer Code"}
+                  </Button>
+                  <Box
+                    sx={{
+                      width: "200px",
+                      height: "64px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      ":hover": {
+                        cursor: "pointer",
+                      },
+                    }}
+                    onClick={() => {
+                      if (!(tCode === "Copied")) {
+                        navigator.clipboard.writeText(tCode);
+                      }
+                      setTCode("Copied");
+                    }}
+                  >
+                    {!!tCode ? (
+                      <>
+                        <KeyboardArrowRightIcon sx={{ color: "#f4511e" }} />
+                        <Typography
+                          sx={{ fontWeight: "bold", color: "#f4511e" }}
+                        >
+                          {tCode}
+                        </Typography>
+                        <KeyboardArrowLeftIcon sx={{ color: "#f4511e" }} />
+                      </>
+                    ) : (
+                      <br />
+                    )}
+                  </Box>
+                  {!!tCode && (
+                    <Button
+                      variant="contained"
+                      disableElevation
+                      color="AdminOrange"
+                      sx={{
+                        borderRadius: "0px",
+                        color: "white",
+                        mt: 1.5,
+                        width: "200px",
+                        height: "64px",
+                        textTransform: "none",
+                        fontWeight: "bold",
+                      }}
+                      onClick={() => {
+                        router.push(`/redemption`);
+                      }}
+                    >
+                      {"To the Redemption"}
+                    </Button>
+                  )}
+                </Box>
+              </Grid>
+            )}
+
           {/* Bottom description and button */}
           <Grid item xs={12}>
-            <Box sx={{ mt: 3, mx: 3 }}>
+            <Box
+              sx={onMedia.onDesktop ? { mt: 3, mx: 3 } : { mt: 1.5, mx: 1.5 }}
+            >
               <Typography sx={{ fontWeight: "bold" }} color="text.primary">
                 {"Description:"}
               </Typography>
-              <Typography
-                component="span"
-                sx={{ mt: 3 }}
-                color="text.secondary"
-              >
+              <Typography component="span" color="text.secondary">
                 <pre
                   style={{
                     fontFamily: "inherit",
                     whiteSpace: "pre-wrap",
+                    wordWrap: "break-word",
                     display: "inline",
                   }}
                 >
@@ -258,30 +381,29 @@ const EventInfo = () => {
                 </pre>
                 <br />
               </Typography>
-              <Link
+              <Button
+                disableElevation
+                sx={{
+                  mt: onMedia.onDesktop ? 3 : 1.5,
+                  border: 1.5,
+                  borderColor: "#dbdbdb",
+                  borderRadius: "30px",
+                  color: "white",
+                  backgroundColor: "#3e95c2",
+                  fontWeight: "bold",
+                  fontSize: "0.8em",
+                  textTransform: "none",
+                  paddingX: 5,
+                }}
+                variant="contained"
+                onClick={(e) => e.stopPropagation()}
+                component={Link}
                 target="_blank"
                 href={event?.registration_form_url}
-                rel="noopener noreferrer"
+                rel="noreferrer"
               >
-                <Button
-                  disableElevation
-                  sx={{
-                    mt: 3,
-                    border: 1.5,
-                    borderColor: "#dbdbdb",
-                    borderRadius: "30px",
-                    color: "white",
-                    backgroundColor: "#3e95c2",
-                    fontWeight: "bold",
-                    fontSize: "0.8em",
-                    textTransform: "none",
-                    paddingX: 5,
-                  }}
-                  variant="contained"
-                >
-                  {"Attend"}
-                </Button>
-              </Link>
+                {"Attend"}
+              </Button>
             </Box>
           </Grid>
 
@@ -289,8 +411,8 @@ const EventInfo = () => {
             <Box sx={{ display: "flex", justifyContent: "center" }}>
               <Box
                 sx={{
-                  paddingY: 3,
-                  paddingX: 3,
+                  paddingY: onMedia.onDesktop ? 3 : 1.5,
+                  paddingX: onMedia.onDesktop ? 3 : 1.5,
                   maxWidth: "100%",
                 }}
                 component="img"

@@ -4,6 +4,7 @@ import {
   GlobalContext,
   TeamContext,
 } from "../../components/Context/ShareContexts";
+import Filler from "../../components/Filler";
 import TeamInfo from "../../components/Team/TeamInfo";
 import TeamProjectList from "../../components/Team/TeamProjectList";
 
@@ -50,35 +51,36 @@ const TeamManagement = () => {
   }, [chats, currentUID]);
 
   return (
-    <TeamContext.Provider
-      value={{
-        project,
-        setProject,
-        projectExt,
-        setProjectExt,
-        joinRequests,
-        forceInfoUpdate,
-        setForceInfoUpdate,
-      }}
-    >
-      <Grid
-        container
-        spaceing={0}
-        mt={1}
-        direction="row"
-        alignItems="start"
-        justifyContent="center"
-      >
-        {/* left comp: list of projects */}
-        <Grid item xs={3}>
-          <TeamProjectList />
-        </Grid>
-        {/* right comp: selected project's info  */}
-        <Grid item xs={9}>
-          <TeamInfo />
-        </Grid>
-      </Grid>
-    </TeamContext.Provider>
+    // <TeamContext.Provider
+    //   value={{
+    //     project,
+    //     setProject,
+    //     projectExt,
+    //     setProjectExt,
+    //     joinRequests,
+    //     forceInfoUpdate,
+    //     setForceInfoUpdate,
+    //   }}
+    // >
+    //   <Grid
+    //     container
+    //     spaceing={0}
+    //     mt={1}
+    //     direction="row"
+    //     alignItems="start"
+    //     justifyContent="center"
+    //   >
+    //     {/* left comp: list of projects */}
+    //     <Grid item xs={3}>
+    //       <TeamProjectList />
+    //     </Grid>
+    //     {/* right comp: selected project's info  */}
+    //     <Grid item xs={9}>
+    //       <TeamInfo />
+    //     </Grid>
+    //   </Grid>
+    // </TeamContext.Provider>
+    <Filler />
   );
 };
 

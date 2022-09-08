@@ -51,7 +51,6 @@ const EventListItem = (props) => {
           border: 1.5,
           borderRadius: "30px",
           borderColor: "#dbdbdb",
-          boxShadow: 0,
           backgroundColor: "#ffffff",
           "&:hover": {
             backgroundColor: "#f6f6f6",
@@ -75,11 +74,11 @@ const EventListItem = (props) => {
           {/* event icon uploaded by users*/}
           <Avatar
             sx={{
-              my: 2,
-              ml: 2,
-              mr: 4,
-              height: "96px",
-              width: "96px",
+              my: 1,
+              ml: 1,
+              mr: 3,
+              height: "80px",
+              width: "80px",
             }}
             src={event?.icon_url}
           >

@@ -16,6 +16,7 @@ import { auth } from "../../firebase";
 
 const Signup = (props) => {
   const setIsSignup = props.setIsSignup;
+  const isMobile = props.isMobile;
 
   // https://www.cluemediator.com/password-and-confirm-password-validation-in-react
   const [input, setInput] = useState({
@@ -103,14 +104,20 @@ const Signup = (props) => {
 
   return (
     <>
-      <Divider sx={{ mt: "1vmin", width: "38vmin", color: "lightgray" }}>
+      <Divider
+        sx={{
+          mt: "1vh",
+          width: isMobile ? "68vmin" : "38vmin",
+          color: "lightgray",
+        }}
+      >
         {"Create an account"}
       </Divider>
-      <Box sx={{ mt: "2vmin", width: "38vmin" }}>
+      <Box sx={{ mt: "2vh", width: isMobile ? "68vmin" : "38vmin" }}>
         <form ref={formRef}>
           <Tooltip title={error.email} placement="left">
             <StyledTextField
-              sx={{ paddingY: 0 }}
+              sx={{ paddingY: 0, fontSize: "0.9em" }}
               fullWidth
               margin="none"
               label="Email"
@@ -126,10 +133,14 @@ const Signup = (props) => {
           </Tooltip>
           <Tooltip title={error.password} placement="left">
             <StyledTextField
-              sx={{ mt: "1.5vmin", paddingY: 0 }}
+              sx={{ mt: "1.5vh", paddingY: 0, fontSize: "0.9em" }}
               fullWidth
               margin="none"
-              label="Password (6 or more characters)"
+              label={
+                isMobile
+                  ? "Password (>5 characters)"
+                  : "Password (6 or more characters)"
+              }
               name="password"
               type="password"
               variant="outlined"
@@ -142,7 +153,7 @@ const Signup = (props) => {
           </Tooltip>
           <Tooltip title={error.confirmPassword} placement="left">
             <StyledTextField
-              sx={{ mt: "1.5vmin", paddingY: 0 }}
+              sx={{ mt: "1.5vh", paddingY: 0, fontSize: "0.9em" }}
               fullWidth
               margin="none"
               label="Password Confirmation"
@@ -160,8 +171,8 @@ const Signup = (props) => {
       </Box>
       <Box
         sx={{
-          mt: "1.5vmin",
-          width: "38vmin",
+          mt: "1.5vh",
+          width: isMobile ? "68vmin" : "38vmin",
           display: "flex",
           justifyContent: "flex-end",
         }}
@@ -185,11 +196,14 @@ const Signup = (props) => {
           {"Confirm"}
         </Button>
       </Box>
-      <Box sx={{ mt: "2vmin", display: "flex" }}>
-        <Typography>{"Already on Edium? "} &nbsp;</Typography>
+      <Box sx={{ mt: "2vh", display: "flex" }}>
+        <Typography sx={{ fontSize: "0.9em" }}>
+          {"Already on Edium? "} &nbsp;
+        </Typography>
         <Typography
           sx={{
             color: "#3e95c2",
+            fontSize: "0.9em",
             ":hover": {
               cursor: "pointer",
             },

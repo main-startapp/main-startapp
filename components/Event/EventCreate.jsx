@@ -29,8 +29,10 @@ import {
   updateDoc,
   deleteDoc,
   setDoc,
+  arrayRemove,
+  arrayUnion,
 } from "firebase/firestore";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { db } from "../../firebase";
 import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import {
@@ -41,12 +43,13 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 
 import moment from "moment";
 import { useRouter } from "next/router";
+import { useAuth } from "../Context/AuthContext";
 
 const EventCreate = (props) => {
   // context
-  const { currentStudent, oldEvent, setOldEvent } = useContext(GlobalContext);
-  const currentUID = currentStudent?.uid;
-
+  const { currentUser } = useAuth();
+  const { currentStudent, currentStudentExt, oldEvent, setOldEvent, onMedia } =
+    useContext(GlobalContext);
   const { showAlert } = useContext(EventContext);
 
   // props from push query
@@ -56,6 +59,8 @@ const EventCreate = (props) => {
   const router = useRouter();
 
   // local vars
+  const currentUID = currentStudent?.uid;
+
   // Event State Initialization.
   const emptyEvent = {
     title: "",
@@ -86,12 +91,26 @@ const EventCreate = (props) => {
   };
 
   // check box
+  const [isCheckedTransferable, setIsCheckedTransferable] = useState(false);
   const [isChecked, setIsChecked] = useState(true);
+  useEffect(() => {
+    if (isCreate) {
+    } else {
+      // update, checked value depends on oldEvent
+      // if creator is admin, check if updating transferable event
+      if (
+        currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
+        !currentStudentExt?.my_event_ids?.includes(oldEvent?.id)
+      ) {
+        setIsCheckedTransferable(true);
+      }
+    }
+  }, [isCreate, oldEvent, currentUser?.uid, currentStudentExt?.my_event_ids]);
 
   // helper functions
   const handleSubmit = async (e) => {
     if (!isClickable) return;
-    if (!!!currentUID) return;
+    if (currentUser?.uid !== currentUID) return;
     if (!formRef.current.reportValidity()) return;
 
     // button is clickable & form is valid
@@ -129,18 +148,57 @@ const EventCreate = (props) => {
 
     // retID: create; !retID: update
     if (retID) {
-      // create extension doc for team management if create
-      const extDocRef = doc(db, "events_ext", retID);
-      const eventExtRef = {
-        members: [currentUID],
-        admins: [currentUID],
-        last_timestamp: serverTimestamp(),
-      };
-      const eventExtModRef = setDoc(extDocRef, eventExtRef).catch((err) => {
-        console.log("setDoc() error: ", err);
-      });
+      // check if admin creats transferable event first
+      if (
+        currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
+        isCheckedTransferable
+      ) {
+        // don't add event id to my_event_ids
+        // do create extenion doc with extra field
+        const extDocRef = doc(db, "events_ext", retID);
 
-      await eventExtModRef;
+        const eventExtRef = {
+          members: [currentUID],
+          admins: [currentUID],
+          last_timestamp: serverTimestamp(),
+          transfer_code: Math.random().toString(16).slice(2),
+        };
+        const eventExtModRef = setDoc(extDocRef, eventExtRef).catch((err) => {
+          console.log("setDoc() error: ", err);
+        });
+
+        navigator.clipboard.writeText(eventExtRef.transfer_code);
+        await eventExtModRef;
+      } else {
+        // add to my_event_ids in student ext data if create
+        const curStudentExtDocRef = doc(db, "students_ext", currentUID);
+        const curStudentExtUpdateRef = {
+          my_event_ids: !!currentStudentExt?.my_event_ids
+            ? arrayUnion(retID)
+            : [retID],
+          last_timestamp: serverTimestamp(),
+        };
+        const curStudentExtModRef = updateDoc(
+          curStudentExtDocRef,
+          curStudentExtUpdateRef
+        ).catch((err) => {
+          console.log("updateDoc() error: ", err);
+        });
+
+        // create extension doc for team management if create
+        const extDocRef = doc(db, "events_ext", retID);
+        const eventExtRef = {
+          members: [currentUID],
+          admins: [currentUID],
+          last_timestamp: serverTimestamp(),
+        };
+        const eventExtModRef = setDoc(extDocRef, eventExtRef).catch((err) => {
+          console.log("setDoc() error: ", err);
+        });
+
+        await curStudentExtModRef;
+        await eventExtModRef;
+      }
     }
 
     // !todo: since updateDoc return Promise<void>, we need other method to check the results
@@ -151,7 +209,7 @@ const EventCreate = (props) => {
 
     setTimeout(() => {
       router.push(`/events`); // can be customized
-    }, 2000); // wait 2 seconds then go to `projects` page
+    }, 2000); // wait 2 seconds then go to `events` page
   };
 
   const handleDiscard = async () => {
@@ -161,7 +219,7 @@ const EventCreate = (props) => {
     showAlert("info", `Draft discarded! Navigate to Events page.`);
     setTimeout(() => {
       router.push(`/events`); // can be customized
-    }, 2000); // wait 2 seconds then go to `projects` page
+    }, 2000); // wait 2 seconds then go to `events` page
   };
 
   const handleDelete = async (id, e) => {
@@ -178,8 +236,22 @@ const EventCreate = (props) => {
       console.log("deleteDoc() error: ", err);
     });
 
+    // delete from student ext
+    const curStudentExtDocRef = doc(db, "students_ext", currentUID);
+    const curStudentExtUpdateRef = {
+      my_event_ids: arrayRemove(id),
+      last_timestamp: serverTimestamp(),
+    };
+    const curStudentExtModRef = updateDoc(
+      curStudentExtDocRef,
+      curStudentExtUpdateRef
+    ).catch((err) => {
+      console.log("updateDoc() error: ", err);
+    });
+
     await eventModRef;
     await eventExtModRef;
+    await curStudentExtModRef;
 
     showAlert(
       "success",
@@ -188,7 +260,7 @@ const EventCreate = (props) => {
 
     setTimeout(() => {
       router.push(`/events`);
-    }, 2000); // wait 2 seconds then go to `projects` page
+    }, 2000); // wait 2 seconds then go to `events` page
   };
 
   const handleDateTimeChange = (e) => {
@@ -204,18 +276,24 @@ const EventCreate = (props) => {
       direction="row"
       alignItems="center"
       justifyContent="center"
-      sx={{ backgroundColor: "#fafafa" }}
+      sx={{
+        backgroundColor: "#fafafa",
+        height: onMedia.onDesktop
+          ? "calc(100vh - 64px)"
+          : "calc(100vh - 48px - 60px)",
+        overflow: "auto",
+      }}
     >
       <Grid
         item
-        xs={8}
+        xs={onMedia.onDesktop ? 8 : 10}
         sx={{
           backgroundColor: "#ffffff",
           borderLeft: 1.5,
           borderRight: 1.5,
           borderColor: "#dbdbdb",
           paddingX: 3,
-          minHeight: "calc(100vh - 64px)",
+          minHeight: "100%",
         }}
       >
         <Typography
@@ -224,12 +302,24 @@ const EventCreate = (props) => {
             justifyContent: "center",
             fontSize: "2em",
             fontWeight: "bold",
-            mt: 6,
-            mb: 6,
+            mt: 5,
+            mb: 5,
           }}
         >
           {isCreate ? "Create New Event" : "Update Event"}
         </Typography>
+        <Box sx={{ mb: 5, display: "flex" }}>
+          <Checkbox
+            sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
+            checked={isCheckedTransferable}
+            onChange={() => {
+              setIsCheckedTransferable(!isCheckedTransferable);
+            }}
+          />
+          <Typography sx={{ color: "#f4511e", fontWeight: "bold" }}>
+            {"ADMIN This event is transferable"}
+          </Typography>
+        </Box>
         <form ref={formRef}>
           {/* Title textfield & Upload logo button */}
           <Box display="flex" justifyContent="space-between" alignItems="start">
@@ -268,7 +358,7 @@ const EventCreate = (props) => {
               onClick={handleDialogOpen}
             >
               <UploadFileIcon sx={{ position: "absolute", left: "5%" }} />
-              <Typography>{"Upload Logo"}</Typography>
+              <Typography>{"Logo"}</Typography>
             </Button>
             <Dialog
               open={isDialogOpen}
@@ -283,7 +373,7 @@ const EventCreate = (props) => {
                   <Link
                     target="_blank"
                     href={"https://imgur.com/upload"}
-                    rel="noopener noreferrer"
+                    rel="noreferrer"
                   >
                     Imgur
                   </Link>
@@ -431,7 +521,6 @@ const EventCreate = (props) => {
               mt: 5,
               mb: 2.5,
             }}
-            required
             fullWidth
             label="Banner URL"
             type="url"
@@ -516,6 +605,7 @@ const EventCreate = (props) => {
                 }}
                 variant="contained"
                 disableElevation
+                disabled={!isClickable || !!!currentUID}
                 onClick={(e) => handleDelete(newEvent.id, e)}
               >
                 {"Delete"}
@@ -537,6 +627,7 @@ const EventCreate = (props) => {
               }}
               variant="contained"
               disableElevation
+              disabled={!isClickable || !!!currentUID}
               onClick={(e) => handleDiscard(e)}
             >
               {"Discard"}
@@ -556,7 +647,7 @@ const EventCreate = (props) => {
               }}
               variant="contained"
               disableElevation
-              disabled={!isClickable}
+              disabled={!isClickable || !!!currentUID}
               onClick={(e) => handleSubmit(e)}
             >
               {"Confirm"}

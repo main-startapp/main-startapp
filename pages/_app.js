@@ -29,6 +29,9 @@ const globalTheme = createTheme({
     SteelBlue: {
       main: "#3e95c2",
     },
+    AdminOrange: {
+      main: "#f4511e",
+    },
   },
 });
 

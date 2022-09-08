@@ -39,13 +39,13 @@ const StudentGridCard = (props) => {
       >
         <Avatar
           sx={{
-            m: 3,
-            width: "5em",
-            height: "5em",
-            border: 1,
-            borderColor: "#dbdbdb",
-            color: "#dbdbdb",
-            backgroundColor: "#ffffff",
+            m: 2,
+            width: "96px",
+            height: "96px",
+            // color: "#dbdbdb",
+            // backgroundColor: "#ffffff",
+            // border: 1,
+            // borderColor: "#dbdbdb",
           }}
           src={student?.photo_url}
           referrerPolicy="no-referrer"
@@ -58,7 +58,7 @@ const StudentGridCard = (props) => {
             backgroundColor: "green",
           }}
         > */}
-        <Typography sx={{ mb: 1.5, fontWeight: "bold", fontSize: "1.1em" }}>
+        <Typography sx={{ fontWeight: "bold", fontSize: "1.1em" }}>
           {student.name}
         </Typography>
         <Typography sx={{ fontSize: "0.9em" }}>
@@ -74,7 +74,7 @@ const StudentGridCard = (props) => {
 
         <Box sx={{ flexGrow: 1 }} />
 
-        <Tooltip title={currentUID ? "" : "Please edit your profile first."}>
+        <Tooltip title={currentUID ? "" : "Please edit your profile first"}>
           <span>
             <Button
               disabled={!currentUID || currentUID === student.uid}

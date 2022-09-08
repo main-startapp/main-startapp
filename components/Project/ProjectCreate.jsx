@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Checkbox,
-  Container,
   Dialog,
   DialogActions,
   DialogContent,
@@ -18,6 +17,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -41,27 +41,29 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
 import { useRouter } from "next/router";
 import { handleDeleteProject } from "../Reusable/Resusable";
+import { useAuth } from "../Context/AuthContext";
 
 const ProjectCreate = (props) => {
   // context
+  const { currentUser } = useAuth();
   const {
     currentStudent,
     currentStudentExt,
     setCurrentStudentExt,
     oldProject,
     setOldProject,
+    onMedia,
   } = useContext(GlobalContext);
-  const currentUID = currentStudent?.uid;
-
   const { showAlert } = useContext(ProjectContext);
 
   // props from push query
   const isCreate = props.isCreateStr === "false" ? false : true; // null, undefined, "true" are all true isCreate
 
-  // router
   const router = useRouter();
 
   // local vars
+  const currentUID = currentStudent?.uid;
+
   // Project State Initialization.
   // https://stackoverflow.com/questions/68945060/react-make-usestate-initial-value-conditional
   const emptyProject = {
@@ -106,9 +108,9 @@ const ProjectCreate = (props) => {
   };
 
   // check box
+  const [isCheckedTransferable, setIsCheckedTransferable] = useState(false);
   const [isCheckedPosition, setIsCheckedPosition] = useState(false);
   const [isCheckedAppForm, setIsCheckedAppForm] = useState(false);
-
   useEffect(() => {
     if (isCreate) {
       setIsCheckedPosition(true);
@@ -120,25 +122,40 @@ const ProjectCreate = (props) => {
       if (oldProject?.application_form_url?.length > 0) {
         setIsCheckedAppForm(true);
       }
+      // if creator is admin, check if updating transferable project
+      if (
+        currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
+        !currentStudentExt?.my_project_ids.includes(oldProject?.id)
+      ) {
+        setIsCheckedTransferable(true);
+      }
     }
-  }, [isCreate, oldProject]);
+  }, [
+    isCreate,
+    oldProject,
+    currentUser?.uid,
+    currentStudentExt?.my_project_ids,
+  ]);
 
   // helper functions
   const handleSubmit = async (e) => {
     if (!isClickable) return;
-    if (!!!currentUID) return;
+    if (currentUser?.uid !== currentUID) return;
     if (!formRef.current.reportValidity()) return;
 
     // button is clickable & form is valid
     setIsClickable(false);
-    // calucalte the max members
-    let maxMemberCount = 1; // creator
-    positionFields.forEach((position) => (maxMemberCount += position.count));
+    // calucalte the team
+    let maxMemberCount = newProject?.max_member_count;
+    if (!!!maxMemberCount) {
+      maxMemberCount = 1;
+      positionFields.forEach((position) => (maxMemberCount += position.count));
+    }
     let projectModRef; // ref to addDoc() or updateDoc()
     if (isCreate) {
       // create a new newProject
       const collectionRef = collection(db, "projects");
-      const projectRef = {
+      let projectRef = {
         ...newProject,
         // update max num of members
         max_member_count: maxMemberCount,
@@ -177,33 +194,61 @@ const ProjectCreate = (props) => {
 
     // retID: create; !retID: update
     if (retID) {
-      // add to my_project_ids in student ext data if create
-      const curStudentExtDocRef = doc(db, "students_ext", currentUID);
-      const curStudentExtUpdateRef = {
-        my_project_ids: arrayUnion(retID),
-        last_timestamp: serverTimestamp(),
-      };
-      const curStudentExtModRef = updateDoc(
-        curStudentExtDocRef,
-        curStudentExtUpdateRef
-      ).catch((err) => {
-        console.log("updateDoc() error: ", err);
-      });
+      // check if admin creats transferable project first
+      if (
+        currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
+        isCheckedTransferable
+      ) {
+        // don't add project id to my_project_ids
+        // do create extenion doc with extra field
+        const extDocRef = doc(db, "projects_ext", retID);
 
-      // create extension doc for team management if create
-      const extDocRef = doc(db, "projects_ext", retID);
-      const projectExtRef = {
-        is_deleted: false,
-        members: [currentUID],
-        admins: [currentUID],
-        last_timestamp: serverTimestamp(),
-      };
-      const projectExtModRef = setDoc(extDocRef, projectExtRef).catch((err) => {
-        console.log("setDoc() error: ", err);
-      });
+        const projectExtRef = {
+          is_deleted: false,
+          members: [currentUID],
+          admins: [currentUID],
+          last_timestamp: serverTimestamp(),
+          transfer_code: Math.random().toString(16).slice(2),
+        };
+        const projectExtModRef = setDoc(extDocRef, projectExtRef).catch(
+          (err) => {
+            console.log("setDoc() error: ", err);
+          }
+        );
 
-      await curStudentExtModRef;
-      await projectExtModRef;
+        navigator.clipboard.writeText(projectExtRef.transfer_code);
+        await projectExtModRef;
+      } else {
+        // add to my_project_ids in student ext data if create
+        const curStudentExtDocRef = doc(db, "students_ext", currentUID);
+        const curStudentExtUpdateRef = {
+          my_project_ids: arrayUnion(retID),
+          last_timestamp: serverTimestamp(),
+        };
+        const curStudentExtModRef = updateDoc(
+          curStudentExtDocRef,
+          curStudentExtUpdateRef
+        ).catch((err) => {
+          console.log("updateDoc() error: ", err);
+        });
+
+        // create extension doc for team management if create
+        const extDocRef = doc(db, "projects_ext", retID);
+        const projectExtRef = {
+          is_deleted: false,
+          members: [currentUID],
+          admins: [currentUID],
+          last_timestamp: serverTimestamp(),
+        };
+        const projectExtModRef = setDoc(extDocRef, projectExtRef).catch(
+          (err) => {
+            console.log("setDoc() error: ", err);
+          }
+        );
+
+        await curStudentExtModRef;
+        await projectExtModRef;
+      }
     }
 
     // !todo: since updateDoc return Promise<void>, we need other method to check the results
@@ -276,18 +321,24 @@ const ProjectCreate = (props) => {
       direction="row"
       alignItems="center"
       justifyContent="center"
-      sx={{ backgroundColor: "#fafafa" }}
+      sx={{
+        backgroundColor: "#fafafa",
+        height: onMedia.onDesktop
+          ? "calc(100vh - 64px)"
+          : "calc(100vh - 48px - 60px)",
+        overflow: "auto",
+      }}
     >
       <Grid
         item
-        xs={8}
+        xs={onMedia.onDesktop ? 8 : 10}
         sx={{
           backgroundColor: "#ffffff",
           borderLeft: 1.5,
           borderRight: 1.5,
           borderColor: "#dbdbdb",
           paddingX: 3,
-          minHeight: "calc(100vh - 64px)",
+          minHeight: "100%",
         }}
       >
         <Typography
@@ -296,21 +347,31 @@ const ProjectCreate = (props) => {
             justifyContent: "center",
             fontSize: "2em",
             fontWeight: "bold",
-            mt: 6,
-            mb: 6,
+            mt: 5,
+            mb: 5,
           }}
         >
           {isCreate ? "Create New Project" : "Update Project"}
         </Typography>
+        <Box sx={{ mb: 5, display: "flex" }}>
+          <Checkbox
+            sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
+            checked={isCheckedTransferable}
+            onChange={() => {
+              setIsCheckedTransferable(!isCheckedTransferable);
+            }}
+          />
+          <Typography sx={{ color: "#f4511e", fontWeight: "bold" }}>
+            {"ADMIN This project is transferable"}
+          </Typography>
+        </Box>
         <form ref={formRef}>
           {/* Title textfield & Upload logo button */}
           <Box display="flex" justifyContent="space-between" alignItems="start">
             <StyledTextField
+              sx={{ mr: 5 }}
               required
               fullWidth
-              sx={{
-                mr: 5,
-              }}
               label="Project Title"
               margin="none"
               inputProps={{
@@ -329,10 +390,9 @@ const ProjectCreate = (props) => {
                 borderRadius: "10px",
                 borderColor: "#dbdbdb",
                 color: "rgba(0, 0, 0, 0.6)",
-
                 height: "56px",
                 textTransform: "none",
-                width: "20%",
+                width: "15%",
                 paddingLeft: "30px",
               }}
               // variant="contained"
@@ -340,7 +400,7 @@ const ProjectCreate = (props) => {
               onClick={handleDialogOpen}
             >
               <UploadFileIcon sx={{ position: "absolute", left: "5%" }} />
-              <Typography>{"Upload Logo"}</Typography>
+              <Typography>{"Logo"}</Typography>
             </Button>
             <Dialog
               open={isDialogOpen}
@@ -355,11 +415,15 @@ const ProjectCreate = (props) => {
                   <Link
                     target="_blank"
                     href={"https://imgur.com/upload"}
-                    rel="noopener noreferrer"
+                    rel="noreferrer"
                   >
                     Imgur
                   </Link>
                   {" is a good image hosting service to start with."}
+                  <br />
+                  {
+                    "After uploaded your icon, hover the image, click Copy Link and paste it here."
+                  }
                 </DialogContentText>
                 <TextField
                   autoFocus
@@ -369,9 +433,19 @@ const ProjectCreate = (props) => {
                   fullWidth
                   variant="standard"
                   value={newProject.icon_url}
-                  onChange={(e) =>
-                    setNewProject({ ...newProject, icon_url: e.target.value })
-                  }
+                  onChange={(e) => {
+                    let url = e.target.value;
+                    if (url.includes("https://imgur.com/")) {
+                      url = url
+                        .replace("https://imgur.com/", "https://i.imgur.com/")
+                        .concat(".png");
+                      console.log(url);
+                    }
+                    setNewProject({
+                      ...newProject,
+                      icon_url: url,
+                    });
+                  }}
                 />
               </DialogContent>
               <DialogActions>
@@ -383,8 +457,8 @@ const ProjectCreate = (props) => {
           <Box
             display="flex"
             justifyContent="space-between"
-            alignItems="center"
-            mt={5}
+            alignItems="start"
+            sx={{ mt: 5 }}
           >
             <FormControl
               required
@@ -438,7 +512,7 @@ const ProjectCreate = (props) => {
               <DesktopDatePicker
                 renderInput={(props) => (
                   <StyledTextField
-                    sx={{ width: "25%" }}
+                    sx={{ width: "30%" }}
                     helperText="Completion date"
                     {...props}
                   />
@@ -451,28 +525,44 @@ const ProjectCreate = (props) => {
               />
             </LocalizationProvider>
           </Box>
-          {/* Details */}
-          <StyledTextField
+          {/* details and total team size */}
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="start"
             sx={{
               mt: 5,
             }}
-            fullWidth
-            label="Details"
-            margin="none"
-            // multiline
-            // minRows={2}
-            // maxRows={8}
-            helperText="Keywords to shortly describe the new project seperated by commas (e.g. tags)"
-            value={newProject.details}
-            onChange={(e) =>
-              setNewProject({ ...newProject, details: e.target.value })
-            }
-          />
+          >
+            <StyledTextField
+              sx={{ mr: 5 }}
+              fullWidth
+              label="Details"
+              margin="none"
+              helperText="Keywords to shortly describe the new project seperated by commas (e.g. tags)"
+              value={newProject.details}
+              onChange={(e) =>
+                setNewProject({ ...newProject, details: e.target.value })
+              }
+            />
+            <StyledTextField
+              sx={{ width: "30%" }}
+              label="Team Size"
+              margin="none"
+              helperText="Total members"
+              value={newProject.max_member_count}
+              onChange={(e) =>
+                setNewProject({
+                  ...newProject,
+                  max_member_count: e.target.value,
+                })
+              }
+            />
+          </Box>
           {/* Description */}
           <StyledTextField
             sx={{
               mt: 5,
-              mb: 2.5,
             }}
             fullWidth
             label="Description"
@@ -491,7 +581,7 @@ const ProjectCreate = (props) => {
           />
           <Box
             sx={{
-              mt: 2.5,
+              mt: 5,
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
@@ -515,7 +605,7 @@ const ProjectCreate = (props) => {
                 <div key={index}>
                   <Divider
                     sx={{
-                      mt: index === 0 ? 1.5 : 2.5,
+                      mt: 2.5,
                       borderBottomWidth: 1.5,
                       borderColor: "#dbdbdb",
                     }}
@@ -577,7 +667,6 @@ const ProjectCreate = (props) => {
                       }}
                     />
                     {/* Add / Remove position button */}
-
                     {index > 0 && (
                       <IconButton
                         sx={{ ml: 2.5, backgroundColor: "#f0f0f0" }}
@@ -596,6 +685,7 @@ const ProjectCreate = (props) => {
                     {/* Responsibilities */}
                     <StyledTextField
                       fullWidth
+                      required
                       multiline
                       minRows={2}
                       maxRows={8}
@@ -620,25 +710,31 @@ const ProjectCreate = (props) => {
               );
             })}
           {/* application form */}
-          <Box
-            sx={{
-              mt: 5,
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-            }}
+          <Tooltip
+            title="All applications will be redirect to this URL"
+            placement="left"
           >
-            <Checkbox
-              sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
-              checked={isCheckedAppForm}
-              onChange={() => {
-                setIsCheckedAppForm(!isCheckedAppForm);
+            <Box
+              sx={{
+                mt: 5,
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
               }}
-            />
-            <Typography sx={{ color: "rgba(0,0,0,0.6)" }}>
-              {"I want to add my own application form"}
-            </Typography>
-          </Box>
+            >
+              <Checkbox
+                sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
+                checked={isCheckedAppForm}
+                onChange={() => {
+                  setIsCheckedAppForm(!isCheckedAppForm);
+                }}
+              />
+
+              <Typography sx={{ color: "rgba(0,0,0,0.6)" }}>
+                {"I want to add my own application form"}
+              </Typography>
+            </Box>
+          </Tooltip>
           {isCheckedAppForm && (
             <StyledTextField
               sx={{
@@ -674,6 +770,7 @@ const ProjectCreate = (props) => {
                 }}
                 variant="contained"
                 disableElevation
+                disabled={!isClickable || !!!currentUID}
                 onClick={(e) => handleDelete(newProject.id, e)}
               >
                 {"Delete"}
@@ -703,6 +800,7 @@ const ProjectCreate = (props) => {
               }}
               variant="contained"
               disableElevation
+              disabled={!isClickable || !!!currentUID}
               onClick={(e) => handleDiscard(e)}
             >
               {"Discard"}
@@ -722,7 +820,7 @@ const ProjectCreate = (props) => {
               }}
               variant="contained"
               disableElevation
-              disabled={!isClickable}
+              disabled={!isClickable || !!!currentUID}
               onClick={(e) => handleSubmit(e)}
             >
               {"Confirm"}

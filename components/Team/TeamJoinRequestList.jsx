@@ -60,7 +60,6 @@ const TeamJoinRequestList = () => {
         border: 1,
         borderRadius: 4,
         borderColor: "text.secondary",
-        boxShadow: 0,
         display: "flex",
         flexDirection: "column",
         // backgroundColor: "green",

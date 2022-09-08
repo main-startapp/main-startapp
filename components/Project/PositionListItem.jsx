@@ -6,6 +6,7 @@ import {
   Button,
   Divider,
   Grid,
+  Link,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -28,9 +29,9 @@ const PositionListItem = (props) => {
     chats,
     currentStudent,
     currentStudentExt,
-    setCurrentStudentExt,
     setChatPartner,
     setForceChatExpand,
+    onMedia,
   } = useContext(GlobalContext);
   const { project } = useContext(ProjectContext);
 
@@ -40,7 +41,9 @@ const PositionListItem = (props) => {
   const posResp = props.posResp;
   const posWeeklyHour = props.posWeeklyHour;
   const isCreator = props.isCreator; // whether currentStudent is the creator
-  const creator = props.creator;
+  const isCreatorAdmin = props.isCreatorAdmin; // where the project creator is Admin
+  const creator = props.creator; // creator's student data
+  const appFormURL = props.appFormURL;
 
   // local vars
   const currentUID = currentStudent?.uid;
@@ -109,8 +112,9 @@ const PositionListItem = (props) => {
       currentStudent.name +
       " requested to join " +
       project.title +
-      " as " +
-      posTitle;
+      " for " +
+      posTitle +
+      " position";
     const messageRef = {
       text: msgStr,
       sent_by: currentUID,
@@ -181,101 +185,149 @@ const PositionListItem = (props) => {
     setForceChatExpand(true);
   };
 
+  // components
+  const appFormButton = (
+    <Button
+      disabled={!currentUID}
+      disableElevation
+      size="small"
+      sx={{
+        border: 1.5,
+        borderColor: "#dbdbdb",
+        borderRadius: "30px",
+        backgroundColor: "#3e95c2",
+        textTransform: "none",
+        paddingX: 3,
+        paddingY: 0,
+      }}
+      onClick={(e) => e.stopPropagation()}
+      variant="contained"
+      component={Link}
+      target="_blank"
+      href={appFormURL}
+      rel="noreferrer"
+    >
+      {"Application Link"}
+    </Button>
+  );
+
+  const joinRequestButton = (
+    <Button
+      disabled={
+        !currentUID ||
+        currentStudentExt?.join_requests?.some(
+          (jr) => jr.project_id === project.id && jr.position_id === posID
+        )
+      }
+      disableElevation
+      size="small"
+      sx={{
+        border: 1.5,
+        borderColor: "#dbdbdb",
+        borderRadius: "30px",
+        backgroundColor: "#3e95c2",
+        textTransform: "none",
+        paddingX: 3,
+        paddingY: 0,
+      }}
+      variant="contained"
+      onClick={(e) => {
+        e.stopPropagation();
+        handleJoinRequest();
+      }}
+    >
+      {"Join Request"}
+    </Button>
+  );
+
   return (
-    <Box sx={{ m: 3 }}>
+    <Box sx={onMedia.onDesktop ? { m: 3 } : { m: 1.5 }}>
       <Accordion
-        square={true}
+        square
         expanded={expandState === "expandIt"}
         sx={{
           border: 1.5,
           borderRadius: "10px",
           borderColor: "#dbdbdb",
-          boxShadow: 0,
-          maxWidth: "100%",
           "&:hover": {
             backgroundColor: "#f6f6f6",
           },
         }}
+        elevation={0}
       >
         <StyledAccordionSummary
           expandIcon={<ExpandMoreIcon />}
           onClick={(e) => handleExpand(e)}
         >
-          <Typography
-            color="text.primary"
-            sx={{ display: "flex", alignItems: "center" }}
+          <Box
+            sx={{
+              mr: 3,
+              width: "100%",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
           >
-            {posTitle}
-          </Typography>
-          {!isCreator && (
-            <Tooltip title={currentUID ? "" : "Edit your profile first."}>
-              <span>
-                <Button
-                  disabled={
-                    !currentUID ||
-                    currentStudentExt?.join_requests?.some(
-                      (jr) =>
-                        jr.project_id === project.id && jr.position_id === posID
-                    )
-                  }
-                  disableElevation
-                  size="small"
-                  sx={{
-                    mr: 3,
-                    border: 1.5,
-                    borderColor: "#dbdbdb",
-                    borderRadius: "30px",
-                    backgroundColor: "#3e95c2",
-                    textTransform: "none",
-                    paddingX: 3,
-                  }}
-                  variant="contained"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleJoinRequest();
-                  }}
-                >
-                  {"Join Request"}
-                </Button>
-              </span>
-            </Tooltip>
-          )}
+            <Typography color="text.primary">{posTitle}</Typography>
+            <Box sx={{ flexGrow: 1 }} />
+            {onMedia.onDesktop && !isCreator && (
+              <Tooltip title={!!currentUID ? "" : "Edit your profile first"}>
+                <span>
+                  {!!appFormURL
+                    ? appFormButton
+                    : !isCreatorAdmin && joinRequestButton}
+                </span>
+              </Tooltip>
+            )}
+          </Box>
         </StyledAccordionSummary>
         <AccordionDetails>
           <Divider
-            sx={{ mb: 3, borderBottomWidth: 1.5, borderColor: "#dbdbdb" }}
+            sx={{ mb: 1.5, borderBottomWidth: 1.5, borderColor: "#dbdbdb" }}
           />
-          <Grid
-            container
-            spacing={0}
-            direction="row"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <Grid item xs={9}>
-              <Typography color="text.primary">
+
+          <Box sx={{ width: "100%", display: "flex", flexDirection: "column" }}>
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography
+                color="text.primary"
+                sx={{ fontSize: "1em", fontWeight: "bold" }}
+              >
                 {"Responsibilities: "}
               </Typography>
-              <Typography component="span" color="text.secondary">
-                <pre
-                  style={{
-                    fontFamily: "inherit",
-                    whiteSpace: "pre-wrap",
-                    display: "inline",
-                  }}
-                >
-                  {posResp}
-                </pre>
-              </Typography>
-            </Grid>
-            <Grid item xs={1} />
-            <Grid item xs={2}>
-              <Typography>
+              <Typography sx={{ fontSize: "1em", fontWeight: "bold" }}>
                 {"Weekly Hours: "}
                 {posWeeklyHour}
               </Typography>
-            </Grid>
-          </Grid>
+            </Box>
+            <Typography component="span" color="text.secondary">
+              <pre
+                style={{
+                  fontFamily: "inherit",
+                  whiteSpace: "pre-wrap",
+                  wordWrap: "break-word",
+                  display: "inline",
+                }}
+              >
+                {posResp}
+              </pre>
+            </Typography>
+            {!onMedia.onDesktop && !isCreator && (
+              <Box sx={{ mt: 1.5, display: "flex", justifyContent: "end" }}>
+                <Tooltip title={!!currentUID ? "" : "Edit your profile first"}>
+                  <span>
+                    {!!appFormURL ? appFormButton : joinRequestButton}
+                  </span>
+                </Tooltip>
+              </Box>
+            )}
+          </Box>
         </AccordionDetails>
       </Accordion>
     </Box>

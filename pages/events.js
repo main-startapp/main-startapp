@@ -52,7 +52,7 @@ const Events = () => {
           </Grid>
         ) : (
           event === null && (
-            <Grid item>
+            <Grid item xs={12}>
               <EventList />
             </Grid>
           )
@@ -64,7 +64,7 @@ const Events = () => {
           </Grid>
         ) : (
           event !== null && (
-            <Grid item>
+            <Grid item xs={12}>
               <EventInfo />
             </Grid>
           )

@@ -14,14 +14,24 @@ import PositionListItem from "./PositionListItem";
 import ExportedImage from "next-image-export-optimizer";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import NextLink from "next/link";
-import { handleConnect } from "../Reusable/Resusable";
+import {
+  findListItem,
+  getDocFromDB,
+  handleConnect,
+} from "../Reusable/Resusable";
+import { useAuth } from "../Context/AuthContext";
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import { useRouter } from "next/router";
 
 const ProjectInfo = () => {
   // context
+  const { currentUser } = useAuth();
   const {
     setOldProject,
     chats,
     currentStudent,
+    currentStudentExt,
     students,
     setChatPartner,
     setForceChatExpand,
@@ -31,15 +41,21 @@ const ProjectInfo = () => {
 
   // local vars
   const currentUID = currentStudent?.uid;
+  const router = useRouter();
+  const [tCode, setTCode] = useState("");
 
-  // hook to find is the currentStudent the project creator
+  // hooks
   const isCreator = useMemo(() => {
     return currentUID === project?.creator_uid ? true : false;
   }, [currentUID, project]);
 
+  const isCreatorAdmin = useMemo(() => {
+    return project?.creator_uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2";
+  }, [project?.creator_uid]);
+
   const creatorStudent = useMemo(() => {
-    return students.find((student) => student.uid === project?.creator_uid);
-  }, [students, project]);
+    return findListItem(students, "uid", project?.creator_uid);
+  }, [students, project?.creator_uid]);
 
   // box ref to used by useEffect
   const boxRef = useRef();
@@ -53,7 +69,9 @@ const ProjectInfo = () => {
     <Box
       ref={boxRef}
       sx={{
-        height: "calc(99.5vh - 128px)",
+        height: onMedia.onDesktop
+          ? "calc(100vh - 2*64px - 1.5px)"
+          : "calc(100vh - 2*48px - 1.5px - 60px)",
         overflow: "auto",
         backgroundColor: "#fafafa",
       }}
@@ -62,7 +80,13 @@ const ProjectInfo = () => {
         <Grid container>
           {/* Top left info box */}
           <Grid item xs={onMedia.onDesktop ? 9 : 12}>
-            <Box mt={3} ml={3} mr={1.5}>
+            <Box
+              sx={
+                onMedia.onDesktop
+                  ? { mt: 3, ml: 3, mr: 1.5 }
+                  : { mt: 1.5, mx: 1.5 }
+              }
+            >
               <Box
                 sx={{
                   display: "flex",
@@ -72,29 +96,43 @@ const ProjectInfo = () => {
               >
                 {/* default unit is px */}
                 <Avatar
-                  sx={{ mr: 2, height: "72px", width: "72px" }}
+                  sx={{
+                    mr: onMedia.onDesktop ? 3 : 1.5,
+                    height: "72px",
+                    width: "72px",
+                  }}
                   src={project?.icon_url}
                 >
                   <UploadFileIcon />
                 </Avatar>
-                <Typography sx={{ fontWeight: "bold", fontSize: "2.5em" }}>
+                <Typography
+                  sx={{
+                    fontWeight: "bold",
+                    fontSize: onMedia.onDesktop ? "2em" : "1em",
+                  }}
+                >
                   {project?.title}
                 </Typography>
               </Box>
               <Divider
                 sx={{
-                  mt: 3,
-                  mb: 3,
+                  mt: onMedia.onDesktop ? 3 : 1.5,
+                  mb: onMedia.onDesktop ? 3 : 1.5,
                   borderBottomWidth: 1.5,
                   borderColor: "#dbdbdb",
                 }}
               />
-              <Typography sx={{ fontWeight: "bold" }} color="text.primary">
+              <Typography
+                sx={{
+                  fontWeight: "bold",
+                }}
+                color="text.primary"
+              >
                 {"Details: "}
               </Typography>
               <Typography color="text.secondary">{project?.details}</Typography>
               <Typography
-                sx={{ mt: 3, fontWeight: "bold" }}
+                sx={{ mt: onMedia.onDesktop ? 3 : 1.5, fontWeight: "bold" }}
                 color="text.primary"
               >
                 {"Team size: "}
@@ -108,7 +146,7 @@ const ProjectInfo = () => {
           </Grid>
 
           {/* Top right founder box */}
-          {onMedia.onDesktop && (
+          {onMedia.onDesktop && !isCreatorAdmin && (
             <Grid item xs={3}>
               <Box
                 sx={{
@@ -121,20 +159,16 @@ const ProjectInfo = () => {
                   ml: 1.5,
                 }}
               >
-                <IconButton>
-                  <Avatar
-                    sx={{
-                      width: "5em",
-                      height: "5em",
-                      border: 1,
-                      borderColor: "#dbdbdb",
-                      color: "#dbdbdb",
-                      backgroundColor: "#ffffff",
-                    }}
-                    src={creatorStudent?.photo_url}
-                    referrerPolicy="no-referrer"
-                  />
-                </IconButton>
+                <Avatar
+                  sx={{
+                    width: "96px",
+                    height: "96px",
+                    // color: "#dbdbdb",
+                    // backgroundColor: "#ffffff",
+                  }}
+                  src={creatorStudent?.photo_url}
+                  referrerPolicy="no-referrer"
+                />
 
                 <Typography
                   sx={{
@@ -148,8 +182,39 @@ const ProjectInfo = () => {
                   {creatorStudent?.name || "Founder"}
                 </Typography>
 
-                {!isCreator && (
-                  <Tooltip title={currentUID ? "" : "Edit your profile first."}>
+                {isCreator ? (
+                  <NextLink
+                    href={{
+                      pathname: "/project/create",
+                      query: { isCreateStr: "false" },
+                    }}
+                    as="/project/create"
+                    passHref
+                  >
+                    <Button
+                      onClick={() => setOldProject(project)}
+                      variant="contained"
+                      sx={{
+                        mt: 1,
+                        border: 1.5,
+                        borderColor: "#dbdbdb",
+                        borderRadius: "30px",
+                        color: "text.primary",
+                        backgroundColor: "#ffffff",
+                        fontWeight: "bold",
+                        fontSize: "0.8em",
+                        "&:hover": {
+                          backgroundColor: "#f6f6f6",
+                        },
+                        textTransform: "none",
+                      }}
+                      disableElevation
+                    >
+                      {"Modify"}
+                    </Button>
+                  </NextLink>
+                ) : (
+                  <Tooltip title={currentUID ? "" : "Edit your profile first"}>
                     <span>
                       <Button
                         disabled={!currentUID}
@@ -185,57 +250,134 @@ const ProjectInfo = () => {
                     </span>
                   </Tooltip>
                 )}
-                {isCreator && (
-                  <NextLink
-                    href={{
-                      pathname: "/project/create",
-                      query: { isCreateStr: "false" },
-                    }}
-                    as="/project/create"
-                    passHref
-                  >
-                    <Button
-                      onClick={() => setOldProject(project)}
-                      variant="contained"
-                      sx={{
-                        mt: 1,
-                        border: 1.5,
-                        borderColor: "#dbdbdb",
-                        borderRadius: "30px",
-                        color: "text.primary",
-                        backgroundColor: "#ffffff",
-                        fontWeight: "bold",
-                        fontSize: "0.8em",
-                        "&:hover": {
-                          backgroundColor: "#f6f6f6",
-                        },
-                        textTransform: "none",
-                      }}
-                      disableElevation
-                    >
-                      {"Modify"}
-                    </Button>
-                  </NextLink>
-                )}
               </Box>
             </Grid>
           )}
 
+          {onMedia.onDesktop &&
+            isCreatorAdmin &&
+            currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" && (
+              // !currentStudentExt.my_project_ids.includes(project?.id) &&
+              <Grid item xs={3}>
+                <Box
+                  sx={{
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    mt: 3,
+                    mr: 3,
+                    ml: 1.5,
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    disableElevation
+                    color="AdminOrange"
+                    sx={{
+                      borderRadius: "0px",
+                      color: "white",
+                      mb: 1.5,
+                      width: "200px",
+                      height: "64px",
+                      textTransform: "none",
+                      fontWeight: "bold",
+                    }}
+                    onClick={() => {
+                      getDocFromDB("projects_ext", project?.id).then((ret) => {
+                        setTCode(ret?.transfer_code);
+                        navigator.clipboard.writeText(
+                          ret?.transfer_code || "null"
+                        );
+                      });
+                    }}
+                  >
+                    {"ADMIN"}
+                    <br />
+                    {"Get Transfer Code"}
+                  </Button>
+                  <Box
+                    sx={{
+                      width: "200px",
+                      height: "64px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      ":hover": {
+                        cursor: "pointer",
+                      },
+                    }}
+                    onClick={() => {
+                      if (!(tCode === "Copied")) {
+                        navigator.clipboard.writeText(tCode);
+                      }
+                      setTCode("Copied");
+                    }}
+                  >
+                    {!!tCode ? (
+                      <>
+                        <KeyboardArrowRightIcon sx={{ color: "#f4511e" }} />
+                        <Typography
+                          sx={{ fontWeight: "bold", color: "#f4511e" }}
+                        >
+                          {tCode}
+                        </Typography>
+                        <KeyboardArrowLeftIcon sx={{ color: "#f4511e" }} />
+                      </>
+                    ) : (
+                      <br />
+                    )}
+                  </Box>
+                  {!!tCode && (
+                    <Button
+                      variant="contained"
+                      disableElevation
+                      color="AdminOrange"
+                      sx={{
+                        borderRadius: "0px",
+                        color: "white",
+                        mt: 1.5,
+                        width: "200px",
+                        height: "64px",
+                        textTransform: "none",
+                        fontWeight: "bold",
+                      }}
+                      onClick={() => {
+                        router.push(`/redemption`);
+                      }}
+                    >
+                      {"To the Redemption"}
+                    </Button>
+                  )}
+                </Box>
+              </Grid>
+            )}
           {/* Bottom description and position boxes */}
           <Grid item xs={12}>
-            <Box sx={{ mt: 3, mx: 3 }}>
+            <Box
+              sx={
+                onMedia.onDesktop
+                  ? {
+                      mt: 3,
+                      mx: 3,
+                      mb: project?.position_list?.length > 0 ? 0 : "64xp",
+                    }
+                  : {
+                      mt: 1.5,
+                      mx: 1.5,
+                    }
+              }
+            >
               <Typography sx={{ fontWeight: "bold" }} color="text.primary">
                 {"Description:"}
               </Typography>
-              <Typography
-                component="span"
-                sx={{ mt: 3 }}
-                color="text.secondary"
-              >
+              <Typography component="span" color="text.secondary">
                 <pre
                   style={{
                     fontFamily: "inherit",
                     whiteSpace: "pre-wrap",
+                    wordWrap: "break-word",
                     display: "inline",
                   }}
                 >
@@ -248,9 +390,8 @@ const ProjectInfo = () => {
               <Box
                 sx={{
                   mt: 3,
-                  ml: 3,
-                  mr: 3,
-                  mb: "64px",
+                  mx: onMedia.onDesktop ? 3 : 0,
+                  mb: onMedia.onDesktop ? "64px" : 3,
                   border: 1.5,
                   borderColor: "#dbdbdb",
                   borderRadius: "10px",
@@ -271,7 +412,9 @@ const ProjectInfo = () => {
                     posResp={position.responsibility}
                     posWeeklyHour={position.weekly_hour}
                     isCreator={isCreator}
+                    isCreatorAdmin={isCreatorAdmin}
                     creator={creatorStudent}
+                    appFormURL={project?.application_form_url || ""}
                   />
                 ))}
               </Box>

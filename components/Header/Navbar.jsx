@@ -39,6 +39,7 @@ const Navbar = () => {
     // signout user -> close menu
     auth.signOut();
     setAnchorEl(null);
+    // window.location.reload();
   };
 
   return (
@@ -59,8 +60,9 @@ const Navbar = () => {
           // flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          height: "64px",
+          height: onMedia.onDesktop ? "64px" : "48px",
           paddingX: onMedia.onDesktop ? 3 : 1.5,
+          minHeight: 0,
         }}
         disableGutters
       >
@@ -77,8 +79,8 @@ const Navbar = () => {
           <ExportedImage
             src="/images/EDIUMPlatformLogo256.png"
             placeholder=""
-            width={48}
-            height={48}
+            width={onMedia.onDesktop ? 48 : 36}
+            height={onMedia.onDesktop ? 48 : 36}
           />
           {/* <Typography variant="edium" sx={{ fontSize: "2em", ml: 1 }}>
             Edium
@@ -141,26 +143,37 @@ const Navbar = () => {
             justifyContent: "end",
           }}
         >
-          {/* <Typography sx={{ fontSize: "1.1em" }}>
-            {currentUser.displayName}
-          </Typography> */}
           <IconButton
             id="navbar-menu-button"
             aria-controls={open ? "navbar-menu" : undefined}
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
+            sx={
+              onMedia.onDesktop
+                ? {
+                    width: "64px",
+                    height: "64px",
+                  }
+                : {
+                    width: "48px",
+                    height: "48px",
+                  }
+            }
             onClick={(e) => handleUserMenu(e)}
           >
             <Avatar
-              sx={{
-                width: "48px",
-                height: "48px",
-                border: 1,
-                borderColor: "black",
-                color: "#dbdbdb",
-                backgroundColor: "#ffffff",
-              }}
-              src={currentUser.photoURL}
+              sx={
+                onMedia.onDesktop
+                  ? {
+                      width: "48px",
+                      height: "48px",
+                    }
+                  : {
+                      width: "36px",
+                      height: "36px",
+                    }
+              }
+              src={currentUser?.photoURL}
               referrerPolicy="no-referrer"
             />
           </IconButton>

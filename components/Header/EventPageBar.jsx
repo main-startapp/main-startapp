@@ -23,7 +23,7 @@ import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
 const EventPageBar = () => {
   // context
   const { onMedia } = useContext(GlobalContext);
-  const { event, setEvent, setSearchTerm, setSearchCategory } =
+  const { event, setEvent, setSearchTerm, searchCategory, setSearchCategory } =
     useContext(EventContext);
 
   // menu
@@ -40,8 +40,13 @@ const EventPageBar = () => {
   const textRef = useRef();
 
   // reuseable comp
-  const ekSearchComp = (
-    <Search sx={{ width: onMedia.onDesktop ? "300px" : "80%" }}>
+  const ekSearch = (
+    <Search
+      sx={{
+        width: onMedia.onDesktop ? "300px" : "80%",
+        height: onMedia.onDesktop ? "40px" : "30px", // to match the small size category
+      }}
+    >
       <SearchIconWrapper>
         <SearchIcon />
       </SearchIconWrapper>
@@ -95,6 +100,7 @@ const EventPageBar = () => {
       <Select
         label="Category"
         defaultValue={""}
+        value={searchCategory}
         onChange={(e) => {
           setSearchCategory(e.target.value);
         }}
@@ -131,10 +137,15 @@ const EventPageBar = () => {
           }}
           disableGutters // will be customozied in sx
         >
-          {ekSearchComp}
+          {ekSearch}
           {categoryComp}
           <Box sx={{ flexGrow: 1 }} />
-          <Search>
+          <Search
+            sx={{
+              width: onMedia.onDesktop ? "300px" : "80%",
+              height: onMedia.onDesktop ? "40px" : "30px", // to match the small size category
+            }}
+          >
             <SearchIconWrapper>
               <FilterAltOutlinedIcon />
             </SearchIconWrapper>
@@ -149,16 +160,17 @@ const EventPageBar = () => {
       {/* mobile version */}
       {!onMedia.onDesktop && (
         <Toolbar
-          sx={{ height: "64px", paddingX: 1.5 }} // 1.5 to match navbar icon and listitem
+          sx={{ height: "48px", minHeight: 0, paddingX: 1.5 }} // 1.5 to match navbar icon and listitem
           disableGutters // disable auto padding
         >
           {event === null ? (
             // list version
             <Box sx={{ width: "100%", display: "flex" }}>
-              {ekSearchComp}
+              {ekSearch}
               <Button
                 sx={{
                   width: "20%",
+                  height: "30px",
                   backgroundColor: "#f0f0f0",
                   color: "gray",
                   borderRadius: "10px",
@@ -204,6 +216,7 @@ const EventPageBar = () => {
                   backgroundColor: "#f0f0f0",
                   color: "gray",
                   borderRadius: "10px",
+                  height: "30px",
                 }}
                 onClick={() => setEvent(null)}
               >
@@ -227,7 +240,6 @@ const Search = styled(Box)(({ theme }) => ({
   "&:hover": {
     backgroundColor: "#dbdbdb",
   },
-  height: "40px", // to match the small size category
   display: "flex",
   alignItems: "center",
 }));

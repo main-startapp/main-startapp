@@ -303,7 +303,7 @@ const TeamCommPanel = () => {
                   key={index}
                   target="_blank"
                   href={link.url}
-                  rel="noopener noreferrer"
+                  rel="noreferrer"
                 >
                   <Tooltip title={link.url}>
                     <Typography>{link.url_text}</Typography>

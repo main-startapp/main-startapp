@@ -15,17 +15,20 @@ import {
   Select,
   Tooltip,
 } from "@mui/material";
-import ClickAwayListener from "@mui/material/ClickAwayListener";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
 
 const ProjectPageBar = () => {
   // context
   const { onMedia } = useContext(GlobalContext);
-  const { project, setProject, setSearchTerm, setSearchCategory } =
-    useContext(ProjectContext);
+  const {
+    project,
+    setProject,
+    setSearchTerm,
+    searchCategory,
+    setSearchCategory,
+  } = useContext(ProjectContext);
 
   // menu
   const [anchorEl, setAnchorEl] = useState(null);
@@ -41,8 +44,13 @@ const ProjectPageBar = () => {
   const textRef = useRef();
 
   // reuseable comp
-  const ppSearchComp = (
-    <Search sx={{ width: onMedia.onDesktop ? "300px" : "80%" }}>
+  const ppSearch = (
+    <Search
+      sx={{
+        width: onMedia.onDesktop ? "300px" : "80%",
+        height: onMedia.onDesktop ? "40px" : "30px", // to match the small size category
+      }}
+    >
       <SearchIconWrapper>
         <SearchIcon />
       </SearchIconWrapper>
@@ -96,6 +104,7 @@ const ProjectPageBar = () => {
       <Select
         label="Category"
         defaultValue={""}
+        value={searchCategory}
         onChange={(e) => {
           setSearchCategory(e.target.value);
         }}
@@ -130,10 +139,15 @@ const ProjectPageBar = () => {
           }}
           disableGutters // will be customozied in sx
         >
-          {ppSearchComp}
+          {ppSearch}
           {categoryComp}
           <Box sx={{ flexGrow: 1 }} />
-          <Search>
+          <Search
+            sx={{
+              width: onMedia.onDesktop ? "300px" : "80%",
+              height: onMedia.onDesktop ? "40px" : "30px", // to match the small size category
+            }}
+          >
             <SearchIconWrapper>
               <FilterAltOutlinedIcon />
             </SearchIconWrapper>
@@ -148,16 +162,17 @@ const ProjectPageBar = () => {
       {/* mobile version */}
       {!onMedia.onDesktop && (
         <Toolbar
-          sx={{ height: "64px", paddingX: 1.5 }} // 1.5 to match navbar icon and projectlistitem
+          sx={{ height: "48px", minHeight: 0, paddingX: 1.5 }} // 1.5 to match navbar icon and projectlistitem
           disableGutters // disable auto padding
         >
           {project === null ? (
             // projectList version
-            <Box sx={{ width: "100%", display: "flex" }}>
-              {ppSearchComp}
+            <Box sx={{ width: "100%", display: "flex", alignItems: "center" }}>
+              {ppSearch}
               <Button
                 sx={{
                   width: "20%",
+                  height: "30px",
                   backgroundColor: "#f0f0f0",
                   color: "gray",
                   borderRadius: "10px",
@@ -181,17 +196,8 @@ const ProjectPageBar = () => {
                   MenuListProps={{
                     "aria-labelledby": "ppb-menu-button",
                   }}
-                  //onClick={(e) => e.stopPropagation()}
                 >
-                  <MenuItem
-                    sx={{
-                      "&:hover": {
-                        backgroundColor: "#ffffff",
-                      },
-                    }}
-                  >
-                    {categoryComp}
-                  </MenuItem>
+                  <MenuItem>{categoryComp}</MenuItem>
                 </Menu>
               </Button>
             </Box>
@@ -203,6 +209,7 @@ const ProjectPageBar = () => {
                   backgroundColor: "#f0f0f0",
                   color: "gray",
                   borderRadius: "10px",
+                  height: "30px",
                 }}
                 onClick={() => setProject(null)}
               >
@@ -226,7 +233,6 @@ const Search = styled(Box)(({ theme }) => ({
   "&:hover": {
     backgroundColor: "#dbdbdb",
   },
-  height: "40px", // to match the small size category
   display: "flex",
   alignItems: "center",
 }));

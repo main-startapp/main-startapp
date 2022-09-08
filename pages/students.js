@@ -7,10 +7,11 @@ import {
 import StudentPageBar from "../components/Header/StudentPageBar";
 import StudentProfile from "../components/Student/StudentProfile";
 import StudentGrid from "../components/Student/StudentGrid";
+import StudentList from "../components/Student/StudentList";
 
 const Students = () => {
   // context
-  const { setChat, setChatPartner, setShowChat, setShowMsg } =
+  const { setChat, setChatPartner, setShowChat, setShowMsg, onMedia } =
     useContext(GlobalContext);
   useEffect(() => {
     setShowChat(true);
@@ -44,12 +45,28 @@ const Students = () => {
         justifyContent="center"
         sx={{ backgroundColor: "#fafafa" }}
       >
-        <Grid item xs={7}>
-          <StudentGrid />
-        </Grid>
-        <Grid item xs={3}>
-          <StudentProfile />
-        </Grid>
+        {onMedia.onDesktop ? (
+          <Grid item xs={7}>
+            <StudentGrid />
+          </Grid>
+        ) : (
+          student === null && (
+            <Grid item xs={12}>
+              <StudentList />
+            </Grid>
+          )
+        )}
+        {onMedia.onDesktop ? (
+          <Grid item xs={3}>
+            <StudentProfile />
+          </Grid>
+        ) : (
+          student !== null && (
+            <Grid item xs={12}>
+              <StudentProfile />
+            </Grid>
+          )
+        )}
       </Grid>
     </StudentContext.Provider>
   );

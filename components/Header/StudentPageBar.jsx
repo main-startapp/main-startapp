@@ -1,28 +1,35 @@
 import { useContext, useRef } from "react";
-import { styled, alpha } from "@mui/material/styles";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import InputBase from "@mui/material/InputBase";
-import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
-import SearchIcon from "@mui/icons-material/Search";
+import { styled } from "@mui/material/styles";
 import {
+  AppBar,
+  Box,
+  Toolbar,
+  InputBase,
   FormControl,
   IconButton,
   InputLabel,
   MenuItem,
   Select,
   Tooltip,
+  Button,
 } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
+import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
 
 const StudentPageBar = () => {
   const { onMedia } = useContext(GlobalContext);
-  const { setSearchTerm, setSearchCategory } = useContext(StudentContext);
+  const { student, setStudent, setSearchTerm } = useContext(StudentContext);
   const textRef = useRef();
 
-  const spSearchComp = (
-    <Search sx={{ width: onMedia.onDesktop ? "300px" : "80%" }}>
+  const spSearch = (
+    <Search
+      sx={{
+        width: onMedia.onDesktop ? "300px" : "100%",
+        height: onMedia.onDesktop ? "40px" : "30px", // to match the small size category
+      }}
+    >
       <SearchIconWrapper>
         <SearchIcon />
       </SearchIconWrapper>
@@ -67,9 +74,14 @@ const StudentPageBar = () => {
           }}
           disableGutters // will be customozied in sx
         >
-          {spSearchComp}
+          {spSearch}
           <Box sx={{ flexGrow: 1 }} />
-          <Search>
+          <Search
+            sx={{
+              width: onMedia.onDesktop ? "300px" : "80%",
+              height: onMedia.onDesktop ? "40px" : "30px", // to match the small size category
+            }}
+          >
             <SearchIconWrapper>
               <FilterAltOutlinedIcon />
             </SearchIconWrapper>
@@ -82,16 +94,16 @@ const StudentPageBar = () => {
       )}
 
       {/* mobile version */}
-      {/* {!onMedia.onDesktop && (
+      {!onMedia.onDesktop && (
         <Toolbar
-          sx={{ height: "64px", paddingX: 1.5 }} // 1.5 to match navbar icon and projectlistitem
+          sx={{ height: "48px", minHeight: 0, paddingX: 1.5 }} // 1.5 to match navbar icon and listitem
           disableGutters // disable auto padding
         >
-          {project === null ? (
-            // projectList version
+          {student === null ? (
+            // list version
             <Box sx={{ width: "100%", display: "flex" }}>
-              {spSearchComp}
-              <Button
+              {spSearch}
+              {/* <Button
                 sx={{
                   width: "20%",
                   backgroundColor: "#f0f0f0",
@@ -108,11 +120,10 @@ const StudentPageBar = () => {
                 }}
               >
                 <TuneRoundedIcon />
-                
-              </Button>
+              </Button> */}
             </Box>
           ) : (
-            // projectInfo version
+            // info version
             <Box>
               <Button
                 sx={{
@@ -120,14 +131,14 @@ const StudentPageBar = () => {
                   color: "gray",
                   borderRadius: "10px",
                 }}
-                onClick={() => setProject(null)}
+                onClick={() => setStudent(null)}
               >
                 <ArrowBackIosRoundedIcon />
               </Button>
             </Box>
           )}
         </Toolbar>
-      )} */}
+      )}
     </AppBar>
   );
 };

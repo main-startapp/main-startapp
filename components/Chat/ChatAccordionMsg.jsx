@@ -30,7 +30,6 @@ import ChatAccordionMsgItem from "./ChatAccordionMsgItem";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import OpenInFullRoundedIcon from "@mui/icons-material/OpenInFullRounded";
 import CloseFullscreenRoundedIcon from "@mui/icons-material/CloseFullscreenRounded";
-
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { findListItem } from "../Reusable/Resusable";
@@ -52,7 +51,7 @@ const ChatAccordionMsg = () => {
   // !todo: either listen to the msg when necessary or using DBListener which one is better?
   const [message, setMessage] = useState({
     text: "",
-    sent_by: currentUser.uid,
+    sent_by: currentUser?.uid,
   });
   const [messages, setMessages] = useState([]);
   useEffect(() => {
@@ -90,6 +89,11 @@ const ChatAccordionMsg = () => {
   // control comp size
   const [isMaximized, setIsMaximized] = useState(false);
 
+  // textfield focused flag
+  const [focused, setFocused] = useState(false);
+  const onFocus = () => setFocused(true);
+  const onBlur = () => setFocused(false);
+
   // dialog modal
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [declineMsg, setDeclineMsg] = useState("");
@@ -107,9 +111,9 @@ const ChatAccordionMsg = () => {
     return chat.join_requests.filter((join_request) => {
       if (join_request.requester_uid !== chatPartner?.uid) return;
       const foundProject = findListItem(
-        join_request.project_id,
+        projects,
         "id",
-        projects
+        join_request.project_id
       );
       if (!foundProject) return;
       join_request.projectTitle = foundProject.title;
@@ -128,13 +132,13 @@ const ChatAccordionMsg = () => {
 
     // add message
     const messageRef = { ...message, sent_at: serverTimestamp() };
-    setMessage({ text: "", sent_by: currentUser.uid }); // reset msg locally
+    setMessage({ text: "", sent_by: currentUser?.uid }); // reset msg locally
     const msgCollectionRef = collection(db, "chats", chat.id, "messages");
     const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
       console.log("addDoc() error: ", err);
     });
     // update chat
-    const my_unread_key = currentUser.uid + "_unread";
+    const my_unread_key = currentUser?.uid + "_unread";
     const partner_unread_key = chatPartner?.uid + "_unread";
     const chatDocRef = doc(db, "chats", chat.id);
     const chatUpdateRef = {
@@ -259,7 +263,7 @@ const ChatAccordionMsg = () => {
     // send msg
     const msgStr = declineMsg
       ? declineMsg
-      : "Sorry. Creator didn't leave a note.";
+      : "Sorry. Creator didn't leave a note";
     const messageRef = {
       text: msgStr,
       sent_by: currentUser?.uid,
@@ -326,223 +330,261 @@ const ChatAccordionMsg = () => {
   return (
     <Box
       sx={{
-        width: isMaximized ? "35vw" : "25vw",
+        width: isMaximized ? "480px" : "320px",
         height: isMaximized ? "75vh" : "50vh",
-        minWidth: "300px",
-        maxHeight: "75vh",
         position: "fixed",
-        right: "max(calc(50px + 15%), 350px)",
-        bottom: 0,
-        border: 1,
+        right: "336px",
+        bottom: -1,
+        border: 1.5,
+        borderColor: "#dbdbdb",
+        borderRadius: "10px 10px 0 0",
+        backgroundColor: "#ffffff",
+        display: "flex",
+        flexDirection: "column",
+        boxShadow: 3,
       }}
     >
+      {/* header */}
       <Box
         sx={{
           display: "flex",
-          flexDirection: "column",
-          backgroundColor: "white",
-          width: "100%",
-          height: "100%",
+          flexDirection: "row",
+          alignItems: "center",
         }}
       >
-        {/* header */}
+        <Avatar
+          sx={{
+            m: "12px",
+            // color: "#dbdbdb",
+            // backgroundColor: "#ffffff",
+            // border: 1,
+            // borderColor: "#dbdbdb",
+            height: "48px",
+            width: "48px",
+          }}
+          src={chatPartner?.photo_url}
+          referrerPolicy="no-referrer"
+        />
+        <Typography sx={{ fontWeight: "bold", fontSize: "1em" }}>
+          {chatPartner?.name}
+        </Typography>
+        <Box sx={{ flexGrow: 1 }} />
+        {!isMaximized && (
+          <IconButton
+            onClick={(e) => {
+              e.stopPropagation();
+              handleMaximize();
+            }}
+          >
+            <OpenInFullRoundedIcon sx={{ fontSize: "0.9em" }} />
+          </IconButton>
+        )}
+        {isMaximized && (
+          <IconButton
+            onClick={(e) => {
+              e.stopPropagation();
+              handleMaximize();
+            }}
+          >
+            <CloseFullscreenRoundedIcon sx={{ fontSize: "0.9em" }} />
+          </IconButton>
+        )}
+        <IconButton
+          onClick={(e) => {
+            e.stopPropagation();
+            handleClose();
+          }}
+        >
+          <CloseRoundedIcon sx={{ fontSize: "1.2em" }} />
+        </IconButton>
+      </Box>
+      {/* join requests */}
+      {joinRequests?.length > 0 && (
         <Box
           sx={{
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            borderBottom: 1,
+            borderTop: 1.5,
+            borderColor: "#dbdbdb",
+            backgroundColor: "#fafafa",
+            paddingRight: "3px",
           }}
         >
-          <Avatar
-            sx={{ m: "12px", color: "#dbdbdb", backgroundColor: "#ffffff" }}
-            src={chatPartner?.photo_url}
-            referrerPolicy="no-referrer"
-          />
-          <Typography sx={{ fontWeight: "bold" }}>
-            {chatPartner?.name}
-          </Typography>
+          <Box
+            sx={{
+              mx: "12px",
+              my: "6px",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Typography sx={{ fontSize: "0.8em", color: "#3e95c2" }}>
+              Join Request
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: "0.8em",
+                display: "-webkit-box",
+                overflow: "hidden",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: 1,
+              }}
+            >
+              {joinRequests[0].projectTitle} {joinRequests[0].positionTitle}
+            </Typography>
+          </Box>
           <Box sx={{ flexGrow: 1 }} />
-          {!isMaximized && (
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                handleMaximize();
-              }}
-            >
-              <OpenInFullRoundedIcon sx={{ fontSize: "1.2em" }} />
-            </IconButton>
-          )}
-          {isMaximized && (
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                handleMaximize();
-              }}
-            >
-              <CloseFullscreenRoundedIcon sx={{ fontSize: "1.2em" }} />
-            </IconButton>
-          )}
           <IconButton
             onClick={(e) => {
               e.stopPropagation();
-              handleClose();
+              handleAccept(joinRequests[0], "title", "title");
             }}
           >
-            <CloseRoundedIcon sx={{ fontSize: "1.2em" }} />
-          </IconButton>
-        </Box>
-        {/* join requests */}
-        {joinRequests?.length > 0 && (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              borderBottom: 1,
-            }}
-          >
-            <Box
+            <CheckCircleIcon
               sx={{
-                mx: "12px",
-                my: "6px",
-                display: "flex",
-                flexDirection: "column",
+                fontSize: "0.9em",
+                color: "#a4ca87",
               }}
-            >
-              <Typography sx={{ fontSize: "0.8em", color: "#3e95c2" }}>
-                {"Join Request"}
-              </Typography>
-              <Typography sx={{ fontSize: "0.8em" }}>
-                {joinRequests[0].projectTitle} {joinRequests[0].positionTitle}
-              </Typography>
-            </Box>
-            <Box sx={{ flexGrow: 1 }} />
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                handleAccept(joinRequests[0], "title", "title");
+            />
+          </IconButton>
+          <IconButton
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDialogOpen();
+            }}
+          >
+            <CancelIcon
+              sx={{
+                fontSize: "0.9em",
+                color: "#e56b6b",
               }}
-            >
-              <CheckCircleIcon
-                sx={{
-                  fontSize: "1em",
-                  color: "#a4ca87",
+            />
+          </IconButton>
+          <Dialog open={isDialogOpen} onClose={handleDialogClose}>
+            <DialogTitle>Message</DialogTitle>
+            <DialogContent sx={{ paddingBottom: 0 }}>
+              <DialogContentText>
+                Leave a note to let them know this position was not a match.
+              </DialogContentText>
+              <TextField
+                autoFocus
+                multiline
+                minRows={5}
+                margin="dense"
+                id="declineMsg"
+                // label="Message"
+                value={declineMsg}
+                fullWidth
+                onChange={(e) => setDeclineMsg(e.target.value)}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={() => {
+                  handleDecline(joinRequests[0]);
+                  handleDialogClose();
                 }}
-              />
-            </IconButton>
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDialogOpen();
-              }}
-            >
-              <CancelIcon
-                sx={{
-                  fontSize: "1em",
-                  color: "#e56b6b",
-                }}
-              />
-            </IconButton>
-            <Dialog open={isDialogOpen} onClose={handleDialogClose}>
-              <DialogTitle>Message</DialogTitle>
-              <DialogContent sx={{ paddingBottom: 0 }}>
-                <DialogContentText>
-                  Leave a note to let them know this position was not a match.
-                </DialogContentText>
-                <TextField
-                  autoFocus
-                  multiline
-                  minRows={5}
-                  margin="dense"
-                  id="declineMsg"
-                  // label="Message"
-                  value={declineMsg}
-                  fullWidth
-                  onChange={(e) => setDeclineMsg(e.target.value)}
-                />
-              </DialogContent>
-              <DialogActions>
-                <Button
-                  onClick={() => {
-                    handleDecline(joinRequests[0]);
-                    handleDialogClose();
-                  }}
-                >
-                  Send
-                </Button>
-              </DialogActions>
-            </Dialog>
-          </Box>
-        )}
-        {/* messages */}
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            overflow: "auto",
-            flexGrow: 1,
-          }}
-        >
-          {messages.map((message, index) => {
-            let isSameAuthor = false;
-            if (index > 0 && messages[index - 1].sent_by === message.sent_by) {
-              isSameAuthor = true;
-            }
-            return (
-              <ChatAccordionMsgItem
-                key={index}
-                message={message}
-                isSameAuthor={isSameAuthor}
-                chatPartner={chatPartner}
-              />
-            );
-          })}
-          <div ref={scrollRef} />
+              >
+                Send
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Box>
-        {/* input */}
+      )}
+      {/* messages */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          overflow: "auto",
+          flexGrow: 1,
+          borderTop: 2.5,
+          borderColor: "#dbdbdb",
+        }}
+      >
+        {messages.map((message, index) => {
+          let isSameAuthor = false;
+          if (index > 0 && messages[index - 1].sent_by === message.sent_by) {
+            isSameAuthor = true;
+          }
+          return (
+            <ChatAccordionMsgItem
+              key={index}
+              message={message}
+              isSameAuthor={isSameAuthor}
+              chatPartner={chatPartner}
+            />
+          );
+        })}
+        <div ref={scrollRef} />
+      </Box>
+      {/* input */}
+      <Box sx={{ position: "sticky", bottom: 0 }}>
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
-            padding: "10px",
-            position: "sticky",
-            bottom: 0,
-            backgroundColor: "#f0f0f0",
-            zIndex: 100,
-            width: "100%",
+            backgroundColor: "#ffffff",
+            borderTop: 2.5,
+            borderColor: focused ? "#3e95c2" : "#dbdbdb",
           }}
         >
           <TextField
             sx={{
               flex: 1,
-              outline: 0,
-              border: "none",
-              borderRadius: 4,
-              padding: "5px",
-              ml: "15px",
-              mr: "15px",
-              backgroundColor: "white",
+              my: "6px",
+              mx: "12px",
+              "& .MuiInputBase-root": {
+                padding: 0,
+                fontSize: "0.9em",
+              },
             }}
             variant="standard"
+            placeholder="Write a message..."
             multiline
-            maxRows={4}
+            rows={4}
             InputProps={{
               disableUnderline: true,
             }}
             value={message.text}
             onChange={(e) => setMessage({ ...message, text: e.target.value })}
-            /* onKeyPress={(e) => {
-                  if (e.key === "Enter" && message.text) {
-                    handleSubmit(e);
-                  }
-                }} */
+            onKeyPress={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                if (message.text) {
+                  handleSubmit(e);
+                }
+              }
+            }}
+            onFocus={onFocus}
+            onBlur={onBlur}
           />
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "flex-end",
+            borderTop: 1.5,
+            borderColor: "#dbdbdb",
+            paddingY: "6px",
+            paddingX: "12px",
+          }}
+        >
           <Button
             variant="contained"
-            disabled={!message.text}
+            disabled={!message.text || !isClickable}
             disableElevation
-            sx={{ backgroundColor: "#3e95c2", mr: "15px" }}
+            sx={{
+              backgroundColor: "#3e95c2",
+              border: 1.5,
+              borderColor: "#dbdbdb",
+              borderRadius: "30px",
+              paddingX: 0,
+              paddingY: 0,
+              textTransform: "none",
+              fontSize: "0.7em",
+              position: "relative",
+            }}
             onClick={(e) => handleSubmit(e)}
           >
             Send
