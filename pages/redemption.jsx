@@ -1,22 +1,39 @@
 import { Button, Grid, TextField, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Box } from "@mui/system";
-import { useRouter } from "next/router";
-import { useContext, useEffect, useMemo, useState } from "react";
-import { GlobalContext } from "../components/Context/ShareContexts";
+import { useContext, useEffect, useState } from "react";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import {
+  collection,
+  doc,
+  getDocs,
+  query,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { useAuth } from "../components/Context/AuthContext";
+import { GlobalContext } from "../components/Context/ShareContexts";
+import { db } from "../firebase";
 
-const Redemption = () => {
+function Redemption() {
   // context
   const { currentUser } = useAuth();
-  const { setChat, setChatPartner, setShowChat, setShowMsg, onMedia } =
-    useContext(GlobalContext);
+  const {
+    ediumUser,
+    ediumUserExt,
+    setChat,
+    setChatPartner,
+    setShowChat,
+    setShowMsg,
+    onMedia,
+  } = useContext(GlobalContext);
   useEffect(() => {
     setShowChat(false);
     setShowMsg(false);
@@ -24,14 +41,12 @@ const Redemption = () => {
     setChatPartner(null);
   }, [setChat, setChatPartner, setShowChat, setShowMsg]);
 
-  // get query
-  const router = useRouter();
-
   // local
   const [isAdminMode, setIsAdminMode] = useState(
-    currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" ? true : false
+    currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2"
   );
   const [generatedURL, setGeneratedURL] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [theCipher, setTheCipher] = useState("");
   const [projectCodes, setProjectCodes] = useState([""]);
@@ -42,19 +57,19 @@ const Redemption = () => {
   useEffect(() => {
     const url = new URL(window.location.href);
     const queries = new URLSearchParams(url.search);
-    const shift = queries.get("s");
-    let cipher = queries.get("c");
-    let projects = queries.getAll("p");
-    let events = queries.getAll("e");
+    // const shift = queries.get("s");
+    const cipher = queries.get("c");
+    const pCodes = queries.getAll("p");
+    const eCodes = queries.getAll("e");
     // decode caesar shifting
-    setTheCipher(!!cipher ? cipher : "");
-    setProjectCodes(projects.length > 0 ? projects : [""]);
-    setEventCodes(events.length > 0 ? events : [""]);
-  }, [router.query]);
+    setTheCipher(cipher || "");
+    setProjectCodes(pCodes.length > 0 ? pCodes : [""]);
+    setEventCodes(eCodes.length > 0 ? eCodes : [""]);
+  }, []);
 
   // helper funs
   const handleChangeCodes = (codeArray, setCodeArray, index, e) => {
-    let cFields = [...codeArray];
+    const cFields = [...codeArray];
     cFields[index] = e.target.value;
     setCodeArray(cFields);
   };
@@ -70,6 +85,13 @@ const Redemption = () => {
   };
 
   const handleGenerateURL = () => {
+    setErrorMessage("");
+    setGeneratedURL("");
+    if (!theCipher) {
+      setErrorMessage("Input Cipher");
+      return;
+    }
+
     const url = new URL(window.location.href);
     const params = new URLSearchParams();
     params.append("s", 0);
@@ -82,17 +104,149 @@ const Redemption = () => {
     });
     // encode caesar shifting
     const urlStr =
-      url.origin.toString() + url.pathname.toString() + "?" + params.toString();
+      `${url.origin.toString() + url.pathname.toString()  }?${  params.toString()}`;
     navigator.clipboard.writeText(urlStr);
     setGeneratedURL(urlStr);
+  };
+
+  const handleRedeem = async () => {
+    setErrorMessage("");
+    if (!theCipher) {
+      setErrorMessage("No Cipher");
+      return;
+    }
+    const pCodes = projectCodes.filter((code) => code);
+    const eCodes = eventCodes.filter((code) => code);
+    if (pCodes.length === 0 && eCodes.length === 0) {
+      setErrorMessage("No Project or Event");
+      return;
+    }
+
+    async function transfer(
+      codeArray,
+      docName,
+      docExtName,
+      myIds,
+      failedCodes
+    ) {
+      codeArray.forEach(async (code) => {
+        let docID;
+        let docExtData;
+        // 1. use pCode to get doc id from doc ext
+        const collectionRef = collection(db, docExtName);
+        const q = query(collectionRef, where("transfer_code", "==", code));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((qDoc) => {
+          docID = qDoc.id;
+          docExtData = qDoc.data();
+        });
+        if (!docID) {
+          failedCodes.push(code);
+          return;
+        }
+        myIds.push(docID);
+        // 2. update doc
+        const docRef = doc(db, docName, docID);
+        const docUpdateRef = {
+          bypass_code: theCipher,
+          creator_uid: ediumUser?.uid,
+          last_timestamp: serverTimestamp(),
+        };
+        const docModRef = updateDoc(docRef, docUpdateRef).catch((err) => {
+          console.log("updateDoc() error: ", err);
+        });
+        // 3. update doc ext
+        const extDocRef = doc(db, docExtName, docID);
+        delete docExtData.transfer_code;
+        const docExtUpdateRef = {
+          ...docExtData,
+          admins: [ediumUser?.uid],
+          members: [ediumUser?.uid],
+          last_timestamp: serverTimestamp(),
+        };
+        const docExtModRef = setDoc(extDocRef, docExtUpdateRef).catch((err) => {
+          failedCodes.push(code);
+          console.log("updateDoc() error: ", err);
+        });
+
+        await docModRef;
+        await docExtModRef;
+      });
+    }
+
+    // update projects and events
+    const myProjectIDs = ediumUserExt?.my_project_ids
+      ? ediumUserExt.my_project_ids
+      : [];
+    const myEventIDs = ediumUserExt?.my_event_ids
+      ? ediumUserExt.my_event_ids
+      : [];
+    const failedProjectCodes = [];
+    const failedEventCodes = [];
+    let isFailedUserExt = false;
+    if (pCodes.length > 0) {
+      await transfer(
+        pCodes,
+        "projects",
+        "projects_ext",
+        myProjectIDs,
+        failedProjectCodes
+      );
+    }
+    if (eCodes.length > 0) {
+      await transfer(
+        eCodes,
+        "events",
+        "events_ext",
+        myEventIDs,
+        failedEventCodes
+      );
+    }
+    // update user ext
+    const userExtDocRef = doc(db, "users_ext", currentUser?.uid);
+    const userExtUpdateRef = {
+      my_project_ids: myProjectIDs,
+      my_event_ids: myEventIDs,
+      last_timestamp: serverTimestamp(),
+    };
+    console.log(userExtUpdateRef);
+    const userExtModRef = updateDoc(userExtDocRef, userExtUpdateRef).catch(
+      (err) => {
+        isFailedUserExt = true;
+        console.log("updateDoc() error: ", err);
+      }
+    );
+
+    await userExtModRef;
+
+    setProjectCodes([""]);
+    setEventCodes([""]);
+    if (
+      failedProjectCodes.length === 0 &&
+      failedEventCodes.length === 0 &&
+      !isFailedUserExt
+    ) {
+      setTheCipher("");
+      setErrorMessage("All Set!");
+    }
+    if (failedProjectCodes.length > 0) {
+      setProjectCodes(failedProjectCodes);
+      setErrorMessage("Please recheck the codes on the screen!");
+    }
+    if (failedEventCodes.length > 0) {
+      setEventCodes(failedEventCodes);
+      setErrorMessage("Please recheck the codes on the screen!");
+    }
+    if (isFailedUserExt) {
+      setErrorMessage("Can't update your user profile with new projects!");
+    }
   };
 
   // reusable comp
   const codeList = (codesArray, setCodesArray, name, isLeft) => (
     <>
-      {codesArray.map((code, index) => {
-        return (
-          <Box key={index} sx={{ mt: 3, width: "100%" }}>
+      {codesArray.map((code, index) => (
+          <Box key={code} sx={{ mt: 3, width: "100%" }}>
             <Typography
               sx={{
                 fontSize: "16px",
@@ -103,8 +257,8 @@ const Redemption = () => {
               }}
             >
               {isLeft
-                ? "> " + name + " Code #" + (index + 1)
-                : name + " Code #" + (index + 1) + " <"}
+                ? `> ${  name  } Code #${  index + 1}`
+                : `${  name  } Code #${  index + 1  } <`}
             </Typography>
             <Box
               sx={{
@@ -152,8 +306,7 @@ const Redemption = () => {
               )}
             </Box>
           </Box>
-        );
-      })}
+        ))}
     </>
   );
 
@@ -164,7 +317,7 @@ const Redemption = () => {
           mt: 5,
           display: "flex",
           alignItems: "center",
-          color: color,
+          color,
         }}
       >
         <KeyboardArrowDownIcon />
@@ -192,7 +345,7 @@ const Redemption = () => {
         sx={{
           display: "flex",
           alignItems: "center",
-          color: color,
+          color,
         }}
       >
         <KeyboardArrowUpIcon />
@@ -350,10 +503,8 @@ const Redemption = () => {
             {!isAdminMode && (
               <>
                 {codeList(projectCodes, setProjectCodes, "Projects", true)}
-
                 {codeList(eventCodes, setEventCodes, "Event", false)}
-
-                {confirmButton("Redeem", "#3e95c2")}
+                {confirmButton("Redeem", "#3e95c2", handleRedeem)}
               </>
             )}
 
@@ -365,7 +516,6 @@ const Redemption = () => {
                   "ADMIN Projects",
                   true
                 )}
-
                 {codeList(
                   adminEventCodes,
                   setAdminEventCodes,
@@ -389,7 +539,7 @@ const Redemption = () => {
                     setGeneratedURL("Copied");
                   }}
                 >
-                  {!!generatedURL ? (
+                  {generatedURL ? (
                     <>
                       <KeyboardArrowRightIcon sx={{ color: "#f4511e" }} />
                       <Typography sx={{ fontWeight: "bold", color: "#f4511e" }}>
@@ -403,16 +553,41 @@ const Redemption = () => {
                 </Box>
               </>
             )}
+
+            {!!errorMessage && (
+              <Box
+                sx={{
+                  mt: 5,
+                  width: "400px",
+                  height: "35px",
+                  backgroundColor:
+                    errorMessage === "All Set!" ? "green" : "red",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Typography
+                  sx={{
+                    color: "white",
+                    fontWeight: "bold",
+                    fontSize: "16px",
+                  }}
+                >
+                  {errorMessage}
+                </Typography>
+              </Box>
+            )}
           </Box>
         </Box>
       </Grid>
     </Grid>
   );
-};
+}
 
 export default Redemption;
 
-const StyledIconBox = styled(Box)(({ theme }) => ({
+const StyledIconBox = styled(Box)(() => ({
   minHeight: "35px",
   minWidth: "35px",
   backgroundColor: "#3e95c2",
@@ -421,7 +596,7 @@ const StyledIconBox = styled(Box)(({ theme }) => ({
   alignItems: "center",
 }));
 
-const StyledTextField = styled(TextField)(({ theme }) => ({
+const StyledTextField = styled(TextField)(() => ({
   "& .MuiInputBase-input": {
     padding: "6px 12px",
   },

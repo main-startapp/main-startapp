@@ -20,7 +20,7 @@ const StudentListItem = (props) => {
 
   // context
   const { currentUser } = useAuth();
-  const { currentStudentExt } = useContext(GlobalContext);
+  const { ediumUserExt } = useContext(GlobalContext);
   const { setStudent } = useContext(StudentContext);
 
   // menu

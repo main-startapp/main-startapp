@@ -7,11 +7,11 @@ import TeamCommPanel from "./TeamCommPanel";
 import TeamScheduler from "./TeamScheduler";
 
 const TeamInfo = () => {
-  const { currentStudent } = useContext(GlobalContext);
+  const { ediumUser } = useContext(GlobalContext);
   const { project, projectExt } = useContext(TeamContext);
 
   // local var
-  const currentUID = currentStudent?.uid;
+  const currentUID = ediumUser?.uid;
 
   return (
     <Box

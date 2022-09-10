@@ -6,29 +6,29 @@ import {
   Link,
   Tooltip,
   Typography,
-} from "@mui/material";
-import { useContext, useEffect, useRef, useState } from "react";
-import { GlobalContext, StudentContext } from "../Context/ShareContexts";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import LinkIcon from "@mui/icons-material/Link";
+} from '@mui/material';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { GlobalContext, StudentContext } from '../Context/ShareContexts';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import InstagramIcon from '@mui/icons-material/Instagram';
+import LinkIcon from '@mui/icons-material/Link';
 import {
   exportCollections,
   getGooglePhotoURLwithRes,
   handleConnect,
-} from "../Reusable/Resusable";
-import ExportedImage from "next-image-export-optimizer";
-import FaceRetouchingNaturalOutlinedIcon from "@mui/icons-material/FaceRetouchingNaturalOutlined";
+} from '../Reusable/Resusable';
+import ExportedImage from 'next-image-export-optimizer';
+import FaceRetouchingNaturalOutlinedIcon from '@mui/icons-material/FaceRetouchingNaturalOutlined';
 
 const StudentProfile = () => {
   // context
-  const { chats, currentStudent, setForceChatExpand, setChatPartner, onMedia } =
+  const { chats, ediumUser, setForceChatExpand, setChatPartner, onMedia } =
     useContext(GlobalContext);
   const { student } = useContext(StudentContext);
 
   // local vars
-  const currentUID = currentStudent?.uid;
+  const currentUID = ediumUser?.uid;
 
   // similar alg in components/Project/ProjectInfo
   // box ref to used by useEffect
@@ -44,61 +44,61 @@ const StudentProfile = () => {
       backgroundColor="#ffffff"
       sx={{
         height: onMedia.onDesktop
-          ? "calc(100vh - 64px - 64px - 1.5px)"
-          : "calc(100vh - 48px - 48px - 1.5px - 60px)",
-        overflow: "auto",
+          ? 'calc(100vh - 64px - 64px - 1.5px)'
+          : 'calc(100vh - 48px - 48px - 1.5px - 60px)',
+        overflow: 'auto',
         borderLeft: 1.5,
         borderRight: 1.5,
-        borderColor: "#dbdbdb",
+        borderColor: '#dbdbdb',
       }}
     >
       {/* 1st box; center; avatar and student info */}
       <Box
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
         }}
       >
         {!!student && (
           <Avatar
             sx={{
               m: onMedia.onDesktop ? 6 : 3,
-              width: "200px",
-              height: "200px",
+              width: '200px',
+              height: '200px',
               // color: "#dbdbdb",
               // backgroundColor: "#ffffff",
               // border: 1,
               // borderColor: "#dbdbdb",
             }}
-            src={getGooglePhotoURLwithRes(student?.photo_url, "256")}
+            src={getGooglePhotoURLwithRes(student?.photo_url, '256')}
             referrerPolicy="no-referrer"
           />
         )}
         {/* name */}
         <Typography
           sx={{
-            fontWeight: "bold",
-            fontSize: onMedia.onDesktop ? "2em" : "1.5em",
+            fontWeight: 'bold',
+            fontSize: onMedia.onDesktop ? '2em' : '1.5em',
           }}
         >
           {student?.name}
         </Typography>
 
         {/* position */}
-        <Typography sx={{ fontSize: onMedia.onDesktop ? "1.1em" : "1em" }}>
+        <Typography sx={{ fontSize: onMedia.onDesktop ? '1.1em' : '1em' }}>
           {student?.desired_position}
         </Typography>
 
         {/* field of interest */}
-        <Typography sx={{ fontSize: onMedia.onDesktop ? "1.1em" : "1em" }}>
+        <Typography sx={{ fontSize: onMedia.onDesktop ? '1.1em' : '1em' }}>
           {student?.field_of_interest}
         </Typography>
 
         {/* education year */}
         {student?.year_of_ed && (
-          <Typography sx={{ fontSize: onMedia.onDesktop ? "1.1em" : "1em" }}>
-            {"Education year: "}
+          <Typography sx={{ fontSize: onMedia.onDesktop ? '1.1em' : '1em' }}>
+            {'Education year: '}
             {student.year_of_ed}
           </Typography>
         )}
@@ -106,9 +106,9 @@ const StudentProfile = () => {
       {/* 2nd box; start; student details */}
       <Box
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
           m: onMedia.onDesktop ? 3 : 1.5,
         }}
       >
@@ -116,21 +116,21 @@ const StudentProfile = () => {
         {student?.awards?.length > 0 && (
           <Typography
             sx={{
-              fontWeight: "bold",
-              fontSize: onMedia.onDesktop ? "1.5em" : "1.25em",
+              fontWeight: 'bold',
+              fontSize: onMedia.onDesktop ? '1.5em' : '1.25em',
             }}
           >
-            {"Awards"}
+            {'Awards'}
           </Typography>
         )}
-        <Box sx={{ display: "flex", flexDirection: "row", width: "100%" }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
           {student?.awards?.length > 0 &&
             student.awards.some(
-              (award) => award.toLowerCase() === "betauser"
+              (award) => award.toLowerCase() === 'betauser'
             ) && (
               <Tooltip title="Beta User">
                 <FaceRetouchingNaturalOutlinedIcon
-                  sx={{ fontSize: onMedia.onDesktop ? "3em" : "2.5em", mr: 1 }}
+                  sx={{ fontSize: onMedia.onDesktop ? '3em' : '2.5em', mr: 1 }}
                 />
               </Tooltip>
             )}
@@ -139,18 +139,18 @@ const StudentProfile = () => {
         {student?.social_media?.length > 0 && (
           <Typography
             sx={{
-              fontWeight: "bold",
-              fontSize: onMedia.onDesktop ? "1.5em" : "1.25em",
+              fontWeight: 'bold',
+              fontSize: onMedia.onDesktop ? '1.5em' : '1.25em',
               mt: 1,
             }}
           >
-            {"Social media"}
+            {'Social media'}
           </Typography>
         )}
-        <Box sx={{ display: "flex", flexDirection: "row", width: "100%" }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
           {student?.social_media?.length > 0 &&
             student.social_media.map((link, index) => {
-              if (link.toLowerCase().includes("linkedin")) {
+              if (link.toLowerCase().includes('linkedin')) {
                 return (
                   <Link
                     key={index}
@@ -160,14 +160,14 @@ const StudentProfile = () => {
                   >
                     <LinkedInIcon
                       sx={{
-                        fontSize: onMedia.onDesktop ? "3em" : "2.5em",
+                        fontSize: onMedia.onDesktop ? '3em' : '2.5em',
                         mr: 1,
-                        color: "black",
+                        color: 'black',
                       }}
                     />
                   </Link>
                 );
-              } else if (link.toLowerCase().includes("facebook")) {
+              } else if (link.toLowerCase().includes('facebook')) {
                 return (
                   <Link
                     key={index}
@@ -177,14 +177,14 @@ const StudentProfile = () => {
                   >
                     <FacebookIcon
                       sx={{
-                        fontSize: onMedia.onDesktop ? "3em" : "2.5em",
+                        fontSize: onMedia.onDesktop ? '3em' : '2.5em',
                         mr: 1,
-                        color: "black",
+                        color: 'black',
                       }}
                     />
                   </Link>
                 );
-              } else if (link.toLowerCase().includes("instagram")) {
+              } else if (link.toLowerCase().includes('instagram')) {
                 return (
                   <Link
                     key={index}
@@ -194,9 +194,9 @@ const StudentProfile = () => {
                   >
                     <InstagramIcon
                       sx={{
-                        fontSize: onMedia.onDesktop ? "3em" : "2.5em",
+                        fontSize: onMedia.onDesktop ? '3em' : '2.5em',
                         mr: 1,
-                        color: "black",
+                        color: 'black',
                       }}
                     />
                   </Link>
@@ -211,9 +211,9 @@ const StudentProfile = () => {
                   >
                     <LinkIcon
                       sx={{
-                        fontSize: onMedia.onDesktop ? "3em" : "2.5em",
+                        fontSize: onMedia.onDesktop ? '3em' : '2.5em',
                         mr: 1,
-                        color: "black",
+                        color: 'black',
                       }}
                     />
                   </Link>
@@ -225,24 +225,24 @@ const StudentProfile = () => {
         {student?.past_exp?.length > 0 && (
           <Typography
             sx={{
-              fontWeight: "bold",
-              fontSize: onMedia.onDesktop ? "1.5em" : "1.25em",
+              fontWeight: 'bold',
+              fontSize: onMedia.onDesktop ? '1.5em' : '1.25em',
               mt: 1,
             }}
           >
-            {"Past experience"}
+            {'Past experience'}
           </Typography>
         )}
-        <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
           {student?.past_exp?.length > 0 &&
             student.past_exp.map((exp, index) => (
               <Typography
                 key={index}
                 sx={{
-                  mx: "1em",
-                  mb: "1em",
-                  fontSize: onMedia.onDesktop ? "1.1em" : "1em",
-                  wordWrap: "break-word",
+                  mx: '1em',
+                  mb: '1em',
+                  fontSize: onMedia.onDesktop ? '1.1em' : '1em',
+                  wordWrap: 'break-word',
                 }}
               >
                 &bull; &nbsp; {exp}
@@ -254,15 +254,15 @@ const StudentProfile = () => {
       {!!student && onMedia.onDesktop && (
         <Box
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
             m: 3,
           }}
         >
           {/* connect button */}
 
-          <Tooltip title={currentUID ? "" : "Edit your profile first"}>
+          <Tooltip title={currentUID ? '' : 'Edit your profile first'}>
             <span>
               <Button
                 disabled={
@@ -273,17 +273,17 @@ const StudentProfile = () => {
                 sx={{
                   my: 3,
                   border: 1.5,
-                  borderColor: "#dbdbdb",
-                  borderRadius: "30px",
-                  color: "#ffffff",
-                  backgroundColor: "#3e95c2",
-                  fontSize: "1.1em",
-                  "&:hover": {
-                    backgroundColor: "#f6f6f6",
+                  borderColor: '#dbdbdb',
+                  borderRadius: '30px',
+                  color: '#ffffff',
+                  backgroundColor: '#3e95c2',
+                  fontSize: '1.1em',
+                  '&:hover': {
+                    backgroundColor: '#f6f6f6',
                   },
                   paddingY: 0.5,
                   paddingX: 5,
-                  textTransform: "none",
+                  textTransform: 'none',
                 }}
                 variant="contained"
                 onClick={(e) => {
@@ -291,27 +291,27 @@ const StudentProfile = () => {
                   handleConnect(
                     chats,
                     student,
-                    currentStudent,
+                    ediumUser,
                     setChatPartner,
                     setForceChatExpand
                   );
                 }}
               >
-                {"Connect"}
+                {'Connect'}
               </Button>
             </span>
           </Tooltip>
         </Box>
       )}
 
-      {!!!student && (
+      {!student && (
         <Box
           id="logo placeholder wrapper"
           sx={{
-            height: "50%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+            height: '50%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
           <ExportedImage

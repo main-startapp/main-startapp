@@ -161,7 +161,7 @@ const ChatAccordionMsg = () => {
     if (!isClickable) return;
     setIsClickable(false);
 
-    // add student to project ext member
+    // add user to project ext member
     const projectExtDocRef = doc(db, "projects_ext", joinRequest.project_id);
     const projectExtUpdateRef = {
       members: arrayUnion(joinRequest.requester_uid),
@@ -227,7 +227,7 @@ const ChatAccordionMsg = () => {
       console.log("updateDoc() error: ", err);
     });
 
-    // JR in student ext will not be changed
+    // JR in user ext will not be changed
 
     // await
     await projectExtModRef;

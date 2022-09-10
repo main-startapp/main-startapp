@@ -1,17 +1,17 @@
-import { useContext, useEffect, useMemo, useState } from "react";
-import { Avatar, Badge, Box, Typography } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import moment from "moment";
-import { GlobalContext } from "../Context/ShareContexts";
-import { useAuth } from "../Context/AuthContext";
-import { handleUnread } from "../Reusable/Resusable";
+import { useContext, useEffect, useMemo, useState } from 'react';
+import { Avatar, Badge, Box, Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import moment from 'moment';
+import { GlobalContext } from '../Context/ShareContexts';
+import { useAuth } from '../Context/AuthContext';
+import { handleUnread } from '../Reusable/Resusable';
 
 const ChatAccordionContact = (props) => {
   const chat = props.chat;
 
   // context
   const { currentUser } = useAuth();
-  const { projects, setChat, setChatPartner, showMsg, setShowMsg, students } =
+  const { projects, setChat, setChatPartner, showMsg, setShowMsg, users } =
     useContext(GlobalContext);
 
   // local states and vars
@@ -20,10 +20,10 @@ const ChatAccordionContact = (props) => {
       chat.chat_user_ids[0] === currentUser?.uid
         ? chat.chat_user_ids[1]
         : chat.chat_user_ids[0];
-    return students.find((student) => student.uid === contactUID);
-  }, [chat.chat_user_ids, currentUser?.uid, students]);
+    return users.find((user) => user.uid === contactUID);
+  }, [chat.chat_user_ids, currentUser?.uid, users]);
 
-  const my_unread_key = currentUser?.uid + "_unread"; // the key to get unread msg no.
+  const my_unread_key = currentUser?.uid + '_unread'; // the key to get unread msg no.
 
   // find the last join request's project and position info
   // !todo: use a map to reduce searching
@@ -69,13 +69,13 @@ const ChatAccordionContact = (props) => {
     >
       <Avatar
         sx={{
-          mx: "12px",
+          mx: '12px',
           // color: "#dbdbdb",
           // backgroundColor: "#ffffff",
           // border: 1,
           // borderColor: "#dbdbdb",
-          height: "56px",
-          width: "56px",
+          height: '56px',
+          width: '56px',
         }}
         src={contact?.photo_url}
         referrerPolicy="no-referrer"
@@ -84,34 +84,34 @@ const ChatAccordionContact = (props) => {
         {/* name & position */}
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            width: "100%",
+            display: 'flex',
+            justifyContent: 'space-between',
+            width: '100%',
           }}
         >
           <Typography
             fontSize="1em"
             fontWeight="bold"
             sx={{
-              display: "-webkit-box",
-              overflow: "hidden",
-              WebkitBoxOrient: "vertical",
+              display: '-webkit-box',
+              overflow: 'hidden',
+              WebkitBoxOrient: 'vertical',
               WebkitLineClamp: 1,
             }}
           >
             {contact?.name}
           </Typography>
         </Box>
-        {!!lastJR ? (
+        {lastJR ? (
           <Box>
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
               <Typography
                 fontSize="0.8em"
                 color="#3e95c2"
                 sx={{
-                  display: "-webkit-box",
-                  overflow: "hidden",
-                  WebkitBoxOrient: "vertical",
+                  display: '-webkit-box',
+                  overflow: 'hidden',
+                  WebkitBoxOrient: 'vertical',
                   WebkitLineClamp: 1,
                 }}
               >
@@ -121,9 +121,9 @@ const ChatAccordionContact = (props) => {
             <Typography
               fontSize="0.8em"
               sx={{
-                display: "-webkit-box",
-                overflow: "hidden",
-                WebkitBoxOrient: "vertical",
+                display: '-webkit-box',
+                overflow: 'hidden',
+                WebkitBoxOrient: 'vertical',
                 WebkitLineClamp: 1,
               }}
             >
@@ -131,7 +131,7 @@ const ChatAccordionContact = (props) => {
             </Typography>
           </Box>
         ) : (
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Typography fontSize="0.8em">
               {contact?.desired_position}
             </Typography>
@@ -141,25 +141,25 @@ const ChatAccordionContact = (props) => {
 
       <Box
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          width: "104px",
-          height: "56px",
-          alignItems: "center",
-          mr: "12px",
+          display: 'flex',
+          flexDirection: 'column',
+          width: '104px',
+          height: '56px',
+          alignItems: 'center',
+          mr: '12px',
         }}
       >
         <Typography fontSize="0.8em">
-          {moment(chat?.last_timestamp?.toDate().getTime()).format("MMM D")}
+          {moment(chat?.last_timestamp?.toDate().getTime()).format('MMM D')}
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
         <Badge
           sx={{
-            mb: "12px",
-            color: "#ffffff",
+            mb: '12px',
+            color: '#ffffff',
           }}
           badgeContent={chat[my_unread_key]}
-          color={"SteelBlue"}
+          color={'SteelBlue'}
         />
       </Box>
     </ContactBox>
@@ -169,19 +169,19 @@ const ChatAccordionContact = (props) => {
 export default ChatAccordionContact;
 
 const ContactBox = styled(Box)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "row",
-  alignItems: "center",
-  height: "calc(56px + 2*12px)",
-  cursor: "pointer",
-  borderBottom: "1.5px solid #dbdbdb",
-  "&:hover": {
-    backgroundColor: "#f6f6f6",
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  height: 'calc(56px + 2*12px)',
+  cursor: 'pointer',
+  borderBottom: '1.5px solid #dbdbdb',
+  '&:hover': {
+    backgroundColor: '#f6f6f6',
   },
 }));
 
-const ChatInfo = styled("div")(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  width: "100%",
+const ChatInfo = styled('div')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
 }));

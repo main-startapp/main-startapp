@@ -6,18 +6,18 @@ import TeamProjectListItemEmpty from "./TeamProjectListItemEmpty";
 
 const TeamProjectList = () => {
   // contexts
-  const { projects, projectsExt, currentStudentExt, chats } =
+  const { projects, projectsExt, ediumUserExt, chats } =
     useContext(GlobalContext);
 
   // local vars
   const maxProjectCount = 3;
   const myProjectCount = useMemo(() => {
-    // if no currentStudent data, don't show the project creation slot
+    // if no ediumUser data, don't show the project creation slot
     // if no length or 0, treat it as 0
     // if number > 0, use it
-    if (!currentStudentExt) return maxProjectCount;
-    return currentStudentExt?.my_project_ids?.length || 0;
-  }, [currentStudentExt]);
+    if (!ediumUserExt) return maxProjectCount;
+    return ediumUserExt?.my_project_ids?.length || 0;
+  }, [ediumUserExt]);
 
   // helper fun
   const getProject = (id) => {
@@ -36,7 +36,7 @@ const TeamProjectList = () => {
       }}
     >
       {/* my projects */}
-      {currentStudentExt?.my_project_ids.map((myProjectID) => {
+      {ediumUserExt?.my_project_ids.map((myProjectID) => {
         return (
           <TeamProjectListItem
             key={myProjectID}

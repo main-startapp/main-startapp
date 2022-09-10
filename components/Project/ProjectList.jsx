@@ -9,11 +9,11 @@ import ProjectListItem from "./ProjectListItem";
 // behavior: filters projects based on the search term and/or search category
 const ProjectList = () => {
   // context
-  const { projects, currentStudent, onMedia } = useContext(GlobalContext);
+  const { projects, ediumUser, onMedia } = useContext(GlobalContext);
   const { searchTerm, searchCategory } = useContext(ProjectContext);
 
   // local vars
-  const currentUID = currentStudent?.uid;
+  const currentUID = ediumUser?.uid;
 
   const filteredProjects = useMemo(
     () =>

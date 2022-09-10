@@ -19,7 +19,7 @@ const TeamProjectListItem = (props) => {
   const projectExt = props.projectExt;
 
   // context
-  const { currentStudentExt, setCurrentStudentExt } = useContext(GlobalContext);
+  const { ediumUserExt, setediumUserExt } = useContext(GlobalContext);
   const { setProject, setProjectExt } = useContext(TeamContext);
 
   // menu
@@ -118,11 +118,7 @@ const TeamProjectListItem = (props) => {
               onClick={() => {
                 setProject(null);
                 setProjectExt(null);
-                handleDeleteProject(
-                  project?.id,
-                  currentStudentExt,
-                  setCurrentStudentExt
-                );
+                handleDeleteProject(project?.id, ediumUserExt, setediumUserExt);
                 handleMenuClose();
               }}
             >

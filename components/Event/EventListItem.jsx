@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState } from 'react';
 import {
   Avatar,
   Box,
@@ -7,12 +7,12 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-} from "@mui/material";
-import moment from "moment";
-import { GlobalContext, EventContext } from "../Context/ShareContexts";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useAuth } from "../Context/AuthContext";
+} from '@mui/material';
+import moment from 'moment';
+import { GlobalContext, EventContext } from '../Context/ShareContexts';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { useAuth } from '../Context/AuthContext';
 
 const EventListItem = (props) => {
   const index = props.index;
@@ -21,7 +21,7 @@ const EventListItem = (props) => {
 
   // context
   const { currentUser } = useAuth();
-  const { currentStudentExt, onMedia } = useContext(GlobalContext);
+  const { ediumUserExt, onMedia } = useContext(GlobalContext);
   const { setEvent } = useContext(EventContext);
 
   // menu
@@ -45,27 +45,27 @@ const EventListItem = (props) => {
       <ListItem
         onClick={() => setEvent(event)}
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
           border: 1.5,
-          borderRadius: "30px",
-          borderColor: "#dbdbdb",
-          backgroundColor: "#ffffff",
-          "&:hover": {
-            backgroundColor: "#f6f6f6",
-            cursor: "default",
+          borderRadius: '30px',
+          borderColor: '#dbdbdb',
+          backgroundColor: '#ffffff',
+          '&:hover': {
+            backgroundColor: '#f6f6f6',
+            cursor: 'default',
           },
           // height: "180px",
-          overflow: "hidden",
+          overflow: 'hidden',
         }}
       >
         <Box
           sx={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            width: "100%",
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            width: '100%',
           }}
           // onClick={(e) => {
           //   e.stopPropagation();
@@ -77,8 +77,8 @@ const EventListItem = (props) => {
               my: 1,
               ml: 1,
               mr: 3,
-              height: "80px",
-              width: "80px",
+              height: '80px',
+              width: '80px',
             }}
             src={event?.icon_url}
           >
@@ -86,21 +86,21 @@ const EventListItem = (props) => {
           </Avatar>
           <ListItemText
             primary={event.title}
-            primaryTypographyProps={{ fontWeight: "bold" }}
+            primaryTypographyProps={{ fontWeight: 'bold' }}
             secondary={
               <>
                 {event.category}
                 <br />
-                {moment(event.starting_date).format("MMMM Do h:mm a")}
+                {moment(event.starting_date).format('MMMM Do h:mm a')}
               </>
             }
           />
           <IconButton
             id="PLI-menu-button"
-            aria-controls={open ? "PLI-menu" : undefined}
+            aria-controls={open ? 'PLI-menu' : undefined}
             aria-haspopup="true"
-            aria-expanded={open ? "true" : undefined}
-            sx={{ position: "absolute", top: "11%", right: "3.5%" }}
+            aria-expanded={open ? 'true' : undefined}
+            sx={{ position: 'absolute', top: '11%', right: '3.5%' }}
             // onClick={(e) => {
             //   handleMenuClick(e);
             // }}
@@ -113,7 +113,7 @@ const EventListItem = (props) => {
             open={open}
             onClose={handleMenuClose}
             MenuListProps={{
-              "aria-labelledby": "PLI-menu-button",
+              'aria-labelledby': 'PLI-menu-button',
             }}
           >
             {currentUser?.uid === 1 && (
@@ -122,7 +122,7 @@ const EventListItem = (props) => {
                   handleMenuClose();
                 }}
               >
-                {project?.is_visible ? "Hide" : "Display"}
+                {event?.is_visible ? 'Hide' : 'Display'}
               </MenuItem>
             )}
 

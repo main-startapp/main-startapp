@@ -9,26 +9,26 @@ import {
   Link,
   Tooltip,
   Typography,
-} from "@mui/material";
-import { styled } from "@mui/material/styles";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useContext, useEffect, useState } from "react";
-import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
-import { db } from "../../firebase";
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useContext, useEffect, useState } from 'react';
+import { GlobalContext, ProjectContext } from '../Context/ShareContexts';
+import { db } from '../../firebase';
 import {
   addDoc,
   collection,
   doc,
   serverTimestamp,
   updateDoc,
-} from "firebase/firestore";
+} from 'firebase/firestore';
 
 const PositionListItem = (props) => {
   // context
   const {
     chats,
-    currentStudent,
-    currentStudentExt,
+    ediumUser,
+    ediumUserExt,
     setChatPartner,
     setForceChatExpand,
     onMedia,
@@ -40,88 +40,87 @@ const PositionListItem = (props) => {
   const posTitle = props.posTitle;
   const posResp = props.posResp;
   const posWeeklyHour = props.posWeeklyHour;
-  const isCreator = props.isCreator; // whether currentStudent is the creator
-  const isCreatorAdmin = props.isCreatorAdmin; // where the project creator is Admin
-  const creator = props.creator; // creator's student data
+  const isCreator = props.isCreator; // whether ediumUser is the creator
+  const creator = props.creator; // creator's user data
   const appFormURL = props.appFormURL;
 
   // local vars
-  const currentUID = currentStudent?.uid;
+  const currentUID = ediumUser?.uid;
 
   // useEffect to reset accordion expansion
-  const [expandState, setExpandState] = useState("collapseIt");
+  const [expandState, setExpandState] = useState('collapseIt');
   useEffect(() => {
-    setExpandState("collpaseIt");
+    setExpandState('collpaseIt');
   }, [project]); // every time project changes, this sets each accordion to collapse
 
   const handleExpand = (e) => {
-    expandState === "expandIt"
-      ? setExpandState("collapseIt")
-      : setExpandState("expandIt");
+    expandState === 'expandIt'
+      ? setExpandState('collapseIt')
+      : setExpandState('expandIt');
   };
 
   // !todo: handleJoinRequest; function is bloated, might need an external lib to hold these func
   const handleJoinRequest = async () => {
     // mod ref
     let jrModRef;
-    let curStudentExtModRef;
+    let ediumUserExtModRef;
     let chatModRef;
 
     // add it to project ext join requests subcollection
     const jrCollectionRef = collection(
       db,
-      "projects_ext",
+      'projects_ext',
       project.id,
-      "join_requests"
+      'join_requests'
     );
     const jrDocRef = {
       position_id: posID,
       requester_uid: currentUID,
-      status: "requesting",
+      status: 'requesting',
       last_timestamp: serverTimestamp(),
     };
     jrModRef = addDoc(jrCollectionRef, jrDocRef).catch((err) => {
-      console.log("addDoc() error: ", err);
+      console.log('addDoc() error: ', err);
     });
     let jrRetID;
     await jrModRef.then((ret) => {
       jrRetID = ret?.id;
     });
 
-    // add it to my student ext
-    const curStudentExtDocRef = doc(db, "students_ext", currentUID);
-    const curStudentExtJoinRequests = currentStudentExt.join_requests;
-    curStudentExtJoinRequests.push({
+    // add it to my user ext
+    const ediumUserExtDocRef = doc(db, 'users_ext', currentUID);
+    const ediumUserExtJoinRequests = ediumUserExt.join_requests;
+    ediumUserExtJoinRequests.push({
       project_id: project.id,
       position_id: posID,
       join_request_doc_id: jrRetID || -1,
     });
-    const curStudentExtUpdateRef = {
-      join_requests: curStudentExtJoinRequests,
+    const ediumUserExtUpdateRef = {
+      join_requests: ediumUserExtJoinRequests,
       last_timestamp: serverTimestamp(),
     };
-    curStudentExtModRef = updateDoc(
-      curStudentExtDocRef,
-      curStudentExtUpdateRef
+    ediumUserExtModRef = updateDoc(
+      ediumUserExtDocRef,
+      ediumUserExtUpdateRef
     ).catch((err) => {
-      console.log("updateDoc() error: ", err);
+      console.log('updateDoc() error: ', err);
     });
 
     // add it to chat or create a chat
     const msgStr =
-      currentStudent.name +
-      " requested to join " +
+      ediumUser.name +
+      ' requested to join ' +
       project.title +
-      " for " +
+      ' for ' +
       posTitle +
-      " position";
+      ' position';
     const messageRef = {
       text: msgStr,
       sent_by: currentUID,
       sent_at: serverTimestamp(),
     };
-    const my_unread_key = currentUID + "_unread";
-    const creator_unread_key = project?.creator_uid + "_unread";
+    const my_unread_key = currentUID + '_unread';
+    const creator_unread_key = project?.creator_uid + '_unread';
     const foundChat = chats.find((chat) =>
       chat.chat_user_ids.some((uid) => uid === project.creator_uid)
     );
@@ -133,7 +132,7 @@ const PositionListItem = (props) => {
     };
     if (foundChat) {
       // update
-      const chatDocRef = doc(db, "chats", foundChat.id);
+      const chatDocRef = doc(db, 'chats', foundChat.id);
       let newChatJoinRequests = foundChat?.join_requests
         ? foundChat.join_requests
         : [];
@@ -146,11 +145,11 @@ const PositionListItem = (props) => {
       };
       // don't need to setChat, as this will be done by hook in ChatAccordion
       chatModRef = updateDoc(chatDocRef, chatUpdateRef).catch((err) => {
-        console.log("updateDoc() error: ", err);
+        console.log('updateDoc() error: ', err);
       });
     } else {
       // create
-      const collectionRef = collection(db, "chats");
+      const collectionRef = collection(db, 'chats');
       const chatRef = {
         // new
         chat_user_ids: [currentUID, project.creator_uid],
@@ -161,7 +160,7 @@ const PositionListItem = (props) => {
         last_timestamp: serverTimestamp(),
       };
       chatModRef = addDoc(collectionRef, chatRef).catch((err) => {
-        console.log("addDoc() error: ", err);
+        console.log('addDoc() error: ', err);
       });
     }
 
@@ -170,14 +169,14 @@ const PositionListItem = (props) => {
     await chatModRef.then((ret) => {
       chatRetID = ret?.id;
     }); // only addDoc will return, updateDoc returns undefined
-    const chatID = !!foundChat ? foundChat.id : chatRetID || -1;
-    const msgCollectionRef = collection(db, "chats", chatID, "messages");
+    const chatID = foundChat ? foundChat.id : chatRetID || -1;
+    const msgCollectionRef = collection(db, 'chats', chatID, 'messages');
     const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
-      console.log("addDoc() error: ", err);
+      console.log('addDoc() error: ', err);
     });
 
     // await the rest
-    await curStudentExtModRef;
+    await ediumUserExtModRef;
     await msgModRef;
 
     // open chat accordion
@@ -193,10 +192,10 @@ const PositionListItem = (props) => {
       size="small"
       sx={{
         border: 1.5,
-        borderColor: "#dbdbdb",
-        borderRadius: "30px",
-        backgroundColor: "#3e95c2",
-        textTransform: "none",
+        borderColor: '#dbdbdb',
+        borderRadius: '30px',
+        backgroundColor: '#3e95c2',
+        textTransform: 'none',
         paddingX: 3,
         paddingY: 0,
       }}
@@ -207,7 +206,7 @@ const PositionListItem = (props) => {
       href={appFormURL}
       rel="noreferrer"
     >
-      {"Application Link"}
+      {'Application Link'}
     </Button>
   );
 
@@ -215,7 +214,7 @@ const PositionListItem = (props) => {
     <Button
       disabled={
         !currentUID ||
-        currentStudentExt?.join_requests?.some(
+        ediumUserExt?.join_requests?.some(
           (jr) => jr.project_id === project.id && jr.position_id === posID
         )
       }
@@ -223,10 +222,10 @@ const PositionListItem = (props) => {
       size="small"
       sx={{
         border: 1.5,
-        borderColor: "#dbdbdb",
-        borderRadius: "30px",
-        backgroundColor: "#3e95c2",
-        textTransform: "none",
+        borderColor: '#dbdbdb',
+        borderRadius: '30px',
+        backgroundColor: '#3e95c2',
+        textTransform: 'none',
         paddingX: 3,
         paddingY: 0,
       }}
@@ -236,7 +235,7 @@ const PositionListItem = (props) => {
         handleJoinRequest();
       }}
     >
-      {"Join Request"}
+      {'Join Request'}
     </Button>
   );
 
@@ -244,13 +243,13 @@ const PositionListItem = (props) => {
     <Box sx={onMedia.onDesktop ? { m: 3 } : { m: 1.5 }}>
       <Accordion
         square
-        expanded={expandState === "expandIt"}
+        expanded={expandState === 'expandIt'}
         sx={{
           border: 1.5,
-          borderRadius: "10px",
-          borderColor: "#dbdbdb",
-          "&:hover": {
-            backgroundColor: "#f6f6f6",
+          borderRadius: '10px',
+          borderColor: '#dbdbdb',
+          '&:hover': {
+            backgroundColor: '#f6f6f6',
           },
         }}
         elevation={0}
@@ -262,20 +261,21 @@ const PositionListItem = (props) => {
           <Box
             sx={{
               mr: 3,
-              width: "100%",
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
             }}
           >
             <Typography color="text.primary">{posTitle}</Typography>
             <Box sx={{ flexGrow: 1 }} />
             {onMedia.onDesktop && !isCreator && (
-              <Tooltip title={!!currentUID ? "" : "Edit your profile first"}>
+              <Tooltip title={currentUID ? '' : 'Edit your profile first'}>
                 <span>
-                  {!!appFormURL
+                  {appFormURL
                     ? appFormButton
-                    : !isCreatorAdmin && joinRequestButton}
+                    : project?.creator_uid !== 'T5q6FqwJFcRTKxm11lu0zmaXl8x2' &&
+                      joinRequestButton}
                 </span>
               </Tooltip>
             )}
@@ -283,47 +283,45 @@ const PositionListItem = (props) => {
         </StyledAccordionSummary>
         <AccordionDetails>
           <Divider
-            sx={{ mb: 1.5, borderBottomWidth: 1.5, borderColor: "#dbdbdb" }}
+            sx={{ mb: 1.5, borderBottomWidth: 1.5, borderColor: '#dbdbdb' }}
           />
 
-          <Box sx={{ width: "100%", display: "flex", flexDirection: "column" }}>
+          <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
             <Box
               sx={{
-                width: "100%",
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
               }}
             >
               <Typography
                 color="text.primary"
-                sx={{ fontSize: "1em", fontWeight: "bold" }}
+                sx={{ fontSize: '1em', fontWeight: 'bold' }}
               >
-                {"Responsibilities: "}
+                {'Responsibilities: '}
               </Typography>
-              <Typography sx={{ fontSize: "1em", fontWeight: "bold" }}>
-                {"Weekly Hours: "}
+              <Typography sx={{ fontSize: '1em', fontWeight: 'bold' }}>
+                {'Weekly Hours: '}
                 {posWeeklyHour}
               </Typography>
             </Box>
             <Typography component="span" color="text.secondary">
               <pre
                 style={{
-                  fontFamily: "inherit",
-                  whiteSpace: "pre-wrap",
-                  wordWrap: "break-word",
-                  display: "inline",
+                  fontFamily: 'inherit',
+                  whiteSpace: 'pre-wrap',
+                  wordWrap: 'break-word',
+                  display: 'inline',
                 }}
               >
                 {posResp}
               </pre>
             </Typography>
             {!onMedia.onDesktop && !isCreator && (
-              <Box sx={{ mt: 1.5, display: "flex", justifyContent: "end" }}>
-                <Tooltip title={!!currentUID ? "" : "Edit your profile first"}>
-                  <span>
-                    {!!appFormURL ? appFormButton : joinRequestButton}
-                  </span>
+              <Box sx={{ mt: 1.5, display: 'flex', justifyContent: 'end' }}>
+                <Tooltip title={currentUID ? '' : 'Edit your profile first'}>
+                  <span>{appFormURL ? appFormButton : joinRequestButton}</span>
                 </Tooltip>
               </Box>
             )}
@@ -337,7 +335,7 @@ const PositionListItem = (props) => {
 export default PositionListItem;
 
 const StyledAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
-  "& .MuiAccordionSummary-content": {
-    justifyContent: "space-between",
+  '& .MuiAccordionSummary-content': {
+    justifyContent: 'space-between',
   },
 }));

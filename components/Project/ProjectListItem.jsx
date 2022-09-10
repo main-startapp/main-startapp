@@ -24,8 +24,7 @@ const ProjectListItem = (props) => {
 
   // context
   const { currentUser } = useAuth();
-  const { currentStudentExt, setCurrentStudentExt, onMedia } =
-    useContext(GlobalContext);
+  const { ediumUserExt, setediumUserExt, onMedia } = useContext(GlobalContext);
   const { setProject } = useContext(ProjectContext);
 
   // menu
@@ -136,8 +135,8 @@ const ProjectListItem = (props) => {
                   setProject(null);
                   handleDeleteProject(
                     project?.id,
-                    currentStudentExt,
-                    setCurrentStudentExt
+                    ediumUserExt,
+                    setediumUserExt
                   );
                   handleMenuClose();
                 }}

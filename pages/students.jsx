@@ -1,15 +1,15 @@
-import { useContext, useEffect, useState } from "react";
-import { Grid } from "@mui/material";
+import { useContext, useEffect, useState } from 'react';
+import { Grid } from '@mui/material';
 import {
   GlobalContext,
   StudentContext,
-} from "../components/Context/ShareContexts";
-import StudentPageBar from "../components/Header/StudentPageBar";
-import StudentProfile from "../components/Student/StudentProfile";
-import StudentGrid from "../components/Student/StudentGrid";
-import StudentList from "../components/Student/StudentList";
+} from '../components/Context/ShareContexts';
+import StudentPageBar from '../components/Header/StudentPageBar';
+import StudentProfile from '../components/Student/StudentProfile';
+import StudentGrid from '../components/Student/StudentGrid';
+import StudentList from '../components/Student/StudentList';
 
-const Students = () => {
+function Students() {
   // context
   const { setChat, setChatPartner, setShowChat, setShowMsg, onMedia } =
     useContext(GlobalContext);
@@ -21,20 +21,20 @@ const Students = () => {
   }, [setChat, setChatPartner, setShowChat, setShowMsg]);
 
   // local
-  const [student, setStudent] = useState(null); // the selected student by clicking the student card in the StudentGrid
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchCategory, setSearchCategory] = useState("");
+  const [student, setStudent] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchCategory, setSearchCategory] = useState('');
 
   return (
     <StudentContext.Provider
-      value={{
-        student,
+      value={
+        (student,
         setStudent,
         searchTerm,
         setSearchTerm,
         searchCategory,
-        setSearchCategory,
-      }}
+        setSearchCategory)
+      }
     >
       <StudentPageBar />
       <Grid
@@ -43,7 +43,7 @@ const Students = () => {
         direction="row"
         // alignItems="center"
         justifyContent="center"
-        sx={{ backgroundColor: "#fafafa" }}
+        sx={{ backgroundColor: '#fafafa' }}
       >
         {onMedia.onDesktop ? (
           <Grid item xs={7}>
@@ -70,6 +70,6 @@ const Students = () => {
       </Grid>
     </StudentContext.Provider>
   );
-};
+}
 
 export default Students;

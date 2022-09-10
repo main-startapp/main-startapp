@@ -6,11 +6,11 @@ import EventListItem from "./EventListItem";
 
 const EventList = () => {
   // context
-  const { events, currentStudent, onMedia } = useContext(GlobalContext);
+  const { events, ediumUser, onMedia } = useContext(GlobalContext);
   const { searchTerm, searchCategory } = useContext(EventContext);
 
   // local vars
-  const currentUID = currentStudent?.uid;
+  const currentUID = ediumUser?.uid;
 
   const filteredEvents = useMemo(
     () =>

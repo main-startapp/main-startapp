@@ -111,6 +111,7 @@ const EventPageBar = () => {
         <MenuItem value={"Conference"}>Conference</MenuItem>
         <MenuItem value={"Expo"}>Expo</MenuItem>
         <MenuItem value={"Festival"}>Festival</MenuItem>
+        <MenuItem value={"Networking"}>Networking</MenuItem>
         <MenuItem value={"Performance"}>Performance</MenuItem>
         <MenuItem value={"Sports"}>Sports</MenuItem>
       </Select>

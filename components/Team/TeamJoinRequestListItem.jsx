@@ -45,26 +45,21 @@ const TeamJoinRequestListItem = (props) => {
   const status = request.status;
 
   // context
-  const {
-    students,
-    chats,
-    currentStudent,
-    setChatPartner,
-    setForceChatExpand,
-  } = useContext(GlobalContext);
+  const { users, chats, ediumUser, setChatPartner, setForceChatExpand } =
+    useContext(GlobalContext);
 
   // local vars
-  const currentUID = currentStudent?.uid;
+  const currentUID = ediumUser?.uid;
 
   // requester's student data
   const [requestingStudent, setRequestingStudent] = useState(null);
   useEffect(() => {
-    const found = students.find((student) => student.uid === requesterUID);
+    const found = users.find((student) => student.uid === requesterUID);
     if (!found) return; // is this even possible?
 
     setRequestingStudent(found);
     return found;
-  }, [requesterUID, students]);
+  }, [requesterUID, users]);
 
   // flip card
   const [isFlipped, setIsFlipped] = useState(false);
@@ -206,7 +201,7 @@ const TeamJoinRequestListItem = (props) => {
             handleConnect(
               chats,
               requestingStudent,
-              currentStudent,
+              ediumUser,
               setChatPartner,
               setForceChatExpand
             );

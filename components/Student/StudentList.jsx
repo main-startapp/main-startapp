@@ -8,29 +8,29 @@ import StudentListItem from "./StudentListItem";
 
 const StudentList = () => {
   // context
-  const { students } = useContext(GlobalContext);
+  const { users } = useContext(GlobalContext);
   const { searchTerm } = useContext(StudentContext);
 
   // local vars
   const filteredStudents = useMemo(
     () =>
-      students.filter((student) => {
-        const isInPosition = student.desired_position
+      users.filter((user) => {
+        const isInPosition = user.desired_position
           .toLowerCase()
           .includes(searchTerm.toLowerCase());
-        const isInFoI = student.field_of_interest
+        const isInFoI = user.field_of_interest
           .toLowerCase()
           .includes(searchTerm.toLowerCase());
-        if (searchTerm === "" && !!!student?.is_club) {
+        if (searchTerm === "" && user?.role == "student") {
           // no search
-          return student;
+          return user;
         }
-        if (!!!student?.is_club && (isInPosition || isInFoI)) {
+        if (user?.role == "student" && (isInPosition || isInFoI)) {
           // in position title or in field of interest
-          return student;
+          return user;
         }
       }),
-    [students, searchTerm]
+    [users, searchTerm]
   );
 
   return (

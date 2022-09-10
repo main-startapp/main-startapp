@@ -10,14 +10,8 @@ import TeamProjectList from "../../components/Team/TeamProjectList";
 
 const TeamManagement = () => {
   // context
-  const {
-    setChat,
-    setChatPartner,
-    setShowChat,
-    setShowMsg,
-    chats,
-    currentStudent,
-  } = useContext(GlobalContext);
+  const { setChat, setChatPartner, setShowChat, setShowMsg, chats, ediumUser } =
+    useContext(GlobalContext);
   useEffect(() => {
     setShowChat(true);
     setShowMsg(false);
@@ -26,7 +20,7 @@ const TeamManagement = () => {
   }, [setChat, setChatPartner, setShowChat, setShowMsg]);
 
   // local vars
-  const currentUID = currentStudent?.uid;
+  const currentUID = ediumUser?.uid;
 
   // team states init
   const [project, setProject] = useState(null);

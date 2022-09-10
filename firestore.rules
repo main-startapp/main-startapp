@@ -35,22 +35,12 @@ service cloud.firestore {
     }
 
     // Allow public read access, only owner can write, nobody can delete
-    match /students/{student} {
-      allow read: if true
-      allow create, update: if request.auth != null && request.resource != null && request.auth.uid == request.resource.id
-    }
-
     match /users/{user} {
       allow read: if true
       allow create, update: if request.auth != null && request.resource != null && request.auth.uid == request.resource.id
     }
 
     // Only owner can read, write, nobody can delete
-    match /students_ext/{student_ext} {
-      allow read: if request.auth != null && request.auth.uid == resource.id
-      allow create, update: if request.auth != null && request.resource != null && request.auth.uid == request.resource.id
-    }
-
     match /users_ext/{user_ext} {
       allow read: if request.auth != null && request.auth.uid == resource.id
       allow create, update: if request.auth != null && request.resource != null && request.auth.uid == request.resource.id

@@ -9,12 +9,12 @@ const StudentGridCard = (props) => {
   const student = props.student;
 
   // context
-  const { chats, currentStudent, setChatPartner, setForceChatExpand } =
+  const { chats, ediumUser, setChatPartner, setForceChatExpand } =
     useContext(GlobalContext);
   const { setStudent } = useContext(StudentContext);
 
   // local vars
-  const currentUID = currentStudent?.uid;
+  const currentUID = ediumUser?.uid;
 
   return (
     <Card
@@ -102,7 +102,7 @@ const StudentGridCard = (props) => {
                 handleConnect(
                   chats,
                   student,
-                  currentStudent,
+                  ediumUser,
                   setChatPartner,
                   setForceChatExpand
                 );

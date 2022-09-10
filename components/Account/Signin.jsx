@@ -62,7 +62,7 @@ const Signin = () => {
 
   const signInWithGoogle = () => {
     signInWithPopup(auth, googleProvider).catch((err) => {
-      console.log("signInWithPopup() error: ", err);
+      console.log("signInWithPopup() error: ", err.message);
     });
   };
 

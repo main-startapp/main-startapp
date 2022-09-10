@@ -6,7 +6,7 @@ import StudentGridCard from "./StudentGridCard";
 
 const StudentGrid = () => {
   // context
-  const { students } = useContext(GlobalContext);
+  const { users } = useContext(GlobalContext);
   const { searchTerm } = useContext(StudentContext);
   const { height, width } = useWindowDimensions();
 
@@ -18,38 +18,30 @@ const StudentGrid = () => {
       }}
     >
       <Grid container spacing={1.5} padding={1.5}>
-        {students
-          .filter((student) => {
-            const isInPosition = student.desired_position
+        {users
+          .filter((user) => {
+            const isInPosition = user.desired_position
               .toLowerCase()
               .includes(searchTerm.toLowerCase());
-            const isInFoI = student.field_of_interest
+            const isInFoI = user.field_of_interest
               .toLowerCase()
               .includes(searchTerm.toLowerCase());
-            if (
-              searchTerm === "" &&
-              !!!student?.is_club &&
-              student?.uid !== "T5q6FqwJFcRTKxm11lu0zmaXl8x2"
-            ) {
+            if (searchTerm === "" && user?.role == "student") {
               // no search
-              return student;
+              return user;
             }
-            if (
-              !!!student?.is_club &&
-              student?.uid !== "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
-              (isInPosition || isInFoI)
-            ) {
+            if (user?.role == "student" && (isInPosition || isInFoI)) {
               // in position title or in field of interest
-              return student;
+              return user;
             }
           })
-          .map((student, index) => (
+          .map((user, index) => (
             <Grid
               key={index}
               item
               xs={width < 1333 ? 4 : width < 1770 ? 3 : width < 2207 ? 2.4 : 2}
             >
-              <StudentGridCard key={student.uid} student={student} />
+              <StudentGridCard key={user.uid} student={user} />
             </Grid>
           ))}
       </Grid>
