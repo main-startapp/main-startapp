@@ -11,18 +11,19 @@ import ProjectInfo from "../components/Project/ProjectInfo";
 // this page is also project homepage. Is this a good practice?
 export default function Home() {
   // global context
-  const { setChat, setShowChat, setShowMsg } = useContext(GlobalContext);
+  const { setChat, setChatPartner, setShowChat, setShowMsg, onMedia } =
+    useContext(GlobalContext);
   useEffect(() => {
     setShowChat(true);
     setShowMsg(false);
     setChat(null);
-  }, [setChat, setShowChat, setShowMsg]);
+    setChatPartner(null);
+  }, [setChat, setChatPartner, setShowChat, setShowMsg]);
 
   // project state init
   const [project, setProject] = useState(null); // thec selected project
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
-
   return (
     <ProjectContext.Provider
       value={{
@@ -36,22 +37,38 @@ export default function Home() {
     >
       {/* Toolbar for searching keywords, category and filter */}
       <ProjectPageBar />
+
       <Grid
         container
         spaceing={0}
-        mt={1}
         direction="row"
         alignItems="start"
         justifyContent="center"
       >
-        {/* left comp: list of projects */}
-        <Grid item xs={4}>
-          <ProjectList />
-        </Grid>
-        {/* right comp: selected project's info  */}
-        <Grid item xs={8}>
-          <ProjectInfo />
-        </Grid>
+        {/* left part: project list */}
+        {onMedia.onDesktop ? (
+          <Grid item xs={4}>
+            <ProjectList />
+          </Grid>
+        ) : (
+          project === null && (
+            <Grid item xs={12}>
+              <ProjectList />
+            </Grid>
+          )
+        )}
+        {/* right part: project info */}
+        {onMedia.onDesktop ? (
+          <Grid item xs={8}>
+            <ProjectInfo />
+          </Grid>
+        ) : (
+          project !== null && (
+            <Grid item xs={12}>
+              <ProjectInfo />
+            </Grid>
+          )
+        )}
       </Grid>
     </ProjectContext.Provider>
   );

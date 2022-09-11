@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { Avatar, Badge, Box, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import moment from "moment";
@@ -11,38 +11,25 @@ const ChatAccordionContact = (props) => {
 
   // context
   const { currentUser } = useAuth();
-  const { projects, setChat, setPartner, showMsg, setShowMsg, students } =
+  const { projects, setChat, setChatPartner, showMsg, setShowMsg, users } =
     useContext(GlobalContext);
 
   // local states and vars
-  const [contact, setContact] = useState(null);
-  const contactUID = chat.chat_user_ids.filter((chat_user_id) => {
-    return chat_user_id !== currentUser.uid;
-  })[0]; // get the first ele of the returned array which will always contain 1 ele
-  // required: students data should be complete (not partial)
-  useEffect(() => {
-    const found = students.find((student) => student.uid === contactUID);
+  const contact = useMemo(() => {
+    const contactUID =
+      chat.chat_user_ids[0] === currentUser?.uid
+        ? chat.chat_user_ids[1]
+        : chat.chat_user_ids[0];
+    return users.find((user) => user.uid === contactUID);
+  }, [chat.chat_user_ids, currentUser?.uid, users]);
 
-    if (found) {
-      setContact({ ...found });
-    }
-
-    return () => {
-      found;
-    };
-  }, [contactUID, students]);
-
-  const my_unread_key = currentUser.uid + "_unread"; // the key to get unread msg no.
+  const my_unread_key = currentUser?.uid + "_unread"; // the key to get unread msg no.
 
   // find the last join request's project and position info
   // !todo: use a map to reduce searching
   const [lastJR, setLastJR] = useState(null);
   useEffect(() => {
-    if (
-      typeof chat?.join_requests?.length !== "number" ||
-      chat?.join_requests?.length <= 0
-    )
-      return;
+    if (!(chat?.join_requests?.length > 0)) return;
 
     const tempLastJR = chat.join_requests[chat.join_requests.length - 1];
     const tempLastJRProject = projects.find(
@@ -52,14 +39,14 @@ const ChatAccordionContact = (props) => {
     if (!tempLastJRProject) return;
 
     const tempLastJRPosition = tempLastJRProject.position_list.find(
-      (position) => position.positionID === tempLastJR.position_id
+      (position) => position.id === tempLastJR.position_id
     );
 
     if (!tempLastJRPosition) return;
 
     setLastJR({
       projectTitle: tempLastJRProject.title,
-      positionTitle: tempLastJRPosition.positionTitle,
+      positionTitle: tempLastJRPosition.title,
     });
 
     return () => {
@@ -70,19 +57,31 @@ const ChatAccordionContact = (props) => {
   }, [chat, projects]);
 
   return (
-    <Container
+    <ContactBox
       onClick={() => {
         setChat(chat);
-        setPartner(contact);
+        setChatPartner(contact);
         if (!showMsg) {
           setShowMsg(true);
         }
-        handleUnread(chat, currentUser);
+        handleUnread(chat, setChat, currentUser);
       }}
     >
-      <Avatar sx={{ m: "14px" }} src={contact?.photo_url} />
+      <Avatar
+        sx={{
+          mx: "12px",
+          // color: "#dbdbdb",
+          // backgroundColor: "#ffffff",
+          // border: 1,
+          // borderColor: "#dbdbdb",
+          height: "56px",
+          width: "56px",
+        }}
+        src={contact?.photo_url}
+        referrerPolicy="no-referrer"
+      />
       <ChatInfo>
-        {/* name & last timestamp */}
+        {/* name & position */}
         <Box
           sx={{
             display: "flex",
@@ -90,38 +89,37 @@ const ChatAccordionContact = (props) => {
             width: "100%",
           }}
         >
-          <Typography fontSize="14px">{contact?.name}</Typography>
-          <Typography fontSize="14px">
-            {moment(chat?.last_timestamp?.toDate().getTime()).format("MMM D")}
+          <Typography
+            fontSize="1em"
+            fontWeight="bold"
+            sx={{
+              display: "-webkit-box",
+              overflow: "hidden",
+              WebkitBoxOrient: "vertical",
+              WebkitLineClamp: 1,
+            }}
+          >
+            {contact?.name}
           </Typography>
         </Box>
-        {/* if NOT join request: position */}
-        {!lastJR && (
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Typography fontSize="14px">{contact?.desired_position}</Typography>
-            <StyledBadge badgeContent={chat[my_unread_key]} color="primary" />
-          </Box>
-        )}
-        {/* if join request: JR info */}
-        {lastJR && (
+        {lastJR ? (
           <Box>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <Typography
-                fontSize="14px"
+                fontSize="0.8em"
                 color="#3e95c2"
-                // sx={{
-                //   display: "-webkit-box",
-                //   overflow: "hidden",
-                //   WebkitBoxOrient: "vertical",
-                //   WebkitLineClamp: 1,
-                // }}
+                sx={{
+                  display: "-webkit-box",
+                  overflow: "hidden",
+                  WebkitBoxOrient: "vertical",
+                  WebkitLineClamp: 1,
+                }}
               >
                 Join Request
               </Typography>
-              <StyledBadge badgeContent={chat[my_unread_key]} color="primary" />
             </Box>
             <Typography
-              fontSize="14px"
+              fontSize="0.8em"
               sx={{
                 display: "-webkit-box",
                 overflow: "hidden",
@@ -132,20 +130,51 @@ const ChatAccordionContact = (props) => {
               {lastJR.projectTitle} {lastJR.positionTitle}
             </Typography>
           </Box>
+        ) : (
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Typography fontSize="0.8em">
+              {contact?.desired_position}
+            </Typography>
+          </Box>
         )}
       </ChatInfo>
-    </Container>
+
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          width: "104px",
+          height: "56px",
+          alignItems: "center",
+          mr: "12px",
+        }}
+      >
+        <Typography fontSize="0.8em">
+          {moment(chat?.last_timestamp?.toDate().getTime()).format("MMM D")}
+        </Typography>
+        <Box sx={{ flexGrow: 1 }} />
+        <Badge
+          sx={{
+            mb: "12px",
+            color: "#ffffff",
+          }}
+          badgeContent={chat[my_unread_key]}
+          color={"SteelBlue"}
+        />
+      </Box>
+    </ContactBox>
   );
 };
 
 export default ChatAccordionContact;
 
-const Container = styled("div")(({ theme }) => ({
+const ContactBox = styled(Box)(({ theme }) => ({
   display: "flex",
+  flexDirection: "row",
   alignItems: "center",
-  height: "80px",
+  height: "calc(56px + 2*12px)",
   cursor: "pointer",
-  borderBottom: "1px solid #ededed",
+  borderBottom: "1.5px solid #dbdbdb",
   "&:hover": {
     backgroundColor: "#f6f6f6",
   },
@@ -155,12 +184,4 @@ const ChatInfo = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   width: "100%",
-  marginRight: "14px",
-}));
-
-const StyledBadge = styled(Badge)(({ theme }) => ({
-  "& .MuiBadge-badge": {
-    right: 13,
-    top: 13,
-  },
 }));

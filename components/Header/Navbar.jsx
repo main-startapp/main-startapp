@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -16,10 +16,16 @@ import { auth } from "../../firebase";
 import { useAuth } from "../Context/AuthContext";
 import { ThemeProvider, styled, createTheme } from "@mui/material/styles";
 import ExportedImage from "next-image-export-optimizer";
+import { GlobalContext } from "../Context/ShareContexts";
 
 const Navbar = () => {
+  // currentUser
   const { currentUser } = useAuth();
 
+  // context
+  const { onMedia } = useContext(GlobalContext);
+
+  // menu
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleUserMenu = (e) => {
@@ -28,10 +34,12 @@ const Navbar = () => {
   const handleUserMenuClose = () => {
     setAnchorEl(null);
   };
+
   const handleUserMenuLogout = () => {
     // signout user -> close menu
     auth.signOut();
     setAnchorEl(null);
+    // window.location.reload();
   };
 
   return (
@@ -52,8 +60,10 @@ const Navbar = () => {
           // flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          maxHeight: "64px",
+          height: onMedia.onDesktop ? "64px" : "48px",
+          paddingX: onMedia.onDesktop ? 3 : 1.5,
         }}
+        disableGutters
       >
         {/* icon */}
         <Box
@@ -66,43 +76,62 @@ const Navbar = () => {
           }}
         >
           <ExportedImage
-            src="/images/EDIUM Platform Logo 256.png"
+            src="/images/EDIUMPlatformLogo256.png"
             placeholder=""
-            width={48}
-            height={48}
-            unoptimized={true}
+            width={onMedia.onDesktop ? 48 : 36}
+            height={onMedia.onDesktop ? 48 : 36}
           />
-          <Typography variant="edium" sx={{ fontSize: "2em", ml: 1 }}>
+          {/* <Typography variant="edium" sx={{ fontSize: "2em", ml: 1 }}>
             Edium
-          </Typography>
+          </Typography> */}
         </Box>
         {/* tabs */}
         {/* https://stackoverflow.com/questions/32378953/keep-the-middle-item-centered-when-side-items-have-different-widths */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <NextLink href="/" passHref>
-            <PageLink>
-              <Typography sx={{ fontSize: "1.1em" }}>Projects</Typography>
-            </PageLink>
-          </NextLink>
-          <Divider sx={{ ml: 3, mr: 3 }} orientation="vertical" flexItem />
-          <NextLink href="/events" passHref>
-            <PageLink>
-              <Typography sx={{ fontSize: "1.1em" }}>Events</Typography>
-            </PageLink>
-          </NextLink>
-          <Divider sx={{ ml: 3, mr: 3 }} orientation="vertical" flexItem />
-          <NextLink href="/students" passHref>
-            <PageLink>
-              <Typography sx={{ fontSize: "1.1em" }}>Students</Typography>
-            </PageLink>
-          </NextLink>
-        </Box>
+        {onMedia.onDesktop && (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <NextLink href="/" passHref>
+              <PageLink>
+                <Typography sx={{ fontSize: "1.1em" }}>Projects</Typography>
+              </PageLink>
+            </NextLink>
+            <Divider
+              sx={{
+                ml: 3,
+                mr: 3,
+                borderRightWidth: 1.5,
+                borderColor: "black",
+              }}
+              orientation="vertical"
+              flexItem
+            />
+            <NextLink href="/events" passHref>
+              <PageLink>
+                <Typography sx={{ fontSize: "1.1em" }}>Events</Typography>
+              </PageLink>
+            </NextLink>
+            <Divider
+              sx={{
+                ml: 3,
+                mr: 3,
+                borderRightWidth: 1.5,
+                borderColor: "black",
+              }}
+              orientation="vertical"
+              flexItem
+            />
+            <NextLink href="/students" passHref>
+              <PageLink>
+                <Typography sx={{ fontSize: "1.1em" }}>Students</Typography>
+              </PageLink>
+            </NextLink>
+          </Box>
+        )}
         {/* user */}
         <Box
           sx={{
@@ -113,17 +142,39 @@ const Navbar = () => {
             justifyContent: "end",
           }}
         >
-          <Typography sx={{ fontSize: "1.1em" }}>
-            {currentUser.displayName}
-          </Typography>
           <IconButton
             id="navbar-menu-button"
             aria-controls={open ? "navbar-menu" : undefined}
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
+            sx={
+              onMedia.onDesktop
+                ? {
+                    width: "64px",
+                    height: "64px",
+                  }
+                : {
+                    width: "48px",
+                    height: "48px",
+                  }
+            }
             onClick={(e) => handleUserMenu(e)}
           >
-            <Avatar src={currentUser.photoURL} />
+            <Avatar
+              sx={
+                onMedia.onDesktop
+                  ? {
+                      width: "48px",
+                      height: "48px",
+                    }
+                  : {
+                      width: "36px",
+                      height: "36px",
+                    }
+              }
+              src={currentUser?.photoURL}
+              referrerPolicy="no-referrer"
+            />
           </IconButton>
           <Menu
             id="navbar-menu"
@@ -140,11 +191,11 @@ const Navbar = () => {
                 <MenuItemLink>Edit Profile</MenuItemLink>
               </NextLink>
             </MenuItem>
-            <MenuItem onClick={handleUserMenuClose}>
+            {/* <MenuItem onClick={handleUserMenuClose}>
               <NextLink href="/team/management" passHref>
                 <MenuItemLink>Team Management</MenuItemLink>
               </NextLink>
-            </MenuItem>
+            </MenuItem> */}
             <MenuItem onClick={handleUserMenuLogout}>Log Out</MenuItem>
           </Menu>
         </Box>
@@ -156,7 +207,7 @@ const Navbar = () => {
 export default Navbar;
 
 const PageLink = styled(MuiLink)(({ theme }) => ({
-  color: "white",
+  color: "#ffffff",
   textDecoration: "none",
 }));
 

@@ -21,7 +21,6 @@ const TeamProjectListItemEmpty = () => {
             border: 1,
             borderRadius: 4,
             borderColor: "text.secondary",
-            boxShadow: 0,
             "&:hover": {
               backgroundColor: "#f6f6f6",
               cursor: "pointer",

@@ -1,34 +1,39 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getAuth } from "firebase/auth";
 import Loading from "../Loading";
-import Login from "../Login";
+import Signin from "../Account/Signin";
 
 const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const auth = getAuth();
+    // https://www.reddit.com/r/webdev/comments/us599i/what_is_the_difference_between_firebase/
     return auth.onIdTokenChanged(async (user) => {
       if (!user) {
         console.log("no user");
         setCurrentUser(null);
-        setLoading(false);
+        setIsLoading(false);
         return;
       }
       const token = await user.getIdToken().catch((err) => {
         console.log("getIdToken() error: ", err);
       });
+      // console.log(user.emailVerified);
       setCurrentUser(user);
-      setLoading(false);
+      setIsLoading(false);
     });
   }, []);
-  if (loading) {
+
+  if (isLoading) {
     return <Loading type="spokes" color="#3e95c2" />;
   }
+
   if (!currentUser) {
-    return <Login />;
+    return <Signin />;
   } else {
     return (
       <AuthContext.Provider value={{ currentUser }}>

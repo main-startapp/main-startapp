@@ -1,7 +1,5 @@
 import { Avatar, Box, Button, Card, Tooltip, Typography } from "@mui/material";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useContext } from "react";
-import { db } from "../../firebase";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
 import { handleConnect } from "../Reusable/Resusable";
 
@@ -9,25 +7,23 @@ const StudentGridCard = (props) => {
   const student = props.student;
 
   // context
-  const { chats, currentStudent, setPartner, setForceChatExpand } =
+  const { chats, ediumUser, setChatPartner, setForceChatExpand } =
     useContext(GlobalContext);
   const { setStudent } = useContext(StudentContext);
 
   // local vars
-  const currentUID = currentStudent?.uid;
+  const currentUID = ediumUser?.uid;
 
   return (
     <Card
       variant="outlined"
       onClick={() => setStudent(student)}
       sx={{
-        // mr: 3,
-        // mt: 3,
-        backgroundColor: "#fafafa",
-        border: "1px solid black",
-        borderRadius: 4,
+        backgroundColor: "#ffffff",
+        border: 1.5,
+        borderRadius: "30px",
+        borderColor: "#dbdbdb",
         height: "100%",
-        minWidth: "200px",
       }}
     >
       <Box
@@ -41,12 +37,16 @@ const StudentGridCard = (props) => {
       >
         <Avatar
           sx={{
-            m: 3,
-            width: "5em",
-            height: "5em",
-            border: "1px solid black",
+            m: 2,
+            width: "96px",
+            height: "96px",
+            // color: "#dbdbdb",
+            // backgroundColor: "#ffffff",
+            // border: 1,
+            // borderColor: "#dbdbdb",
           }}
-          src={student.photo_url}
+          src={student?.photo_url}
+          referrerPolicy="no-referrer"
         />
         {/* <CardContent
           sx={{
@@ -56,7 +56,7 @@ const StudentGridCard = (props) => {
             backgroundColor: "green",
           }}
         > */}
-        <Typography sx={{ fontWeight: "bold", fontSize: "1em" }}>
+        <Typography sx={{ fontWeight: "bold", fontSize: "1.1em" }}>
           {student.name}
         </Typography>
         <Typography sx={{ fontSize: "0.9em" }}>
@@ -72,16 +72,26 @@ const StudentGridCard = (props) => {
 
         <Box sx={{ flexGrow: 1 }} />
 
-        <Tooltip title={currentUID ? "" : "Please edit your profile first."}>
+        <Tooltip title={currentUID ? "" : "Please edit your profile first"}>
           <span>
             <Button
               disabled={!currentUID || currentUID === student.uid}
               disableElevation
               size="small"
               sx={{
-                m: 3,
-                borderRadius: 4,
+                my: 2,
+                border: 1.5,
+                borderColor: "#dbdbdb",
+                borderRadius: "30px",
+                color: "#ffffff",
                 backgroundColor: "#3e95c2",
+                fontSize: "0.8em",
+                "&:hover": {
+                  backgroundColor: "#f6f6f6",
+                },
+                paddingY: 0.1,
+                paddingX: 3,
+                textTransform: "none",
               }}
               variant="contained"
               onClick={(e) => {
@@ -90,15 +100,13 @@ const StudentGridCard = (props) => {
                 handleConnect(
                   chats,
                   student,
-                  currentStudent,
-                  setPartner,
+                  ediumUser,
+                  setChatPartner,
                   setForceChatExpand
                 );
               }}
             >
-              <Typography sx={{ fontSize: "0.9em" }}>
-                &emsp; {"Connect"} &emsp;
-              </Typography>
+              {"Connect"}
             </Button>
           </span>
         </Tooltip>

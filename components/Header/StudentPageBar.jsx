@@ -1,91 +1,162 @@
 import { useContext, useRef } from "react";
-import { styled, alpha } from "@mui/material/styles";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import InputBase from "@mui/material/InputBase";
-import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
-import SearchIcon from "@mui/icons-material/Search";
+import { styled } from "@mui/material/styles";
 import {
+  AppBar,
+  Box,
+  Toolbar,
+  InputBase,
   FormControl,
   IconButton,
   InputLabel,
   MenuItem,
   Select,
   Tooltip,
+  Button,
 } from "@mui/material";
-import { StudentContext } from "../Context/ShareContexts";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import SearchIcon from "@mui/icons-material/Search";
+import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
+import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
+import { GlobalContext, StudentContext } from "../Context/ShareContexts";
 
-export default function ProjectPageBar() {
-  const { setSearchTerm, setSearchCategory } = useContext(StudentContext);
+const StudentPageBar = () => {
+  const { onMedia } = useContext(GlobalContext);
+  const { student, setStudent, setSearchTerm } = useContext(StudentContext);
   const textRef = useRef();
+
+  const spSearch = (
+    <Search
+      sx={{
+        width: onMedia.onDesktop ? "300px" : "100%",
+        height: onMedia.onDesktop ? "40px" : "30px", // to match the small size category
+      }}
+    >
+      <SearchIconWrapper>
+        <SearchIcon />
+      </SearchIconWrapper>
+
+      <Tooltip title="Search for positions or fields of interest...">
+        <StyledInputBase
+          placeholder="Position or Field of Interest…"
+          inputProps={{ "aria-label": "search" }}
+          inputRef={textRef}
+          fullWidth={true}
+          onChange={(e) => {
+            if (e.target.value.length !== 0) return;
+            setSearchTerm("");
+          }}
+          onKeyPress={(e) => {
+            if (e.key === "Enter") {
+              setSearchTerm(e.target.value);
+            }
+          }}
+        />
+      </Tooltip>
+    </Search>
+  );
 
   return (
     <AppBar
       position="static"
-      sx={{ backgroundColor: "#fafafa", color: "#000000" }}
+      sx={{
+        color: "text.primary",
+        backgroundColor: "#ffffff",
+        borderBottom: 1.5,
+        borderColor: "#dbdbdb",
+      }}
+      elevation={0}
     >
-      <Toolbar sx={{ maxHeight: "64px" }}>
-        <Search>
-          <SearchIconWrapper>
-            <SearchIcon />
-          </SearchIconWrapper>
-          <Tooltip title="Search for students or positions...">
-            <StyledInputBase
-              placeholder="Name or Position…"
-              inputProps={{ "aria-label": "search" }}
-              inputRef={textRef}
-              // onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") {
-                  setSearchTerm(e.target.value);
-                }
-              }}
-            />
-          </Tooltip>
-          <Tooltip title="Reset">
-            <IconButton
-              sx={{ color: "#000000" }}
-              onClick={() => {
-                textRef.current.value = "";
-                setSearchTerm("");
-              }}
-            >
-              <RestartAltIcon />
-            </IconButton>
-          </Tooltip>
-        </Search>
-        {/* <FormControl sx={{ ml: 3, minWidth: 200 }} size="small">
-          <InputLabel>Category</InputLabel>
-          <Select
-            label="Category"
-            defaultValue={""}
-            onChange={(e) => {
-              setSearchCategory(e.target.value);
+      {/* desktop version */}
+      {onMedia.onDesktop && (
+        <Toolbar
+          sx={{
+            height: "64px",
+            paddingX: 3,
+          }}
+          disableGutters // will be customozied in sx
+        >
+          {spSearch}
+          <Box sx={{ flexGrow: 1 }} />
+          <Search
+            sx={{
+              width: onMedia.onDesktop ? "300px" : "80%",
+              height: onMedia.onDesktop ? "40px" : "30px", // to match the small size category
             }}
           >
-            <MenuItem value={""}>None</MenuItem>
-            <MenuItem value={"Startup"}>Startup</MenuItem>
-            <MenuItem value={"PersonalProject"}>Personal Project</MenuItem>
-            <MenuItem value={"Event"}>Event</MenuItem>
-            <MenuItem value={"CharityInitiative"}>Charity Initiative</MenuItem>
-          </Select>
-        </FormControl> */}
-        <Box sx={{ flexGrow: 1 }} />
-        <Search>
-          <SearchIconWrapper>
-            <FilterAltOutlinedIcon />
-          </SearchIconWrapper>
-          <StyledInputBase
-            placeholder="Filter… (coming soon)"
-            inputProps={{ "aria-label": "search" }}
-          />
-        </Search>
-      </Toolbar>
+            <SearchIconWrapper>
+              <FilterAltOutlinedIcon />
+            </SearchIconWrapper>
+            <StyledInputBase
+              placeholder="Filter… (coming soon)"
+              inputProps={{ "aria-label": "search" }}
+            />
+          </Search>
+        </Toolbar>
+      )}
+
+      {/* mobile version */}
+      {!onMedia.onDesktop && (
+        <Toolbar
+          sx={{ height: "48px", paddingX: 1.5 }} // 1.5 to match navbar icon and listitem
+          disableGutters // disable auto padding
+        >
+          {student === null ? (
+            // list version
+            <Box sx={{ width: "100%", display: "flex" }}>
+              {spSearch}
+              {/* <Button
+                sx={{
+                  width: "20%",
+                  backgroundColor: "#f0f0f0",
+                  color: "gray",
+                  borderRadius: "10px",
+                  ml: 1.5,
+                }}
+                id="ppb-menu-button"
+                aria-controls={open ? "ppb-menu" : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? "true" : undefined}
+                onClick={(e) => {
+                  open ? handleUserMenuClose() : handleUserMenu(e);
+                }}
+              >
+                <TuneRoundedIcon />
+              </Button> */}
+            </Box>
+          ) : (
+            // info version
+            <Box>
+              <Button
+                sx={{
+                  backgroundColor: "#f0f0f0",
+                  color: "gray",
+                  borderRadius: "10px",
+                }}
+                onClick={() => setStudent(null)}
+              >
+                <ArrowBackIosRoundedIcon />
+              </Button>
+            </Box>
+          )}
+        </Toolbar>
+      )}
     </AppBar>
   );
-}
+};
+
+export default StudentPageBar;
+
+const Search = styled(Box)(({ theme }) => ({
+  // position: "relative",
+  border: 0,
+  borderRadius: "10px",
+  backgroundColor: "#f0f0f0",
+  "&:hover": {
+    backgroundColor: "#dbdbdb",
+  },
+  height: "40px", // to match the small size category
+  display: "flex",
+  alignItems: "center",
+}));
 
 const SearchIconWrapper = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 2),
@@ -95,36 +166,14 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-}));
-
-const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.black, 0.15),
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.common.black, 0.25),
-  },
-  marginLeft: 10,
-  width: "100%",
-  [theme.breakpoints.up("sm")]: {
-    marginLeft: theme.spacing(0),
-    width: "auto",
-  },
+  color: "gray",
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: "inherit",
   "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
+    padding: theme.spacing(0, 2, 0, 0), // 2 units to the right
     // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create("width"),
-    width: "100%",
-    [theme.breakpoints.up("sm")]: {
-      width: "20ch",
-      "&:focus": {
-        width: "25ch",
-      },
-    },
   },
 }));

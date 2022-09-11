@@ -3,18 +3,20 @@ import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import {
   GlobalContext,
-  ProjectContext,
+  EventContext,
 } from "../../components/Context/ShareContexts";
-import ProjectCreate from "../../components/Project/ProjectCreate";
+import EventCreate from "../../components/Event/EventCreate";
 
 const Create = () => {
   // context
-  const { setChat, setShowChat, setShowMsg } = useContext(GlobalContext);
+  const { setChat, setChatPartner, setShowChat, setShowMsg } =
+    useContext(GlobalContext);
   useEffect(() => {
     setShowChat(false);
     setShowMsg(false);
     setChat(null);
-  }, [setChat, setShowChat, setShowMsg]);
+    setChatPartner(null);
+  }, [setChat, setChatPartner, setShowChat, setShowMsg]);
 
   // local
   const { query } = useRouter();
@@ -35,7 +37,7 @@ const Create = () => {
     setOpen(false);
   };
   return (
-    <ProjectContext.Provider value={{ showAlert }}>
+    <EventContext.Provider value={{ showAlert }}>
       <Snackbar
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         open={open}
@@ -50,8 +52,8 @@ const Create = () => {
           {alertMessage}
         </Alert>
       </Snackbar>
-      <ProjectCreate isCreateStr={query.isCreateStr} />
-    </ProjectContext.Provider>
+      <EventCreate isCreateStr={query.isCreateStr} />
+    </EventContext.Provider>
   );
 };
 

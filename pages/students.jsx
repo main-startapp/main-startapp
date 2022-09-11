@@ -7,18 +7,21 @@ import {
 import StudentPageBar from "../components/Header/StudentPageBar";
 import StudentProfile from "../components/Student/StudentProfile";
 import StudentGrid from "../components/Student/StudentGrid";
+import StudentList from "../components/Student/StudentList";
 
-export default function Students() {
+function Students() {
   // context
-  const { setChat, setShowChat, setShowMsg } = useContext(GlobalContext);
+  const { setChat, setChatPartner, setShowChat, setShowMsg, onMedia } =
+    useContext(GlobalContext);
   useEffect(() => {
     setShowChat(true);
     setShowMsg(false);
     setChat(null);
-  }, [setChat, setShowChat, setShowMsg]);
+    setChatPartner(null);
+  }, [setChat, setChatPartner, setShowChat, setShowMsg]);
 
   // local
-  const [student, setStudent] = useState(null); // the selected student by clicking the student card in the StudentGrid
+  const [student, setStudent] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
 
@@ -37,18 +40,36 @@ export default function Students() {
       <Grid
         container
         spaceing={0}
-        mt={1}
         direction="row"
         // alignItems="center"
         justifyContent="center"
+        sx={{ backgroundColor: "#fafafa" }}
       >
-        <Grid item xs={7}>
-          <StudentGrid />
-        </Grid>
-        <Grid item xs={3}>
-          <StudentProfile />
-        </Grid>
+        {onMedia.onDesktop ? (
+          <Grid item xs={7}>
+            <StudentGrid />
+          </Grid>
+        ) : (
+          student === null && (
+            <Grid item xs={12}>
+              <StudentList />
+            </Grid>
+          )
+        )}
+        {onMedia.onDesktop ? (
+          <Grid item xs={3}>
+            <StudentProfile />
+          </Grid>
+        ) : (
+          student !== null && (
+            <Grid item xs={12}>
+              <StudentProfile />
+            </Grid>
+          )
+        )}
       </Grid>
     </StudentContext.Provider>
   );
 }
+
+export default Students;

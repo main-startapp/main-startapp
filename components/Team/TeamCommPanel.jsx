@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogContentText,
   IconButton,
+  Link,
   TextField,
   Tooltip,
   Typography,
@@ -92,15 +93,15 @@ const TeamCommPanel = () => {
       url_text: "Link",
       url: "",
     };
-    let links = projectExt?.links ? projectExt.links : [];
-    links.push(linkObj);
-    setProjectExt({ ...projectExt, links });
+    let newLinks = projectExt?.links ? projectExt.links : [];
+    newLinks.push(linkObj);
+    setProjectExt({ ...projectExt, links: newLinks });
   };
 
   const handleDeleteLink = (index) => {
-    let links = projectExt.links;
-    links.splice(index, 1);
-    setProjectExt({ ...projectExt, links });
+    let newLinks = projectExt.links;
+    newLinks.splice(index, 1);
+    setProjectExt({ ...projectExt, links: newLinks });
   };
 
   const handleOnChangeLink = (key, value, index) => {
@@ -114,7 +115,7 @@ const TeamCommPanel = () => {
     });
   };
 
-  // project_ext was created with project, don't add only update
+  // project_ext was created with project
   const handleSubmit = async (e) => {
     if (!isClickable) return;
     if (!formRef.current.reportValidity()) return;
@@ -183,7 +184,7 @@ const TeamCommPanel = () => {
               borderColor: "darkgray",
               padding: "15px 15px",
               "&: hover": {
-                borderColor: "steelblue",
+                borderColor: "#3e95c2",
                 backgroundColor: "#fafafa",
               },
               "& .MuiInput-root": {
@@ -214,11 +215,6 @@ const TeamCommPanel = () => {
         )}
         {/* links */}
         {projectExt?.links?.map((link, index) => {
-          let adjustedURL = link.url;
-          // todo!: too hacky, is there any library can do this properly?
-          if (!adjustedURL.toLowerCase().includes("http")) {
-            adjustedURL = "https://" + adjustedURL;
-          }
           return (
             <LinkWrapper
               sx={{
@@ -244,7 +240,7 @@ const TeamCommPanel = () => {
                     ml: "10px",
                     padding: "1px 0px 1px 6px",
                     "&: hover": {
-                      borderColor: "steelblue",
+                      borderColor: "#3e95c2",
                       backgroundColor: "#fafafa",
                     },
                     "& .MuiInput-input": {
@@ -278,7 +274,7 @@ const TeamCommPanel = () => {
                     borderColor: "darkgray",
                     padding: "1px 6px",
                     "&: hover": {
-                      borderColor: "steelblue",
+                      borderColor: "#3e95c2",
                       backgroundColor: "#fafafa",
                     },
                     "& .MuiInput-input": {
@@ -303,16 +299,16 @@ const TeamCommPanel = () => {
                   }}
                 />
               ) : (
-                <a
+                <Link
                   key={index}
                   target="_blank"
-                  href={adjustedURL}
-                  rel="noopener noreferrer"
+                  href={link.url}
+                  rel="noreferrer"
                 >
                   <Tooltip title={link.url}>
                     <Typography>{link.url_text}</Typography>
                   </Tooltip>
-                </a>
+                </Link>
               )}
               {isEditing && (
                 <IconButton

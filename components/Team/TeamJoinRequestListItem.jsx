@@ -3,12 +3,14 @@ import {
   Box,
   Button,
   Card,
+  Container,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
   IconButton,
+  Link,
   Modal,
   TextField,
   Tooltip,
@@ -21,7 +23,7 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef, useMemo } from "react";
 import { db } from "../../firebase";
 import { GlobalContext } from "../Context/ShareContexts";
 import { handleConnect } from "../Reusable/Resusable";
@@ -43,21 +45,21 @@ const TeamJoinRequestListItem = (props) => {
   const status = request.status;
 
   // context
-  const { students, chats, currentStudent, setPartner, setForceChatExpand } =
+  const { users, chats, ediumUser, setChatPartner, setForceChatExpand } =
     useContext(GlobalContext);
 
   // local vars
-  const currentUID = currentStudent?.uid;
+  const currentUID = ediumUser?.uid;
 
   // requester's student data
   const [requestingStudent, setRequestingStudent] = useState(null);
   useEffect(() => {
-    const found = students.find((student) => student.uid === requesterUID);
+    const found = users.find((student) => student.uid === requesterUID);
     if (!found) return; // is this even possible?
 
     setRequestingStudent(found);
     return found;
-  }, [requesterUID, students]);
+  }, [requesterUID, users]);
 
   // flip card
   const [isFlipped, setIsFlipped] = useState(false);
@@ -77,11 +79,12 @@ const TeamJoinRequestListItem = (props) => {
   };
   const handleReply = async (newStatus) => {
     // 1. find chat and send msg
+    // !todo: update to newer infastructure
     const foundChat = chats.find((chat) => chat.id === chatID);
     if (!foundChat) return;
     const msgStr = declineMsg
       ? declineMsg
-      : "Sorry. Creator didn't leave a note.";
+      : "Sorry. Creator didn't leave a note";
     const messageRef = {
       text: msgStr,
       sent_by: currentUID,
@@ -127,6 +130,16 @@ const TeamJoinRequestListItem = (props) => {
   const handleStudentCardClose = () => {
     setIsStudentCardOpen(false);
   };
+
+  // ref to detect overflow
+  // !todo: optim
+  const cardRef = useRef();
+  const isOverflow = () => {
+    return cardRef?.current?.clientHeight < cardRef?.current?.scrollHeight
+      ? true
+      : false;
+  };
+
   return (
     <ReactCardFlip isFlipped={isFlipped}>
       <Card
@@ -152,9 +165,13 @@ const TeamJoinRequestListItem = (props) => {
             mb: 1.5,
             width: "5em",
             height: "5em",
-            border: "1px solid black",
+            border: 1,
+            borderColor: "#dbdbdb",
+            color: "#dbdbdb",
+            backgroundColor: "#ffffff",
           }}
           src={requestingStudent?.photo_url}
+          referrerPolicy="no-referrer"
         />
 
         <Typography sx={{ fontWeight: "bold", fontSize: "1em" }}>
@@ -184,8 +201,8 @@ const TeamJoinRequestListItem = (props) => {
             handleConnect(
               chats,
               requestingStudent,
-              currentStudent,
-              setPartner,
+              ediumUser,
+              setChatPartner,
               setForceChatExpand
             );
           }}
@@ -261,13 +278,15 @@ const TeamJoinRequestListItem = (props) => {
       >
         <Box
           sx={{
-            mx: 1.5,
-            my: 3,
+            mx: 2,
+            mt: 2,
+            mb: isOverflow ? 0 : 2,
             display: "flex",
             flexDirection: "column",
             // flexFlow: "column wrap",
             overflow: "hidden",
           }}
+          ref={cardRef}
         >
           <IconButton
             sx={{ position: "fixed", top: 0, right: 10 }}
@@ -340,62 +359,57 @@ const TeamJoinRequestListItem = (props) => {
                 )}
                 {requestingStudent?.social_media?.length > 0 &&
                   requestingStudent.social_media.map((link, index) => {
-                    // todo!: too hacky, is there any library can do this properly?
-                    if (!link.toLowerCase().includes("https://")) {
-                      link = "https://" + link;
-                    }
-
                     if (link.toLowerCase().includes("linkedin")) {
                       return (
-                        <a
+                        <Link
                           key={index}
                           target="_blank"
                           href={link}
-                          rel="noopener noreferrer"
+                          rel="noreferrer"
                         >
                           <LinkedInIcon
                             sx={{ fontSize: "2em", mr: 1, color: "black" }}
                           />
-                        </a>
+                        </Link>
                       );
                     } else if (link.toLowerCase().includes("facebook")) {
                       return (
-                        <a
+                        <Link
                           key={index}
                           target="_blank"
                           href={link}
-                          rel="noopener noreferrer"
+                          rel="noreferrer"
                         >
                           <FacebookIcon
                             sx={{ fontSize: "2em", mr: 1, color: "black" }}
                           />
-                        </a>
+                        </Link>
                       );
                     } else if (link.toLowerCase().includes("instagram")) {
                       return (
-                        <a
+                        <Link
                           key={index}
                           target="_blank"
                           href={link}
-                          rel="noopener noreferrer"
+                          rel="noreferrer"
                         >
                           <InstagramIcon
                             sx={{ fontSize: "2em", mr: 1, color: "black" }}
                           />
-                        </a>
+                        </Link>
                       );
                     } else {
                       return (
-                        <a
+                        <Link
                           key={index}
                           target="_blank"
                           href={link}
-                          rel="noopener noreferrer"
+                          rel="noreferrer"
                         >
                           <LinkIcon
                             sx={{ fontSize: "2em", mr: 1, color: "black" }}
                           />
-                        </a>
+                        </Link>
                       );
                     }
                   })}
@@ -450,59 +464,55 @@ const TeamJoinRequestListItem = (props) => {
           {requestingStudent?.social_media?.length > 0 &&
             requestingStudent.social_media.map((link, index) => {
               // todo!: too hacky, is there any library can do this properly?
-              if (!link.toLowerCase().includes("https://")) {
-                link = "https://" + link;
-              }
-
               if (link.toLowerCase().includes("linkedin")) {
                 return (
-                  <a
+                  <Link
                     key={index}
                     target="_blank"
                     href={link}
-                    rel="noopener noreferrer"
+                    rel="noreferrer"
                   >
                     <LinkedInIcon
                       sx={{ fontSize: "2em", mr: 1, color: "black" }}
                     />
-                  </a>
+                  </Link>
                 );
               } else if (link.toLowerCase().includes("facebook")) {
                 return (
-                  <a
+                  <Link
                     key={index}
                     target="_blank"
                     href={link}
-                    rel="noopener noreferrer"
+                    rel="noreferrer"
                   >
                     <FacebookIcon
                       sx={{ fontSize: "2em", mr: 1, color: "black" }}
                     />
-                  </a>
+                  </Link>
                 );
               } else if (link.toLowerCase().includes("instagram")) {
                 return (
-                  <a
+                  <Link
                     key={index}
                     target="_blank"
                     href={link}
-                    rel="noopener noreferrer"
+                    rel="noreferrer"
                   >
                     <InstagramIcon
                       sx={{ fontSize: "2em", mr: 1, color: "black" }}
                     />
-                  </a>
+                  </Link>
                 );
               } else {
                 return (
-                  <a
+                  <Link
                     key={index}
                     target="_blank"
                     href={link}
-                    rel="noopener noreferrer"
+                    rel="noreferrer"
                   >
                     <LinkIcon sx={{ fontSize: "2em", mr: 1, color: "black" }} />
-                  </a>
+                  </Link>
                 );
               }
             })}
@@ -525,6 +535,21 @@ const TeamJoinRequestListItem = (props) => {
               </Typography>
             ))}
         </Box>
+        {/* overflow */}
+        {isOverflow && (
+          <Typography
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignContent: "center",
+              fontWeight: "bold",
+              fontSize: "1.5em",
+              paddingBottom: 1.5,
+            }}
+          >
+            {"..."}
+          </Typography>
+        )}
       </Card>
     </ReactCardFlip>
   );

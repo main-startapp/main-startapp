@@ -7,43 +7,39 @@ import moment from "moment";
 const ChatAccordionMsgItem = (props) => {
   const message = props.message;
   const isSameAuthor = props.isSameAuthor;
+  const chatPartner = props.chatPartner;
 
   // context
   const { currentUser } = useAuth();
-  const { partner } = useContext(GlobalContext);
 
   return (
     <>
-      {!isSameAuthor && message.sent_by === partner?.uid && (
+      {!isSameAuthor && message.sent_by === chatPartner?.uid && (
         <Box
           sx={{
-            padding: "5px",
-            ml: "10px",
-            mr: "10px",
-            mb: "5px",
-            mt: "5px",
+            mx: "12px",
+            mt: "18px",
             position: "relative",
           }}
         >
-          <Typography sx={{ display: "inline", fontWeight: "bold" }}>
-            {partner?.name}
+          <Typography
+            sx={{ display: "inline", fontWeight: "bold", fontSize: "1em" }}
+          >
+            {chatPartner?.name}
           </Typography>
           <Typography
-            sx={{ display: "inline", color: "gray", fontSize: "0.9em" }}
+            sx={{ display: "inline", color: "lightgray", fontSize: "0.9em" }}
           >
             {" · "}
             {moment(message?.sent_at?.toDate().getTime()).format("M/D LT")}
           </Typography>
         </Box>
       )}
-      {!isSameAuthor && message.sent_by === currentUser.uid && (
+      {!isSameAuthor && message.sent_by === currentUser?.uid && (
         <Box
           sx={{
-            padding: "5px",
-            ml: "10px",
-            mr: "10px",
-            mb: "5px",
-            mt: "5px",
+            mx: "12px",
+            mt: "18px",
             position: "relative",
           }}
         >
@@ -51,7 +47,7 @@ const ChatAccordionMsgItem = (props) => {
             Me
           </Typography>
           <Typography
-            sx={{ display: "inline", color: "gray", fontSize: "0.9em" }}
+            sx={{ display: "inline", color: "lightgray", fontSize: "0.9em" }}
           >
             {" · "}
             {moment(message?.sent_at?.toDate().getTime()).format("M/D LT")}
@@ -60,18 +56,15 @@ const ChatAccordionMsgItem = (props) => {
       )}
       <Box
         sx={{
-          backgroundColor: "white",
-          padding: "5px",
-          ml: "15px",
-          mr: "10px",
-          mb: "2.5px",
           position: "relative",
           width: "fit-content",
-          wordBreak: "break-all",
+          wordWrap: "break-word",
           whiteSpace: "pre-wrap",
         }}
       >
-        {message.text}
+        <Typography sx={{ fontSize: "0.9em", mx: "18px" }}>
+          {message.text}
+        </Typography>
       </Box>
     </>
   );

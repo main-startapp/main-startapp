@@ -3,10 +3,11 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
+  Button,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "../Context/AuthContext";
 import { GlobalContext } from "../Context/ShareContexts";
 import ChatAccordionContact from "./ChatAccordionContact";
@@ -23,19 +24,20 @@ const ChatAccordion = () => {
     setShowMsg,
     forceChatExpand,
     setForceChatExpand,
-    partner,
+    chatPartner,
+    setChatPartner,
   } = useContext(GlobalContext);
 
   // local
   const [expandState, setExpandState] = useState("collapseIt");
-  const [hasUnread, setHasUnread] = useState(false);
 
-  // handle chat expansion called by handleConnect
+  // handle chat expansion called by handleConnect/handleJoinRequest
+  // connect or join request might create a new chat, this new chat must be found by this hook
   useEffect(() => {
     if (!forceChatExpand) return;
 
     const foundChat = chats.find((chat) =>
-      chat.chat_user_ids.some((uid) => uid === partner.uid)
+      chat.chat_user_ids.some((uid) => uid === chatPartner?.uid)
     );
 
     if (!foundChat) return;
@@ -52,7 +54,7 @@ const ChatAccordion = () => {
     }, timeout); // delayed msg window
 
     setTimeout(() => {
-      handleUnread(foundChat, currentUser);
+      handleUnread(foundChat, setChat, currentUser);
     }, 1000); // delayed reset unread
 
     setForceChatExpand(false);
@@ -65,11 +67,17 @@ const ChatAccordion = () => {
     expandState,
     setForceChatExpand,
     chats,
-    partner,
+    chatPartner,
     setChat,
     setShowMsg,
     currentUser,
   ]);
+
+  // unread signal
+  const hasUnread = useMemo(() => {
+    const my_unread_key = currentUser?.uid + "_unread";
+    return chats.some((chat) => chat[my_unread_key] > 0) ? true : false;
+  }, [currentUser?.uid, chats]);
 
   // helper func
   const handleExpand = (e) => {
@@ -78,58 +86,64 @@ const ChatAccordion = () => {
       : setExpandState("expandIt");
     setShowMsg(false);
     setChat(null);
+    setChatPartner(null);
   };
 
-  // unread signal
-  useEffect(() => {
-    const my_unread_key = currentUser.uid + "_unread";
-
-    if (chats.some((chat) => chat[my_unread_key] > 0)) {
-      setHasUnread(true);
-    } else {
-      setHasUnread(false);
-    }
-  }, [chats, currentUser]);
-
   return (
-    <Box sx={{ display: "flex", justifyContent: "right" }}>
+    // box is essential for wrapping the accrodion to get rid of ugly top line
+    <Box>
       <Accordion
-        square={true}
         expanded={expandState === "expandIt"}
+        square
         sx={{
-          // minWidth: "100px",
-          width: "15vw",
-          minWidth: "300px",
-          maxHeight: "75vh",
+          width: "320px",
           position: "fixed",
-          right: "20px",
-          bottom: 0,
-          //   backgroundColor: "pink",
-          border: 1,
+          right: 0,
+          bottom: -1,
+          border: 1.5,
+          borderRadius: "10px 10px 0px 0px",
+          borderColor: "#dbdbdb",
         }}
+        disableGutters
+        elevation={3}
       >
         <StyledAccordionSummary
-          sx={{ borderBottom: 1 }}
+          sx={{
+            borderBottom: 1.5,
+            borderColor: "#dbdbdb",
+          }}
           expandIcon={<ExpandLessIcon />}
           onClick={(e) => handleExpand(e)}
         >
-          <Typography>Messenger</Typography>
-          {hasUnread && (
-            <CircleIcon
-              sx={{ color: "steelblue", fontSize: "15px", ml: "5px" }}
-            />
-          )}
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Typography
+              sx={{
+                fontSize: "1em",
+                fontWeight: "bold",
+              }}
+            >
+              Messenger
+            </Typography>
+            {hasUnread && (
+              <CircleIcon
+                sx={{
+                  color: "#3e95c2",
+                  fontSize: "0.8em",
+                  position: "absolute",
+                  right: "30%",
+                }}
+              />
+            )}
+          </Box>
         </StyledAccordionSummary>
         <AccordionDetails
-          sx={{ overflow: "auto", maxHeight: "50vh", padding: 0 }}
+          sx={{ overflow: "auto", maxHeight: "75vh", padding: 0 }}
         >
-          <Wrapper>
-            <ChatList>
-              {chats.map((chat) => (
-                <ChatAccordionContact key={chat.id} chat={chat} />
-              ))}
-            </ChatList>
-          </Wrapper>
+          <ChatList>
+            {chats.map((chat) => (
+              <ChatAccordionContact key={chat.id} chat={chat} />
+            ))}
+          </ChatList>
         </AccordionDetails>
       </Accordion>
     </Box>
@@ -138,14 +152,9 @@ const ChatAccordion = () => {
 
 export default ChatAccordion;
 
-const Wrapper = styled("div")(({ theme }) => ({
+const ChatList = styled(Box)(({ theme }) => ({
   display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-}));
-
-const ChatList = styled("div")(({ theme }) => ({
-  maxHeight: "100%",
+  flexDirection: "column",
   width: "100%",
 }));
 

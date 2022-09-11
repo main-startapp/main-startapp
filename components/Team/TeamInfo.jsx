@@ -7,11 +7,11 @@ import TeamCommPanel from "./TeamCommPanel";
 import TeamScheduler from "./TeamScheduler";
 
 const TeamInfo = () => {
-  const { currentStudent } = useContext(GlobalContext);
+  const { ediumUser } = useContext(GlobalContext);
   const { project, projectExt } = useContext(TeamContext);
 
   // local var
-  const currentUID = currentStudent?.uid;
+  const currentUID = ediumUser?.uid;
 
   return (
     <Box
@@ -31,7 +31,7 @@ const TeamInfo = () => {
             }}
           >
             {/* default unit is px */}
-            <Avatar sx={{ mr: 2, height: 75, width: "75px" }}>
+            <Avatar sx={{ mr: 2, height: "72px", width: "72px" }}>
               <UploadFileIcon />
             </Avatar>
             <Typography sx={{ fontWeight: "bold", fontSize: "2.5em" }}>
@@ -45,20 +45,18 @@ const TeamInfo = () => {
           <Box sx={{ display: "flex", flexDirection: "row", mt: 3 }}>
             <Box
               sx={{
-                width: "60%",
-                backgroundColor: "lightyellow",
+                width: "100%",
               }}
             >
               <TeamCommPanel />
             </Box>
-            <Box
+            {/* <Box
               sx={{
                 width: "40%",
-                backgroundColor: "lightblue",
               }}
             >
               <TeamScheduler />
-            </Box>
+            </Box> */}
           </Box>
         </Box>
       )}
