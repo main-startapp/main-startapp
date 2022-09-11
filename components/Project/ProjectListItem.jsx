@@ -166,13 +166,19 @@ const ProjectListItem = (props) => {
               </Typography>
             }
           />
-          {project.position_list.map((position, index) => (
+          {project.position_list.slice(0, 3).map((position, index) => (
             <ListItemText
               sx={{ ml: "5%" }}
               key={index}
               secondary={<span>&bull; &nbsp; {position.title}</span>}
             />
           ))}
+          {project.position_list.length > 3 && (
+            <ListItemText
+              sx={{ ml: "5%" }}
+              secondary={<span>&bull; &nbsp; {"and more..."}</span>}
+            />
+          )}
           {onMedia.onDesktop && (
             <ListItemText
               secondary={

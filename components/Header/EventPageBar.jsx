@@ -106,14 +106,13 @@ const EventPageBar = () => {
         }}
       >
         <MenuItem value={""}>None</MenuItem>
-        <MenuItem value={"Community Event"}>Community Event</MenuItem>
-        <MenuItem value={"Concert"}>Concert</MenuItem>
-        <MenuItem value={"Conference"}>Conference</MenuItem>
-        <MenuItem value={"Expo"}>Expo</MenuItem>
-        <MenuItem value={"Festival"}>Festival</MenuItem>
-        <MenuItem value={"Networking"}>Networking</MenuItem>
-        <MenuItem value={"Performance"}>Performance</MenuItem>
-        <MenuItem value={"Sports"}>Sports</MenuItem>
+        {eventStrList.map((eventStr, index) => {
+          return (
+            <MenuItem key={index} value={eventStr}>
+              {eventStr}
+            </MenuItem>
+          );
+        })}
       </Select>
     </FormControl>
   );
@@ -161,7 +160,7 @@ const EventPageBar = () => {
       {/* mobile version */}
       {!onMedia.onDesktop && (
         <Toolbar
-          sx={{ height: "48px", minHeight: 0, paddingX: 1.5 }} // 1.5 to match navbar icon and listitem
+          sx={{ height: "48px", paddingX: 1.5 }} // 1.5 to match navbar icon and listitem
           disableGutters // disable auto padding
         >
           {event === null ? (
@@ -264,3 +263,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
   },
 }));
+
+export const eventStrList = [
+  "Case Competition",
+  "Community Event",
+  "Concert",
+  "Conference",
+  "Expo",
+  "Festival",
+  "Hackathon",
+  "Info Session",
+  "Networking Session",
+  "Sports",
+  "Workshop",
+];

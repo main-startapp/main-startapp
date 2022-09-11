@@ -2322,7 +2322,7 @@ find-up@^5.0.0:
     locate-path "^6.0.0"
     path-exists "^4.0.0"
 
-firebase@^9.9.3:
+firebase@^9.9.4:
   version "9.9.4"
   resolved "https://registry.yarnpkg.com/firebase/-/firebase-9.9.4.tgz#bf13706eff90f40a8dc9de803223a728447a6279"
   integrity sha512-XRfCw54nNGYUYNYi5PLJ6rcERN2M+aS32f6caYEx9GhCp9ndgHHzBL9BpPohUpEpKPtHA75EqYNf8kuR0HQndA==
@@ -2354,7 +2354,15 @@ firebase@^9.9.3:
     "@firebase/storage-compat" "0.1.17"
     "@firebase/util" "1.6.3"
 
-firebaseui@^6.0.1:
+firebaseui@^0.600.0:
+  version "0.600.0"
+  resolved "https://registry.yarnpkg.com/firebaseui/-/firebaseui-0.600.0.tgz#4d9b1ab978e86d23f306952fa347ffdb7ebac510"
+  integrity sha512-5iaRcuaaXTmCIU+VNJHIerzz1bgcfGmPTZCFL/yLHsQ6o3KeUggr/mY2rmMh2aMT38UgpyV5QndwEAZDiOeOWg==
+  dependencies:
+    dialog-polyfill "^0.4.7"
+    material-design-lite "^1.2.0"
+
+firebaseui@^6.0.0:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/firebaseui/-/firebaseui-6.0.1.tgz#bdabc69de9c245975a1277d507b2f0ff0044e558"
   integrity sha512-SMNCFt/xns3mnvd0hImEDu7di5fqRU3MVyIaXpVEfg6v0bH6f3m+YybivU7KElRUT/47DHMn++D8MrZYYnoN5g==
@@ -3438,6 +3446,13 @@ react-dom@17.0.2:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
     scheduler "^0.20.2"
+
+react-firebaseui@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/react-firebaseui/-/react-firebaseui-6.0.0.tgz#97a075e7caa2fb969c8ded9efbbcefccb1f33ce1"
+  integrity sha512-VzLMiW7DBZCsW/qpP9nky/pPlAoIjDxA2Qyc+QAPf+RjelIkvPPiCBXR2aAz+Upy+ujrx6pYDXj547DW5uC4ww==
+  dependencies:
+    firebaseui "^6.0.0"
 
 react-is@^16.13.1, react-is@^16.7.0:
   version "16.13.1"

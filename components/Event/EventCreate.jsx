@@ -18,9 +18,9 @@ import {
   Select,
   TextField,
   Typography,
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
 import {
   collection,
   doc,
@@ -31,19 +31,20 @@ import {
   setDoc,
   arrayRemove,
   arrayUnion,
-} from 'firebase/firestore';
-import { useContext, useEffect, useRef, useState } from 'react';
-import { db } from '../../firebase';
-import { GlobalContext, EventContext } from '../Context/ShareContexts';
+} from "firebase/firestore";
+import { useContext, useEffect, useRef, useState } from "react";
+import { db } from "../../firebase";
+import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import {
   LocalizationProvider,
   DesktopDateTimePicker,
-} from '@mui/x-date-pickers';
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+} from "@mui/x-date-pickers";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 
-import moment from 'moment';
-import { useRouter } from 'next/router';
-import { useAuth } from '../Context/AuthContext';
+import moment from "moment";
+import { useRouter } from "next/router";
+import { useAuth } from "../Context/AuthContext";
+import { eventStrList } from "../Header/EventPageBar";
 
 const EventCreate = (props) => {
   // context
@@ -53,7 +54,7 @@ const EventCreate = (props) => {
   const { showAlert } = useContext(EventContext);
 
   // props from push query
-  const isCreate = props.isCreateStr === 'false' ? false : true; // null, undefined, "true" are all true isCreate
+  const isCreate = props.isCreateStr === "false" ? false : true; // null, undefined, "true" are all true isCreate
 
   // router
   const router = useRouter();
@@ -63,17 +64,17 @@ const EventCreate = (props) => {
 
   // Event State Initialization.
   const emptyEvent = {
-    title: '',
-    category: '',
+    title: "",
+    category: "",
     starting_date: moment().toDate(),
-    location: '',
-    details: '',
-    description: '',
+    location: "",
+    details: "",
+    description: "",
     creator_uid: currentUID,
     is_visible: true,
-    icon_url: '',
-    banner_url: '',
-    registration_form_url: '',
+    icon_url: "",
+    banner_url: "",
+    registration_form_url: "",
   };
   const [newEvent, setNewEvent] = useState(() =>
     isCreate ? emptyEvent : oldEvent
@@ -98,7 +99,7 @@ const EventCreate = (props) => {
       // update, checked value depends on oldEvent
       // if creator is admin, check if updating transferable event
       if (
-        currentUser?.uid === 'T5q6FqwJFcRTKxm11lu0zmaXl8x2' &&
+        currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
         !ediumUserExt?.my_event_ids?.includes(oldEvent?.id)
       ) {
         setIsCheckedTransferable(true);
@@ -117,26 +118,26 @@ const EventCreate = (props) => {
     let eventModRef; // ref to addDoc() or updateDoc()
     if (isCreate) {
       // create a new event
-      const collectionRef = collection(db, 'events');
+      const collectionRef = collection(db, "events");
       const eventRef = {
         ...newEvent,
         create_timestamp: serverTimestamp(),
         last_timestamp: serverTimestamp(),
       };
       eventModRef = addDoc(collectionRef, eventRef).catch((err) => {
-        console.log('addDoc() error: ', err);
+        console.log("addDoc() error: ", err);
       });
     } else {
       // update an existing event
       // since all the changes are in newEvent, can't just update partially
-      const docRef = doc(db, 'events', newEvent.id);
+      const docRef = doc(db, "events", newEvent.id);
       const eventRef = {
         ...newEvent,
         last_timestamp: serverTimestamp(),
       };
       delete eventRef.id;
       eventModRef = updateDoc(docRef, eventRef).catch((err) => {
-        console.log('updateDoc() error: ', err);
+        console.log("updateDoc() error: ", err);
       });
     }
     setOldEvent(null);
@@ -149,12 +150,12 @@ const EventCreate = (props) => {
     if (retID) {
       // check if admin creats transferable event first
       if (
-        currentUser?.uid === 'T5q6FqwJFcRTKxm11lu0zmaXl8x2' &&
+        currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
         isCheckedTransferable
       ) {
         // don't add event id to my_event_ids
         // do create extenion doc with extra field
-        const extDocRef = doc(db, 'events_ext', retID);
+        const extDocRef = doc(db, "events_ext", retID);
 
         const eventExtRef = {
           members: [currentUID],
@@ -163,14 +164,14 @@ const EventCreate = (props) => {
           transfer_code: Math.random().toString(16).slice(2),
         };
         const eventExtModRef = setDoc(extDocRef, eventExtRef).catch((err) => {
-          console.log('setDoc() error: ', err);
+          console.log("setDoc() error: ", err);
         });
 
         navigator.clipboard.writeText(eventExtRef.transfer_code);
         await eventExtModRef;
       } else {
         // add to my_event_ids in user ext data if create
-        const ediumUserExtDocRef = doc(db, 'users_ext', currentUID);
+        const ediumUserExtDocRef = doc(db, "users_ext", currentUID);
         const ediumUserExtUpdateRef = {
           my_event_ids: ediumUserExt?.my_event_ids
             ? arrayUnion(retID)
@@ -181,18 +182,18 @@ const EventCreate = (props) => {
           ediumUserExtDocRef,
           ediumUserExtUpdateRef
         ).catch((err) => {
-          console.log('updateDoc() error: ', err);
+          console.log("updateDoc() error: ", err);
         });
 
         // create extension doc for team management if create
-        const extDocRef = doc(db, 'events_ext', retID);
+        const extDocRef = doc(db, "events_ext", retID);
         const eventExtRef = {
           members: [currentUID],
           admins: [currentUID],
           last_timestamp: serverTimestamp(),
         };
         const eventExtModRef = setDoc(extDocRef, eventExtRef).catch((err) => {
-          console.log('setDoc() error: ', err);
+          console.log("setDoc() error: ", err);
         });
 
         await ediumUserExtModRef;
@@ -202,7 +203,7 @@ const EventCreate = (props) => {
 
     // !todo: since updateDoc return Promise<void>, we need other method to check the results
     showAlert(
-      'success',
+      "success",
       `"${newEvent.title}" is updated successfully! Navigate to Events page.`
     );
 
@@ -215,28 +216,28 @@ const EventCreate = (props) => {
     setOldEvent(null);
     setNewEvent(emptyEvent);
 
-    showAlert('info', `Draft discarded! Navigate to Events page.`);
+    showAlert("info", `Draft discarded! Navigate to Events page.`);
     setTimeout(() => {
       router.push(`/events`); // can be customized
     }, 2000); // wait 2 seconds then go to `events` page
   };
 
   const handleDelete = async (id, e) => {
-    const docRef = doc(db, 'events', id);
+    const docRef = doc(db, "events", id);
     const eventModRef = deleteDoc(docRef).catch((err) => {
-      console.log('deleteDoc() error: ', err);
+      console.log("deleteDoc() error: ", err);
     });
     setOldEvent(null);
     setNewEvent(emptyEvent);
 
     // delete event_ext
-    const extDocRef = doc(db, 'events_ext', id);
+    const extDocRef = doc(db, "events_ext", id);
     const eventExtModRef = deleteDoc(extDocRef).catch((err) => {
-      console.log('deleteDoc() error: ', err);
+      console.log("deleteDoc() error: ", err);
     });
 
     // delete from user ext
-    const ediumUserExtDocRef = doc(db, 'users_ext', currentUID);
+    const ediumUserExtDocRef = doc(db, "users_ext", currentUID);
     const ediumUserExtUpdateRef = {
       my_event_ids: arrayRemove(id),
       last_timestamp: serverTimestamp(),
@@ -245,7 +246,7 @@ const EventCreate = (props) => {
       ediumUserExtDocRef,
       ediumUserExtUpdateRef
     ).catch((err) => {
-      console.log('updateDoc() error: ', err);
+      console.log("updateDoc() error: ", err);
     });
 
     await eventModRef;
@@ -253,7 +254,7 @@ const EventCreate = (props) => {
     await ediumUserExtModRef;
 
     showAlert(
-      'success',
+      "success",
       `"${newEvent.title}" is deleted sucessfully! Navigate to Events page.`
     );
 
@@ -276,48 +277,48 @@ const EventCreate = (props) => {
       alignItems="center"
       justifyContent="center"
       sx={{
-        backgroundColor: '#fafafa',
+        backgroundColor: "#fafafa",
         height: onMedia.onDesktop
-          ? 'calc(100vh - 64px)'
-          : 'calc(100vh - 48px - 60px)',
-        overflow: 'auto',
+          ? "calc(100vh - 64px)"
+          : "calc(100vh - 48px - 60px)",
+        overflow: "auto",
       }}
     >
       <Grid
         item
         xs={onMedia.onDesktop ? 8 : 10}
         sx={{
-          backgroundColor: '#ffffff',
+          backgroundColor: "#ffffff",
           borderLeft: 1.5,
           borderRight: 1.5,
-          borderColor: '#dbdbdb',
+          borderColor: "#dbdbdb",
           paddingX: 3,
-          minHeight: '100%',
+          minHeight: "100%",
         }}
       >
         <Typography
           sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            fontSize: '2em',
-            fontWeight: 'bold',
+            display: "flex",
+            justifyContent: "center",
+            fontSize: "2em",
+            fontWeight: "bold",
             mt: 5,
             mb: 5,
           }}
         >
-          {isCreate ? 'Create New Event' : 'Update Event'}
+          {isCreate ? "Create New Event" : "Update Event"}
         </Typography>
-        {currentUID === 'T5q6FqwJFcRTKxm11lu0zmaXl8x2' && (
-          <Box sx={{ mb: 5, display: 'flex' }}>
+        {currentUID === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" && (
+          <Box sx={{ mb: 5, display: "flex" }}>
             <Checkbox
-              sx={{ mr: 1.5, color: '#dbdbdb', padding: 0 }}
+              sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
               checked={isCheckedTransferable}
               onChange={() => {
                 setIsCheckedTransferable(!isCheckedTransferable);
               }}
             />
-            <Typography sx={{ color: '#f4511e', fontWeight: 'bold' }}>
-              {'ADMIN This is a transferable event'}
+            <Typography sx={{ color: "#f4511e", fontWeight: "bold" }}>
+              {"ADMIN This is a transferable event"}
             </Typography>
           </Box>
         )}
@@ -343,23 +344,23 @@ const EventCreate = (props) => {
             />
             <Button
               sx={{
-                backgroundColor: '#f0f0f0',
+                backgroundColor: "#f0f0f0",
                 border: 1.5,
-                borderRadius: '10px',
-                borderColor: '#dbdbdb',
-                color: 'rgba(0, 0, 0, 0.6)',
+                borderRadius: "10px",
+                borderColor: "#dbdbdb",
+                color: "rgba(0, 0, 0, 0.6)",
 
-                height: '56px',
-                textTransform: 'none',
-                width: '30%',
-                paddingLeft: '30px',
+                height: "56px",
+                textTransform: "none",
+                width: "30%",
+                paddingLeft: "30px",
               }}
               // variant="contained"
               disableElevation
               onClick={handleDialogOpen}
             >
-              <UploadFileIcon sx={{ position: 'absolute', left: '5%' }} />
-              <Typography>{'Logo'}</Typography>
+              <UploadFileIcon sx={{ position: "absolute", left: "5%" }} />
+              <Typography>{"Logo"}</Typography>
             </Button>
             <Dialog
               open={isDialogOpen}
@@ -370,15 +371,15 @@ const EventCreate = (props) => {
               <DialogTitle>Upload Logo from URL</DialogTitle>
               <DialogContent>
                 <DialogContentText>
-                  {'Please enter the URL of your icon here. '}
+                  {"Please enter the URL of your icon here. "}
                   <Link
                     target="_blank"
-                    href={'https://imgur.com/upload'}
+                    href={"https://imgur.com/upload"}
                     rel="noreferrer"
                   >
                     Imgur
                   </Link>
-                  {' is a good image hosting service to start with.'}
+                  {" is a good image hosting service to start with."}
                 </DialogContentText>
                 <TextField
                   autoFocus
@@ -410,22 +411,22 @@ const EventCreate = (props) => {
               fullWidth
               sx={{
                 mr: 5,
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '10px',
-                  backgroundColor: '#f0f0f0',
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "10px",
+                  backgroundColor: "#f0f0f0",
                 },
-                '& .MuiOutlinedInput-notchedOutline': {
+                "& .MuiOutlinedInput-notchedOutline": {
                   border: 1.5,
-                  borderColor: '#dbdbdb',
+                  borderColor: "#dbdbdb",
                 },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
+                "&:hover .MuiOutlinedInput-notchedOutline": {
                   border: 1.5,
-                  borderColor: '#dbdbdb',
+                  borderColor: "#dbdbdb",
                 },
-                '.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline':
+                ".MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                   {
                     border: 1.5,
-                    borderColor: '#3e95c2',
+                    borderColor: "#3e95c2",
                   },
               }}
             >
@@ -437,20 +438,19 @@ const EventCreate = (props) => {
                   setNewEvent({ ...newEvent, category: e.target.value })
                 }
               >
-                <MenuItem value={'Community Event'}>Community Event</MenuItem>
-                <MenuItem value={'Concert'}>Concert</MenuItem>
-                <MenuItem value={'Conference'}>Conference</MenuItem>
-                <MenuItem value={'Expo'}>Expo</MenuItem>
-                <MenuItem value={'Festival'}>Festival</MenuItem>
-                <MenuItem value={'Networking'}>Networking</MenuItem>
-                <MenuItem value={'Performance'}>Performance</MenuItem>
-                <MenuItem value={'Sports'}>Sports</MenuItem>
+                {eventStrList.map((eventStr, index) => {
+                  return (
+                    <MenuItem key={index} value={eventStr}>
+                      {eventStr}
+                    </MenuItem>
+                  );
+                })}
               </Select>
               <FormHelperText
                 id="ec-category-helper-text"
-                sx={{ color: 'lightgray', fontSize: '12px' }}
+                sx={{ color: "lightgray", fontSize: "12px" }}
               >
-                {'A general category of your event'}
+                {"A general category of your event"}
               </FormHelperText>
             </FormControl>
 
@@ -458,7 +458,7 @@ const EventCreate = (props) => {
               <DesktopDateTimePicker
                 renderInput={(props) => (
                   <StyledTextField
-                    sx={{ width: '60%' }}
+                    sx={{ width: "60%" }}
                     helperText="Starting date and time"
                     {...props}
                   />
@@ -536,16 +536,16 @@ const EventCreate = (props) => {
               })
             }
           />
-          <Divider sx={{ borderBottomWidth: 1.5, borderColor: '#dbdbdb' }} />
+          <Divider sx={{ borderBottomWidth: 1.5, borderColor: "#dbdbdb" }} />
 
           {/* application form */}
           <Container
             sx={{
               mt: 2.5,
               mx: 0,
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
             }}
             disableGutters
           >
@@ -592,17 +592,17 @@ const EventCreate = (props) => {
             />
           )}
           {/* Buttons */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             {!isCreate && (
               <Button
                 sx={{
                   mt: 5,
                   mb: 5,
                   border: 1.5,
-                  borderColor: '#dbdbdb',
-                  borderRadius: '30px',
-                  backgroundColor: '#3e95c2',
-                  textTransform: 'none',
+                  borderColor: "#dbdbdb",
+                  borderRadius: "30px",
+                  backgroundColor: "#3e95c2",
+                  textTransform: "none",
                   paddingX: 5,
                 }}
                 variant="contained"
@@ -610,7 +610,7 @@ const EventCreate = (props) => {
                 disabled={!isClickable || !currentUID}
                 onClick={(e) => handleDelete(newEvent.id, e)}
               >
-                {'Delete'}
+                {"Delete"}
               </Button>
             )}
             <Box sx={{ flexGrow: 1 }} />
@@ -620,11 +620,11 @@ const EventCreate = (props) => {
                 ml: 2.5,
                 mb: 5,
                 border: 1.5,
-                borderColor: '#dbdbdb',
-                borderRadius: '30px',
-                backgroundColor: '#fafafa',
-                color: 'black',
-                textTransform: 'none',
+                borderColor: "#dbdbdb",
+                borderRadius: "30px",
+                backgroundColor: "#fafafa",
+                color: "black",
+                textTransform: "none",
                 paddingX: 5,
               }}
               variant="contained"
@@ -632,7 +632,7 @@ const EventCreate = (props) => {
               disabled={!isClickable || !currentUID}
               onClick={(e) => handleDiscard(e)}
             >
-              {'Discard'}
+              {"Discard"}
             </Button>
 
             <Button
@@ -641,10 +641,10 @@ const EventCreate = (props) => {
                 ml: 2.5,
                 mb: 5,
                 border: 1.5,
-                borderColor: '#dbdbdb',
-                borderRadius: '30px',
-                backgroundColor: '#3e95c2',
-                textTransform: 'none',
+                borderColor: "#dbdbdb",
+                borderRadius: "30px",
+                backgroundColor: "#3e95c2",
+                textTransform: "none",
                 paddingX: 5,
               }}
               variant="contained"
@@ -652,7 +652,7 @@ const EventCreate = (props) => {
               disabled={!isClickable || !currentUID}
               onClick={(e) => handleSubmit(e)}
             >
-              {'Confirm'}
+              {"Confirm"}
             </Button>
           </Box>
         </form>
@@ -665,24 +665,24 @@ export default EventCreate;
 
 // !todo: notchedOuline not working
 const StyledTextField = styled(TextField)(({ theme }) => ({
-  '& .MuiOutlinedInput-root': {
-    borderRadius: '10px',
-    backgroundColor: '#f0f0f0',
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "10px",
+    backgroundColor: "#f0f0f0",
   },
-  '& .MuiOutlinedInput-notchedOutline': {
+  "& .MuiOutlinedInput-notchedOutline": {
     borderWidth: 1.5,
-    borderColor: '#dbdbdb',
+    borderColor: "#dbdbdb",
   },
-  '&:hover .MuiOutlinedInput-notchedOutline': {
+  "&:hover .MuiOutlinedInput-notchedOutline": {
     borderWidth: 1.5,
-    borderColor: '#dbdbdb !important',
+    borderColor: "#dbdbdb !important",
   },
-  '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+  "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
     borderWidth: 1.5,
-    borderColor: '#3e95c2 !important',
+    borderColor: "#3e95c2 !important",
   },
-  '& .MuiFormHelperText-root': {
-    color: 'lightgray',
-    fontSize: '12px',
+  "& .MuiFormHelperText-root": {
+    color: "lightgray",
+    fontSize: "12px",
   },
 }));

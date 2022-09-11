@@ -103,8 +103,9 @@ function Redemption() {
       params.append("e", aECode);
     });
     // encode caesar shifting
-    const urlStr =
-      `${url.origin.toString() + url.pathname.toString()  }?${  params.toString()}`;
+    const urlStr = `${
+      url.origin.toString() + url.pathname.toString()
+    }?${params.toString()}`;
     navigator.clipboard.writeText(urlStr);
     setGeneratedURL(urlStr);
   };
@@ -246,67 +247,67 @@ function Redemption() {
   const codeList = (codesArray, setCodesArray, name, isLeft) => (
     <>
       {codesArray.map((code, index) => (
-          <Box key={code} sx={{ mt: 3, width: "100%" }}>
-            <Typography
-              sx={{
-                fontSize: "16px",
-                fontWeight: "bold",
-                color: "#3e95c2",
-                display: "flex",
-                justifyContent: isLeft ? "start" : "end",
+        <Box key={index} sx={{ mt: 3, width: "100%" }}>
+          <Typography
+            sx={{
+              fontSize: "16px",
+              fontWeight: "bold",
+              color: "#3e95c2",
+              display: "flex",
+              justifyContent: isLeft ? "start" : "end",
+            }}
+          >
+            {isLeft
+              ? `> ${name} Code #${index + 1}`
+              : `${name} Code #${index + 1} <`}
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <StyledTextField
+              required
+              fullWidth
+              margin="none"
+              inputProps={{
+                maxLength: 50,
               }}
-            >
-              {isLeft
-                ? `> ${  name  } Code #${  index + 1}`
-                : `${  name  } Code #${  index + 1  } <`}
-            </Typography>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <StyledTextField
-                required
-                fullWidth
-                margin="none"
-                inputProps={{
-                  maxLength: 50,
+              // helperText="The name of your newProject (limit: 50)"
+              value={code}
+              onChange={(e) =>
+                handleChangeCodes(codesArray, setCodesArray, index, e)
+              }
+            />
+            {index > 0 && (
+              <StyledIconBox
+                sx={{
+                  ml: "10px",
                 }}
-                // helperText="The name of your newProject (limit: 50)"
-                value={code}
-                onChange={(e) =>
-                  handleChangeCodes(codesArray, setCodesArray, index, e)
-                }
-              />
-              {index > 0 && (
-                <StyledIconBox
-                  sx={{
-                    ml: "10px",
-                  }}
-                  onClick={() => {
-                    handleRemoveCodes(codesArray, setCodesArray, index);
-                  }}
-                >
-                  <RemoveRoundedIcon sx={{ color: "white" }} />
-                </StyledIconBox>
-              )}
-              {index === codesArray.length - 1 && (
-                <StyledIconBox
-                  sx={{
-                    ml: "10px",
-                  }}
-                  onClick={() => {
-                    handleAddCodes(codesArray, setCodesArray);
-                  }}
-                >
-                  <AddRoundedIcon sx={{ color: "white" }} />
-                </StyledIconBox>
-              )}
-            </Box>
+                onClick={() => {
+                  handleRemoveCodes(codesArray, setCodesArray, index);
+                }}
+              >
+                <RemoveRoundedIcon sx={{ color: "white" }} />
+              </StyledIconBox>
+            )}
+            {index === codesArray.length - 1 && (
+              <StyledIconBox
+                sx={{
+                  ml: "10px",
+                }}
+                onClick={() => {
+                  handleAddCodes(codesArray, setCodesArray);
+                }}
+              >
+                <AddRoundedIcon sx={{ color: "white" }} />
+              </StyledIconBox>
+            )}
           </Box>
-        ))}
+        </Box>
+      ))}
     </>
   );
 
@@ -377,7 +378,7 @@ function Redemption() {
           borderRight: 1.5,
           borderColor: "#dbdbdb",
           paddingX: 3,
-          minHeight: "100%",
+          height: "100%",
         }}
       >
         <Box

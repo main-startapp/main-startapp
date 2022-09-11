@@ -1,17 +1,17 @@
-import '../styles/globals.css';
-import { CssBaseline } from '@mui/material';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { useState } from 'react';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { AuthProvider } from '../components/Context/AuthContext';
-import Navbar from '../components/Header/Navbar';
-import ChatAccordion from '../components/Chat/ChatAccordion';
-import { GlobalContext } from '../components/Context/ShareContexts';
-import ChatAccordionMsg from '../components/Chat/ChatAccordionMsg';
-import DBListener from '../components/DBListener';
-import BottomNav from '../components/Header/BottomNav';
+import "../styles/globals.css";
+import { CssBaseline } from "@mui/material";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { useState } from "react";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { AuthProvider } from "../components/Context/AuthContext";
+import Navbar from "../components/Header/Navbar";
+import ChatAccordion from "../components/Chat/ChatAccordion";
+import { GlobalContext } from "../components/Context/ShareContexts";
+import ChatAccordionMsg from "../components/Chat/ChatAccordionMsg";
+import DBListener from "../components/DBListener";
+import BottomNav from "../components/Header/BottomNav";
 
 // makeStyles, useStyles, createStyles, withStyles, styled
 // https://smartdevpreneur.com/material-ui-makestyles-usestyles-createstyles-and-withstyles-explained/
@@ -21,16 +21,16 @@ import BottomNav from '../components/Header/BottomNav';
 const globalTheme = createTheme({
   typography: {
     edium: {
-      fontFamily: ['Stick No Bills', 'sans-serif'].join(','),
+      fontFamily: ["Stick No Bills", "sans-serif"].join(","),
     },
   },
 
   palette: {
     SteelBlue: {
-      main: '#3e95c2',
+      main: "#3e95c2",
     },
     AdminOrange: {
-      main: '#f4511e',
+      main: "#f4511e",
     },
   },
 });
@@ -60,9 +60,9 @@ function MyApp({ Component, pageProps }) {
 
   // media query
   const onMedia = { onDesktop: false, onTablet: false, onMobile: false };
-  onMedia.onDesktop = useMediaQuery('(min-width:1024px)');
-  onMedia.onTablet = useMediaQuery('(min-width:768px) and (max-width:1023px)');
-  onMedia.onMobile = useMediaQuery('(max-width:767px)');
+  onMedia.onDesktop = useMediaQuery("(min-width:1024px)");
+  onMedia.onTablet = useMediaQuery("(min-width:768px) and (max-width:1023px)");
+  onMedia.onMobile = useMediaQuery("(max-width:767px)");
 
   return (
     <ThemeProvider theme={globalTheme}>

@@ -19,7 +19,7 @@ const EventList = () => {
 
         // !todo: is this optimized?
         const isInTitles =
-          searchTerm !== "" && // lazy evaluation
+          searchTerm !== "" &&
           event.title.toLowerCase().includes(searchTerm.toLowerCase());
 
         const isInCategory =

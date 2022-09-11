@@ -18,6 +18,9 @@ import AppleIcon from "@mui/icons-material/Apple";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import Signup from "./Signup";
 
+import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
+import { GoogleAuthProvider, EmailAuthProvider } from "firebase/auth";
+
 // sign in, sign up, log in
 // https://ux.stackexchange.com/questions/1080/using-sign-in-vs-using-log-in
 
@@ -28,6 +31,26 @@ const Signin = () => {
 
   // independent media query
   const isMobile = useMediaQuery("(max-width:767px)");
+
+  // Configure FirebaseUI.
+  // const uiConfig = {
+  //   // Popup signin flow rather than redirect flow.
+  //   signInFlow: "popup",
+  //   // We will display Google and Email as auth providers.
+  //   signInOptions: [
+  //     {
+  //       provider: EmailAuthProvider.PROVIDER_ID, //  Firebase v9
+  //       requireDisplayName: false,
+  //     },
+  //     {
+  //       provider: GoogleAuthProvider.PROVIDER_ID, //  Firebase v9
+  //       customParameters: {
+  //         // Forces account selection even when one account is available.
+  //         prompt: "select_account",
+  //       },
+  //     },
+  //   ],
+  // };
 
   const handleSignIn = () => {
     signInWithEmailAndPassword(auth, input.email, input.password).catch(
@@ -68,6 +91,7 @@ const Signin = () => {
 
   const signinComp = (
     <>
+      {/* <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} /> */}
       <StyledButton
         sx={{
           mt: "1vh",
@@ -221,8 +245,7 @@ const Signin = () => {
           borderRight: 1.5,
           borderColor: "#dbdbdb",
           paddingX: 3,
-          minHeight: "100vh",
-          maxHeight: "100vh",
+          height: "100vh",
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",

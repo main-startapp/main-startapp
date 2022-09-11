@@ -8,8 +8,8 @@ import {
   serverTimestamp,
   setDoc,
   updateDoc,
-} from 'firebase/firestore';
-import { db } from '../../firebase';
+} from "firebase/firestore";
+import { db } from "../../firebase";
 
 //============================================================
 // handle connect/message: if chat found, return; if not, create a chat with "request to connect" auto msg.
@@ -33,16 +33,16 @@ export const handleConnect = async (
   if (foundChat) return;
 
   // build msg
-  const msgStr = ediumUser.name + ' requested to connect';
+  const msgStr = ediumUser.name + " requested to connect";
   const messageRef = {
     text: msgStr,
     sent_by: ediumUser.uid,
     sent_at: serverTimestamp(),
   };
   // add chat doc
-  const collectionRef = collection(db, 'chats');
-  const my_unread_key = ediumUser.uid + '_unread';
-  const it_unread_key = partnerUser.uid + '_unread';
+  const collectionRef = collection(db, "chats");
+  const my_unread_key = ediumUser.uid + "_unread";
+  const it_unread_key = partnerUser.uid + "_unread";
   const chatRef = {
     chat_user_ids: [ediumUser.uid, partnerUser.uid],
     [my_unread_key]: 0,
@@ -51,7 +51,7 @@ export const handleConnect = async (
     last_timestamp: serverTimestamp(),
   };
   const chatModRef = addDoc(collectionRef, chatRef).catch((err) => {
-    console.log('addDoc() error: ', err);
+    console.log("addDoc() error: ", err);
   });
   let retID;
   await chatModRef.then((ret) => {
@@ -59,9 +59,9 @@ export const handleConnect = async (
   });
   if (!retID) return; // extra safe, although this will never happen
   // use returned chat doc id to add message
-  const msgCollectionRef = collection(db, 'chats', retID, 'messages');
+  const msgCollectionRef = collection(db, "chats", retID, "messages");
   const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
-    console.log('addDoc() error: ', err);
+    console.log("addDoc() error: ", err);
   });
   await msgModRef;
 };
@@ -72,17 +72,17 @@ export const handleConnect = async (
 // https://stackoverflow.com/questions/66263271/firebase-update-returning-undefined-is-it-not-supposed-to-return-the-updated
 //============================================================
 export const handleUnread = async (chat, setChat, ediumUser) => {
-  const my_unread_key = ediumUser.uid + '_unread';
+  const my_unread_key = ediumUser.uid + "_unread";
 
   if (chat[my_unread_key] > 0) {
-    const chatDocRef = doc(db, 'chats', chat.id);
+    const chatDocRef = doc(db, "chats", chat.id);
     const chatUpdateRef = {
       [my_unread_key]: 0,
       last_timestamp: serverTimestamp(),
     };
     setChat({ ...chat, ...chatUpdateRef });
     const chatModRef = updateDoc(chatDocRef, chatUpdateRef).catch((err) => {
-      console.log('updateDoc() error: ', err); // .then() is useless as updateDoc() returns Promise<void>
+      console.log("updateDoc() error: ", err); // .then() is useless as updateDoc() returns Promise<void>
     });
     await chatModRef;
   }
@@ -92,13 +92,13 @@ export const handleUnread = async (chat, setChat, ediumUser) => {
 // change project's visibility
 //============================================================
 export const handleVisibility = async (project) => {
-  const docRef = doc(db, 'projects', project.id);
+  const docRef = doc(db, "projects", project.id);
   const projectUpdateRef = {
     is_visible: !project.is_visible,
     last_timestamp: serverTimestamp(),
   };
   const projectModRef = updateDoc(docRef, projectUpdateRef).catch((err) => {
-    console.log('updateDoc() error: ', err);
+    console.log("updateDoc() error: ", err);
   });
   await projectModRef;
 };
@@ -108,13 +108,13 @@ export const handleVisibility = async (project) => {
 // !todo: use cloud function for batch deletion
 //============================================================
 export const handleDeleteProject = async (projectID, ediumUserExt) => {
-  const docRef = doc(db, 'projects', projectID);
+  const docRef = doc(db, "projects", projectID);
   const projectModRef = updateDoc(docRef, { is_deleted: true }).catch((err) => {
-    console.log('updateDoc() error: ', err);
+    console.log("updateDoc() error: ", err);
   });
 
   // remove project ref from my_project_ids in user ext doc
-  const ediumUserExtDocRef = doc(db, 'users_ext', ediumUserExt?.uid);
+  const ediumUserExtDocRef = doc(db, "users_ext", ediumUserExt?.uid);
   const ediumUserExtUpdateRef = {
     my_project_ids: arrayRemove(projectID),
     last_timestamp: serverTimestamp(),
@@ -123,14 +123,14 @@ export const handleDeleteProject = async (projectID, ediumUserExt) => {
     ediumUserExtDocRef,
     ediumUserExtUpdateRef
   ).catch((err) => {
-    console.log('updateDoc() error: ', err);
+    console.log("updateDoc() error: ", err);
   });
 
   // delete project_ext
-  const extDocRef = doc(db, 'projects_ext', projectID);
+  const extDocRef = doc(db, "projects_ext", projectID);
   const projectExtModRef = updateDoc(extDocRef, { is_deleted: true }).catch(
     (err) => {
-      console.log('updateDoc() error: ', err);
+      console.log("updateDoc() error: ", err);
     }
   );
 
@@ -146,7 +146,7 @@ export const handleDeleteProject = async (projectID, ediumUserExt) => {
 export const getDocFromDB = async (dbName, docID) => {
   const docRef = doc(db, dbName, docID);
   const docSnap = await getDoc(docRef).catch((err) => {
-    console.log('getDoc() error: ', err);
+    console.log("getDoc() error: ", err);
   });
 
   return docSnap?.data() ? docSnap.data() : null;
@@ -163,8 +163,8 @@ export const findListItem = (list, key, itemID) => {
 // change google url photo resolution
 //============================================================
 export const getGooglePhotoURLwithRes = (photo_url, res) => {
-  const newRes = '=s' + res + '-c';
-  return photo_url.replace('=s96-c', newRes);
+  const newRes = "=s" + res + "-c";
+  return photo_url.replace("=s96-c", newRes);
 };
 
 //============================================================

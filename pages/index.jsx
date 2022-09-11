@@ -1,12 +1,12 @@
-import { useContext, useEffect, useState } from 'react';
-import { Grid } from '@mui/material';
+import { useContext, useEffect, useState } from "react";
+import { Grid } from "@mui/material";
 import {
   GlobalContext,
   ProjectContext,
-} from '../components/Context/ShareContexts';
-import ProjectPageBar from '../components/Header/ProjectPageBar';
-import ProjectList from '../components/Project/ProjectList';
-import ProjectInfo from '../components/Project/ProjectInfo';
+} from "../components/Context/ShareContexts";
+import ProjectPageBar from "../components/Header/ProjectPageBar";
+import ProjectList from "../components/Project/ProjectList";
+import ProjectInfo from "../components/Project/ProjectInfo";
 
 // this page is also project homepage. Is this a good practice?
 export default function Home() {
@@ -22,19 +22,18 @@ export default function Home() {
 
   // project state init
   const [project, setProject] = useState(null); // thec selected project
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchCategory, setSearchCategory] = useState('');
-
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchCategory, setSearchCategory] = useState("");
   return (
     <ProjectContext.Provider
-      value={
-        (project,
+      value={{
+        project,
         setProject,
         searchTerm,
         setSearchTerm,
         searchCategory,
-        setSearchCategory)
-      }
+        setSearchCategory,
+      }}
     >
       {/* Toolbar for searching keywords, category and filter */}
       <ProjectPageBar />

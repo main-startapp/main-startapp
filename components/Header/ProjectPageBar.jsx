@@ -162,7 +162,7 @@ const ProjectPageBar = () => {
       {/* mobile version */}
       {!onMedia.onDesktop && (
         <Toolbar
-          sx={{ height: "48px", minHeight: 0, paddingX: 1.5 }} // 1.5 to match navbar icon and projectlistitem
+          sx={{ height: "48px", paddingX: 1.5 }} // 1.5 to match navbar icon and projectlistitem
           disableGutters // disable auto padding
         >
           {project === null ? (

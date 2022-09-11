@@ -62,7 +62,6 @@ const Navbar = () => {
           alignItems: "center",
           height: onMedia.onDesktop ? "64px" : "48px",
           paddingX: onMedia.onDesktop ? 3 : 1.5,
-          minHeight: 0,
         }}
         disableGutters
       >

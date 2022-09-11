@@ -1,7 +1,5 @@
 import { Avatar, Box, Button, Card, Tooltip, Typography } from "@mui/material";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useContext } from "react";
-import { db } from "../../firebase";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
 import { handleConnect } from "../Reusable/Resusable";
 

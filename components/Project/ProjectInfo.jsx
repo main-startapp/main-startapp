@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   Avatar,
   Box,
@@ -8,21 +8,21 @@ import {
   IconButton,
   Tooltip,
   Typography,
-} from '@mui/material';
-import { GlobalContext, ProjectContext } from '../Context/ShareContexts';
-import PositionListItem from './PositionListItem';
-import ExportedImage from 'next-image-export-optimizer';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
-import NextLink from 'next/link';
+} from "@mui/material";
+import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
+import PositionListItem from "./PositionListItem";
+import ExportedImage from "next-image-export-optimizer";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
+import NextLink from "next/link";
 import {
   findListItem,
   getDocFromDB,
   handleConnect,
-} from '../Reusable/Resusable';
-import { useAuth } from '../Context/AuthContext';
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { useRouter } from 'next/router';
+} from "../Reusable/Resusable";
+import { useAuth } from "../Context/AuthContext";
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import { useRouter } from "next/router";
 
 const ProjectInfo = () => {
   // context
@@ -42,7 +42,7 @@ const ProjectInfo = () => {
   // local vars
   const currentUID = ediumUser?.uid;
   const router = useRouter();
-  const [tCode, setTCode] = useState('');
+  const [tCode, setTCode] = useState("");
 
   // hooks
   const isCreator = useMemo(() => {
@@ -50,7 +50,7 @@ const ProjectInfo = () => {
   }, [currentUID, project]);
 
   const creatorUser = useMemo(() => {
-    return findListItem(users, 'uid', project?.creator_uid);
+    return findListItem(users, "uid", project?.creator_uid);
   }, [users, project?.creator_uid]);
 
   // box ref to used by useEffect
@@ -66,10 +66,10 @@ const ProjectInfo = () => {
       ref={boxRef}
       sx={{
         height: onMedia.onDesktop
-          ? 'calc(100vh - 2*64px - 1.5px)'
-          : 'calc(100vh - 2*48px - 1.5px - 60px)',
-        overflow: 'auto',
-        backgroundColor: '#fafafa',
+          ? "calc(100vh - 2*64px - 1.5px)"
+          : "calc(100vh - 2*48px - 1.5px - 60px)",
+        overflow: "auto",
+        backgroundColor: "#fafafa",
       }}
     >
       {!!project && (
@@ -85,17 +85,17 @@ const ProjectInfo = () => {
             >
               <Box
                 sx={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
                 }}
               >
                 {/* default unit is px */}
                 <Avatar
                   sx={{
                     mr: onMedia.onDesktop ? 3 : 1.5,
-                    height: '72px',
-                    width: '72px',
+                    height: "72px",
+                    width: "72px",
                   }}
                   src={project?.icon_url}
                 >
@@ -103,8 +103,8 @@ const ProjectInfo = () => {
                 </Avatar>
                 <Typography
                   sx={{
-                    fontWeight: 'bold',
-                    fontSize: onMedia.onDesktop ? '2em' : '1em',
+                    fontWeight: "bold",
+                    fontSize: onMedia.onDesktop ? "2em" : "1em",
                   }}
                 >
                   {project?.title}
@@ -115,23 +115,23 @@ const ProjectInfo = () => {
                   mt: onMedia.onDesktop ? 3 : 1.5,
                   mb: onMedia.onDesktop ? 3 : 1.5,
                   borderBottomWidth: 1.5,
-                  borderColor: '#dbdbdb',
+                  borderColor: "#dbdbdb",
                 }}
               />
               <Typography
                 sx={{
-                  fontWeight: 'bold',
+                  fontWeight: "bold",
                 }}
                 color="text.primary"
               >
-                {'Details: '}
+                {"Details: "}
               </Typography>
               <Typography color="text.secondary">{project?.details}</Typography>
               <Typography
-                sx={{ mt: onMedia.onDesktop ? 3 : 1.5, fontWeight: 'bold' }}
+                sx={{ mt: onMedia.onDesktop ? 3 : 1.5, fontWeight: "bold" }}
                 color="text.primary"
               >
-                {'Team size: '}
+                {"Team size: "}
               </Typography>
               <Typography color="text.secondary">
                 {/* {project?.cur_member_count}
@@ -143,15 +143,15 @@ const ProjectInfo = () => {
 
           {/* Top right founder box */}
           {onMedia.onDesktop &&
-            (project?.creator_uid !== 'T5q6FqwJFcRTKxm11lu0zmaXl8x2' ||
-              currentUID === 'T5q6FqwJFcRTKxm11lu0zmaXl8x2') && (
+            (project?.creator_uid !== "T5q6FqwJFcRTKxm11lu0zmaXl8x2" ||
+              currentUID === "T5q6FqwJFcRTKxm11lu0zmaXl8x2") && (
               <Grid item xs={3}>
                 <Box
                   sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
                     mt: 3,
                     mr: 3,
                     ml: 1.5,
@@ -159,8 +159,8 @@ const ProjectInfo = () => {
                 >
                   <Avatar
                     sx={{
-                      width: '96px',
-                      height: '96px',
+                      width: "96px",
+                      height: "96px",
                       // color: "#dbdbdb",
                       // backgroundColor: "#ffffff",
                     }}
@@ -170,21 +170,21 @@ const ProjectInfo = () => {
 
                   <Typography
                     sx={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      fontWeight: 'bold',
-                      fontSize: '1.1em',
+                      display: "flex",
+                      justifyContent: "center",
+                      fontWeight: "bold",
+                      fontSize: "1.1em",
                       mt: 1,
                     }}
                   >
-                    {creatorUser?.name || 'Founder'}
+                    {creatorUser?.name || "Founder"}
                   </Typography>
 
                   {isCreator ? (
                     <NextLink
                       href={{
-                        pathname: '/project/create',
-                        query: { isCreateStr: 'false' },
+                        pathname: "/project/create",
+                        query: { isCreateStr: "false" },
                       }}
                       as="/project/create"
                       passHref
@@ -195,25 +195,25 @@ const ProjectInfo = () => {
                         sx={{
                           mt: 1,
                           border: 1.5,
-                          borderColor: '#dbdbdb',
-                          borderRadius: '30px',
-                          color: 'text.primary',
-                          backgroundColor: '#ffffff',
-                          fontWeight: 'bold',
-                          fontSize: '0.8em',
-                          '&:hover': {
-                            backgroundColor: '#f6f6f6',
+                          borderColor: "#dbdbdb",
+                          borderRadius: "30px",
+                          color: "text.primary",
+                          backgroundColor: "#ffffff",
+                          fontWeight: "bold",
+                          fontSize: "0.8em",
+                          "&:hover": {
+                            backgroundColor: "#f6f6f6",
                           },
-                          textTransform: 'none',
+                          textTransform: "none",
                         }}
                         disableElevation
                       >
-                        {'Modify'}
+                        {"Modify"}
                       </Button>
                     </NextLink>
                   ) : (
                     <Tooltip
-                      title={currentUID ? '' : 'Edit your profile first'}
+                      title={currentUID ? "" : "Edit your profile first"}
                     >
                       <span>
                         <Button
@@ -222,16 +222,16 @@ const ProjectInfo = () => {
                           sx={{
                             mt: 1,
                             border: 1.5,
-                            borderColor: '#dbdbdb',
-                            borderRadius: '30px',
-                            color: 'text.primary',
-                            backgroundColor: '#ffffff',
-                            fontWeight: 'bold',
-                            fontSize: '0.8em',
-                            '&:hover': {
-                              backgroundColor: '#f6f6f6',
+                            borderColor: "#dbdbdb",
+                            borderRadius: "30px",
+                            color: "text.primary",
+                            backgroundColor: "#ffffff",
+                            fontWeight: "bold",
+                            fontSize: "0.8em",
+                            "&:hover": {
+                              backgroundColor: "#f6f6f6",
                             },
-                            textTransform: 'none',
+                            textTransform: "none",
                           }}
                           variant="contained"
                           onClick={(e) => {
@@ -245,7 +245,7 @@ const ProjectInfo = () => {
                             );
                           }}
                         >
-                          {'Connect'}
+                          {"Connect"}
                         </Button>
                       </span>
                     </Tooltip>
@@ -262,7 +262,7 @@ const ProjectInfo = () => {
                   ? {
                       mt: 3,
                       mx: 3,
-                      mb: project?.position_list?.length > 0 ? 0 : '64xp',
+                      mb: project?.position_list?.length > 0 ? 0 : "64xp",
                     }
                   : {
                       mt: 1.5,
@@ -270,16 +270,16 @@ const ProjectInfo = () => {
                     }
               }
             >
-              <Typography sx={{ fontWeight: 'bold' }} color="text.primary">
-                {'Description:'}
+              <Typography sx={{ fontWeight: "bold" }} color="text.primary">
+                {"Description:"}
               </Typography>
               <Typography component="span" color="text.secondary">
                 <pre
                   style={{
-                    fontFamily: 'inherit',
-                    whiteSpace: 'pre-wrap',
-                    wordWrap: 'break-word',
-                    display: 'inline',
+                    fontFamily: "inherit",
+                    whiteSpace: "pre-wrap",
+                    wordWrap: "break-word",
+                    display: "inline",
                   }}
                 >
                   {project?.description}
@@ -292,18 +292,18 @@ const ProjectInfo = () => {
                 sx={{
                   mt: 3,
                   mx: onMedia.onDesktop ? 3 : 0,
-                  mb: onMedia.onDesktop ? '64px' : 3,
+                  mb: onMedia.onDesktop ? "64px" : 3,
                   border: 1.5,
-                  borderColor: '#dbdbdb',
-                  borderRadius: '10px',
-                  backgroundColor: '#ffffff',
+                  borderColor: "#dbdbdb",
+                  borderRadius: "10px",
+                  backgroundColor: "#ffffff",
                 }}
               >
                 <Typography
-                  sx={{ ml: 3, mt: 1.5, fontWeight: 'bold' }}
+                  sx={{ ml: 3, mt: 1.5, fontWeight: "bold" }}
                   color="text.primary"
                 >
-                  {'Positions:'}
+                  {"Positions:"}
                 </Typography>
                 {project?.position_list.map((position, index) => (
                   <PositionListItem
@@ -314,7 +314,7 @@ const ProjectInfo = () => {
                     posWeeklyHour={position.weekly_hour}
                     isCreator={isCreator}
                     creator={creatorUser}
-                    appFormURL={project?.application_form_url || ''}
+                    appFormURL={project?.application_form_url || ""}
                   />
                 ))}
               </Box>
@@ -322,17 +322,17 @@ const ProjectInfo = () => {
           </Grid>
 
           {onMedia.onDesktop &&
-            project?.creator_uid === 'T5q6FqwJFcRTKxm11lu0zmaXl8x2' &&
-            currentUser?.uid === 'T5q6FqwJFcRTKxm11lu0zmaXl8x2' &&
+            project?.creator_uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
+            currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
             !ediumUserExt.my_project_ids.includes(project?.id) && (
               <Grid item xs={12}>
                 <Box
                   sx={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
                     mt: 3,
                     mr: 3,
                     ml: 1.5,
@@ -343,54 +343,54 @@ const ProjectInfo = () => {
                     disableElevation
                     color="AdminOrange"
                     sx={{
-                      borderRadius: '0px',
-                      color: 'white',
+                      borderRadius: "0px",
+                      color: "white",
                       mb: 1.5,
-                      width: '200px',
-                      height: '64px',
-                      textTransform: 'none',
-                      fontWeight: 'bold',
+                      width: "200px",
+                      height: "64px",
+                      textTransform: "none",
+                      fontWeight: "bold",
                     }}
                     onClick={() => {
-                      getDocFromDB('projects_ext', project?.id).then((ret) => {
+                      getDocFromDB("projects_ext", project?.id).then((ret) => {
                         setTCode(ret?.transfer_code);
                         navigator.clipboard.writeText(
-                          ret?.transfer_code || 'null'
+                          ret?.transfer_code || "null"
                         );
                       });
                     }}
                   >
-                    {'ADMIN'}
+                    {"ADMIN"}
                     <br />
-                    {'Get Transfer Code'}
+                    {"Get Transfer Code"}
                   </Button>
                   <Box
                     sx={{
-                      width: '200px',
-                      height: '64px',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      ':hover': {
-                        cursor: 'pointer',
+                      width: "200px",
+                      height: "64px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      ":hover": {
+                        cursor: "pointer",
                       },
                     }}
                     onClick={() => {
-                      if (!(tCode === 'Copied')) {
+                      if (!(tCode === "Copied")) {
                         navigator.clipboard.writeText(tCode);
                       }
-                      setTCode('Copied');
+                      setTCode("Copied");
                     }}
                   >
                     {tCode ? (
                       <>
-                        <KeyboardArrowRightIcon sx={{ color: '#f4511e' }} />
+                        <KeyboardArrowRightIcon sx={{ color: "#f4511e" }} />
                         <Typography
-                          sx={{ fontWeight: 'bold', color: '#f4511e' }}
+                          sx={{ fontWeight: "bold", color: "#f4511e" }}
                         >
                           {tCode}
                         </Typography>
-                        <KeyboardArrowLeftIcon sx={{ color: '#f4511e' }} />
+                        <KeyboardArrowLeftIcon sx={{ color: "#f4511e" }} />
                       </>
                     ) : (
                       <br />
@@ -402,19 +402,19 @@ const ProjectInfo = () => {
                       disableElevation
                       color="AdminOrange"
                       sx={{
-                        borderRadius: '0px',
-                        color: 'white',
+                        borderRadius: "0px",
+                        color: "white",
                         mt: 1.5,
-                        width: '200px',
-                        height: '64px',
-                        textTransform: 'none',
-                        fontWeight: 'bold',
+                        width: "200px",
+                        height: "64px",
+                        textTransform: "none",
+                        fontWeight: "bold",
                       }}
                       onClick={() => {
                         router.push(`/redemption`);
                       }}
                     >
-                      {'To the Redemption'}
+                      {"To the Redemption"}
                     </Button>
                   )}
                 </Box>
@@ -426,18 +426,18 @@ const ProjectInfo = () => {
         <Box
           id="logo placeholder container"
           sx={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
           <Box
             id="logo placeholder wrapper"
             sx={{
-              display: 'flex',
-              justifyContent: 'center',
+              display: "flex",
+              justifyContent: "center",
             }}
           >
             <ExportedImage

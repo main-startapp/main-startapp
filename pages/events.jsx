@@ -1,12 +1,12 @@
-import { useContext, useEffect, useState } from 'react';
-import { Grid } from '@mui/material';
+import { useContext, useEffect, useState } from "react";
+import { Grid } from "@mui/material";
 import {
   GlobalContext,
   EventContext,
-} from '../components/Context/ShareContexts';
-import EventList from '../components/Event/EventList';
-import EventPageBar from '../components/Header/EventPageBar';
-import EventInfo from '../components/Event/EventInfo';
+} from "../components/Context/ShareContexts";
+import EventList from "../components/Event/EventList";
+import EventPageBar from "../components/Header/EventPageBar";
+import EventInfo from "../components/Event/EventInfo";
 
 function Events() {
   // global context
@@ -21,19 +21,19 @@ function Events() {
 
   // event state init
   const [event, setEvent] = useState(null); // thec selected project
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchCategory, setSearchCategory] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchCategory, setSearchCategory] = useState("");
 
   return (
     <EventContext.Provider
-      value={
-        (event,
+      value={{
+        event,
         setEvent,
         searchTerm,
         setSearchTerm,
         searchCategory,
-        setSearchCategory)
-      }
+        setSearchCategory,
+      }}
     >
       {/* Toolbar for searching keywords, category and filter */}
       <EventPageBar />

@@ -96,7 +96,7 @@ const StudentPageBar = () => {
       {/* mobile version */}
       {!onMedia.onDesktop && (
         <Toolbar
-          sx={{ height: "48px", minHeight: 0, paddingX: 1.5 }} // 1.5 to match navbar icon and listitem
+          sx={{ height: "48px", paddingX: 1.5 }} // 1.5 to match navbar icon and listitem
           disableGutters // disable auto padding
         >
           {student === null ? (
