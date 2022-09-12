@@ -3,7 +3,6 @@ import {
   Avatar,
   Box,
   Button,
-  Container,
   Divider,
   Grid,
   IconButton,
@@ -45,6 +44,26 @@ const EventInfo = () => {
   const currentUID = ediumUser?.uid;
   const router = useRouter();
   const [tCode, setTCode] = useState("");
+  useEffect(() => {
+    setTCode("");
+  }, [event]);
+
+  // moment
+  const startMoment = useMemo(() => {
+    return moment(event?.start_date);
+  }, [event?.start_date]);
+
+  const endMoment = useMemo(() => {
+    return moment(event?.end_date);
+  }, [event?.end_date]);
+
+  const isSameDay = useMemo(() => {
+    return startMoment.format("L") === endMoment.format("L");
+  }, [startMoment, endMoment]);
+
+  const isSameTime = useMemo(() => {
+    return startMoment.format("LLL") === endMoment.format("LLL");
+  }, [startMoment, endMoment]);
 
   // hook to find is the ediumUser the event creator
   const isCreator = useMemo(() => {
@@ -134,7 +153,12 @@ const EventInfo = () => {
                 {"Time: "}
               </Typography>
               <Typography color="text.secondary">
-                {moment(event?.starting_date).format("MMMM Do YYYY h:mm a")}
+                {isSameDay
+                  ? startMoment.format("MMMM Do YYYY, h:mm a") +
+                    (isSameTime ? "" : " - " + endMoment.format("h:mm a"))
+                  : startMoment.format("MMMM Do YYYY, h:mm a") +
+                    " - " +
+                    endMoment.format("MMMM Do YYYY, h:mm a")}
               </Typography>
               {/* location */}
               <Typography

@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
     // https://www.reddit.com/r/webdev/comments/us599i/what_is_the_difference_between_firebase/
     return auth.onIdTokenChanged(async (user) => {
       if (!user) {
-        console.log("no user");
+        // console.log("no user");
         setCurrentUser(null);
         setIsLoading(false);
         return;

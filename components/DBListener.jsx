@@ -120,7 +120,8 @@ const DBListener = () => {
             id: doc.id,
             create_timestamp: doc.data().create_timestamp?.toDate(),
             last_timestamp: doc.data().last_timestamp?.toDate(),
-            starting_date: doc.data().starting_date?.toDate(),
+            start_date: doc.data().start_date?.toDate(),
+            end_date: doc.data().end_date?.toDate(),
           }))
         );
       },
@@ -131,6 +132,38 @@ const DBListener = () => {
 
     return unsub;
   }, [setEvents]);
+
+  // listen to realtime events ext collection, only doc's field: memebers contains currentUser will be pulled
+  useEffect(() => {
+    const collectionRef = collection(db, "events_ext");
+    const q = query(
+      collectionRef,
+      where("members", "array-contains", currentUser?.uid),
+      orderBy("last_timestamp", "desc")
+    );
+    const unsub = onSnapshot(
+      q,
+      (querySnapshot) => {
+        setEventsExt(
+          querySnapshot.docs.map((doc) => {
+            const eventExt = {
+              ...doc.data(),
+              id: doc.id,
+              last_timestamp: doc.data().last_timestamp?.toDate(),
+            };
+            return eventExt;
+          })
+        );
+      },
+      (error) => {
+        console.log(error?.message);
+      }
+    );
+
+    return () => {
+      unsub;
+    };
+  }, [currentUser, setEventsExt]);
 
   // listen to realtime users collection, public
   useEffect(() => {
