@@ -41,7 +41,7 @@ import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
 import { useRouter } from "next/router";
-import { findListItem, handleDeleteProject } from "../Reusable/Resusable";
+import { findItemFromList, handleDeleteEntry } from "../Reusable/Resusable";
 import { useAuth } from "../Context/AuthContext";
 
 const ProjectCreate = (props) => {
@@ -51,7 +51,7 @@ const ProjectCreate = (props) => {
     projectsExt,
     ediumUser,
     ediumUserExt,
-    setediumUserExt,
+    setEdiumUserExt,
     oldProject,
     setOldProject,
     onMedia,
@@ -268,7 +268,7 @@ const ProjectCreate = (props) => {
           await ediumUserExtModRef;
         }
         // add transfer code
-        const projectExt = findListItem(projectsExt, "id", oldProject.id);
+        const projectExt = findItemFromList(projectsExt, "id", oldProject.id);
         if (!projectExt.transfer_code) {
           const extDocRef = doc(db, "projects_ext", oldProject.id);
           const projectExtRef = {
@@ -298,7 +298,7 @@ const ProjectCreate = (props) => {
     }, 2000); // wait 2 seconds then go to `projects` page
   };
 
-  const handleDiscard = async () => {
+  const handleDiscard = () => {
     setOldProject(null);
     setNewProject(emptyProject);
     setPositionFields([emptyPositionField]);
@@ -309,8 +309,14 @@ const ProjectCreate = (props) => {
     }, 2000); // wait 2 seconds then go to `projects` page
   };
 
-  const handleDelete = async (id, e) => {
-    handleDeleteProject(id, ediumUserExt, setediumUserExt);
+  const handleDelete = (docID) => {
+    handleDeleteEntry(
+      "projects",
+      "projects_ext",
+      "my_project_ids",
+      docID,
+      currentUID
+    );
 
     showAlert(
       "success",
@@ -809,7 +815,7 @@ const ProjectCreate = (props) => {
                 variant="contained"
                 disableElevation
                 disabled={!isClickable || !currentUID}
-                onClick={(e) => handleDelete(newProject.id, e)}
+                onClick={() => handleDelete(newProject.id)}
               >
                 {"Delete"}
               </Button>

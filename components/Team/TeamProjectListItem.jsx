@@ -12,14 +12,14 @@ import { useContext, useState } from "react";
 import { GlobalContext, TeamContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { handleDeleteProject, handleVisibility } from "../Reusable/Resusable";
+import { handleDeleteEntry, handleVisibility } from "../Reusable/Resusable";
 
 const TeamProjectListItem = (props) => {
   const project = props.project;
   const projectExt = props.projectExt;
 
   // context
-  const { ediumUserExt, setediumUserExt } = useContext(GlobalContext);
+  const { ediumUser } = useContext(GlobalContext);
   const { setProject, setProjectExt } = useContext(TeamContext);
 
   // menu
@@ -118,7 +118,13 @@ const TeamProjectListItem = (props) => {
               onClick={() => {
                 setProject(null);
                 setProjectExt(null);
-                handleDeleteProject(project?.id, ediumUserExt, setediumUserExt);
+                handleDeleteEntry(
+                  "projects",
+                  "projects_ext",
+                  "my_project_ids",
+                  project?.id,
+                  ediumUser?.uid
+                );
                 handleMenuClose();
               }}
             >

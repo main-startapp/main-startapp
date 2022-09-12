@@ -13,6 +13,7 @@ import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useAuth } from "../Context/AuthContext";
+import { handleDeleteEntry } from "../Reusable/Resusable";
 
 const EventListItem = (props) => {
   const index = props.index;
@@ -20,8 +21,7 @@ const EventListItem = (props) => {
   const last = props.last;
 
   // context
-  const { currentUser } = useAuth();
-  const { onMedia } = useContext(GlobalContext);
+  const { ediumUser, onMedia } = useContext(GlobalContext);
   const { setEvent } = useContext(EventContext);
 
   // local
@@ -130,9 +130,10 @@ const EventListItem = (props) => {
               aria-controls={open ? "PLI-menu" : undefined}
               aria-haspopup="true"
               aria-expanded={open ? "true" : undefined}
-              // onClick={(e) => {
-              //   handleMenuClick(e);
-              // }}
+              onClick={(e) => {
+                if (ediumUser?.uid !== event?.creator_uid) return; // !todo: will be removed after there's at least one menu for regular user
+                handleMenuClick(e);
+              }}
             >
               <MoreVertIcon />
             </IconButton>
@@ -145,7 +146,7 @@ const EventListItem = (props) => {
                 "aria-labelledby": "PLI-menu-button",
               }}
             >
-              {currentUser?.uid === 1 && (
+              {ediumUser?.uid === event?.creator_uid && (
                 <MenuItem
                   onClick={() => {
                     handleMenuClose();
@@ -154,10 +155,18 @@ const EventListItem = (props) => {
                   {event?.is_visible ? "Hide" : "Display"}
                 </MenuItem>
               )}
-
-              {currentUser?.uid === 1 && (
+              {ediumUser?.uid === event?.creator_uid && (
                 <MenuItem
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteEntry(
+                      "events",
+                      "evets_ext",
+                      "my_event_ids",
+                      event?.id,
+                      ediumUser?.uid
+                    );
+                    setEvent(null);
                     handleMenuClose();
                   }}
                 >

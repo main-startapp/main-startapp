@@ -48,8 +48,8 @@ function MyApp({ Component, pageProps }) {
   const [eventsExt, setEventsExt] = useState([]); // list of ext of event
   // users related
   const [users, setUsers] = useState([]); // all users data
-  const [ediumUser, setediumUser] = useState(null); // currentUser's data
-  const [ediumUserExt, setediumUserExt] = useState(null); // currentUser's ext data
+  const [ediumUser, setEdiumUser] = useState(null); // currentUser's data
+  const [ediumUserExt, setEdiumUserExt] = useState(null); // currentUser's ext data
   // chats related
   const [chat, setChat] = useState(null);
   const [chats, setChats] = useState([]);
@@ -85,9 +85,9 @@ function MyApp({ Component, pageProps }) {
               users,
               setUsers,
               ediumUser,
-              setediumUser,
+              setEdiumUser,
               ediumUserExt,
-              setediumUserExt,
+              setEdiumUserExt,
               chats,
               setChats,
               chat,
