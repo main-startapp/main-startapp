@@ -32,7 +32,7 @@ import OpenInFullRoundedIcon from "@mui/icons-material/OpenInFullRounded";
 import CloseFullscreenRoundedIcon from "@mui/icons-material/CloseFullscreenRounded";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { findListItem } from "../Reusable/Resusable";
+import { findItemFromList } from "../Reusable/Resusable";
 
 const ChatAccordionMsg = () => {
   // context
@@ -110,7 +110,7 @@ const ChatAccordionMsg = () => {
     if (!(chat?.join_requests?.length > 0)) return [];
     return chat.join_requests.filter((join_request) => {
       if (join_request.requester_uid !== chatPartner?.uid) return;
-      const foundProject = findListItem(
+      const foundProject = findItemFromList(
         projects,
         "id",
         join_request.project_id

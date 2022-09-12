@@ -15,7 +15,7 @@ import ExportedImage from "next-image-export-optimizer";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import NextLink from "next/link";
 import {
-  findListItem,
+  findItemFromList,
   getDocFromDB,
   handleConnect,
 } from "../Reusable/Resusable";
@@ -53,7 +53,7 @@ const ProjectInfo = () => {
   }, [currentUID, project]);
 
   const creatorUser = useMemo(() => {
-    return findListItem(users, "uid", project?.creator_uid);
+    return findItemFromList(users, "uid", project?.creator_uid);
   }, [users, project?.creator_uid]);
 
   // box ref to used by useEffect

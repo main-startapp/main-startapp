@@ -13,7 +13,7 @@ import moment from "moment";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { handleDeleteProject, handleVisibility } from "../Reusable/Resusable";
+import { handleDeleteEntry, handleVisibility } from "../Reusable/Resusable";
 import { useAuth } from "../Context/AuthContext";
 
 // the project list item component in the project list: has full project data but only shows some brief information
@@ -23,8 +23,7 @@ const ProjectListItem = (props) => {
   const last = props.last;
 
   // context
-  const { currentUser } = useAuth();
-  const { ediumUserExt, setediumUserExt, onMedia } = useContext(GlobalContext);
+  const { ediumUser, onMedia } = useContext(GlobalContext);
   const { setProject } = useContext(ProjectContext);
 
   // menu
@@ -70,9 +69,6 @@ const ProjectListItem = (props) => {
             alignItems: "center",
             width: "100%",
           }}
-          // onClick={(e) => {
-          //   e.stopPropagation();
-          // }}
         >
           {/* project icon uploaded by users*/}
           <Avatar
@@ -103,9 +99,10 @@ const ProjectListItem = (props) => {
             aria-controls={open ? "PLI-menu" : undefined}
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
-            // onClick={(e) => {
-            //   handleMenuClick(e);
-            // }}
+            onClick={(e) => {
+              if (ediumUser?.uid !== project?.creator_uid) return; // !todo: will be removed after there's at least one menu for regular user
+              handleMenuClick(e);
+            }}
           >
             <MoreVertIcon />
           </IconButton>
@@ -118,26 +115,28 @@ const ProjectListItem = (props) => {
               "aria-labelledby": "PLI-menu-button",
             }}
           >
-            {currentUser?.uid === 1 && (
+            {ediumUser?.uid === project?.creator_uid && (
               <MenuItem
                 onClick={() => {
-                  handleVisibility(project);
+                  handleVisibility("projects", project);
                   handleMenuClose();
                 }}
               >
                 {project?.is_visible ? "Hide" : "Display"}
               </MenuItem>
             )}
-
-            {currentUser?.uid === 1 && (
+            {ediumUser?.uid === project?.creator_uid && (
               <MenuItem
-                onClick={() => {
-                  setProject(null);
-                  handleDeleteProject(
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteEntry(
+                    "projects",
+                    "projects_ext",
+                    "my_project_ids",
                     project?.id,
-                    ediumUserExt,
-                    setediumUserExt
+                    ediumUser?.uid
                   );
+                  setProject(null);
                   handleMenuClose();
                 }}
               >

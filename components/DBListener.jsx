@@ -24,8 +24,8 @@ const DBListener = () => {
     setEvents,
     setEventsExt,
     setUsers,
-    setediumUser,
-    setediumUserExt,
+    setEdiumUser,
+    setEdiumUserExt,
     setChats,
   } = useContext(GlobalContext);
 
@@ -109,7 +109,11 @@ const DBListener = () => {
   useEffect(() => {
     // db query
     const collectionRef = collection(db, "events");
-    const q = query(collectionRef, orderBy("create_timestamp", "desc"));
+    const q = query(
+      collectionRef,
+      where("is_deleted", "==", false),
+      orderBy("create_timestamp", "desc")
+    );
 
     const unsub = onSnapshot(
       q,
@@ -197,7 +201,7 @@ const DBListener = () => {
       doc(db, "users", docID),
       (doc) => {
         if (doc.exists()) {
-          setediumUser({ ...doc.data(), uid: docID });
+          setEdiumUser({ ...doc.data(), uid: docID });
         }
       },
       (error) => {
@@ -206,7 +210,7 @@ const DBListener = () => {
     );
 
     return unsub;
-  }, [currentUser, setediumUser]);
+  }, [currentUser, setEdiumUser]);
 
   // listen to realtime currentUser's ext doc
   useEffect(() => {
@@ -217,7 +221,7 @@ const DBListener = () => {
       doc(db, "users_ext", docID),
       (doc) => {
         if (doc.exists()) {
-          setediumUserExt({ ...doc.data(), uid: docID });
+          setEdiumUserExt({ ...doc.data(), uid: docID });
         }
       },
       (error) => {
@@ -226,7 +230,7 @@ const DBListener = () => {
     );
 
     return unsub;
-  }, [currentUser, setediumUserExt]);
+  }, [currentUser, setEdiumUserExt]);
 
   // listen to realtime chats collection, only doc's field: chat_user_ids contains currentUser will be pulled
   useEffect(() => {

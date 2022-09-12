@@ -27,7 +27,6 @@ import {
   addDoc,
   serverTimestamp,
   updateDoc,
-  deleteDoc,
   setDoc,
   arrayRemove,
   arrayUnion,
@@ -45,7 +44,7 @@ import moment from "moment";
 import { useRouter } from "next/router";
 import { useAuth } from "../Context/AuthContext";
 import { eventStrList } from "../Header/EventPageBar";
-import { findListItem } from "../Reusable/Resusable";
+import { findItemFromList, handleDeleteEntry } from "../Reusable/Resusable";
 
 const EventCreate = (props) => {
   // context
@@ -73,6 +72,7 @@ const EventCreate = (props) => {
     details: "",
     description: "",
     creator_uid: currentUID,
+    is_deleted: false,
     is_visible: true,
     icon_url: "",
     banner_url: "",
@@ -160,6 +160,7 @@ const EventCreate = (props) => {
         const extDocRef = doc(db, "events_ext", retID);
 
         const eventExtRef = {
+          is_deleted: false,
           members: [currentUID],
           admins: [currentUID],
           last_timestamp: serverTimestamp(),
@@ -190,6 +191,7 @@ const EventCreate = (props) => {
         // create extension doc for team management if create
         const extDocRef = doc(db, "events_ext", retID);
         const eventExtRef = {
+          is_deleted: false,
           members: [currentUID],
           admins: [currentUID],
           last_timestamp: serverTimestamp(),
@@ -224,7 +226,7 @@ const EventCreate = (props) => {
           await ediumUserExtModRef;
         }
         // add transfer code
-        const eventExt = findListItem(eventsExt, "id", oldEvent.id);
+        const eventExt = findItemFromList(eventsExt, "id", oldEvent.id);
         if (!eventExt.transfer_code) {
           const extDocRef = doc(db, "events_ext", oldEvent.id);
           const eventExtRef = {
@@ -254,7 +256,7 @@ const EventCreate = (props) => {
     }, 2000); // wait 2 seconds then go to `events` page
   };
 
-  const handleDiscard = async () => {
+  const handleDiscard = () => {
     setOldEvent(null);
     setNewEvent(emptyEvent);
 
@@ -264,36 +266,14 @@ const EventCreate = (props) => {
     }, 2000); // wait 2 seconds then go to `events` page
   };
 
-  const handleDelete = async (id, e) => {
-    const docRef = doc(db, "events", id);
-    const eventModRef = deleteDoc(docRef).catch((err) => {
-      console.log("deleteDoc() error: ", err);
-    });
-    setOldEvent(null);
-    setNewEvent(emptyEvent);
-
-    // delete event_ext
-    const extDocRef = doc(db, "events_ext", id);
-    const eventExtModRef = deleteDoc(extDocRef).catch((err) => {
-      console.log("deleteDoc() error: ", err);
-    });
-
-    // delete from user ext
-    const ediumUserExtDocRef = doc(db, "users_ext", currentUID);
-    const ediumUserExtUpdateRef = {
-      my_event_ids: arrayRemove(id),
-      last_timestamp: serverTimestamp(),
-    };
-    const ediumUserExtModRef = updateDoc(
-      ediumUserExtDocRef,
-      ediumUserExtUpdateRef
-    ).catch((err) => {
-      console.log("updateDoc() error: ", err);
-    });
-
-    await eventModRef;
-    await eventExtModRef;
-    await ediumUserExtModRef;
+  const handleDelete = (docID) => {
+    handleDeleteEntry(
+      "events",
+      "events_ext",
+      "my_event_ids",
+      docID,
+      currentUID
+    );
 
     showAlert(
       "success",
@@ -668,7 +648,7 @@ const EventCreate = (props) => {
                 variant="contained"
                 disableElevation
                 disabled={!isClickable || !currentUID}
-                onClick={(e) => handleDelete(newEvent.id, e)}
+                onClick={() => handleDelete(newEvent.id)}
               >
                 {"Delete"}
               </Button>

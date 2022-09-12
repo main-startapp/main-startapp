@@ -15,7 +15,7 @@ import ExportedImage from "next-image-export-optimizer";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import NextLink from "next/link";
 import {
-  findListItem,
+  findItemFromList,
   getDocFromDB,
   handleConnect,
 } from "../Reusable/Resusable";
@@ -72,7 +72,7 @@ const EventInfo = () => {
 
   // hook to get event creator data
   const creatorUser = useMemo(() => {
-    return findListItem(users, "uid", event?.creator_uid);
+    return findItemFromList(users, "uid", event?.creator_uid);
   }, [users, event?.creator_uid]);
 
   // box ref to used by useEffect
