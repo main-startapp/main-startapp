@@ -43,6 +43,9 @@ const ProjectInfo = () => {
   const currentUID = ediumUser?.uid;
   const router = useRouter();
   const [tCode, setTCode] = useState("");
+  useEffect(() => {
+    setTCode("");
+  }, [project]);
 
   // hooks
   const isCreator = useMemo(() => {

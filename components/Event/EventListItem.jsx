@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import {
   Avatar,
   Box,
@@ -21,8 +21,29 @@ const EventListItem = (props) => {
 
   // context
   const { currentUser } = useAuth();
-  const { ediumUserExt, onMedia } = useContext(GlobalContext);
+  const { onMedia } = useContext(GlobalContext);
   const { setEvent } = useContext(EventContext);
+
+  // local
+  const startMoment = useMemo(() => {
+    return moment(event?.start_date);
+  }, [event?.start_date]);
+
+  const endMoment = useMemo(() => {
+    return moment(event?.end_date);
+  }, [event?.end_date]);
+
+  const isExpired = useMemo(() => {
+    return moment({ hour: 23, minute: 59 }).isAfter(endMoment);
+  }, [endMoment]);
+
+  const isSameDay = useMemo(() => {
+    return startMoment.format("L") === endMoment.format("L");
+  }, [startMoment, endMoment]);
+
+  const isSameTime = useMemo(() => {
+    return startMoment.format("LLL") === endMoment.format("LLL");
+  }, [startMoment, endMoment]);
 
   // menu
   const [anchorEl, setAnchorEl] = useState(null);
@@ -58,6 +79,7 @@ const EventListItem = (props) => {
           },
           // height: "180px",
           overflow: "hidden",
+          opacity: isExpired ? "50%" : "100%",
         }}
       >
         <Box
@@ -91,51 +113,59 @@ const EventListItem = (props) => {
               <>
                 {event.category}
                 <br />
-                {moment(event.starting_date).format("MMMM Do h:mm a")}
+                {isSameDay
+                  ? startMoment.format("MMM Do h:mm a") +
+                    (isSameTime ? "" : " - " + endMoment.format("h:mm a"))
+                  : startMoment.format("MMM Do h:mm a") +
+                    " - " +
+                    endMoment.format("MMM Do h:mm a")}
               </>
             }
           />
-          <IconButton
-            id="PLI-menu-button"
-            aria-controls={open ? "PLI-menu" : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? "true" : undefined}
-            sx={{ position: "absolute", top: "11%", right: "3.5%" }}
-            // onClick={(e) => {
-            //   handleMenuClick(e);
-            // }}
+          <Box
+            sx={{ height: "96px", display: "flex", alignItems: "flex-start" }}
           >
-            <MoreVertIcon />
-          </IconButton>
-          <Menu
-            id="PLI-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleMenuClose}
-            MenuListProps={{
-              "aria-labelledby": "PLI-menu-button",
-            }}
-          >
-            {currentUser?.uid === 1 && (
-              <MenuItem
-                onClick={() => {
-                  handleMenuClose();
-                }}
-              >
-                {event?.is_visible ? "Hide" : "Display"}
-              </MenuItem>
-            )}
+            <IconButton
+              id="PLI-menu-button"
+              aria-controls={open ? "PLI-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? "true" : undefined}
+              // onClick={(e) => {
+              //   handleMenuClick(e);
+              // }}
+            >
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              id="PLI-menu"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleMenuClose}
+              MenuListProps={{
+                "aria-labelledby": "PLI-menu-button",
+              }}
+            >
+              {currentUser?.uid === 1 && (
+                <MenuItem
+                  onClick={() => {
+                    handleMenuClose();
+                  }}
+                >
+                  {event?.is_visible ? "Hide" : "Display"}
+                </MenuItem>
+              )}
 
-            {currentUser?.uid === 1 && (
-              <MenuItem
-                onClick={() => {
-                  handleMenuClose();
-                }}
-              >
-                Delete
-              </MenuItem>
-            )}
-          </Menu>
+              {currentUser?.uid === 1 && (
+                <MenuItem
+                  onClick={() => {
+                    handleMenuClose();
+                  }}
+                >
+                  Delete
+                </MenuItem>
+              )}
+            </Menu>
+          </Box>
         </Box>
       </ListItem>
     </Box>
