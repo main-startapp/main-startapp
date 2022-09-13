@@ -3,13 +3,15 @@ import { useState } from "react";
 import ListAltRoundedIcon from "@mui/icons-material/ListAltRounded";
 import EventRoundedIcon from "@mui/icons-material/EventRounded";
 import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
-import NextLink from "next/link";
+import ForumIcon from "@mui/icons-material/Forum";
+import { useRouter } from "next/router";
 
 // !todo: current implementation didn't fully utilize the bottom nav comp. It merely use it as some general layout then wrap the bottomNavAction with Nextlink.
 
 const BottomNav = () => {
-  //const [destination, setDestination] = useState(null);
-  //console.log(destination);
+  const [destination, setDestination] = useState(null);
+  const router = useRouter();
+
   return (
     <BottomNavigation
       sx={{
@@ -25,34 +27,45 @@ const BottomNav = () => {
         },
         zIndex: 100,
       }}
-
-      //   value={destination}
-      //   onChange={(event, newDestination) => {
-      //     setDestination(newDestination);
-      //   }}
+      value={destination}
+      onChange={(event, newDestination) => {
+        setDestination(newDestination);
+      }}
     >
-      <NextLink href="/">
-        <BottomNavigationAction
-          //   value="/"
-          label="Projects"
-          icon={<ListAltRoundedIcon />}
-        />
-      </NextLink>
+      <BottomNavigationAction
+        value="projects"
+        label="Projects"
+        icon={<ListAltRoundedIcon />}
+        onClick={() => {
+          router.push("/");
+        }}
+      />
+      <BottomNavigationAction
+        value="events"
+        label="Events"
+        icon={<EventRoundedIcon />}
+        onClick={() => {
+          router.push("/events");
+        }}
+      />
 
-      <NextLink href="/events">
-        <BottomNavigationAction
-          //   value="/events"
-          label="Events"
-          icon={<EventRoundedIcon />}
-        />
-      </NextLink>
-      <NextLink href="/students">
-        <BottomNavigationAction
-          //   value="/students"
-          label="Students"
-          icon={<PeopleRoundedIcon />}
-        />
-      </NextLink>
+      <BottomNavigationAction
+        value="students"
+        label="Students"
+        icon={<PeopleRoundedIcon />}
+        onClick={() => {
+          router.push("/students");
+        }}
+      />
+
+      <BottomNavigationAction
+        value="chats"
+        label="Chats"
+        icon={<ForumIcon />}
+        onClick={() => {
+          router.push("/chats");
+        }}
+      />
     </BottomNavigation>
   );
 };

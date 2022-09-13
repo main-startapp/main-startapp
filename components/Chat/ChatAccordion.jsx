@@ -26,6 +26,7 @@ const ChatAccordion = () => {
     setForceChatExpand,
     chatPartner,
     setChatPartner,
+    onMedia,
   } = useContext(GlobalContext);
 
   // local
@@ -89,7 +90,7 @@ const ChatAccordion = () => {
     setChatPartner(null);
   };
 
-  return (
+  return onMedia.onDesktop ? (
     // box is essential for wrapping the accrodion to get rid of ugly top line
     <Box>
       <Accordion
@@ -147,7 +148,7 @@ const ChatAccordion = () => {
         </AccordionDetails>
       </Accordion>
     </Box>
-  );
+  ) : null;
 };
 
 export default ChatAccordion;

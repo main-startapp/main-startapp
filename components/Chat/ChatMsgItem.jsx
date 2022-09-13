@@ -4,10 +4,11 @@ import { useAuth } from "../Context/AuthContext";
 import { GlobalContext } from "../Context/ShareContexts";
 import moment from "moment";
 
-const ChatAccordionMsgItem = (props) => {
+const ChatMsgItem = (props) => {
   const message = props.message;
   const isSameAuthor = props.isSameAuthor;
   const chatPartner = props.chatPartner;
+  const isLastMsg = props.isLastMsg;
 
   // context
   const { currentUser } = useAuth();
@@ -60,6 +61,7 @@ const ChatAccordionMsgItem = (props) => {
           width: "fit-content",
           wordWrap: "break-word",
           whiteSpace: "pre-wrap",
+          mb: isLastMsg ? "18px" : 0,
         }}
       >
         <Typography sx={{ fontSize: "0.9em", mx: "18px" }}>
@@ -70,4 +72,4 @@ const ChatAccordionMsgItem = (props) => {
   );
 };
 
-export default ChatAccordionMsgItem;
+export default ChatMsgItem;

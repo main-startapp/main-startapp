@@ -57,19 +57,12 @@ const ProjectList = () => {
   );
 
   return (
-    <Box
-      sx={{
-        backgroundColor: "#fafafa",
-        height: onMedia.onDesktop
-          ? "calc(100vh - 64px - 64px - 1.5px)"
-          : "calc(100vh - 48px - 48px - 1.5px)", // navbar; projectbar; border
-      }}
-    >
+    <Box sx={{ backgroundColor: "#fafafa" }}>
       <Box
         sx={{
           height: onMedia.onDesktop
             ? "calc(100vh - 64px - 64px - 1.5px - 36px - 24px)"
-            : "calc(100vh - 48px - 48px - 1.5px - 36px - 24px)", // navbar; projectbar; border; button; y-margins
+            : "calc(100vh - 48px - 48px - 1.5px - 60px)", // navbar; projectbar; border; button; y-margins
           overflow: "auto",
         }}
       >
@@ -95,10 +88,10 @@ const ProjectList = () => {
             <span>
               <NextLink
                 href={{
-                  pathname: "/project/create",
+                  pathname: "/projects/create",
                   query: { isCreateStr: "true" },
                 }}
-                as="/project/create"
+                as="/projects/create"
                 passHref
               >
                 <Button
