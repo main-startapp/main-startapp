@@ -50,19 +50,12 @@ const EventList = () => {
   );
 
   return (
-    <Box
-      sx={{
-        backgroundColor: "#fafafa",
-        height: onMedia.onDesktop
-          ? "calc(100vh - 64px - 64px - 1.5px)"
-          : "calc(100vh - 48px - 48px - 1.5px)", // navbar; appbar; border
-      }}
-    >
+    <Box sx={{ backgroundColor: "#fafafa" }}>
       <Box
         sx={{
           height: onMedia.onDesktop
             ? "calc(100vh - 64px - 64px - 1.5px - 36px - 24px)"
-            : "calc(100vh - 48px - 48px - 1.5px - 36px - 24px)", // navbar; appbar; border; button; y-margins
+            : "calc(100vh - 48px - 48px - 1.5px - 60px)", // navbar; appbar; border; button; y-margins
           overflow: "auto",
         }}
       >
@@ -88,10 +81,10 @@ const EventList = () => {
             <span>
               <NextLink
                 href={{
-                  pathname: "/event/create",
+                  pathname: "/events/create",
                   query: { isCreateStr: "true" },
                 }}
-                as="/event/create"
+                as="/events/create"
                 passHref
               >
                 <Button

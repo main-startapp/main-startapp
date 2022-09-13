@@ -22,7 +22,7 @@ import { useAuth } from "../components/Context/AuthContext";
 import { GlobalContext } from "../components/Context/ShareContexts";
 import { db } from "../firebase";
 
-function Redemption() {
+const Redemption = () => {
   // context
   const { currentUser } = useAuth();
   const {
@@ -584,7 +584,7 @@ function Redemption() {
       </Grid>
     </Grid>
   );
-}
+};
 
 export default Redemption;
 

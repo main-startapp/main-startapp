@@ -9,7 +9,7 @@ import { AuthProvider } from "../components/Context/AuthContext";
 import Navbar from "../components/Header/Navbar";
 import ChatAccordion from "../components/Chat/ChatAccordion";
 import { GlobalContext } from "../components/Context/ShareContexts";
-import ChatAccordionMsg from "../components/Chat/ChatAccordionMsg";
+import ChatMsgBox from "../components/Chat/ChatMsgBox";
 import DBListener from "../components/DBListener";
 import BottomNav from "../components/Header/BottomNav";
 
@@ -48,8 +48,8 @@ function MyApp({ Component, pageProps }) {
   const [eventsExt, setEventsExt] = useState([]); // list of ext of event
   // users related
   const [users, setUsers] = useState([]); // all users data
-  const [ediumUser, setediumUser] = useState(null); // currentUser's data
-  const [ediumUserExt, setediumUserExt] = useState(null); // currentUser's ext data
+  const [ediumUser, setEdiumUser] = useState(null); // currentUser's data
+  const [ediumUserExt, setEdiumUserExt] = useState(null); // currentUser's ext data
   // chats related
   const [chat, setChat] = useState(null);
   const [chats, setChats] = useState([]);
@@ -85,9 +85,9 @@ function MyApp({ Component, pageProps }) {
               users,
               setUsers,
               ediumUser,
-              setediumUser,
+              setEdiumUser,
               ediumUserExt,
-              setediumUserExt,
+              setEdiumUserExt,
               chats,
               setChats,
               chat,
@@ -107,7 +107,7 @@ function MyApp({ Component, pageProps }) {
             <DBListener />
             <Navbar />
             <Component {...pageProps} />
-            {onMedia.onDesktop && showMsg && <ChatAccordionMsg />}
+            {onMedia.onDesktop && showMsg && <ChatMsgBox />}
             {onMedia.onDesktop && showChat && <ChatAccordion />}
             {!onMedia.onDesktop && <BottomNav />}
           </GlobalContext.Provider>

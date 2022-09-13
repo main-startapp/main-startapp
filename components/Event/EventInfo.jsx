@@ -3,7 +3,6 @@ import {
   Avatar,
   Box,
   Button,
-  Container,
   Divider,
   Grid,
   IconButton,
@@ -16,7 +15,7 @@ import ExportedImage from "next-image-export-optimizer";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import NextLink from "next/link";
 import {
-  findListItem,
+  findItemFromList,
   getDocFromDB,
   handleConnect,
 } from "../Reusable/Resusable";
@@ -45,6 +44,26 @@ const EventInfo = () => {
   const currentUID = ediumUser?.uid;
   const router = useRouter();
   const [tCode, setTCode] = useState("");
+  useEffect(() => {
+    setTCode("");
+  }, [event]);
+
+  // moment
+  const startMoment = useMemo(() => {
+    return moment(event?.start_date);
+  }, [event?.start_date]);
+
+  const endMoment = useMemo(() => {
+    return moment(event?.end_date);
+  }, [event?.end_date]);
+
+  const isSameDay = useMemo(() => {
+    return startMoment.format("L") === endMoment.format("L");
+  }, [startMoment, endMoment]);
+
+  const isSameTime = useMemo(() => {
+    return startMoment.format("LLL") === endMoment.format("LLL");
+  }, [startMoment, endMoment]);
 
   // hook to find is the ediumUser the event creator
   const isCreator = useMemo(() => {
@@ -53,7 +72,7 @@ const EventInfo = () => {
 
   // hook to get event creator data
   const creatorUser = useMemo(() => {
-    return findListItem(users, "uid", event?.creator_uid);
+    return findItemFromList(users, "uid", event?.creator_uid);
   }, [users, event?.creator_uid]);
 
   // box ref to used by useEffect
@@ -134,7 +153,12 @@ const EventInfo = () => {
                 {"Time: "}
               </Typography>
               <Typography color="text.secondary">
-                {moment(event?.starting_date).format("MMMM Do YYYY h:mm a")}
+                {isSameDay
+                  ? startMoment.format("MMMM Do YYYY, h:mm a") +
+                    (isSameTime ? "" : " - " + endMoment.format("h:mm a"))
+                  : startMoment.format("MMMM Do YYYY, h:mm a") +
+                    " - " +
+                    endMoment.format("MMMM Do YYYY, h:mm a")}
               </Typography>
               {/* location */}
               <Typography
@@ -232,10 +256,10 @@ const EventInfo = () => {
                   {isCreator && (
                     <NextLink
                       href={{
-                        pathname: "/event/create",
+                        pathname: "/events/create",
                         query: { isCreateStr: "false" },
                       }}
-                      as="/event/create"
+                      as="/events/create"
                       passHref
                     >
                       <Button

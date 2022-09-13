@@ -5,10 +5,10 @@ import {
   EventContext,
 } from "../components/Context/ShareContexts";
 import EventList from "../components/Event/EventList";
-import EventPageBar from "../components/Header/EventPageBar";
+import EventsPageBar from "../components/Header/EventsPageBar";
 import EventInfo from "../components/Event/EventInfo";
 
-function Events() {
+const Events = () => {
   // global context
   const { setChat, setChatPartner, setShowChat, setShowMsg, onMedia } =
     useContext(GlobalContext);
@@ -36,7 +36,7 @@ function Events() {
       }}
     >
       {/* Toolbar for searching keywords, category and filter */}
-      <EventPageBar />
+      <EventsPageBar />
 
       <Grid
         container
@@ -72,6 +72,6 @@ function Events() {
       </Grid>
     </EventContext.Provider>
   );
-}
+};
 
 export default Events;

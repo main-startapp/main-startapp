@@ -89,34 +89,49 @@ export const handleUnread = async (chat, setChat, ediumUser) => {
 };
 
 //============================================================
-// change project's visibility
+// change entry's visibility (project, event)
 //============================================================
-export const handleVisibility = async (project) => {
-  const docRef = doc(db, "projects", project.id);
-  const projectUpdateRef = {
-    is_visible: !project.is_visible,
+export const handleVisibility = async (collectionName, entry) => {
+  const docRef = doc(db, collectionName, entry.id);
+  const entryUpdateRef = {
+    is_visible: entry?.is_visible !== undefined ? !entry.is_visible : true, // if has is_visible field, flip it; if not, hide it
     last_timestamp: serverTimestamp(),
   };
-  const projectModRef = updateDoc(docRef, projectUpdateRef).catch((err) => {
+  const entryModRef = updateDoc(docRef, entryUpdateRef).catch((err) => {
     console.log("updateDoc() error: ", err);
   });
-  await projectModRef;
+  await entryModRef;
 };
 
 //============================================================
-// never delete, only hide
+// change is_deleted field in entry and entryExt, remove id from my_entry_ids (project/event)
 // !todo: use cloud function for batch deletion
 //============================================================
-export const handleDeleteProject = async (projectID, ediumUserExt) => {
-  const docRef = doc(db, "projects", projectID);
-  const projectModRef = updateDoc(docRef, { is_deleted: true }).catch((err) => {
+export const handleDeleteEntry = async (
+  colletionName,
+  extColletionName,
+  keyName,
+  entryID,
+  ediumUserID
+) => {
+  // set is_deleted to true in entry doc
+  const docRef = doc(db, colletionName, entryID);
+  const entryModRef = updateDoc(docRef, { is_deleted: true }).catch((err) => {
     console.log("updateDoc() error: ", err);
   });
 
-  // remove project ref from my_project_ids in user ext doc
-  const ediumUserExtDocRef = doc(db, "users_ext", ediumUserExt?.uid);
+  // set is_deleted to true in entry ext doc
+  const extDocRef = doc(db, extColletionName, entryID);
+  const entryExtModRef = updateDoc(extDocRef, { is_deleted: true }).catch(
+    (err) => {
+      console.log("updateDoc() error: ", err);
+    }
+  );
+
+  // remove entry id from my_entry_ids
+  const ediumUserExtDocRef = doc(db, "users_ext", ediumUserID);
   const ediumUserExtUpdateRef = {
-    my_project_ids: arrayRemove(projectID),
+    [keyName]: arrayRemove(entryID),
     last_timestamp: serverTimestamp(),
   };
   const ediumUserExtModRef = updateDoc(
@@ -126,18 +141,10 @@ export const handleDeleteProject = async (projectID, ediumUserExt) => {
     console.log("updateDoc() error: ", err);
   });
 
-  // delete project_ext
-  const extDocRef = doc(db, "projects_ext", projectID);
-  const projectExtModRef = updateDoc(extDocRef, { is_deleted: true }).catch(
-    (err) => {
-      console.log("updateDoc() error: ", err);
-    }
-  );
-
   // wait
-  await projectModRef;
+  await entryModRef;
+  await entryExtModRef;
   await ediumUserExtModRef;
-  await projectExtModRef;
 };
 
 //============================================================
@@ -153,9 +160,9 @@ export const getDocFromDB = async (dbName, docID) => {
 };
 
 //============================================================
-// find item from list using id
+// find item from list using id, like projects, events
 //============================================================
-export const findListItem = (list, key, itemID) => {
+export const findItemFromList = (list, key, itemID) => {
   return list.find((listItem) => listItem[key] === itemID);
 };
 
@@ -170,10 +177,10 @@ export const getGooglePhotoURLwithRes = (photo_url, res) => {
 //============================================================
 // ADMIN: Duplicate Collections With New Name
 //============================================================
-export const exportCollections = async (collection, newCollectionName) => {
-  collection.forEach(async (data) => {
-    const uid = data.uid;
-    delete data.uid;
-    await setDoc(doc(db, newCollectionName, uid), { ...data });
-  });
-};
+// export const exportCollections = async (collection, newCollectionName) => {
+//   collection.forEach(async (data) => {
+//     const uid = data.uid;
+//     delete data.uid;
+//     await setDoc(doc(db, newCollectionName, uid), { ...data });
+//   });
+// };

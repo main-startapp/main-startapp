@@ -27,7 +27,6 @@ import {
   addDoc,
   serverTimestamp,
   updateDoc,
-  deleteDoc,
   setDoc,
   arrayRemove,
   arrayUnion,
@@ -44,12 +43,13 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
 import { useRouter } from "next/router";
 import { useAuth } from "../Context/AuthContext";
-import { eventStrList } from "../Header/EventPageBar";
+import { eventStrList } from "../Header/EventsPageBar";
+import { findItemFromList, handleDeleteEntry } from "../Reusable/Resusable";
 
 const EventCreate = (props) => {
   // context
   const { currentUser } = useAuth();
-  const { ediumUser, ediumUserExt, oldEvent, setOldEvent, onMedia } =
+  const { eventsExt, ediumUser, ediumUserExt, oldEvent, setOldEvent, onMedia } =
     useContext(GlobalContext);
   const { showAlert } = useContext(EventContext);
 
@@ -66,11 +66,13 @@ const EventCreate = (props) => {
   const emptyEvent = {
     title: "",
     category: "",
-    starting_date: moment().toDate(),
+    start_date: moment().toDate(),
+    end_date: moment().toDate(),
     location: "",
     details: "",
     description: "",
     creator_uid: currentUID,
+    is_deleted: false,
     is_visible: true,
     icon_url: "",
     banner_url: "",
@@ -140,7 +142,7 @@ const EventCreate = (props) => {
         console.log("updateDoc() error: ", err);
       });
     }
-    setOldEvent(null);
+
     let retID;
     await eventModRef.then((ret) => {
       retID = ret?.id;
@@ -158,6 +160,7 @@ const EventCreate = (props) => {
         const extDocRef = doc(db, "events_ext", retID);
 
         const eventExtRef = {
+          is_deleted: false,
           members: [currentUID],
           admins: [currentUID],
           last_timestamp: serverTimestamp(),
@@ -188,6 +191,7 @@ const EventCreate = (props) => {
         // create extension doc for team management if create
         const extDocRef = doc(db, "events_ext", retID);
         const eventExtRef = {
+          is_deleted: false,
           members: [currentUID],
           admins: [currentUID],
           last_timestamp: serverTimestamp(),
@@ -199,7 +203,47 @@ const EventCreate = (props) => {
         await ediumUserExtModRef;
         await eventExtModRef;
       }
+    } else {
+      // update
+      if (
+        currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
+        isCheckedTransferable
+      ) {
+        // remove invalid ids
+        const event_ids = ediumUserExt?.my_event_ids;
+        if (event_ids.find((event_id) => event_id === oldEvent.id)) {
+          const ediumUserExtDocRef = doc(db, "users_ext", currentUID);
+          const ediumUserExtUpdateRef = {
+            my_event_ids: arrayRemove(oldEvent.id),
+            last_timestamp: serverTimestamp(),
+          };
+          const ediumUserExtModRef = updateDoc(
+            ediumUserExtDocRef,
+            ediumUserExtUpdateRef
+          ).catch((err) => {
+            console.log("updateDoc() error: ", err);
+          });
+          await ediumUserExtModRef;
+        }
+        // add transfer code
+        const eventExt = findItemFromList(eventsExt, "id", oldEvent.id);
+        if (!eventExt.transfer_code) {
+          const extDocRef = doc(db, "events_ext", oldEvent.id);
+          const eventExtRef = {
+            last_timestamp: serverTimestamp(),
+            transfer_code: Math.random().toString(16).slice(2),
+          };
+          const eventExtModRef = updateDoc(extDocRef, eventExtRef).catch(
+            (err) => {
+              console.log("updateDoc() error: ", err);
+            }
+          );
+          await eventExtModRef;
+        }
+      }
     }
+
+    setOldEvent(null);
 
     // !todo: since updateDoc return Promise<void>, we need other method to check the results
     showAlert(
@@ -212,7 +256,7 @@ const EventCreate = (props) => {
     }, 2000); // wait 2 seconds then go to `events` page
   };
 
-  const handleDiscard = async () => {
+  const handleDiscard = () => {
     setOldEvent(null);
     setNewEvent(emptyEvent);
 
@@ -222,36 +266,14 @@ const EventCreate = (props) => {
     }, 2000); // wait 2 seconds then go to `events` page
   };
 
-  const handleDelete = async (id, e) => {
-    const docRef = doc(db, "events", id);
-    const eventModRef = deleteDoc(docRef).catch((err) => {
-      console.log("deleteDoc() error: ", err);
-    });
-    setOldEvent(null);
-    setNewEvent(emptyEvent);
-
-    // delete event_ext
-    const extDocRef = doc(db, "events_ext", id);
-    const eventExtModRef = deleteDoc(extDocRef).catch((err) => {
-      console.log("deleteDoc() error: ", err);
-    });
-
-    // delete from user ext
-    const ediumUserExtDocRef = doc(db, "users_ext", currentUID);
-    const ediumUserExtUpdateRef = {
-      my_event_ids: arrayRemove(id),
-      last_timestamp: serverTimestamp(),
-    };
-    const ediumUserExtModRef = updateDoc(
-      ediumUserExtDocRef,
-      ediumUserExtUpdateRef
-    ).catch((err) => {
-      console.log("updateDoc() error: ", err);
-    });
-
-    await eventModRef;
-    await eventExtModRef;
-    await ediumUserExtModRef;
+  const handleDelete = (docID) => {
+    handleDeleteEntry(
+      "events",
+      "events_ext",
+      "my_event_ids",
+      docID,
+      currentUID
+    );
 
     showAlert(
       "success",
@@ -263,8 +285,10 @@ const EventCreate = (props) => {
     }, 2000); // wait 2 seconds then go to `events` page
   };
 
-  const handleDateTimeChange = (e) => {
-    setNewEvent({ ...newEvent, starting_date: e?._d });
+  const handleDateTimeChange = (e, isStart) => {
+    isStart
+      ? setNewEvent({ ...newEvent, start_date: e?._d })
+      : setNewEvent({ ...newEvent, end_date: e?._d });
   };
 
   const formRef = useRef();
@@ -352,7 +376,7 @@ const EventCreate = (props) => {
 
                 height: "56px",
                 textTransform: "none",
-                width: "30%",
+                minWidth: "20%",
                 paddingLeft: "30px",
               }}
               // variant="contained"
@@ -399,7 +423,7 @@ const EventCreate = (props) => {
               </DialogActions>
             </Dialog>
           </Box>
-          {/* Category select & starting date*/}
+          {/* Category select & start/end date */}
           <Box
             display="flex"
             justifyContent="space-between"
@@ -458,15 +482,31 @@ const EventCreate = (props) => {
               <DesktopDateTimePicker
                 renderInput={(props) => (
                   <StyledTextField
-                    sx={{ width: "60%" }}
-                    helperText="Starting date and time"
+                    sx={{ minWidth: "20%", mr: 5 }}
+                    helperText="Start date and time"
                     {...props}
                   />
                 )}
-                // label="Starting Date"
-                value={newEvent.starting_date}
+                value={newEvent.start_date}
                 onChange={(e) => {
-                  handleDateTimeChange(e);
+                  handleDateTimeChange(e, true);
+                }}
+              />
+            </LocalizationProvider>
+
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+              <DesktopDateTimePicker
+                renderInput={(props) => (
+                  <StyledTextField
+                    sx={{ minWidth: "20%" }}
+                    helperText="End date and time"
+                    {...props}
+                  />
+                )}
+                value={newEvent.end_date}
+                minDateTime={moment(newEvent.start_date)}
+                onChange={(e) => {
+                  handleDateTimeChange(e, false);
                 }}
               />
             </LocalizationProvider>
@@ -608,7 +648,7 @@ const EventCreate = (props) => {
                 variant="contained"
                 disableElevation
                 disabled={!isClickable || !currentUID}
-                onClick={(e) => handleDelete(newEvent.id, e)}
+                onClick={() => handleDelete(newEvent.id)}
               >
                 {"Delete"}
               </Button>

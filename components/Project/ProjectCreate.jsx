@@ -32,6 +32,7 @@ import {
   updateDoc,
   setDoc,
   arrayUnion,
+  arrayRemove,
 } from "firebase/firestore";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { db } from "../../firebase";
@@ -40,16 +41,17 @@ import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
 import { useRouter } from "next/router";
-import { handleDeleteProject } from "../Reusable/Resusable";
+import { findItemFromList, handleDeleteEntry } from "../Reusable/Resusable";
 import { useAuth } from "../Context/AuthContext";
 
 const ProjectCreate = (props) => {
   // context
   const { currentUser } = useAuth();
   const {
+    projectsExt,
     ediumUser,
     ediumUserExt,
-    setediumUserExt,
+    setEdiumUserExt,
     oldProject,
     setOldProject,
     onMedia,
@@ -181,7 +183,7 @@ const ProjectCreate = (props) => {
         console.log("updateDoc() error: ", err);
       });
     }
-    setOldProject(null);
+
     let retID;
     await projectModRef.then((ret) => {
       retID = ret?.id;
@@ -197,7 +199,6 @@ const ProjectCreate = (props) => {
         // don't add project id to my_project_ids
         // do create extenion doc with extra field
         const extDocRef = doc(db, "projects_ext", retID);
-
         const projectExtRef = {
           is_deleted: false,
           members: [currentUID],
@@ -244,7 +245,47 @@ const ProjectCreate = (props) => {
         await ediumUserExtModRef;
         await projectExtModRef;
       }
+    } else {
+      // update
+      if (
+        currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
+        isCheckedTransferable
+      ) {
+        // remove invalid ids
+        const project_ids = ediumUserExt?.my_project_ids;
+        if (project_ids.find((project_id) => project_id === oldProject.id)) {
+          const ediumUserExtDocRef = doc(db, "users_ext", currentUID);
+          const ediumUserExtUpdateRef = {
+            my_project_ids: arrayRemove(oldProject.id),
+            last_timestamp: serverTimestamp(),
+          };
+          const ediumUserExtModRef = updateDoc(
+            ediumUserExtDocRef,
+            ediumUserExtUpdateRef
+          ).catch((err) => {
+            console.log("updateDoc() error: ", err);
+          });
+          await ediumUserExtModRef;
+        }
+        // add transfer code
+        const projectExt = findItemFromList(projectsExt, "id", oldProject.id);
+        if (!projectExt.transfer_code) {
+          const extDocRef = doc(db, "projects_ext", oldProject.id);
+          const projectExtRef = {
+            last_timestamp: serverTimestamp(),
+            transfer_code: Math.random().toString(16).slice(2),
+          };
+          const projectExtModRef = updateDoc(extDocRef, projectExtRef).catch(
+            (err) => {
+              console.log("updateDoc() error: ", err);
+            }
+          );
+          await projectExtModRef;
+        }
+      }
     }
+
+    setOldProject(null);
 
     // !todo: since updateDoc return Promise<void>, we need other method to check the results
     showAlert(
@@ -257,7 +298,7 @@ const ProjectCreate = (props) => {
     }, 2000); // wait 2 seconds then go to `projects` page
   };
 
-  const handleDiscard = async () => {
+  const handleDiscard = () => {
     setOldProject(null);
     setNewProject(emptyProject);
     setPositionFields([emptyPositionField]);
@@ -268,8 +309,14 @@ const ProjectCreate = (props) => {
     }, 2000); // wait 2 seconds then go to `projects` page
   };
 
-  const handleDelete = async (id, e) => {
-    handleDeleteProject(id, ediumUserExt, setediumUserExt);
+  const handleDelete = (docID) => {
+    handleDeleteEntry(
+      "projects",
+      "projects_ext",
+      "my_project_ids",
+      docID,
+      currentUID
+    );
 
     showAlert(
       "success",
@@ -768,7 +815,7 @@ const ProjectCreate = (props) => {
                 variant="contained"
                 disableElevation
                 disabled={!isClickable || !currentUID}
-                onClick={(e) => handleDelete(newProject.id, e)}
+                onClick={() => handleDelete(newProject.id)}
               >
                 {"Delete"}
               </Button>

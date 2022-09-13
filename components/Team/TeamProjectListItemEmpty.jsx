@@ -7,10 +7,10 @@ const TeamProjectListItemEmpty = () => {
     <Box m={3}>
       <NextLink
         href={{
-          pathname: "/project/create",
+          pathname: "/projects/create",
           query: { isCreateStr: "true" },
         }}
-        as="/project/create"
+        as="/projects/create"
         passHref
       >
         <ListItem

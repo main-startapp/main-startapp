@@ -4,12 +4,12 @@ import {
   GlobalContext,
   ProjectContext,
 } from "../components/Context/ShareContexts";
-import ProjectPageBar from "../components/Header/ProjectPageBar";
+import ProjectsPageBar from "../components/Header/ProjectsPageBar";
 import ProjectList from "../components/Project/ProjectList";
 import ProjectInfo from "../components/Project/ProjectInfo";
 
 // this page is also project homepage. Is this a good practice?
-export default function Home() {
+const Home = () => {
   // global context
   const { setChat, setChatPartner, setShowChat, setShowMsg, onMedia } =
     useContext(GlobalContext);
@@ -36,7 +36,7 @@ export default function Home() {
       }}
     >
       {/* Toolbar for searching keywords, category and filter */}
-      <ProjectPageBar />
+      <ProjectsPageBar />
 
       <Grid
         container
@@ -72,4 +72,6 @@ export default function Home() {
       </Grid>
     </ProjectContext.Provider>
   );
-}
+};
+
+export default Home;
