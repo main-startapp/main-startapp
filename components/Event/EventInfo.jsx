@@ -256,10 +256,10 @@ const EventInfo = () => {
                   {isCreator && (
                     <NextLink
                       href={{
-                        pathname: "/event/create",
+                        pathname: "/events/create",
                         query: { isCreateStr: "false" },
                       }}
-                      as="/event/create"
+                      as="/events/create"
                       passHref
                     >
                       <Button

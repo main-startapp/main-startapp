@@ -4,12 +4,12 @@ import {
   GlobalContext,
   StudentContext,
 } from "../components/Context/ShareContexts";
-import StudentPageBar from "../components/Header/StudentPageBar";
+import StudentsPageBar from "../components/Header/StudentsPageBar";
 import StudentProfile from "../components/Student/StudentProfile";
 import StudentGrid from "../components/Student/StudentGrid";
 import StudentList from "../components/Student/StudentList";
 
-function Students() {
+const Students = () => {
   // context
   const { setChat, setChatPartner, setShowChat, setShowMsg, onMedia } =
     useContext(GlobalContext);
@@ -36,7 +36,7 @@ function Students() {
         setSearchCategory,
       }}
     >
-      <StudentPageBar />
+      <StudentsPageBar />
       <Grid
         container
         spaceing={0}
@@ -70,6 +70,6 @@ function Students() {
       </Grid>
     </StudentContext.Provider>
   );
-}
+};
 
 export default Students;

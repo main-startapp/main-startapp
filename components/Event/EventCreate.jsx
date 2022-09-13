@@ -43,7 +43,7 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
 import { useRouter } from "next/router";
 import { useAuth } from "../Context/AuthContext";
-import { eventStrList } from "../Header/EventPageBar";
+import { eventStrList } from "../Header/EventsPageBar";
 import { findItemFromList, handleDeleteEntry } from "../Reusable/Resusable";
 
 const EventCreate = (props) => {

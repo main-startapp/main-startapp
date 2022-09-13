@@ -9,7 +9,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import {
   Button,
   FormControl,
-  IconButton,
   InputLabel,
   Menu,
   MenuItem,
@@ -20,7 +19,7 @@ import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
 
-const EventPageBar = () => {
+const EventsPageBar = () => {
   // context
   const { onMedia } = useContext(GlobalContext);
   const { event, setEvent, setSearchTerm, searchCategory, setSearchCategory } =
@@ -160,7 +159,14 @@ const EventPageBar = () => {
       {/* mobile version */}
       {!onMedia.onDesktop && (
         <Toolbar
-          sx={{ height: "48px", paddingX: 1.5 }} // 1.5 to match navbar icon and listitem
+          sx={{
+            minHeight: 0,
+            "@media (min-width: 600px)": {
+              minHeight: 0,
+            },
+            height: "48px",
+            paddingX: 1.5,
+          }} // 1.5 to match navbar icon and listitem
           disableGutters // disable auto padding
         >
           {event === null ? (
@@ -230,7 +236,7 @@ const EventPageBar = () => {
   );
 };
 
-export default EventPageBar;
+export default EventsPageBar;
 
 const Search = styled(Box)(({ theme }) => ({
   // position: "relative",

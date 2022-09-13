@@ -34,15 +34,10 @@ const StudentList = () => {
   );
 
   return (
-    <Box
-      sx={{
-        backgroundColor: "#fafafa",
-        height: "calc(100vh - 48px - 48px - 1.5px)", // navbar; appbar; border
-      }}
-    >
+    <Box sx={{ backgroundColor: "#fafafa" }}>
       <Box
         sx={{
-          height: "calc(100vh - 48px - 48px - 1.5px - 36px - 24px)", // navbar; appbar; border; bottom
+          height: "calc(100vh - 48px - 48px - 1.5px - 60px)", // navbar; appbar; border; bottom
           overflow: "auto",
         }}
       >

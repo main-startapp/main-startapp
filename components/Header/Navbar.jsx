@@ -60,6 +60,10 @@ const Navbar = () => {
           // flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
+          minHeight: 0,
+          "@media (min-width: 600px)": {
+            minHeight: 0,
+          },
           height: onMedia.onDesktop ? "64px" : "48px",
           paddingX: onMedia.onDesktop ? 3 : 1.5,
         }}
@@ -95,10 +99,8 @@ const Navbar = () => {
               justifyContent: "center",
             }}
           >
-            <NextLink href="/" passHref>
-              <PageLink>
-                <Typography sx={{ fontSize: "1.1em" }}>Projects</Typography>
-              </PageLink>
+            <NextLink href="/">
+              <PageLink>Projects</PageLink>
             </NextLink>
             <Divider
               sx={{
@@ -110,10 +112,8 @@ const Navbar = () => {
               orientation="vertical"
               flexItem
             />
-            <NextLink href="/events" passHref>
-              <PageLink>
-                <Typography sx={{ fontSize: "1.1em" }}>Events</Typography>
-              </PageLink>
+            <NextLink href="/events">
+              <PageLink>Events</PageLink>
             </NextLink>
             <Divider
               sx={{
@@ -125,10 +125,8 @@ const Navbar = () => {
               orientation="vertical"
               flexItem
             />
-            <NextLink href="/students" passHref>
-              <PageLink>
-                <Typography sx={{ fontSize: "1.1em" }}>Students</Typography>
-              </PageLink>
+            <NextLink href="/students">
+              <PageLink>Students</PageLink>
             </NextLink>
           </Box>
         )}
@@ -187,7 +185,7 @@ const Navbar = () => {
             }}
           >
             <MenuItem onClick={handleUserMenuClose}>
-              <NextLink href="/student/create" passHref>
+              <NextLink href="/students/create" passHref>
                 <MenuItemLink>Edit Profile</MenuItemLink>
               </NextLink>
             </MenuItem>
@@ -209,6 +207,7 @@ export default Navbar;
 const PageLink = styled(MuiLink)(({ theme }) => ({
   color: "#ffffff",
   textDecoration: "none",
+  fontSize: "1.1em",
 }));
 
 const MenuItemLink = styled(MuiLink)(({ theme }) => ({

@@ -186,10 +186,10 @@ const ProjectInfo = () => {
                   {isCreator ? (
                     <NextLink
                       href={{
-                        pathname: "/project/create",
+                        pathname: "/projects/create",
                         query: { isCreateStr: "false" },
                       }}
-                      as="/project/create"
+                      as="/projects/create"
                       passHref
                     >
                       <Button

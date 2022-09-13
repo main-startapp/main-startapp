@@ -1,65 +1,40 @@
-import { useContext, useRef, useState } from "react";
-import { styled, alpha } from "@mui/material/styles";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import InputBase from "@mui/material/InputBase";
-import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
-import SearchIcon from "@mui/icons-material/Search";
+import { useContext, useRef } from "react";
+import { styled } from "@mui/material/styles";
 import {
-  Button,
-  FormControl,
-  InputLabel,
-  Menu,
-  MenuItem,
-  Select,
+  AppBar,
+  Box,
+  Toolbar,
+  InputBase,
   Tooltip,
+  Button,
 } from "@mui/material";
-import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
+import SearchIcon from "@mui/icons-material/Search";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
-import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
+import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
+import { GlobalContext, StudentContext } from "../Context/ShareContexts";
 
-const ProjectPageBar = () => {
-  // context
+const StudentsPageBar = () => {
   const { onMedia } = useContext(GlobalContext);
-  const {
-    project,
-    setProject,
-    setSearchTerm,
-    searchCategory,
-    setSearchCategory,
-  } = useContext(ProjectContext);
-
-  // menu
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-  const handleUserMenu = (e) => {
-    setAnchorEl(e.currentTarget);
-  };
-  const handleUserMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  // ref
+  const { student, setStudent, setSearchTerm } = useContext(StudentContext);
   const textRef = useRef();
 
-  // reuseable comp
-  const ppSearch = (
+  const spSearch = (
     <Search
       sx={{
-        width: onMedia.onDesktop ? "300px" : "80%",
+        width: onMedia.onDesktop ? "300px" : "100%",
         height: onMedia.onDesktop ? "40px" : "30px", // to match the small size category
       }}
     >
       <SearchIconWrapper>
         <SearchIcon />
       </SearchIconWrapper>
-      <Tooltip title="Search for projects or positions...">
+
+      <Tooltip title="Search for positions or fields of interest...">
         <StyledInputBase
-          fullWidth={true}
-          placeholder="Project or Position…"
+          placeholder="Position or Field of Interest…"
           inputProps={{ "aria-label": "search" }}
           inputRef={textRef}
+          fullWidth={true}
           onChange={(e) => {
             if (e.target.value.length !== 0) return;
             setSearchTerm("");
@@ -72,51 +47,6 @@ const ProjectPageBar = () => {
         />
       </Tooltip>
     </Search>
-  );
-
-  const categoryComp = (
-    <FormControl
-      sx={{
-        ml: onMedia.onDesktop ? 3 : 0,
-        width: "300px",
-        "& .MuiOutlinedInput-root": {
-          borderRadius: "10px",
-          backgroundColor: "#f0f0f0",
-        },
-        "&:hover .MuiOutlinedInput-root": {
-          backgroundColor: "#dbdbdb",
-        },
-        "& .MuiOutlinedInput-notchedOutline": {
-          border: 0,
-        },
-        "&:hover .MuiOutlinedInput-notchedOutline": {
-          border: 0,
-        },
-        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-          {
-            border: 1.5,
-            borderColor: "#3e95c2",
-          },
-      }}
-      size="small"
-    >
-      <InputLabel sx={{ color: "#b1b1b1" }}>Category</InputLabel>
-      <Select
-        label="Category"
-        defaultValue={""}
-        value={searchCategory}
-        onChange={(e) => {
-          setSearchCategory(e.target.value);
-        }}
-      >
-        <MenuItem value={""}>None</MenuItem>
-        <MenuItem value={"Charity Initiative"}>Charity Initiative</MenuItem>
-        <MenuItem value={"Club"}>Club</MenuItem>
-        <MenuItem value={"Fun Project"}>Fun Project</MenuItem>
-        <MenuItem value={"Learning Project"}>Learning Project</MenuItem>
-        <MenuItem value={"Startup"}>Startup</MenuItem>
-      </Select>
-    </FormControl>
   );
 
   return (
@@ -139,8 +69,7 @@ const ProjectPageBar = () => {
           }}
           disableGutters // will be customozied in sx
         >
-          {ppSearch}
-          {categoryComp}
+          {spSearch}
           <Box sx={{ flexGrow: 1 }} />
           <Search
             sx={{
@@ -162,17 +91,23 @@ const ProjectPageBar = () => {
       {/* mobile version */}
       {!onMedia.onDesktop && (
         <Toolbar
-          sx={{ height: "48px", paddingX: 1.5 }} // 1.5 to match navbar icon and projectlistitem
+          sx={{
+            minHeight: 0,
+            "@media (min-width: 600px)": {
+              minHeight: 0,
+            },
+            height: "48px",
+            paddingX: 1.5,
+          }} // 1.5 to match navbar icon and listitem
           disableGutters // disable auto padding
         >
-          {project === null ? (
-            // projectList version
-            <Box sx={{ width: "100%", display: "flex", alignItems: "center" }}>
-              {ppSearch}
-              <Button
+          {student === null ? (
+            // list version
+            <Box sx={{ width: "100%", display: "flex" }}>
+              {spSearch}
+              {/* <Button
                 sx={{
                   width: "20%",
-                  height: "30px",
                   backgroundColor: "#f0f0f0",
                   color: "gray",
                   borderRadius: "10px",
@@ -187,31 +122,18 @@ const ProjectPageBar = () => {
                 }}
               >
                 <TuneRoundedIcon />
-                <Menu
-                  id="ppb-menu"
-                  anchorEl={anchorEl}
-                  // anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                  open={open}
-                  onClose={handleUserMenuClose}
-                  MenuListProps={{
-                    "aria-labelledby": "ppb-menu-button",
-                  }}
-                >
-                  <MenuItem>{categoryComp}</MenuItem>
-                </Menu>
-              </Button>
+              </Button> */}
             </Box>
           ) : (
-            // projectInfo version
+            // info version
             <Box>
               <Button
                 sx={{
                   backgroundColor: "#f0f0f0",
                   color: "gray",
                   borderRadius: "10px",
-                  height: "30px",
                 }}
-                onClick={() => setProject(null)}
+                onClick={() => setStudent(null)}
               >
                 <ArrowBackIosRoundedIcon />
               </Button>
@@ -223,7 +145,7 @@ const ProjectPageBar = () => {
   );
 };
 
-export default ProjectPageBar;
+export default StudentsPageBar;
 
 const Search = styled(Box)(({ theme }) => ({
   // position: "relative",
@@ -233,6 +155,7 @@ const Search = styled(Box)(({ theme }) => ({
   "&:hover": {
     backgroundColor: "#dbdbdb",
   },
+  height: "40px", // to match the small size category
   display: "flex",
   alignItems: "center",
 }));

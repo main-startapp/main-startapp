@@ -9,7 +9,7 @@ import { AuthProvider } from "../components/Context/AuthContext";
 import Navbar from "../components/Header/Navbar";
 import ChatAccordion from "../components/Chat/ChatAccordion";
 import { GlobalContext } from "../components/Context/ShareContexts";
-import ChatAccordionMsg from "../components/Chat/ChatAccordionMsg";
+import ChatMsgBox from "../components/Chat/ChatMsgBox";
 import DBListener from "../components/DBListener";
 import BottomNav from "../components/Header/BottomNav";
 
@@ -107,7 +107,7 @@ function MyApp({ Component, pageProps }) {
             <DBListener />
             <Navbar />
             <Component {...pageProps} />
-            {onMedia.onDesktop && showMsg && <ChatAccordionMsg />}
+            {onMedia.onDesktop && showMsg && <ChatMsgBox />}
             {onMedia.onDesktop && showChat && <ChatAccordion />}
             {!onMedia.onDesktop && <BottomNav />}
           </GlobalContext.Provider>
