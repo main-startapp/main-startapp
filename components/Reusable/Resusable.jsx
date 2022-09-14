@@ -50,8 +50,8 @@ export const handleConnect = async (
     last_text: msgStr,
     last_timestamp: serverTimestamp(),
   };
-  const chatModRef = addDoc(collectionRef, chatRef).catch((err) => {
-    console.log("addDoc() error: ", err);
+  const chatModRef = addDoc(collectionRef, chatRef).catch((error) => {
+    console.log(error?.message);
   });
   let retID;
   await chatModRef.then((ret) => {
@@ -60,8 +60,8 @@ export const handleConnect = async (
   if (!retID) return; // extra safe, although this will never happen
   // use returned chat doc id to add message
   const msgCollectionRef = collection(db, "chats", retID, "messages");
-  const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
-    console.log("addDoc() error: ", err);
+  const msgModRef = addDoc(msgCollectionRef, messageRef).catch((error) => {
+    console.log(error?.message);
   });
   await msgModRef;
 };
@@ -81,8 +81,8 @@ export const handleUnread = async (chat, setChat, ediumUser) => {
       last_timestamp: serverTimestamp(),
     };
     setChat({ ...chat, ...chatUpdateRef });
-    const chatModRef = updateDoc(chatDocRef, chatUpdateRef).catch((err) => {
-      console.log("updateDoc() error: ", err); // .then() is useless as updateDoc() returns Promise<void>
+    const chatModRef = updateDoc(chatDocRef, chatUpdateRef).catch((error) => {
+      console.log(error?.message); // .then() is useless as updateDoc() returns Promise<void>
     });
     await chatModRef;
   }
@@ -97,8 +97,8 @@ export const handleVisibility = async (collectionName, entry) => {
     is_visible: entry?.is_visible !== undefined ? !entry.is_visible : true, // if has is_visible field, flip it; if not, hide it
     last_timestamp: serverTimestamp(),
   };
-  const entryModRef = updateDoc(docRef, entryUpdateRef).catch((err) => {
-    console.log("updateDoc() error: ", err);
+  const entryModRef = updateDoc(docRef, entryUpdateRef).catch((error) => {
+    console.log(error?.message);
   });
   await entryModRef;
 };
@@ -116,15 +116,15 @@ export const handleDeleteEntry = async (
 ) => {
   // set is_deleted to true in entry doc
   const docRef = doc(db, colletionName, entryID);
-  const entryModRef = updateDoc(docRef, { is_deleted: true }).catch((err) => {
-    console.log("updateDoc() error: ", err);
+  const entryModRef = updateDoc(docRef, { is_deleted: true }).catch((error) => {
+    console.log(error?.message);
   });
 
   // set is_deleted to true in entry ext doc
   const extDocRef = doc(db, extColletionName, entryID);
   const entryExtModRef = updateDoc(extDocRef, { is_deleted: true }).catch(
-    (err) => {
-      console.log("updateDoc() error: ", err);
+    (error) => {
+      console.log(error?.message);
     }
   );
 
@@ -137,8 +137,8 @@ export const handleDeleteEntry = async (
   const ediumUserExtModRef = updateDoc(
     ediumUserExtDocRef,
     ediumUserExtUpdateRef
-  ).catch((err) => {
-    console.log("updateDoc() error: ", err);
+  ).catch((error) => {
+    console.log(error?.message);
   });
 
   // wait
@@ -152,8 +152,8 @@ export const handleDeleteEntry = async (
 //============================================================
 export const getDocFromDB = async (dbName, docID) => {
   const docRef = doc(db, dbName, docID);
-  const docSnap = await getDoc(docRef).catch((err) => {
-    console.log("getDoc() error: ", err);
+  const docSnap = await getDoc(docRef).catch((error) => {
+    console.log(error?.message);
   });
 
   return docSnap?.data() ? docSnap.data() : null;

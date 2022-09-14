@@ -97,8 +97,8 @@ const StudentCreate = () => {
     if (student.create_timestamp) {
       // update
       // can't update partially
-      studentModRef = updateDoc(docRef, studentRef).catch((err) => {
-        console.log("updateDoc() error: ", err);
+      studentModRef = updateDoc(docRef, studentRef).catch((error) => {
+        console.log(error?.message);
       });
     } else {
       // create; add create_timestamp
@@ -107,8 +107,8 @@ const StudentCreate = () => {
         create_timestamp: serverTimestamp(),
         last_timestamp: serverTimestamp(),
       };
-      studentModRef = setDoc(docRef, studentRef).catch((err) => {
-        console.log("setDoc() error: ", err);
+      studentModRef = setDoc(docRef, studentRef).catch((error) => {
+        console.log(error?.message);
       });
 
       const extDocRef = doc(db, "users_ext", uid);
@@ -118,9 +118,11 @@ const StudentCreate = () => {
         join_requests: [],
         last_timestamp: serverTimestamp(),
       };
-      const studentExtModRef = setDoc(extDocRef, studentExtRef).catch((err) => {
-        console.log("setDoc() error: ", err);
-      });
+      const studentExtModRef = setDoc(extDocRef, studentExtRef).catch(
+        (error) => {
+          console.log(error?.message);
+        }
+      );
 
       await studentExtModRef;
     }

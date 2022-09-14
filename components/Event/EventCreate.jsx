@@ -133,8 +133,8 @@ const EventCreate = (props) => {
         create_timestamp: serverTimestamp(),
         last_timestamp: serverTimestamp(),
       };
-      eventModRef = addDoc(collectionRef, eventRef).catch((err) => {
-        console.log("addDoc() error: ", err);
+      eventModRef = addDoc(collectionRef, eventRef).catch((error) => {
+        console.log(error?.message);
       });
     } else {
       // update an existing event
@@ -145,8 +145,8 @@ const EventCreate = (props) => {
         last_timestamp: serverTimestamp(),
       };
       delete eventRef.id;
-      eventModRef = updateDoc(docRef, eventRef).catch((err) => {
-        console.log("updateDoc() error: ", err);
+      eventModRef = updateDoc(docRef, eventRef).catch((error) => {
+        console.log(error?.message);
       });
     }
 
@@ -173,8 +173,8 @@ const EventCreate = (props) => {
           last_timestamp: serverTimestamp(),
           transfer_code: Math.random().toString(16).slice(2),
         };
-        const eventExtModRef = setDoc(extDocRef, eventExtRef).catch((err) => {
-          console.log("setDoc() error: ", err);
+        const eventExtModRef = setDoc(extDocRef, eventExtRef).catch((error) => {
+          console.log(error?.message);
         });
 
         navigator.clipboard.writeText(eventExtRef.transfer_code);
@@ -191,8 +191,8 @@ const EventCreate = (props) => {
         const ediumUserExtModRef = updateDoc(
           ediumUserExtDocRef,
           ediumUserExtUpdateRef
-        ).catch((err) => {
-          console.log("updateDoc() error: ", err);
+        ).catch((error) => {
+          console.log(error?.message);
         });
 
         // create extension doc for team management if create
@@ -203,8 +203,8 @@ const EventCreate = (props) => {
           admins: [currentUID],
           last_timestamp: serverTimestamp(),
         };
-        const eventExtModRef = setDoc(extDocRef, eventExtRef).catch((err) => {
-          console.log("setDoc() error: ", err);
+        const eventExtModRef = setDoc(extDocRef, eventExtRef).catch((error) => {
+          console.log(error?.message);
         });
 
         await ediumUserExtModRef;
@@ -227,8 +227,8 @@ const EventCreate = (props) => {
           const ediumUserExtModRef = updateDoc(
             ediumUserExtDocRef,
             ediumUserExtUpdateRef
-          ).catch((err) => {
-            console.log("updateDoc() error: ", err);
+          ).catch((error) => {
+            console.log(error?.message);
           });
           await ediumUserExtModRef;
         }
@@ -241,8 +241,8 @@ const EventCreate = (props) => {
             transfer_code: Math.random().toString(16).slice(2),
           };
           const eventExtModRef = updateDoc(extDocRef, eventExtRef).catch(
-            (err) => {
-              console.log("updateDoc() error: ", err);
+            (error) => {
+              console.log(error?.message);
             }
           );
           await eventExtModRef;

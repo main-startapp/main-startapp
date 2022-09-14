@@ -131,7 +131,7 @@ const Redemption = () => {
       myIds,
       failedCodes
     ) {
-      codeArray.forEach(async (code) => {
+      for (const code of codeArray) {
         let docID;
         let docExtData;
         // 1. use pCode to get doc id from doc ext
@@ -154,8 +154,8 @@ const Redemption = () => {
           creator_uid: ediumUser?.uid,
           last_timestamp: serverTimestamp(),
         };
-        const docModRef = updateDoc(docRef, docUpdateRef).catch((err) => {
-          console.log("updateDoc() error: ", err);
+        const docModRef = updateDoc(docRef, docUpdateRef).catch((error) => {
+          console.log(error?.message);
         });
         // 3. update doc ext
         const extDocRef = doc(db, docExtName, docID);
@@ -166,14 +166,16 @@ const Redemption = () => {
           members: [ediumUser?.uid],
           last_timestamp: serverTimestamp(),
         };
-        const docExtModRef = setDoc(extDocRef, docExtUpdateRef).catch((err) => {
-          failedCodes.push(code);
-          console.log("updateDoc() error: ", err);
-        });
+        const docExtModRef = setDoc(extDocRef, docExtUpdateRef).catch(
+          (error) => {
+            failedCodes.push(code);
+            console.log(error?.message);
+          }
+        );
 
         await docModRef;
         await docExtModRef;
-      });
+      }
     }
 
     // update projects and events
@@ -211,11 +213,11 @@ const Redemption = () => {
       my_event_ids: myEventIDs,
       last_timestamp: serverTimestamp(),
     };
-    console.log(userExtUpdateRef);
+
     const userExtModRef = updateDoc(userExtDocRef, userExtUpdateRef).catch(
-      (err) => {
+      (error) => {
         isFailedUserExt = true;
-        console.log("updateDoc() error: ", err);
+        console.log(error?.message);
       }
     );
 
@@ -466,7 +468,7 @@ const Redemption = () => {
         </Box>
         <Box
           sx={{
-            mt: "10vh",
+            mt: "15vh",
             width: "100%",
             display: "flex",
             flexDirection: "row",

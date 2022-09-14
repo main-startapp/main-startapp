@@ -95,8 +95,8 @@ const Signup = (props) => {
       //   const user = userCredential.user;
       //   await sendEmailVerification(user);
       // })
-      .catch((err) => {
-        console.log("signInWithPopup() error: ", err);
+      .catch((error) => {
+        console.log(error?.message);
       });
   };
 

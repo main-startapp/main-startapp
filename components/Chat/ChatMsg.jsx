@@ -133,8 +133,8 @@ const ChatMsg = (props) => {
     const messageRef = { ...message, sent_at: serverTimestamp() };
     setMessage({ text: "", sent_by: currentUser?.uid }); // reset msg locally
     const msgCollectionRef = collection(db, "chats", chat.id, "messages");
-    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
-      console.log("addDoc() error: ", err);
+    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((error) => {
+      console.log(error?.message);
     });
     // update chat
     const my_unread_key = currentUser?.uid + "_unread";
@@ -147,8 +147,8 @@ const ChatMsg = (props) => {
       last_timestamp: serverTimestamp(),
     };
     setChat({ ...chat, ...chatUpdateRef }); // second entry will overwrite first entry for the same keys
-    const chatModRef = updateDoc(chatDocRef, chatUpdateRef).catch((err) => {
-      console.log("updateDoc() error: ", err);
+    const chatModRef = updateDoc(chatDocRef, chatUpdateRef).catch((error) => {
+      console.log(error?.message);
     });
 
     await msgModRef;
@@ -169,8 +169,8 @@ const ChatMsg = (props) => {
     const projectExtModRef = updateDoc(
       projectExtDocRef,
       projectExtUpdateRef
-    ).catch((err) => {
-      console.log("updateDoc() error: ", err);
+    ).catch((error) => {
+      console.log(error?.message);
     });
 
     // update JR in project ext subcollection
@@ -188,8 +188,8 @@ const ChatMsg = (props) => {
     const projectExtJRModRef = updateDoc(
       projectExtJRDocRef,
       projectExtJRUpdateRef
-    ).catch((err) => {
-      console.log("updateDoc() error: ", err);
+    ).catch((error) => {
+      console.log(error?.message);
     });
 
     // send auto msg
@@ -204,8 +204,8 @@ const ChatMsg = (props) => {
       sent_at: serverTimestamp(),
     };
     const msgCollectionRef = collection(db, "chats", chat.id, "messages");
-    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
-      console.log("addDoc() error: ", err);
+    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((error) => {
+      console.log(error?.message);
     });
     // remove JR in chat
     const my_unread_key = currentUser?.uid + "_unread";
@@ -222,8 +222,8 @@ const ChatMsg = (props) => {
       last_timestamp: serverTimestamp(),
     };
     setChat({ ...chat, ...chatUpdateRef });
-    const chatModRef = updateDoc(chatDocRef, chatUpdateRef).catch((err) => {
-      console.log("updateDoc() error: ", err);
+    const chatModRef = updateDoc(chatDocRef, chatUpdateRef).catch((error) => {
+      console.log(error?.message);
     });
 
     // JR in user ext will not be changed
@@ -255,8 +255,8 @@ const ChatMsg = (props) => {
     const projectExtJRModRef = updateDoc(
       projectExtJRDocRef,
       projectExtJRUpdateRef
-    ).catch((err) => {
-      console.log("updateDoc() error: ", err);
+    ).catch((error) => {
+      console.log(error?.message);
     });
 
     // send msg
@@ -269,8 +269,8 @@ const ChatMsg = (props) => {
       sent_at: serverTimestamp(),
     };
     const msgCollectionRef = collection(db, "chats", chat.id, "messages");
-    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
-      console.log("addDoc() error: ", err);
+    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((error) => {
+      console.log(error?.message);
     });
     // remove JR in chat
     const my_unread_key = currentUser?.uid + "_unread";
@@ -287,8 +287,8 @@ const ChatMsg = (props) => {
       last_timestamp: serverTimestamp(),
     };
     setChat({ ...chat, ...chatUpdateRef });
-    const chatModRef = updateDoc(chatDocRef, chatUpdateRef).catch((err) => {
-      console.log("updateDoc() error: ", err);
+    const chatModRef = updateDoc(chatDocRef, chatUpdateRef).catch((error) => {
+      console.log(error?.message);
     });
 
     // await

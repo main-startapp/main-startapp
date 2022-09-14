@@ -1,9 +1,9 @@
-// create Cloud Functions and set up triggers.
-import { firestore } from "firebase-functions";
-
 // The Firebase Admin SDK to access Firestore.
 import { initializeApp } from "firebase-admin";
 initializeApp();
+
+// create Cloud Functions and set up triggers.
+import { firestore } from "firebase-functions";
 
 // 3rd party
 import { createTransport } from "nodemailer";

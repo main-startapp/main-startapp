@@ -135,8 +135,8 @@ const TeamCommPanel = () => {
     }
     // remove id to keep the doc consistent
     delete projectExtRef?.id;
-    const projectExtModRef = updateDoc(docRef, projectExtRef).catch((err) => {
-      console.log("updateDoc() error: ", err);
+    const projectExtModRef = updateDoc(docRef, projectExtRef).catch((error) => {
+      console.log(error?.message);
     });
     await projectExtModRef;
   };

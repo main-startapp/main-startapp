@@ -79,8 +79,8 @@ const PositionListItem = (props) => {
       status: "requesting",
       last_timestamp: serverTimestamp(),
     };
-    jrModRef = addDoc(jrCollectionRef, jrDocRef).catch((err) => {
-      console.log("addDoc() error: ", err);
+    jrModRef = addDoc(jrCollectionRef, jrDocRef).catch((error) => {
+      console.log(error?.message);
     });
     let jrRetID;
     await jrModRef.then((ret) => {
@@ -102,8 +102,8 @@ const PositionListItem = (props) => {
     ediumUserExtModRef = updateDoc(
       ediumUserExtDocRef,
       ediumUserExtUpdateRef
-    ).catch((err) => {
-      console.log("updateDoc() error: ", err);
+    ).catch((error) => {
+      console.log(error?.message);
     });
 
     // add it to chat or create a chat
@@ -144,8 +144,8 @@ const PositionListItem = (props) => {
         last_timestamp: serverTimestamp(),
       };
       // don't need to setChat, as this will be done by hook in ChatAccordion
-      chatModRef = updateDoc(chatDocRef, chatUpdateRef).catch((err) => {
-        console.log("updateDoc() error: ", err);
+      chatModRef = updateDoc(chatDocRef, chatUpdateRef).catch((error) => {
+        console.log(error?.message);
       });
     } else {
       // create
@@ -159,8 +159,8 @@ const PositionListItem = (props) => {
         last_text: msgStr,
         last_timestamp: serverTimestamp(),
       };
-      chatModRef = addDoc(collectionRef, chatRef).catch((err) => {
-        console.log("addDoc() error: ", err);
+      chatModRef = addDoc(collectionRef, chatRef).catch((error) => {
+        console.log(error?.message);
       });
     }
 
@@ -171,8 +171,8 @@ const PositionListItem = (props) => {
     }); // only addDoc will return, updateDoc returns undefined
     const chatID = foundChat ? foundChat.id : chatRetID || -1;
     const msgCollectionRef = collection(db, "chats", chatID, "messages");
-    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
-      console.log("addDoc() error: ", err);
+    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((error) => {
+      console.log(error?.message);
     });
 
     // await the rest

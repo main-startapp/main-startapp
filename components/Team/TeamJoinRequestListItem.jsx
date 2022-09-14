@@ -111,12 +111,12 @@ const TeamJoinRequestListItem = (props) => {
       last_timestamp: serverTimestamp(),
     };
     delete chatRef.id;
-    const chatModRef = updateDoc(chatDocRef, chatRef).catch((err) => {
-      console.log("updateDoc() error: ", err);
+    const chatModRef = updateDoc(chatDocRef, chatRef).catch((error) => {
+      console.log(error?.message);
     });
     const msgCollectionRef = collection(db, "chats", chatID, "messages");
-    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
-      console.log("addDoc() error: ", err);
+    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((error) => {
+      console.log(error?.message);
     });
     await chatModRef;
     await msgModRef;

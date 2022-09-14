@@ -58,7 +58,6 @@ const Chats = () => {
     currentUser,
   ]);
 
-  console.log(chat, chatPartner);
   return !onMedia.onDesktop ? (
     <>
       <ChatsPageBar />

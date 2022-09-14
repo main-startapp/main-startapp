@@ -161,8 +161,8 @@ const ProjectCreate = (props) => {
         create_timestamp: serverTimestamp(),
         last_timestamp: serverTimestamp(),
       };
-      projectModRef = addDoc(collectionRef, projectRef).catch((err) => {
-        console.log("addDoc() error: ", err);
+      projectModRef = addDoc(collectionRef, projectRef).catch((error) => {
+        console.log(error?.message);
       });
     } else {
       // update an existing newProject
@@ -179,8 +179,8 @@ const ProjectCreate = (props) => {
         last_timestamp: serverTimestamp(),
       };
       delete projectRef.id;
-      projectModRef = updateDoc(docRef, projectRef).catch((err) => {
-        console.log("updateDoc() error: ", err);
+      projectModRef = updateDoc(docRef, projectRef).catch((error) => {
+        console.log(error?.message);
       });
     }
 
@@ -207,8 +207,8 @@ const ProjectCreate = (props) => {
           transfer_code: Math.random().toString(16).slice(2),
         };
         const projectExtModRef = setDoc(extDocRef, projectExtRef).catch(
-          (err) => {
-            console.log("setDoc() error: ", err);
+          (error) => {
+            console.log(error?.message);
           }
         );
 
@@ -224,8 +224,8 @@ const ProjectCreate = (props) => {
         const ediumUserExtModRef = updateDoc(
           ediumUserExtDocRef,
           ediumUserExtUpdateRef
-        ).catch((err) => {
-          console.log("updateDoc() error: ", err);
+        ).catch((error) => {
+          console.log(error?.message);
         });
 
         // create extension doc for team management if create
@@ -237,8 +237,8 @@ const ProjectCreate = (props) => {
           last_timestamp: serverTimestamp(),
         };
         const projectExtModRef = setDoc(extDocRef, projectExtRef).catch(
-          (err) => {
-            console.log("setDoc() error: ", err);
+          (error) => {
+            console.log(error?.message);
           }
         );
 
@@ -262,8 +262,8 @@ const ProjectCreate = (props) => {
           const ediumUserExtModRef = updateDoc(
             ediumUserExtDocRef,
             ediumUserExtUpdateRef
-          ).catch((err) => {
-            console.log("updateDoc() error: ", err);
+          ).catch((error) => {
+            console.log(error?.message);
           });
           await ediumUserExtModRef;
         }
@@ -276,8 +276,8 @@ const ProjectCreate = (props) => {
             transfer_code: Math.random().toString(16).slice(2),
           };
           const projectExtModRef = updateDoc(extDocRef, projectExtRef).catch(
-            (err) => {
-              console.log("updateDoc() error: ", err);
+            (error) => {
+              console.log(error?.message);
             }
           );
           await projectExtModRef;
@@ -483,7 +483,6 @@ const ProjectCreate = (props) => {
                       url = url
                         .replace("https://imgur.com/", "https://i.imgur.com/")
                         .concat(".png");
-                      console.log(url);
                     }
                     setNewProject({
                       ...newProject,
