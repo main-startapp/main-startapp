@@ -34,7 +34,7 @@ import {
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { db } from "../../firebase";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
@@ -51,9 +51,9 @@ const ProjectCreate = (props) => {
     projectsExt,
     ediumUser,
     ediumUserExt,
-    setEdiumUserExt,
     oldProject,
     setOldProject,
+    winHeight,
     onMedia,
   } = useContext(GlobalContext);
   const { showAlert } = useContext(ProjectContext);
@@ -366,8 +366,8 @@ const ProjectCreate = (props) => {
       sx={{
         backgroundColor: "#fafafa",
         height: onMedia.onDesktop
-          ? "calc(100vh - 64px)"
-          : "calc(100vh - 48px - 60px)",
+          ? `calc(${winHeight}px - 64px)`
+          : `calc(${winHeight}px - 48px - 60px)`,
         overflow: "auto",
       }}
     >

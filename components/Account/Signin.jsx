@@ -13,6 +13,7 @@ import { styled } from "@mui/material/styles";
 import ExportedImage from "next-image-export-optimizer";
 import { useState } from "react";
 import { auth, googleProvider } from "../../firebase";
+import useWindowDimensions from "../Reusable/WindowDimensions";
 import GoogleIcon from "@mui/icons-material/Google";
 import AppleIcon from "@mui/icons-material/Apple";
 import FacebookIcon from "@mui/icons-material/Facebook";
@@ -31,6 +32,7 @@ const Signin = () => {
 
   // independent media query
   const isMobile = useMediaQuery("(max-width:767px)");
+  const { winWidth, winHeight } = useWindowDimensions();
 
   // Configure FirebaseUI.
   // const uiConfig = {
@@ -245,7 +247,7 @@ const Signin = () => {
           borderRight: 1.5,
           borderColor: "#dbdbdb",
           paddingX: 3,
-          height: "100vh",
+          height: `${winHeight}px`,
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",

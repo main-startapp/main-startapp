@@ -1,6 +1,5 @@
 import { useContext, useMemo } from "react";
-import NextLink from "next/link";
-import { Box, Button, Tooltip } from "@mui/material";
+import { Box } from "@mui/material";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
 import StudentListItem from "./StudentListItem";
 
@@ -8,7 +7,7 @@ import StudentListItem from "./StudentListItem";
 
 const StudentList = () => {
   // context
-  const { users } = useContext(GlobalContext);
+  const { users, winHeight } = useContext(GlobalContext);
   const { searchTerm } = useContext(StudentContext);
 
   // local vars
@@ -37,7 +36,7 @@ const StudentList = () => {
     <Box sx={{ backgroundColor: "#fafafa" }}>
       <Box
         sx={{
-          height: "calc(100vh - 48px - 48px - 1.5px - 60px)", // navbar; appbar; border; bottom
+          height: `calc(${winHeight}px - 48px - 48px - 1.5px - 60px)`, // navbar; appbar; border; bottom
           overflow: "auto",
         }}
       >

@@ -112,7 +112,7 @@ const DBListener = () => {
     const q = query(
       collectionRef,
       where("is_deleted", "==", false),
-      orderBy("create_timestamp", "desc")
+      orderBy("start_date", "asc")
     );
 
     const unsub = onSnapshot(

@@ -12,6 +12,7 @@ import { GlobalContext } from "../components/Context/ShareContexts";
 import ChatMsgBox from "../components/Chat/ChatMsgBox";
 import DBListener from "../components/DBListener";
 import BottomNav from "../components/Header/BottomNav";
+import useWindowDimensions from "../components/Reusable/WindowDimensions";
 
 // makeStyles, useStyles, createStyles, withStyles, styled
 // https://smartdevpreneur.com/material-ui-makestyles-usestyles-createstyles-and-withstyles-explained/
@@ -31,6 +32,16 @@ const globalTheme = createTheme({
     },
     AdminOrange: {
       main: "#f4511e",
+    },
+  },
+
+  components: {
+    // Name of the component ⚛️
+    MuiButtonBase: {
+      defaultProps: {
+        // The props to apply
+        disableRipple: true, // No more ripple, on the whole application 💣!
+      },
     },
   },
 });
@@ -57,8 +68,8 @@ function MyApp({ Component, pageProps }) {
   const [showMsg, setShowMsg] = useState(false);
   const [showChat, setShowChat] = useState(true);
   const [forceChatExpand, setForceChatExpand] = useState(false);
-
   // media query
+  const { winWidth, winHeight } = useWindowDimensions();
   const onMedia = { onDesktop: false, onTablet: false, onMobile: false };
   onMedia.onDesktop = useMediaQuery("(min-width:1024px)");
   onMedia.onTablet = useMediaQuery("(min-width:768px) and (max-width:1023px)");
@@ -100,6 +111,8 @@ function MyApp({ Component, pageProps }) {
               setShowChat,
               forceChatExpand,
               setForceChatExpand,
+              winWidth,
+              winHeight,
               onMedia,
             }}
           >

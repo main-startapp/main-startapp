@@ -27,7 +27,7 @@ import cloneDeep from "lodash/cloneDeep";
 const StudentCreate = () => {
   // context & hooks
   const { currentUser } = useAuth();
-  const { ediumUser, onMedia } = useContext(GlobalContext);
+  const { ediumUser, winHeight, onMedia } = useContext(GlobalContext);
   const { showAlert } = useContext(StudentContext);
 
   // router
@@ -274,8 +274,8 @@ const StudentCreate = () => {
       sx={{
         backgroundColor: "#fafafa",
         height: onMedia.onDesktop
-          ? "calc(100vh - 64px)"
-          : "calc(100vh - 48px - 60px)",
+          ? `calc(${winHeight}px - 64px)`
+          : `calc(${winHeight}px - 48px - 60px)`,
         overflow: "auto",
       }}
     >

@@ -1,20 +1,37 @@
-import { useContext, useMemo } from "react";
+import { useContext, useMemo, useEffect } from "react";
 import NextLink from "next/link";
 import { Box, Button, Tooltip } from "@mui/material";
 import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import EventListItem from "./EventListItem";
+import moment from "moment";
+import cloneDeep from "lodash/cloneDeep";
 
 const EventList = () => {
   // context
-  const { events, ediumUser, onMedia } = useContext(GlobalContext);
+  const { events, ediumUser, winHeight, onMedia } = useContext(GlobalContext);
   const { searchTerm, searchCategory } = useContext(EventContext);
 
   // local vars
   const currentUID = ediumUser?.uid;
 
+  const sortedEvents = useMemo(() => {
+    const tempEvents = cloneDeep(events);
+    const eventsLength = tempEvents.length;
+    for (let i = eventsLength - 1; i > -1; i--) {
+      if (
+        moment({ hour: 23, minute: 59 }).isAfter(moment(tempEvents[i].end_date))
+      ) {
+        let temp = tempEvents[i];
+        tempEvents.splice(i, 1);
+        tempEvents.push(temp);
+      }
+    }
+    return tempEvents;
+  }, [events]);
+
   const filteredEvents = useMemo(
     () =>
-      events.filter((event) => {
+      sortedEvents.filter((event) => {
         if (!event.is_visible) return;
 
         // !todo: is this optimized?
@@ -46,7 +63,7 @@ const EventList = () => {
           return event;
         }
       }),
-    [events, searchTerm, searchCategory]
+    [sortedEvents, searchTerm, searchCategory]
   );
 
   return (
@@ -54,8 +71,8 @@ const EventList = () => {
       <Box
         sx={{
           height: onMedia.onDesktop
-            ? "calc(100vh - 64px - 64px - 1.5px - 36px - 24px)"
-            : "calc(100vh - 48px - 48px - 1.5px - 60px)", // navbar; appbar; border; button; y-margins
+            ? `calc(${winHeight}px - 64px - 64px - 1.5px - 36px - 24px)`
+            : `calc(${winHeight}px - 48px - 48px - 1.5px - 60px)`, // navbar; appbar; border; button; y-margins
           overflow: "auto",
         }}
       >

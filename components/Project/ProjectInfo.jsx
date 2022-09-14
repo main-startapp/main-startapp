@@ -35,6 +35,7 @@ const ProjectInfo = () => {
     users,
     setChatPartner,
     setForceChatExpand,
+    winHeight,
     onMedia,
   } = useContext(GlobalContext);
   const { project } = useContext(ProjectContext);
@@ -69,8 +70,8 @@ const ProjectInfo = () => {
       ref={boxRef}
       sx={{
         height: onMedia.onDesktop
-          ? "calc(100vh - 2*64px - 1.5px)"
-          : "calc(100vh - 2*48px - 1.5px - 60px)",
+          ? `calc(${winHeight}px - 2*64px - 1.5px)`
+          : `calc(${winHeight}px - 2*48px - 1.5px - 60px)`,
         overflow: "auto",
         backgroundColor: "#fafafa",
       }}
@@ -296,6 +297,7 @@ const ProjectInfo = () => {
                   mt: 3,
                   mx: onMedia.onDesktop ? 3 : 0,
                   mb: onMedia.onDesktop ? "64px" : 3,
+                  paddingY: 1.5,
                   border: 1.5,
                   borderColor: "#dbdbdb",
                   borderRadius: "10px",
@@ -303,7 +305,7 @@ const ProjectInfo = () => {
                 }}
               >
                 <Typography
-                  sx={{ ml: 3, mt: 1.5, fontWeight: "bold" }}
+                  sx={{ ml: 3, fontWeight: "bold" }}
                   color="text.primary"
                 >
                   {"Positions:"}

@@ -1,19 +1,17 @@
 import { Box, Grid } from "@mui/material";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
-import useWindowDimensions from "../Reusable/WindowDimensions";
 import StudentGridCard from "./StudentGridCard";
 
 const StudentGrid = () => {
   // context
-  const { users } = useContext(GlobalContext);
+  const { users, winWidth, winHeight } = useContext(GlobalContext);
   const { searchTerm } = useContext(StudentContext);
-  const { height, width } = useWindowDimensions();
 
   return (
     <Box
       sx={{
-        height: "calc(100vh - 64px - 64px - 1.5px)",
+        height: `calc(${winHeight}px - 64px - 64px - 1.5px)`,
         overflow: "auto",
       }}
     >
@@ -39,7 +37,15 @@ const StudentGrid = () => {
             <Grid
               key={index}
               item
-              xs={width < 1333 ? 4 : width < 1770 ? 3 : width < 2207 ? 2.4 : 2}
+              xs={
+                winWidth < 1333
+                  ? 4
+                  : winWidth < 1770
+                  ? 3
+                  : winWidth < 2207
+                  ? 2.4
+                  : 2
+              }
             >
               <StudentGridCard key={user.uid} student={user} />
             </Grid>

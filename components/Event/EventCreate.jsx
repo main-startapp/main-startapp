@@ -49,8 +49,15 @@ import { findItemFromList, handleDeleteEntry } from "../Reusable/Resusable";
 const EventCreate = (props) => {
   // context
   const { currentUser } = useAuth();
-  const { eventsExt, ediumUser, ediumUserExt, oldEvent, setOldEvent, onMedia } =
-    useContext(GlobalContext);
+  const {
+    eventsExt,
+    ediumUser,
+    ediumUserExt,
+    oldEvent,
+    setOldEvent,
+    winHeight,
+    onMedia,
+  } = useContext(GlobalContext);
   const { showAlert } = useContext(EventContext);
 
   // props from push query
@@ -303,8 +310,8 @@ const EventCreate = (props) => {
       sx={{
         backgroundColor: "#fafafa",
         height: onMedia.onDesktop
-          ? "calc(100vh - 64px)"
-          : "calc(100vh - 48px - 60px)",
+          ? `calc(${winHeight}px - 64px)`
+          : `calc(${winHeight}px - 48px - 60px)`,
         overflow: "auto",
       }}
     >

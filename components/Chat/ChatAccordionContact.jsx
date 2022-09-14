@@ -11,8 +11,15 @@ const ChatAccordionContact = (props) => {
 
   // context
   const { currentUser } = useAuth();
-  const { projects, setChat, setChatPartner, showMsg, setShowMsg, users } =
-    useContext(GlobalContext);
+  const {
+    projects,
+    setChat,
+    setChatPartner,
+    showMsg,
+    setShowMsg,
+    users,
+    onMedia,
+  } = useContext(GlobalContext);
 
   // local states and vars
   const contact = useMemo(() => {
@@ -61,11 +68,12 @@ const ChatAccordionContact = (props) => {
       onClick={() => {
         setChat(chat);
         setChatPartner(contact);
-        if (!showMsg) {
+        if (!showMsg && onMedia.onDesktop) {
           setShowMsg(true);
         }
         handleUnread(chat, setChat, currentUser);
       }}
+      sx={{ minHeight: "80px" }}
     >
       <Avatar
         sx={{

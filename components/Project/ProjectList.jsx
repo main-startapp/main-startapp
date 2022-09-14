@@ -9,7 +9,7 @@ import ProjectListItem from "./ProjectListItem";
 // behavior: filters projects based on the search term and/or search category
 const ProjectList = () => {
   // context
-  const { projects, ediumUser, onMedia } = useContext(GlobalContext);
+  const { projects, ediumUser, winHeight, onMedia } = useContext(GlobalContext);
   const { searchTerm, searchCategory } = useContext(ProjectContext);
 
   // local vars
@@ -61,8 +61,8 @@ const ProjectList = () => {
       <Box
         sx={{
           height: onMedia.onDesktop
-            ? "calc(100vh - 64px - 64px - 1.5px - 36px - 24px)"
-            : "calc(100vh - 48px - 48px - 1.5px - 60px)", // navbar; projectbar; border; button; y-margins
+            ? `calc(${winHeight}px - 64px - 64px - 1.5px - 36px - 24px)`
+            : `calc(${winHeight}px - 48px - 48px - 1.5px - 60px)`, // navbar; projectbar; border; button; y-margins
           overflow: "auto",
         }}
       >

@@ -36,6 +36,7 @@ const EventInfo = () => {
     users,
     setChatPartner,
     setForceChatExpand,
+    winHeight,
     onMedia,
   } = useContext(GlobalContext);
   const { event } = useContext(EventContext);
@@ -88,8 +89,8 @@ const EventInfo = () => {
       ref={boxRef}
       sx={{
         height: onMedia.onDesktop
-          ? "calc(100vh - 2*64px - 1.5px)"
-          : "calc(100vh - 2*48px - 1.5px - 60px)",
+          ? `calc(${winHeight}px - 2*64px - 1.5px)`
+          : `calc(${winHeight}px - 2*48px - 1.5px - 60px)`,
         overflow: "auto",
         backgroundColor: "#fafafa",
       }}

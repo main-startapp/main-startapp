@@ -208,6 +208,9 @@ const PageLink = styled(MuiLink)(({ theme }) => ({
   color: "#ffffff",
   textDecoration: "none",
   fontSize: "1.1em",
+  ":hover": {
+    cursor: "pointer",
+  },
 }));
 
 const MenuItemLink = styled(MuiLink)(({ theme }) => ({

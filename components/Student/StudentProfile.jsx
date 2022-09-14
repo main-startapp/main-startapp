@@ -13,18 +13,20 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import LinkIcon from "@mui/icons-material/Link";
-import {
-  exportCollections,
-  getGooglePhotoURLwithRes,
-  handleConnect,
-} from "../Reusable/Resusable";
+import { getGooglePhotoURLwithRes, handleConnect } from "../Reusable/Resusable";
 import ExportedImage from "next-image-export-optimizer";
 import FaceRetouchingNaturalOutlinedIcon from "@mui/icons-material/FaceRetouchingNaturalOutlined";
 
 const StudentProfile = () => {
   // context
-  const { chats, ediumUser, setForceChatExpand, setChatPartner, onMedia } =
-    useContext(GlobalContext);
+  const {
+    chats,
+    ediumUser,
+    setForceChatExpand,
+    setChatPartner,
+    winHeight,
+    onMedia,
+  } = useContext(GlobalContext);
   const { student } = useContext(StudentContext);
 
   // local vars
@@ -44,8 +46,8 @@ const StudentProfile = () => {
       backgroundColor="#ffffff"
       sx={{
         height: onMedia.onDesktop
-          ? "calc(100vh - 64px - 64px - 1.5px)"
-          : "calc(100vh - 48px - 48px - 1.5px - 60px)",
+          ? `calc(${winHeight}px - 64px - 64px - 1.5px)`
+          : `calc(${winHeight}px - 48px - 48px - 1.5px - 60px)`,
         overflow: "auto",
         borderLeft: 1.5,
         borderRight: 1.5,
@@ -265,9 +267,7 @@ const StudentProfile = () => {
           <Tooltip title={currentUID ? "" : "Edit your profile first"}>
             <span>
               <Button
-                disabled={
-                  !currentUID || !student?.uid || currentUID === student?.uid
-                }
+                disabled={!currentUID || currentUID === student?.uid}
                 disableElevation
                 size="large"
                 sx={{
@@ -278,9 +278,6 @@ const StudentProfile = () => {
                   color: "#ffffff",
                   backgroundColor: "#3e95c2",
                   fontSize: "1.1em",
-                  "&:hover": {
-                    backgroundColor: "#f6f6f6",
-                  },
                   paddingY: 0.5,
                   paddingX: 5,
                   textTransform: "none",
