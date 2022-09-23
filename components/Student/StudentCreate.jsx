@@ -165,9 +165,6 @@ const StudentCreate = () => {
       }
       label="Name"
       margin="none"
-      inputProps={{
-        maxLength: 20,
-      }}
       value={student.name}
       onChange={(e) => {
         setStudent({ ...student, name: e.target.value });
@@ -201,9 +198,6 @@ const StudentCreate = () => {
       }
       label="Desired Position"
       margin="none"
-      inputProps={{
-        maxLength: 20,
-      }}
       value={student.desired_position}
       helperText="Project position you would like to try"
       onChange={(e) => {

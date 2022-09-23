@@ -106,6 +106,7 @@ const TeamJoinRequestListItem = (props) => {
     const chatRef = {
       ...foundChat,
       [receiver_unread_key]: foundChat[receiver_unread_key] + 1,
+      has_unread: true,
       join_requests: newJoinRequests,
       last_text: msgStr,
       last_timestamp: serverTimestamp(),

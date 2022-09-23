@@ -364,10 +364,6 @@ const EventCreate = (props) => {
               }}
               label="Event Title"
               margin="none"
-              inputProps={{
-                maxLength: 50,
-              }}
-              // helperText="The name of your newEvent (limit: 50)"
               value={newEvent.title}
               onChange={(e) =>
                 setNewEvent({ ...newEvent, title: e.target.value })

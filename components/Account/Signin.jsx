@@ -56,10 +56,10 @@ const Signin = () => {
 
   const handleSignIn = () => {
     signInWithEmailAndPassword(auth, input.email, input.password).catch(
-      (err) => {
+      (error) => {
         let emailMsg = "";
         let passwordMsg = "";
-        switch (err.code) {
+        switch (error.code) {
           case "auth/user-not-found":
             emailMsg = "User not found";
             passwordMsg = "";
@@ -96,7 +96,7 @@ const Signin = () => {
       {/* <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} /> */}
       <StyledButton
         sx={{
-          mt: "1vh",
+          mt: "2vh",
           width: isMobile ? "68vmin" : "38vmin",
           fontSize: "0.9em",
           border: 1.5,
@@ -146,39 +146,43 @@ const Signin = () => {
           mt: "2vh",
           width: isMobile ? "68vmin" : "38vmin",
           color: "lightgray",
+          ":before": {
+            top: 0,
+          },
+          ":after": {
+            top: 0,
+          },
         }}
       >
         {"or Sign in with Email"}
       </Divider>
       <Box sx={{ mt: "2vh", width: isMobile ? "68vmin" : "38vmin" }}>
-        <Tooltip title={errorMsg.email} placement="left">
-          <StyledTextField
-            sx={{ paddingY: 0, fontSize: "0.9em" }}
-            fullWidth
-            margin="none"
-            label="Email"
-            name="email"
-            type="email"
-            variant="outlined"
-            value={input.email}
-            onChange={(e) => setInput({ ...input, email: e.target.value })}
-            error={!!errorMsg.email}
-          />
-        </Tooltip>
-        <Tooltip title={errorMsg.password} placement="left">
-          <StyledTextField
-            sx={{ mt: "1.5vh", paddingY: 0, fontSize: "0.9em" }}
-            fullWidth
-            margin="none"
-            label="Password"
-            name="password"
-            type="password"
-            variant="outlined"
-            value={input.password}
-            onChange={(e) => setInput({ ...input, password: e.target.value })}
-            error={!!errorMsg.password}
-          />
-        </Tooltip>
+        <StyledTextField
+          sx={{ paddingY: 0, fontSize: "0.9em" }}
+          fullWidth
+          margin="none"
+          label="Email"
+          name="email"
+          type="email"
+          variant="outlined"
+          value={input.email}
+          onChange={(e) => setInput({ ...input, email: e.target.value })}
+          error={!!errorMsg.email}
+          helperText={errorMsg.email || " "}
+        />
+        <StyledTextField
+          sx={{ paddingY: 0, fontSize: "0.9em" }}
+          fullWidth
+          margin="none"
+          label="Password"
+          name="password"
+          type="password"
+          variant="outlined"
+          value={input.password}
+          onChange={(e) => setInput({ ...input, password: e.target.value })}
+          error={!!errorMsg.password}
+          helperText={errorMsg.password || " "}
+        />
       </Box>
       <Box
         sx={{
@@ -190,7 +194,7 @@ const Signin = () => {
         <Button
           disableElevation
           sx={{
-            mt: "1.5vh",
+            mt: "1vh",
             border: 1.5,
             borderColor: "#dbdbdb",
             borderRadius: "30px",

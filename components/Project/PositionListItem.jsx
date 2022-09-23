@@ -5,7 +5,6 @@ import {
   Box,
   Button,
   Divider,
-  Grid,
   Link,
   Tooltip,
   Typography,
@@ -22,11 +21,13 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
+import { findItemFromList } from "../Reusable/Resusable";
 
 const PositionListItem = (props) => {
   // context
   const {
     chats,
+    users,
     ediumUser,
     ediumUserExt,
     setChatPartner,
@@ -139,6 +140,7 @@ const PositionListItem = (props) => {
       newChatJoinRequests.push(chatJR);
       const chatUpdateRef = {
         [creator_unread_key]: foundChat[creator_unread_key] + 1, // dont use ++foundChat[creator_unread_key]; dont directly mutate the state
+        has_unread: true,
         join_requests: newChatJoinRequests,
         last_text: msgStr,
         last_timestamp: serverTimestamp(),
@@ -150,11 +152,17 @@ const PositionListItem = (props) => {
     } else {
       // create
       const collectionRef = collection(db, "chats");
+      const my_name_key = currentUID + "_name";
+      const creator_name_key = project?.creator_uid + "_name";
+      const creatorUser = findItemFromList(users, "uid", project?.creator_uid);
       const chatRef = {
         // new
         chat_user_ids: [currentUID, project.creator_uid],
+        [my_name_key]: ediumUser?.name,
+        [creator_name_key]: creatorUser?.name,
         [my_unread_key]: 0,
         [creator_unread_key]: 1,
+        has_unread: true,
         join_requests: [chatJR],
         last_text: msgStr,
         last_timestamp: serverTimestamp(),
@@ -271,12 +279,7 @@ const PositionListItem = (props) => {
             <Box sx={{ flexGrow: 1 }} />
             {onMedia.onDesktop && !isCreator && (
               <Tooltip title={currentUID ? "" : "Edit your profile first"}>
-                <span>
-                  {appFormURL
-                    ? appFormButton
-                    : project?.creator_uid !== "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
-                      joinRequestButton}
-                </span>
+                <span>{appFormURL ? appFormButton : joinRequestButton}</span>
               </Tooltip>
             )}
           </Box>

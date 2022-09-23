@@ -71,7 +71,7 @@ const ChatAccordionContact = (props) => {
         if (!showMsg && onMedia.onDesktop) {
           setShowMsg(true);
         }
-        handleUnread(chat, setChat, currentUser);
+        handleUnread(chat, setChat, currentUser, contact);
       }}
       sx={{ minHeight: "80px" }}
     >

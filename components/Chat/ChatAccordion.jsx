@@ -33,7 +33,7 @@ const ChatAccordion = () => {
   const [expandState, setExpandState] = useState("collapseIt");
 
   // handle chat expansion called by handleConnect/handleJoinRequest
-  // connect or join request might create a new chat, this new chat must be found by this hook
+  // connect or join request might create a new chat, this new chat will be found by this hook
   useEffect(() => {
     if (!forceChatExpand) return;
 
@@ -42,23 +42,19 @@ const ChatAccordion = () => {
     );
 
     if (!foundChat) return;
-    setChat(foundChat);
 
-    var timeout = 200;
+    setChat(foundChat);
+    setForceChatExpand(false);
+
+    let timeout = 250;
     if (expandState !== "expandIt") {
       setExpandState("expandIt");
       timeout = 500; // wait more time
     }
-
+    handleUnread(foundChat, setChat, currentUser, chatPartner); // simulate clicking the contact, won't do anything if my_unread is 0
     setTimeout(() => {
       setShowMsg(true);
     }, timeout); // delayed msg window
-
-    setTimeout(() => {
-      handleUnread(foundChat, setChat, currentUser);
-    }, 1000); // delayed reset unread
-
-    setForceChatExpand(false);
 
     return () => {
       foundChat;

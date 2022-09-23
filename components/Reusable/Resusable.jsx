@@ -4,9 +4,7 @@ import {
   collection,
   doc,
   getDoc,
-  getDocs,
   serverTimestamp,
-  setDoc,
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase";
@@ -41,12 +39,17 @@ export const handleConnect = async (
   };
   // add chat doc
   const collectionRef = collection(db, "chats");
+  const my_name_key = ediumUser.uid + "_name";
+  const partner_name_key = partnerUser.uid + "_name";
   const my_unread_key = ediumUser.uid + "_unread";
-  const it_unread_key = partnerUser.uid + "_unread";
+  const partner_unread_key = partnerUser.uid + "_unread";
   const chatRef = {
     chat_user_ids: [ediumUser.uid, partnerUser.uid],
+    [my_name_key]: ediumUser.name,
+    [partner_name_key]: partnerUser.name,
     [my_unread_key]: 0,
-    [it_unread_key]: 1,
+    [partner_unread_key]: 1,
+    has_unread: true,
     last_text: msgStr,
     last_timestamp: serverTimestamp(),
   };
@@ -71,15 +74,19 @@ export const handleConnect = async (
 // https://stackoverflow.com/questions/43302584/why-doesnt-the-code-after-await-run-right-away-isnt-it-supposed-to-be-non-blo
 // https://stackoverflow.com/questions/66263271/firebase-update-returning-undefined-is-it-not-supposed-to-return-the-updated
 //============================================================
-export const handleUnread = async (chat, setChat, ediumUser) => {
-  const my_unread_key = ediumUser.uid + "_unread";
+export const handleUnread = async (chat, setChat, currentUser, chatPartner) => {
+  const my_unread_key = currentUser?.uid + "_unread";
+  const partner_unread_key = chatPartner?.uid + "_unread";
 
   if (chat[my_unread_key] > 0) {
     const chatDocRef = doc(db, "chats", chat.id);
-    const chatUpdateRef = {
+    let chatUpdateRef = {
       [my_unread_key]: 0,
       last_timestamp: serverTimestamp(),
     };
+    if (chat[partner_unread_key] === 0) {
+      chatUpdateRef = { ...chatUpdateRef, has_unread: false };
+    }
     setChat({ ...chat, ...chatUpdateRef });
     const chatModRef = updateDoc(chatDocRef, chatUpdateRef).catch((error) => {
       console.log(error?.message); // .then() is useless as updateDoc() returns Promise<void>

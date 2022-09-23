@@ -140,9 +140,10 @@ const ChatMsg = (props) => {
     const my_unread_key = currentUser?.uid + "_unread";
     const partner_unread_key = chatPartner?.uid + "_unread";
     const chatDocRef = doc(db, "chats", chat.id);
-    const chatUpdateRef = {
+    let chatUpdateRef = {
       [my_unread_key]: 0,
       [partner_unread_key]: chat[partner_unread_key] + 1,
+      has_unread: true,
       last_text: message.text,
       last_timestamp: serverTimestamp(),
     };
@@ -217,6 +218,7 @@ const ChatMsg = (props) => {
     const chatUpdateRef = {
       [my_unread_key]: 0,
       [partner_unread_key]: chat[partner_unread_key] + 1,
+      has_unread: true,
       join_requests: newJR,
       last_text: msgStr,
       last_timestamp: serverTimestamp(),
@@ -282,6 +284,7 @@ const ChatMsg = (props) => {
     const chatUpdateRef = {
       [my_unread_key]: 0,
       [partner_unread_key]: chat[partner_unread_key] + 1,
+      has_unread: true,
       join_requests: newJR,
       last_text: msgStr,
       last_timestamp: serverTimestamp(),

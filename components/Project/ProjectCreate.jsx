@@ -418,10 +418,6 @@ const ProjectCreate = (props) => {
               fullWidth
               label="Project Title"
               margin="none"
-              inputProps={{
-                maxLength: 50,
-              }}
-              // helperText="The name of your newProject (limit: 50)"
               value={newProject.title}
               onChange={(e) =>
                 setNewProject({ ...newProject, title: e.target.value })
@@ -613,9 +609,6 @@ const ProjectCreate = (props) => {
             multiline
             minRows={4}
             maxRows={8}
-            // inputProps={{
-            //   maxLength: 200,
-            // }}
             helperText="A brief description of the new project (e.g. scope, mission, work format, timeline)"
             value={newProject.description}
             onChange={(e) =>

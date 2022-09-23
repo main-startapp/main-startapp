@@ -25,7 +25,7 @@ const Signup = (props) => {
     confirmPassword: "",
   });
 
-  const [error, setError] = useState({
+  const [errorMsg, setErrorMsg] = useState({
     email: "",
     password: "",
     confirmPassword: "",
@@ -42,7 +42,7 @@ const Signup = (props) => {
 
   const validateInput = (e) => {
     let { name, value } = e.target;
-    setError((prev) => {
+    setErrorMsg((prev) => {
       const stateObj = { ...prev, [name]: "" };
 
       switch (name) {
@@ -59,11 +59,11 @@ const Signup = (props) => {
             stateObj[name] = "Password must contains 6 or more characters";
           } else if (input.confirmPassword && value !== input.confirmPassword) {
             stateObj["confirmPassword"] =
-              "Password and Confirm Password does not match";
+              "Password and Confirm Password do not match";
           } else {
             stateObj["confirmPassword"] = input.confirmPassword
               ? ""
-              : error.confirmPassword;
+              : errorMsg.confirmPassword;
           }
           break;
 
@@ -73,7 +73,7 @@ const Signup = (props) => {
           } else if (value?.length < 6) {
             stateObj[name] = "Password must contains 6 or more characters";
           } else if (input.password && value !== input.password) {
-            stateObj[name] = "Password and Confirm Password does not match";
+            stateObj[name] = "Password and Confirm Password do not match";
           }
           break;
 
@@ -88,7 +88,7 @@ const Signup = (props) => {
   const handleConfirm = (e) => {
     e.preventDefault();
     if (!formRef.current.reportValidity()) return;
-    const hasError = Object.values(error).some((err) => err.length > 0);
+    const hasError = Object.values(errorMsg).some((error) => error.length > 0);
     if (hasError) return;
     createUserWithEmailAndPassword(auth, input.email, input.password)
       // .then(async (userCredential) => {
@@ -96,7 +96,19 @@ const Signup = (props) => {
       //   await sendEmailVerification(user);
       // })
       .catch((error) => {
-        console.log(error?.message);
+        let msg = "";
+        switch (error.code) {
+          case "auth/email-already-in-use":
+            msg = "Email is already in use";
+            break;
+
+          default:
+            msg =
+              "Contact us at contact@edium.ca with the following code: " +
+              error?.msg;
+            break;
+        }
+        setErrorMsg({ email: msg, password: "", confirmPassword: "" });
       });
   };
 
@@ -106,72 +118,74 @@ const Signup = (props) => {
     <>
       <Divider
         sx={{
-          mt: "1vh",
+          mt: "2vh",
           width: isMobile ? "68vmin" : "38vmin",
           color: "lightgray",
+          ":before": {
+            top: 0,
+          },
+          ":after": {
+            top: 0,
+          },
         }}
       >
-        {"Create an account"}
+        {"Create an Account"}
       </Divider>
       <Box sx={{ mt: "2vh", width: isMobile ? "68vmin" : "38vmin" }}>
         <form ref={formRef}>
-          <Tooltip title={error.email} placement="left">
-            <StyledTextField
-              sx={{ paddingY: 0, fontSize: "0.9em" }}
-              fullWidth
-              margin="none"
-              label="Email"
-              name="email"
-              type="email"
-              variant="outlined"
-              value={input.email}
-              onChange={(e) => handleInputChange(e)}
-              onBlur={(e) => validateInput(e)}
-              error={!!error.email}
-              //helperText={error.email || " "}
-            />
-          </Tooltip>
-          <Tooltip title={error.password} placement="left">
-            <StyledTextField
-              sx={{ mt: "1.5vh", paddingY: 0, fontSize: "0.9em" }}
-              fullWidth
-              margin="none"
-              label={
-                isMobile
-                  ? "Password (>5 characters)"
-                  : "Password (6 or more characters)"
-              }
-              name="password"
-              type="password"
-              variant="outlined"
-              value={input.password}
-              onChange={(e) => handleInputChange(e)}
-              onBlur={(e) => validateInput(e)}
-              error={!!error.password}
-              //helperText={error.password || " "}
-            />
-          </Tooltip>
-          <Tooltip title={error.confirmPassword} placement="left">
-            <StyledTextField
-              sx={{ mt: "1.5vh", paddingY: 0, fontSize: "0.9em" }}
-              fullWidth
-              margin="none"
-              label="Password Confirmation"
-              name="confirmPassword"
-              type="password"
-              variant="outlined"
-              value={input.confirmPassword}
-              onChange={(e) => handleInputChange(e)}
-              onBlur={(e) => validateInput(e)}
-              error={!!error.confirmPassword}
-              //helperText={error.confirmPassword || " "}
-            />
-          </Tooltip>
+          <StyledTextField
+            sx={{ paddingY: 0, fontSize: "0.9em" }}
+            fullWidth
+            margin="none"
+            label="Email"
+            name="email"
+            type="email"
+            variant="outlined"
+            value={input.email}
+            onChange={(e) => handleInputChange(e)}
+            onBlur={(e) => validateInput(e)}
+            error={!!errorMsg.email}
+            helperText={errorMsg.email || " "}
+          />
+
+          <StyledTextField
+            sx={{ paddingY: 0, fontSize: "0.9em" }}
+            fullWidth
+            margin="none"
+            label={
+              isMobile
+                ? "Password (>5 characters)"
+                : "Password (6 or more characters)"
+            }
+            name="password"
+            type="password"
+            variant="outlined"
+            value={input.password}
+            onChange={(e) => handleInputChange(e)}
+            onBlur={(e) => validateInput(e)}
+            error={!!errorMsg.password}
+            helperText={errorMsg.password || " "}
+          />
+
+          <StyledTextField
+            sx={{ paddingY: 0, fontSize: "0.9em" }}
+            fullWidth
+            margin="none"
+            label="Password Confirmation"
+            name="confirmPassword"
+            type="password"
+            variant="outlined"
+            value={input.confirmPassword}
+            onChange={(e) => handleInputChange(e)}
+            onBlur={(e) => validateInput(e)}
+            error={!!errorMsg.confirmPassword}
+            helperText={errorMsg.confirmPassword || " "}
+          />
         </form>
       </Box>
       <Box
         sx={{
-          mt: "1.5vh",
+          mt: "1vh",
           width: isMobile ? "68vmin" : "38vmin",
           display: "flex",
           justifyContent: "flex-end",
@@ -254,6 +268,6 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
       borderColor: "#d32f2f !important",
     },
   "& .MuiFormHelperText-root": {
-    fontSize: "10px",
+    fontSize: "12px",
   },
 }));

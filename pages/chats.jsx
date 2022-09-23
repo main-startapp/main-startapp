@@ -29,21 +29,18 @@ const Chats = () => {
   });
 
   // connect or join request might create a new chat, this new chat must be found by this hook
+  // this has similar functionality to the one in ChatAccordion; this one is for mobile chats
   useEffect(() => {
     if (!forceChatExpand) return;
 
     const foundChat = chats.find((chat) =>
       chat.chat_user_ids.some((uid) => uid === chatPartner?.uid)
     );
-
     if (!foundChat) return;
+
     setChat(foundChat);
-
-    setTimeout(() => {
-      handleUnread(foundChat, setChat, currentUser);
-    }, 2000); // delayed reset unread
-
     setForceChatExpand(false);
+    handleUnread(foundChat, setChat, currentUser, chatPartner); // simulate clicking the contact, won't do anything if my_unread is 0
 
     return () => {
       foundChat;

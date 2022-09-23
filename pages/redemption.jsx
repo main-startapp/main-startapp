@@ -275,10 +275,6 @@ const Redemption = () => {
               required
               fullWidth
               margin="none"
-              inputProps={{
-                maxLength: 50,
-              }}
-              // helperText="The name of your newProject (limit: 50)"
               value={code}
               onChange={(e) =>
                 handleChangeCodes(codesArray, setCodesArray, index, e)
@@ -497,9 +493,6 @@ const Redemption = () => {
               required
               fullWidth
               margin="none"
-              inputProps={{
-                maxLength: 50,
-              }}
               value={theCipher}
               onChange={(e) => setTheCipher(e.target.value)}
             />
