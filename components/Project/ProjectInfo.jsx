@@ -130,17 +130,21 @@ const ProjectInfo = () => {
                 {"Details: "}
               </Typography>
               <Typography color="text.secondary">{project?.details}</Typography>
-              <Typography
-                sx={{ mt: onMedia.onDesktop ? 3 : 1.5, fontWeight: "bold" }}
-                color="text.primary"
-              >
-                {"Team size: "}
-              </Typography>
-              <Typography color="text.secondary">
-                {/* {project?.cur_member_count}
+              {project.max_member_count && (
+                <div>
+                  <Typography
+                    sx={{ mt: onMedia.onDesktop ? 3 : 1.5, fontWeight: "bold" }}
+                    color="text.primary"
+                  >
+                    {"Team size: "}
+                  </Typography>
+                  <Typography color="text.secondary">
+                    {/* {project?.cur_member_count}
                 {"/"} */}
-                {project?.max_member_count}
-              </Typography>
+                    {project?.max_member_count}
+                  </Typography>
+                </div>
+              )}
             </Box>
           </Grid>
 

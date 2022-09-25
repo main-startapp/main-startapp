@@ -71,7 +71,8 @@ const ProjectCreate = (props) => {
   const emptyProject = {
     title: "",
     category: "",
-    completion_date: moment().toDate(),
+    completion_date: null,
+    max_member_count: null,
     details: "",
     description: "",
     is_visible: true,
@@ -91,6 +92,7 @@ const ProjectCreate = (props) => {
     responsibility: "",
     weekly_hour: 1,
     count: 1,
+    url: "",
   };
   const [positionFields, setPositionFields] = useState(() =>
     isCreate
@@ -113,9 +115,12 @@ const ProjectCreate = (props) => {
   const [isCheckedTransferable, setIsCheckedTransferable] = useState(false);
   const [isCheckedPosition, setIsCheckedPosition] = useState(false);
   const [isCheckedAppForm, setIsCheckedAppForm] = useState(false);
+  const [isCheckedCompDate, setIsCheckedCompDate] = useState(false);
+  const [isCheckedTeamSize, setIsCheckedTeamSize] = useState(false);
+
   useEffect(() => {
     if (isCreate) {
-      setIsCheckedPosition(true);
+      // setIsCheckedPosition(true); what is this for??
     } else {
       // update, checked value depends on oldProject
       if (oldProject?.position_list?.length > 0) {
@@ -142,12 +147,19 @@ const ProjectCreate = (props) => {
 
     // button is clickable & form is valid
     setIsClickable(false);
+
     // calucalte the team
-    let maxMemberCount = newProject?.max_member_count;
-    if (!maxMemberCount) {
-      maxMemberCount = 1;
+
+    // change field value into an int if not null
+    let maxMemberCount = newProject.max_member_count
+      ? parseInt(newProject.max_member_count)
+      : null;
+
+    // if checked position, add number of positions to count
+    if (maxMemberCount && isCheckedPosition) {
       positionFields.forEach((position) => (maxMemberCount += position.count));
     }
+
     let projectModRef; // ref to addDoc() or updateDoc()
     if (isCreate) {
       // create a new newProject
@@ -338,8 +350,14 @@ const ProjectCreate = (props) => {
     setPositionFields(pFields);
   };
 
-  const handleAddPosField = () => {
-    setPositionFields([...positionFields, emptyPositionField]);
+  const handleAddPosField = (index) => {
+    setPositionFields([
+      ...positionFields,
+      {
+        ...emptyPositionField,
+        url: index >= 0 ? positionFields[index].url : "",
+      },
+    ]);
   };
 
   const handleRemovePosField = (index) => {
@@ -353,6 +371,36 @@ const ProjectCreate = (props) => {
   };
 
   const formRef = useRef();
+
+  const handleCompDateChange = (e) => {
+    setIsCheckedCompDate(!isCheckedCompDate);
+    setNewProject({
+      ...newProject,
+      completion_date: isCheckedCompDate ? e.target.value : null,
+    });
+  };
+
+  const handleTeamSizeChange = (e) => {
+    setIsCheckedTeamSize(!isCheckedTeamSize);
+    setNewProject({
+      ...newProject,
+      max_member_count: isCheckedTeamSize ? e.target.value : null,
+    });
+  };
+
+  // new projects will get link from the project.url attribute, old projects will get from
+  // project.application_form_url link
+  const getAppLink = (index) => {
+    // old project versions will have this attribute set to a url
+    if (newProject.application_form_url !== "")
+      return newProject.application_form_url;
+
+    // get app link of previous position if possible
+    if (index === 0) return positionFields[index].url;
+    else {
+      return positionFields[index - 1].url;
+    }
+  };
 
   // debugging console logs if there's any
 
@@ -497,6 +545,7 @@ const ProjectCreate = (props) => {
               </DialogActions>
             </Dialog>
           </Box>
+
           {/* Category select & completion date*/}
           <Box
             display="flex"
@@ -509,6 +558,7 @@ const ProjectCreate = (props) => {
               fullWidth
               sx={{
                 mr: 5,
+                width: "105%",
                 "& .MuiOutlinedInput-root": {
                   borderRadius: "10px",
                   backgroundColor: "#f0f0f0",
@@ -552,23 +602,48 @@ const ProjectCreate = (props) => {
               </FormHelperText>
             </FormControl>
 
-            <LocalizationProvider dateAdapter={AdapterMoment}>
-              <DesktopDatePicker
-                renderInput={(props) => (
-                  <StyledTextField
-                    sx={{ width: "30%" }}
-                    helperText="Completion date"
-                    {...props}
+            {/* completion date container */}
+            <Box display="flex" flexDirection="column" width="40%">
+              {/* date and checkbox */}
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignContent="center"
+                gap="10%"
+              >
+                <LocalizationProvider dateAdapter={AdapterMoment}>
+                  <DesktopDatePicker
+                    renderInput={(props) => {
+                      return (
+                        <StyledTextField
+                          {...props}
+                          disabled={!isCheckedCompDate}
+                        />
+                      );
+                    }}
+                    // label="Completion Date"
+                    disabled={!isCheckedCompDate}
+                    border="none"
+                    value={newProject.completion_date}
+                    onChange={(e) => {
+                      handleDateTimeChange(e);
+                    }}
                   />
-                )}
-                // label="Completion Date"
-                value={newProject.completion_date}
-                onChange={(e) => {
-                  handleDateTimeChange(e);
-                }}
-              />
-            </LocalizationProvider>
+                </LocalizationProvider>
+                <Checkbox
+                  sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
+                  checked={isCheckedCompDate}
+                  onChange={handleCompDateChange}
+                />
+              </Box>
+              <FormHelperText
+                sx={{ color: "lightgray", fontSize: "12px", ml: 1 }}
+              >
+                {"Completion Date"}
+              </FormHelperText>
+            </Box>
           </Box>
+
           {/* details and total team size */}
           <Box
             display="flex"
@@ -579,7 +654,7 @@ const ProjectCreate = (props) => {
             }}
           >
             <StyledTextField
-              sx={{ mr: 5 }}
+              sx={{ mr: 5, width: "105%" }}
               fullWidth
               label="Details"
               margin="none"
@@ -589,19 +664,42 @@ const ProjectCreate = (props) => {
                 setNewProject({ ...newProject, details: e.target.value })
               }
             />
-            <StyledTextField
-              sx={{ width: "30%" }}
-              label="Team Size"
-              margin="none"
-              helperText="Total members"
-              value={newProject.max_member_count}
-              onChange={(e) =>
-                setNewProject({
-                  ...newProject,
-                  max_member_count: e.target.value,
-                })
-              }
-            />
+
+            {/* Team Size container */}
+            <Box display="flex" flexDirection="column" width="40%">
+              {/* Size and checkbox */}
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignContent="center"
+                gap="10%"
+              >
+                <StyledTextField
+                  fullWidth
+                  label="Team Size"
+                  type="number"
+                  margin="none"
+                  disabled={!isCheckedTeamSize}
+                  value={newProject.max_member_count}
+                  onChange={(e) =>
+                    setNewProject({
+                      ...newProject,
+                      max_member_count: e.target.value,
+                    })
+                  }
+                />
+                <Checkbox
+                  sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
+                  checked={isCheckedTeamSize}
+                  onChange={handleTeamSizeChange}
+                />
+              </Box>
+              <FormHelperText
+                sx={{ color: "lightgray", fontSize: "12px", ml: 1 }}
+              >
+                {"Total Members"}
+              </FormHelperText>
+            </Box>
           </Box>
           {/* Description */}
           <StyledTextField
@@ -622,7 +720,9 @@ const ProjectCreate = (props) => {
             onChange={(e) =>
               setNewProject({ ...newProject, description: e.target.value })
             }
-          />
+          >
+            <h1>hello</h1>
+          </StyledTextField>
           <Box
             sx={{
               mt: 5,
@@ -735,69 +835,58 @@ const ProjectCreate = (props) => {
                       maxRows={8}
                       margin="none"
                       name="responsibility"
-                      label="Responsibilities"
+                      label="Responsibilities & Qualifications"
                       value={positionField.responsibility}
                       onChange={(e) => {
                         handleChangePosInput(index, e);
                       }}
                     />
-                    {index === positionFields.length - 1 && (
-                      <IconButton
-                        sx={{ ml: 2.5, backgroundColor: "#f0f0f0" }}
-                        onClick={() => handleAddPosField()}
-                      >
-                        <AddRoundedIcon />
-                      </IconButton>
-                    )}
+                  </Box>
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    mt={2.5}
+                  >
+                    <StyledTextField
+                      fullWidth
+                      margin="none"
+                      name="url"
+                      label="Application Form Link"
+                      defaultValue={getAppLink(index)}
+                      onChange={(e) => handleChangePosInput(index, e)}
+                    />
                   </Box>
                 </div>
               );
             })}
-          {/* application form */}
-          <Tooltip
-            title="All applications will be redirect to this URL"
-            placement="left"
-          >
+          {/* add button */}
+          {isCheckedPosition && (
             <Box
               sx={{
                 mt: 5,
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              <Checkbox
-                sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
-                checked={isCheckedAppForm}
-                onChange={() => {
-                  setIsCheckedAppForm(!isCheckedAppForm);
+              <IconButton
+                sx={{
+                  width: "12%",
+                  borderRadius: "30px",
+                  border: 1.5,
+                  borderColor: "#dbdbdb",
+                  backgroundColor: "#fafafa",
+                  color: "black",
                 }}
-              />
-
-              <Typography sx={{ color: "rgba(0,0,0,0.6)" }}>
-                {"I want to add my own application form"}
-              </Typography>
+                onClick={() => handleAddPosField(positionFields.length - 1)}
+              >
+                <AddRoundedIcon />
+              </IconButton>
             </Box>
-          </Tooltip>
-          {isCheckedAppForm && (
-            <StyledTextField
-              sx={{
-                mt: 2.5,
-              }}
-              required
-              fullWidth
-              label="Application Form URL"
-              type="url"
-              margin="none"
-              value={newProject.application_form_url}
-              onChange={(e) =>
-                setNewProject({
-                  ...newProject,
-                  application_form_url: e.target.value,
-                })
-              }
-            />
           )}
+
           {/* Buttons */}
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             {!isCreate && (

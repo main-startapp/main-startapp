@@ -86,10 +86,8 @@ const ProjectListItem = (props) => {
             primaryTypographyProps={{ fontWeight: "bold" }}
             secondary={
               <>
-                {"Team size: "}
-                {/* {project.cur_member_count}
-                {"/"} */}
-                {project.max_member_count}
+                {project.max_member_count && "Team size: "}
+                {project.max_member_count && project.max_member_count}
                 <br />
               </>
             }
