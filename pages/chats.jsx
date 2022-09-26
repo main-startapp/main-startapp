@@ -2,15 +2,14 @@ import { Box } from "@mui/material";
 import { useEffect, useContext } from "react";
 import ChatAccordionContact from "../components/Chat/ChatAccordionContact";
 import ChatMsg from "../components/Chat/ChatMsg";
-import { useAuth } from "../components/Context/AuthContext";
 import { GlobalContext } from "../components/Context/ShareContexts";
 import Filler from "../components/Filler";
 import ChatsPageBar from "../components/Header/ChatsPageBar";
 import { handleUnread } from "../components/Reusable/Resusable";
 
 const Chats = () => {
-  const { currentUser } = useAuth();
   const {
+    ediumUser,
     chats,
     chat,
     chatPartner,
@@ -40,7 +39,7 @@ const Chats = () => {
 
     setChat(foundChat);
     setForceChatExpand(false);
-    handleUnread(foundChat, setChat, currentUser, chatPartner); // simulate clicking the contact, won't do anything if my_unread is 0
+    handleUnread(foundChat, setChat, ediumUser, chatPartner); // simulate clicking the contact, won't do anything if my_unread is 0
 
     return () => {
       foundChat;
@@ -52,7 +51,7 @@ const Chats = () => {
     chatPartner,
     setChat,
     setShowMsg,
-    currentUser,
+    ediumUser,
   ]);
 
   return !onMedia.onDesktop ? (

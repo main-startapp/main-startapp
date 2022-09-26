@@ -3,15 +3,14 @@ import { Avatar, Badge, Box, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import moment from "moment";
 import { GlobalContext } from "../Context/ShareContexts";
-import { useAuth } from "../Context/AuthContext";
 import { handleUnread } from "../Reusable/Resusable";
 
 const ChatAccordionContact = (props) => {
   const chat = props.chat;
 
   // context
-  const { currentUser } = useAuth();
   const {
+    ediumUser,
     projects,
     setChat,
     setChatPartner,
@@ -24,13 +23,13 @@ const ChatAccordionContact = (props) => {
   // local states and vars
   const contact = useMemo(() => {
     const contactUID =
-      chat.chat_user_ids[0] === currentUser?.uid
+      chat.chat_user_ids[0] === ediumUser?.uid
         ? chat.chat_user_ids[1]
         : chat.chat_user_ids[0];
     return users.find((user) => user.uid === contactUID);
-  }, [chat.chat_user_ids, currentUser?.uid, users]);
+  }, [chat.chat_user_ids, ediumUser?.uid, users]);
 
-  const my_unread_key = currentUser?.uid + "_unread"; // the key to get unread msg no.
+  const my_unread_key = ediumUser?.uid + "_unread"; // the key to get unread msg no.
 
   // find the last join request's project and position info
   // !todo: use a map to reduce searching
@@ -71,7 +70,7 @@ const ChatAccordionContact = (props) => {
         if (!showMsg && onMedia.onDesktop) {
           setShowMsg(true);
         }
-        handleUnread(chat, setChat, currentUser, contact);
+        handleUnread(chat, setChat, ediumUser, contact);
       }}
       sx={{ minHeight: "80px" }}
     >
