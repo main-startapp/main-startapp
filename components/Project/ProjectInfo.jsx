@@ -321,7 +321,13 @@ const ProjectInfo = () => {
                     posWeeklyHour={position.weekly_hour}
                     isCreator={isCreator}
                     creator={creatorUser}
-                    appFormURL={project?.application_form_url || ""}
+                    appFormURL={
+                      project.application_form_url !== ""
+                        ? project.application_form_url
+                        : position.url
+                        ? position.url
+                        : ""
+                    }
                   />
                 ))}
               </Box>

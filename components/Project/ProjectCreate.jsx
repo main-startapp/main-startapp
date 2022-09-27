@@ -43,6 +43,7 @@ import moment from "moment";
 import { useRouter } from "next/router";
 import { findItemFromList, handleDeleteEntry } from "../Reusable/Resusable";
 import { useAuth } from "../Context/AuthContext";
+import TextEditor from "../TextEditor";
 
 const ProjectCreate = (props) => {
   // context
@@ -705,6 +706,7 @@ const ProjectCreate = (props) => {
           <StyledTextField
             sx={{
               mt: 5,
+              textAlign: "left",
             }}
             fullWidth
             label="Description"
@@ -720,9 +722,8 @@ const ProjectCreate = (props) => {
             onChange={(e) =>
               setNewProject({ ...newProject, description: e.target.value })
             }
-          >
-            <h1>hello</h1>
-          </StyledTextField>
+          ></StyledTextField>
+          <TextEditor />
           <Box
             sx={{
               mt: 5,
