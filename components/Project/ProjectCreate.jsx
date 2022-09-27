@@ -39,7 +39,6 @@ import { db } from "../../firebase";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
-import moment from "moment";
 import { useRouter } from "next/router";
 import { findItemFromList, handleDeleteEntry } from "../Reusable/Resusable";
 import { useAuth } from "../Context/AuthContext";
@@ -72,8 +71,8 @@ const ProjectCreate = (props) => {
   const emptyProject = {
     title: "",
     category: "",
-    completion_date: null,
-    max_member_count: null,
+    completion_date: "",
+    max_member_count: 0,
     details: "",
     description: "",
     is_visible: true,
@@ -84,6 +83,8 @@ const ProjectCreate = (props) => {
   const [newProject, setNewProject] = useState(() =>
     isCreate ? emptyProject : oldProject
   );
+
+  // use effect to set project
 
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
 
@@ -377,7 +378,7 @@ const ProjectCreate = (props) => {
     setIsCheckedCompDate(!isCheckedCompDate);
     setNewProject({
       ...newProject,
-      completion_date: isCheckedCompDate ? e.target.value : null,
+      completion_date: isCheckedCompDate ? e.target.value : "",
     });
   };
 
@@ -385,7 +386,7 @@ const ProjectCreate = (props) => {
     setIsCheckedTeamSize(!isCheckedTeamSize);
     setNewProject({
       ...newProject,
-      max_member_count: isCheckedTeamSize ? e.target.value : null,
+      max_member_count: isCheckedTeamSize ? e.target.value : 0,
     });
   };
 
@@ -723,7 +724,8 @@ const ProjectCreate = (props) => {
               setNewProject({ ...newProject, description: e.target.value })
             }
           ></StyledTextField>
-          <TextEditor />
+
+          <TextEditor update={setNewProject} project={newProject} />
           <Box
             sx={{
               mt: 5,
