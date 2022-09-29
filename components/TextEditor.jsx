@@ -25,7 +25,6 @@ const TextEditor = ({ update, project }) => {
       ...project,
       description: e,
     });
-    console.log(e);
   };
 
   return (
@@ -35,7 +34,8 @@ const TextEditor = ({ update, project }) => {
       onChange={(e) => handleTextOnChange(e)}
       style={{
         backgroundColor: "#f0f0f0",
-        border: "#dbdbdb",
+        border: "4px solid #cccccc",
+        borderRadius: "10px",
       }}
     />
   );

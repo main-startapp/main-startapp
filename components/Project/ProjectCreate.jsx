@@ -679,7 +679,7 @@ const ProjectCreate = (props) => {
               >
                 <StyledTextField
                   fullWidth
-                  label="Team Size"
+                  // label="Team Size"
                   type="number"
                   margin="none"
                   disabled={!isCheckedTeamSize}
@@ -700,7 +700,7 @@ const ProjectCreate = (props) => {
               <FormHelperText
                 sx={{ color: "lightgray", fontSize: "12px", ml: 1 }}
               >
-                {"Total Members"}
+                {"Team Size"}
               </FormHelperText>
             </Box>
           </Box>
