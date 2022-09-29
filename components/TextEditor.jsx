@@ -2,10 +2,9 @@ import React from "react";
 import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import ImageResize from "quill-image-resize-module-react";
+Quill.register("modules/imageResize", ImageResize);
 
 const TextEditor = ({ update, project }) => {
-  Quill.register("modules/imageResize", ImageResize);
-
   const modules = {
     toolbar: [
       [{ header: [1, 2, 3, 4, 5, 6, false] }],
@@ -15,7 +14,7 @@ const TextEditor = ({ update, project }) => {
       ["clean"],
     ],
     imageResize: {
-      parchment: Quill.import("parchment"),
+      // parchment: Quill.import("parchment"),
       modules: ["Resize", "DisplaySize"],
     },
   };

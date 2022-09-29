@@ -15,6 +15,7 @@ import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { handleDeleteEntry, handleVisibility } from "../Reusable/Resusable";
 import { useAuth } from "../Context/AuthContext";
+import { useEffect } from "react";
 
 // the project list item component in the project list: has full project data but only shows some brief information
 const ProjectListItem = (props) => {
@@ -23,7 +24,7 @@ const ProjectListItem = (props) => {
   const last = props.last;
 
   // context
-  const { ediumUser, onMedia } = useContext(GlobalContext);
+  const { ediumUser, onMedia, projects } = useContext(GlobalContext);
   const { setProject } = useContext(ProjectContext);
 
   // menu
@@ -153,6 +154,7 @@ const ProjectListItem = (props) => {
           <ListItemText
             secondary={
               <Typography
+                component="span" // this fixed eror saying div cannot appear as descendant of p
                 sx={{
                   display: "-webkit-box",
                   overflow: "hidden",

@@ -7,7 +7,7 @@ import StudentGridCard from "./StudentGridCard";
 const StudentGrid = () => {
   // context
   const { users } = useContext(GlobalContext);
-  const { searchTerm } = useContext(StudentContext);
+  const { searchTerm, setStudent } = useContext(StudentContext);
   const { height, width } = useWindowDimensions();
 
   return (

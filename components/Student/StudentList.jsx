@@ -3,13 +3,14 @@ import NextLink from "next/link";
 import { Box, Button, Tooltip } from "@mui/material";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
 import StudentListItem from "./StudentListItem";
+import { useEffect } from "react";
 
 // always !onDesktop
 
 const StudentList = () => {
   // context
   const { users } = useContext(GlobalContext);
-  const { searchTerm } = useContext(StudentContext);
+  const { searchTerm, setStudent } = useContext(StudentContext);
 
   // local vars
   const filteredStudents = useMemo(

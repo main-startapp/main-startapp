@@ -37,7 +37,7 @@ const ProjectInfo = () => {
     setForceChatExpand,
     onMedia,
   } = useContext(GlobalContext);
-  const { project } = useContext(ProjectContext);
+  const { project, projects, setProject } = useContext(ProjectContext);
 
   // local vars
   const currentUID = ediumUser?.uid;

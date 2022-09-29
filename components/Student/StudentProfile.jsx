@@ -23,9 +23,15 @@ import FaceRetouchingNaturalOutlinedIcon from "@mui/icons-material/FaceRetouchin
 
 const StudentProfile = () => {
   // context
-  const { chats, ediumUser, setForceChatExpand, setChatPartner, onMedia } =
-    useContext(GlobalContext);
-  const { student } = useContext(StudentContext);
+  const {
+    chats,
+    ediumUser,
+    setForceChatExpand,
+    setChatPartner,
+    onMedia,
+    users,
+  } = useContext(GlobalContext);
+  const { student, setStudent } = useContext(StudentContext);
 
   // local vars
   const currentUID = ediumUser?.uid;
@@ -37,6 +43,11 @@ const StudentProfile = () => {
   useEffect(() => {
     boxRef.current.scrollTop = 0;
   }, [student]); // every time project changes, this forces each accordion to collapse
+
+  // // set initial student to be first in list to render out immediately
+  // useEffect(() => {
+  //   setStudent(users.length > 0 ? users[0] : null);
+  // }, [setStudent, users]);
 
   return (
     <Box

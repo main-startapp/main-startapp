@@ -3,6 +3,8 @@ import NextLink from "next/link";
 import { Box, Button, Tooltip } from "@mui/material";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import ProjectListItem from "./ProjectListItem";
+import { filter } from "lodash";
+import { useEffect } from "react";
 
 // link/router https://stackoverflow.com/questions/65086108/next-js-link-vs-router-push-vs-a-tag
 // description: a list of projects (project list items); a button to create new project (router.push)
@@ -10,7 +12,7 @@ import ProjectListItem from "./ProjectListItem";
 const ProjectList = () => {
   // context
   const { projects, ediumUser, onMedia } = useContext(GlobalContext);
-  const { searchTerm, searchCategory } = useContext(ProjectContext);
+  const { searchTerm, searchCategory, setProject } = useContext(ProjectContext);
 
   // local vars
   const currentUID = ediumUser?.uid;
@@ -55,6 +57,11 @@ const ProjectList = () => {
       }),
     [projects, searchTerm, searchCategory]
   );
+
+  // set initial project to be first in list to render out immediately
+  useEffect(() => {
+    setProject(projects.length > 0 ? projects[0] : null);
+  }, [setProject, projects]);
 
   return (
     <Box sx={{ backgroundColor: "#fafafa" }}>
