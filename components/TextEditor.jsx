@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { useQuill, setContents } from "react-quilljs";
-import "quill/dist/quill.snow.css";
+import React from "react";
+import ReactQuill, { Quill } from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import ImageResize from "quill-image-resize-module-react";
 
 const TextEditor = ({ update, project }) => {
-  // const theme = "snow";
+  Quill.register("modules/imageResize", ImageResize);
 
   const modules = {
     toolbar: [
@@ -13,34 +14,30 @@ const TextEditor = ({ update, project }) => {
       [{ list: "ordered" }, { list: "bullet" }],
       ["clean"],
     ],
+    imageResize: {
+      parchment: Quill.import("parchment"),
+      modules: ["Resize", "DisplaySize"],
+    },
   };
-  // const formats = ["bold", "italic", "underline", "strike"];
-  // const placeholder = "insert text here";
 
-  const { quill, quillRef } = useQuill({
-    // theme,
-    modules,
-  });
-
-  useEffect(() => {
-    // console.log(quill.container.style); // maybe update style from here????
-    if (quill) {
-      quill.setContents("");
-      quill.on("text-change", () => {
-        console.log("changed");
-        // update({
-        //   ...project,
-        //   description: quill.container.firstChild.innerHTML,
-        // });
-        console.log(quill.container.firstChild.innerHTML);
-      });
-    }
-  }, [quill]);
+  const handleTextOnChange = (e) => {
+    update({
+      ...project,
+      description: e,
+    });
+    console.log(e);
+  };
 
   return (
-    <div id="quill-container">
-      <div ref={quillRef}></div>
-    </div>
+    <ReactQuill
+      theme="snow"
+      modules={modules}
+      onChange={(e) => handleTextOnChange(e)}
+      style={{
+        backgroundColor: "#f0f0f0",
+        border: "#dbdbdb",
+      }}
+    />
   );
 };
 

@@ -289,7 +289,9 @@ const ProjectInfo = () => {
                     display: "inline",
                   }}
                 >
-                  {project?.description}
+                  <div
+                    dangerouslySetInnerHTML={{ __html: project?.description }}
+                  />
                 </pre>
               </Typography>
             </Box>

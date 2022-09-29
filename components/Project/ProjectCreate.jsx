@@ -653,6 +653,7 @@ const ProjectCreate = (props) => {
             alignItems="start"
             sx={{
               mt: 5,
+              mb: 5,
             }}
           >
             <StyledTextField
@@ -703,29 +704,13 @@ const ProjectCreate = (props) => {
               </FormHelperText>
             </Box>
           </Box>
-          {/* Description */}
-          <StyledTextField
-            sx={{
-              mt: 5,
-              textAlign: "left",
-            }}
-            fullWidth
-            label="Description"
-            margin="none"
-            multiline
-            minRows={4}
-            maxRows={8}
-            // inputProps={{
-            //   maxLength: 200,
-            // }}
-            helperText="A brief description of the new project (e.g. scope, mission, work format, timeline)"
-            value={newProject.description}
-            onChange={(e) =>
-              setNewProject({ ...newProject, description: e.target.value })
-            }
-          ></StyledTextField>
 
           <TextEditor update={setNewProject} project={newProject} />
+          <FormHelperText sx={{ color: "lightgray", fontSize: "12px", ml: 1 }}>
+            {
+              "A brief description of the new project (e.g. scope, mission, work format, timeline)"
+            }
+          </FormHelperText>
           <Box
             sx={{
               mt: 5,

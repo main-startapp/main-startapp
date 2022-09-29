@@ -36,6 +36,12 @@ const ProjectListItem = (props) => {
     setAnchorEl(null);
   };
 
+  // functions
+  const editDescString = (text) => {
+    if (text) return text.replace(/<img .*>/, "");
+    else return "";
+  };
+
   return (
     <Box
       sx={{
@@ -159,7 +165,11 @@ const ProjectListItem = (props) => {
                   color: "rgba(0, 0, 0, 0.6)",
                 }}
               >
-                {project.description}
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: editDescString(project.description),
+                  }}
+                />
               </Typography>
             }
           />
