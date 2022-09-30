@@ -10,7 +10,7 @@ import { useEffect } from "react";
 const StudentList = () => {
   // context
   const { users } = useContext(GlobalContext);
-  const { searchTerm, setStudent } = useContext(StudentContext);
+  const { searchTerm } = useContext(StudentContext);
 
   // local vars
   const filteredStudents = useMemo(

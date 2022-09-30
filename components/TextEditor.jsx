@@ -31,11 +31,6 @@ const TextEditor = ({ update, project }) => {
       theme="snow"
       modules={modules}
       onChange={(e) => handleTextOnChange(e)}
-      style={{
-        backgroundColor: "#f0f0f0",
-        border: "4px solid #cccccc",
-        borderRadius: "10px",
-      }}
     />
   );
 };
