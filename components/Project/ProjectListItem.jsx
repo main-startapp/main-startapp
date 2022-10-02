@@ -24,7 +24,8 @@ const ProjectListItem = (props) => {
   const last = props.last;
 
   // context
-  const { ediumUser, onMedia, projects } = useContext(GlobalContext);
+
+  const { ediumUser, onMedia } = useContext(GlobalContext);
   const { setProject } = useContext(ProjectContext);
 
   // menu
