@@ -23,9 +23,15 @@ import FaceRetouchingNaturalOutlinedIcon from "@mui/icons-material/FaceRetouchin
 
 const StudentProfile = () => {
   // context
-  const { chats, ediumUser, setForceChatExpand, setChatPartner, onMedia } =
-    useContext(GlobalContext);
-  const { student } = useContext(StudentContext);
+  const {
+    chats,
+    ediumUser,
+    setForceChatExpand,
+    setChatPartner,
+    onMedia,
+    users,
+  } = useContext(GlobalContext);
+  const { student, setStudent } = useContext(StudentContext);
 
   // local vars
   const currentUID = ediumUser?.uid;

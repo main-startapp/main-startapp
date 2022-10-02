@@ -7,8 +7,13 @@ import StudentGridCard from "./StudentGridCard";
 const StudentGrid = () => {
   // context
   const { users } = useContext(GlobalContext);
-  const { searchTerm } = useContext(StudentContext);
+  const { searchTerm, setStudent } = useContext(StudentContext);
   const { height, width } = useWindowDimensions();
+
+  // set initial student to be first in list to render out immediately
+  useEffect(() => {
+    setStudent(users.length > 0 ? users[0] : null);
+  }, [setStudent, users]);
 
   return (
     <Box

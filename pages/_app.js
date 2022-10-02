@@ -1,4 +1,5 @@
 import "../styles/globals.css";
+import "../styles/quill.snow.css";
 import { CssBaseline } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";

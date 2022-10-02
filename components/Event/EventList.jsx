@@ -1,4 +1,4 @@
-import { useContext, useMemo } from "react";
+import { useContext, useMemo, useEffect } from "react";
 import NextLink from "next/link";
 import { Box, Button, Tooltip } from "@mui/material";
 import { GlobalContext, EventContext } from "../Context/ShareContexts";
@@ -7,7 +7,7 @@ import EventListItem from "./EventListItem";
 const EventList = () => {
   // context
   const { events, ediumUser, onMedia } = useContext(GlobalContext);
-  const { searchTerm, searchCategory } = useContext(EventContext);
+  const { searchTerm, searchCategory, setEvent } = useContext(EventContext);
 
   // local vars
   const currentUID = ediumUser?.uid;
@@ -48,6 +48,11 @@ const EventList = () => {
       }),
     [events, searchTerm, searchCategory]
   );
+
+  // set initial event to be first in list to render out immediately
+  useEffect(() => {
+    setEvent(events.length > 0 ? events[0] : null);
+  }, [setEvent, events]);
 
   return (
     <Box sx={{ backgroundColor: "#fafafa" }}>
