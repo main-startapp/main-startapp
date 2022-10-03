@@ -21,9 +21,8 @@ import {
 import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
-import Filter from "../Filter";
 
-const EventPageBar = () => {
+const EventPageBar = ({ toggleFilter, isFilterOpen }) => {
   // context
   const { onMedia } = useContext(GlobalContext);
   const { event, setEvent, setSearchTerm, searchCategory, setSearchCategory } =
@@ -41,9 +40,6 @@ const EventPageBar = () => {
 
   // ref
   const textRef = useRef();
-
-  //state
-  const [filterOpen, setFilterOpen] = useState(false);
 
   // reuseable comp
   const ekSearch = (
@@ -127,7 +123,7 @@ const EventPageBar = () => {
     <ClickAwayListener
       mouseEvent="onMouseDown"
       touchEvent="onTouchStart"
-      onClickAway={() => setFilterOpen(false)}
+      onClickAway={() => toggleFilter(false)}
     >
       <Button
         sx={{
@@ -146,7 +142,7 @@ const EventPageBar = () => {
           overflow: "hidden",
           paddingX: "10px",
         }}
-        onClick={() => setFilterOpen(!filterOpen)}
+        onClick={() => toggleFilter(!isFilterOpen)}
         variant="contained"
         disableElevation
       >
@@ -170,6 +166,8 @@ const EventPageBar = () => {
         backgroundColor: "#ffffff",
         borderBottom: 1.5,
         borderColor: "#dbdbdb",
+        position: "relative",
+        zIndex: "1500",
       }}
       elevation={0}
     >
@@ -189,7 +187,6 @@ const EventPageBar = () => {
           {filterComp}
         </Toolbar>
       )}
-      {filterOpen && <Filter isToggled={filterOpen}></Filter>}
 
       {/* mobile version */}
       {!onMedia.onDesktop && (

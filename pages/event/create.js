@@ -17,6 +17,7 @@ const Create = () => {
     setChat(null);
     setChatPartner(null);
   }, [setChat, setChatPartner, setShowChat, setShowMsg]);
+  const { onMedia } = useContext(GlobalContext);
 
   // local
   const { query } = useRouter();
@@ -36,6 +37,7 @@ const Create = () => {
     }
     setOpen(false);
   };
+
   return (
     <EventContext.Provider value={{ showAlert }}>
       <Snackbar
@@ -52,7 +54,7 @@ const Create = () => {
           {alertMessage}
         </Alert>
       </Snackbar>
-      <EventCreate isCreateStr={query.isCreateStr} />
+      <EventCreate />
     </EventContext.Provider>
   );
 };

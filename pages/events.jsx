@@ -7,6 +7,7 @@ import {
 import EventList from "../components/Event/EventList";
 import EventPageBar from "../components/Header/EventPageBar";
 import EventInfo from "../components/Event/EventInfo";
+import Filter from "../components/Filter";
 
 function Events() {
   // global context
@@ -23,6 +24,7 @@ function Events() {
   const [event, setEvent] = useState(null); // thec selected project
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
+  const [filterOpen, setFilterOpen] = useState(false);
 
   return (
     <EventContext.Provider
@@ -34,9 +36,13 @@ function Events() {
         searchCategory,
         setSearchCategory,
       }}
+      sx={{
+        position: "relative",
+        // zIndex: "100",
+      }}
     >
       {/* Toolbar for searching keywords, category and filter */}
-      <EventPageBar />
+      <EventPageBar toggleFilter={setFilterOpen} isFilterOpen={filterOpen} />
 
       <Grid
         container
@@ -70,6 +76,7 @@ function Events() {
           )
         )}
       </Grid>
+      <Filter isToggled={filterOpen}></Filter>
     </EventContext.Provider>
   );
 }

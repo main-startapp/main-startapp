@@ -91,7 +91,12 @@ const ChatAccordion = () => {
 
   return (
     // box is essential for wrapping the accrodion to get rid of ugly top line
-    <Box>
+    <Box
+    // sx={{
+    //   position: "relative",
+    //   zIndex: "1500",
+    // }}
+    >
       <Accordion
         expanded={expandState === "expandIt"}
         square

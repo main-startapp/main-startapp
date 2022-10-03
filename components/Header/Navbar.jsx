@@ -51,6 +51,8 @@ const Navbar = () => {
         "&:hover": {
           cursor: "default",
         },
+        position: "relative",
+        zIndex: "1500",
       }}
       elevation={0}
     >
