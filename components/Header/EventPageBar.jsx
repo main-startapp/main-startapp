@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react";
+import { useContext, useRef, useState, useEffect } from "react";
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -15,10 +15,13 @@ import {
   MenuItem,
   Select,
   Tooltip,
+  Typography,
+  ClickAwayListener,
 } from "@mui/material";
 import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
+import Filter from "../Filter";
 
 const EventPageBar = () => {
   // context
@@ -38,6 +41,9 @@ const EventPageBar = () => {
 
   // ref
   const textRef = useRef();
+
+  //state
+  const [filterOpen, setFilterOpen] = useState(false);
 
   // reuseable comp
   const ekSearch = (
@@ -117,6 +123,45 @@ const EventPageBar = () => {
     </FormControl>
   );
 
+  const filterComp = (
+    <ClickAwayListener
+      mouseEvent="onMouseDown"
+      touchEvent="onTouchStart"
+      onClickAway={() => setFilterOpen(false)}
+    >
+      <Button
+        sx={{
+          width: onMedia.onDesktop ? "10%" : "18%",
+          height: onMedia.onDesktop ? "40px" : "30px", // to match the small size category
+          ml: onMedia.onDesktop ? 0 : 1.5,
+          backgroundColor: "#f0f0f0",
+          border: "none",
+          borderRadius: "10px",
+          color: "gray",
+          textTransform: "none",
+          "&:hover": {
+            backgroundColor: "#ffffff",
+          },
+          mr: 1,
+          overflow: "hidden",
+          paddingX: "10px",
+        }}
+        onClick={() => setFilterOpen(!filterOpen)}
+        variant="contained"
+        disableElevation
+      >
+        {onMedia.onDesktop && (
+          <FilterAltOutlinedIcon
+            sx={{
+              mr: 1,
+            }}
+          />
+        )}
+        <Typography>{"Filter"}</Typography>
+      </Button>
+    </ClickAwayListener>
+  );
+
   return (
     <AppBar
       position="static"
@@ -140,22 +185,11 @@ const EventPageBar = () => {
           {ekSearch}
           {categoryComp}
           <Box sx={{ flexGrow: 1 }} />
-          <Search
-            sx={{
-              width: onMedia.onDesktop ? "300px" : "80%",
-              height: onMedia.onDesktop ? "40px" : "30px", // to match the small size category
-            }}
-          >
-            <SearchIconWrapper>
-              <FilterAltOutlinedIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Filter… (coming soon)"
-              inputProps={{ "aria-label": "search" }}
-            />
-          </Search>
+
+          {filterComp}
         </Toolbar>
       )}
+      {filterOpen && <Filter isToggled={filterOpen}></Filter>}
 
       {/* mobile version */}
       {!onMedia.onDesktop && (
@@ -224,6 +258,7 @@ const EventPageBar = () => {
               </Button>
             </Box>
           )}
+          {filterComp}
         </Toolbar>
       )}
     </AppBar>
