@@ -2,18 +2,25 @@ import React, { useState } from "react";
 import {
   Drawer,
   Box,
-  Typography,
-  ListSubheaderm,
-  FormLabel,
   InputLabel,
   Checkbox,
   ClickAwayListener,
   Divider,
+  FormControlLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 const Filter = ({ isToggled, toggleFilter }) => {
-  const drawerWidth = 240;
+  const drawerWidth = 300;
+  const departmentsList = ["Science", "Business", "Arts"];
+  const majorList = [
+    "Computer Science",
+    "Biochemistry",
+    "Biology",
+    "Neuroscience",
+  ];
 
   const DrawerHeader = styled(Box)(({ theme }) => ({
     display: "flex",
@@ -25,7 +32,11 @@ const Filter = ({ isToggled, toggleFilter }) => {
   // reusable components
   const filterSection = (name, body) => {
     return (
-      <Box>
+      <Box
+        sx={{
+          mt: 2,
+        }}
+      >
         <InputLabel
           sx={{
             fontSize: "16px",
@@ -53,8 +64,7 @@ const Filter = ({ isToggled, toggleFilter }) => {
           "& .MuiDrawer-paper": {
             width: drawerWidth,
             boxSizing: "border-box",
-            border: "solid red 2px",
-            padding: "8% 1%",
+            padding: "150px 2%",
           },
         }}
         variant="persistent"
@@ -62,14 +72,60 @@ const Filter = ({ isToggled, toggleFilter }) => {
         open={isToggled}
       >
         <DrawerHeader>Filter</DrawerHeader>
-        <Divider />
+        <Divider sx={{ mt: 1.5, mb: 1.5 }} />
         {filterSection(
           "Fees",
+          <Box
+            sx={{
+              display: "flex",
+              gap: "10px",
+              justifyContent: "flex-start",
+            }}
+          >
+            <FormControlLabel control={<Checkbox />} label="Free" />
+            <FormControlLabel control={<Checkbox />} label="Paid" />
+          </Box>
+        )}
+        <Divider sx={{ mt: 1.5, mb: 1.5 }} />
+        {filterSection(
+          "Department",
           <Box>
-            <Checkbox
-              sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
-              checked={true}
-            />
+            <Select
+              defaultValue={""}
+              sx={{
+                width: "100%",
+                mt: 1.6, // match the spacing with component on top
+              }}
+            >
+              {departmentsList.map((department, index) => {
+                return (
+                  <MenuItem key={index} value={department}>
+                    {department}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </Box>
+        )}
+        <Divider sx={{ mt: 1.5, mb: 1.5 }} />
+        {filterSection(
+          "Major",
+          <Box>
+            <Select
+              defaultValue={""}
+              sx={{
+                width: "100%",
+                mt: 1.6, // match the spacing with component on top
+              }}
+            >
+              {majorList.map((major, index) => {
+                return (
+                  <MenuItem key={index} value={major}>
+                    {major}
+                  </MenuItem>
+                );
+              })}
+            </Select>
           </Box>
         )}
       </Drawer>

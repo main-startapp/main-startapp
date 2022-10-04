@@ -186,7 +186,7 @@ const EventPageBar = ({ toggleFilter, isFilterOpen }) => {
         borderBottom: 1.5,
         borderColor: "#dbdbdb",
         position: "relative",
-        zIndex: "1500",
+        zIndex: "1300", // why 1300 work but not 1500?
       }}
       elevation={0}
     >

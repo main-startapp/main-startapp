@@ -36,10 +36,6 @@ function Events() {
         searchCategory,
         setSearchCategory,
       }}
-      sx={{
-        position: "relative",
-        // zIndex: "100",
-      }}
     >
       {/* Toolbar for searching keywords, category and filter */}
       <EventPageBar toggleFilter={setFilterOpen} isFilterOpen={filterOpen} />
