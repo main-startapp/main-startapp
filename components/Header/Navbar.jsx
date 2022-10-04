@@ -52,7 +52,7 @@ const Navbar = () => {
           cursor: "default",
         },
         position: "relative",
-        zIndex: "1500",
+        zIndex: "10000",
       }}
       elevation={0}
     >
@@ -186,6 +186,10 @@ const Navbar = () => {
             onClose={handleUserMenuClose}
             MenuListProps={{
               "aria-labelledby": "navbar-menu-button",
+            }}
+            sx={{
+              position: "absolute",
+              zIndex: "10000",
             }}
           >
             <MenuItem onClick={handleUserMenuClose}>

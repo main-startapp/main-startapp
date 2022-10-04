@@ -41,6 +41,25 @@ const EventPageBar = ({ toggleFilter, isFilterOpen }) => {
   // ref
   const textRef = useRef();
 
+  //state
+  // if filterClicked, then that means filter is open currently, false if not open
+  // need to have extra local state because of clickaway listener in Filter.jsx modifying the filter state before
+  // eventpagebar checks
+  const [filterClicked, setFilterClicked] = useState(false);
+
+  //helpers
+
+  // handles local state change as well as filter state change depending on the local state
+  const filterOnClick = () => {
+    if (filterClicked) {
+      toggleFilter(false); // sets filter state
+      setFilterClicked(false); // set local state
+    } else {
+      toggleFilter(true);
+      setFilterClicked(true);
+    }
+  };
+
   // reuseable comp
   const ekSearch = (
     <Search
@@ -123,7 +142,7 @@ const EventPageBar = ({ toggleFilter, isFilterOpen }) => {
     <ClickAwayListener
       mouseEvent="onMouseDown"
       touchEvent="onTouchStart"
-      onClickAway={() => toggleFilter(false)}
+      onClickAway={() => setFilterClicked(false)} // if clicked outside of component, then need to reset filterClicked
     >
       <Button
         sx={{
@@ -142,7 +161,7 @@ const EventPageBar = ({ toggleFilter, isFilterOpen }) => {
           overflow: "hidden",
           paddingX: "10px",
         }}
-        onClick={() => toggleFilter(!isFilterOpen)}
+        onClick={filterOnClick} // change depending on current local state
         variant="contained"
         disableElevation
       >

@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Grid } from "@mui/material";
+import { Grid, ClickAwayListener } from "@mui/material";
 import {
   GlobalContext,
   EventContext,
@@ -76,7 +76,14 @@ function Events() {
           )
         )}
       </Grid>
-      <Filter isToggled={filterOpen}></Filter>
+      {/* <ClickAwayListener
+        mouseEvent="onMouseDown"
+        touchEvent="onTouchStart"
+        onClickAway={() => setFilterOpen(false)}
+        disableReactTree={true}
+      > */}
+      <Filter isToggled={filterOpen} toggleFilter={setFilterOpen}></Filter>
+      {/* </ClickAwayListener> */}
     </EventContext.Provider>
   );
 }
