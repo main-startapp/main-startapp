@@ -19,39 +19,22 @@ const ProjectList = () => {
     () =>
       projects.filter((project) => {
         if (!project.is_visible) return;
+        if (searchTerm === "" && searchCategory === "") return project;
 
         // !todo: is this optimized?
+        // lazy evaluation
         const isInTitles =
-          searchTerm !== "" && // lazy evaluation
+          searchTerm !== "" &&
           (project.title.toLowerCase().includes(searchTerm.toLowerCase()) || // project title
             project.position_list.some(
               (position) =>
                 position.title.toLowerCase().includes(searchTerm.toLowerCase()) // position title
             ));
-
         const isInCategory =
           searchCategory !== "" && // lazy evaluation to avoid unnecessary expensive includes()
           project.category.toLowerCase().includes(searchCategory.toLowerCase());
 
-        if (searchTerm === "" && searchCategory === "") {
-          // no search
-          return project;
-        } else if (
-          searchCategory === "" &&
-          isInTitles // no Category, only search titles
-        ) {
-          return project;
-        } else if (
-          searchTerm === "" &&
-          isInCategory // no Term, only search category
-        ) {
-          return project;
-        } else if (
-          isInTitles &&
-          isInCategory // search both
-        ) {
-          return project;
-        }
+        if (isInTitles || isInCategory) return project;
       }),
     [projects, searchTerm, searchCategory]
   );

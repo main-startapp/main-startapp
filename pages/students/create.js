@@ -4,7 +4,7 @@ import {
   GlobalContext,
   StudentContext,
 } from "../../components/Context/ShareContexts";
-import StudentCreate from "../../components/Student/StudentCreate";
+import UserCreate from "../../components/User/UserCreate";
 
 const Create = () => {
   // context
@@ -51,7 +51,7 @@ const Create = () => {
           {alertMessage}
         </Alert>
       </Snackbar>
-      <StudentCreate />
+      <UserCreate />
     </StudentContext.Provider>
   );
 };

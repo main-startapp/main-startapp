@@ -20,7 +20,6 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
@@ -41,8 +40,13 @@ import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
 import { useRouter } from "next/router";
-import { findItemFromList, handleDeleteEntry } from "../Reusable/Resusable";
+import {
+  DefaultTextField,
+  findItemFromList,
+  handleDeleteEntry,
+} from "../Reusable/Resusable";
 import { useAuth } from "../Context/AuthContext";
+import { projectStrList } from "../Reusable/MenuStringList";
 
 const ProjectCreate = (props) => {
   // context
@@ -412,7 +416,7 @@ const ProjectCreate = (props) => {
         <form ref={formRef}>
           {/* Title textfield & Upload logo button */}
           <Box display="flex" justifyContent="space-between" alignItems="start">
-            <StyledTextField
+            <DefaultTextField
               sx={{ mr: 5 }}
               required
               fullWidth
@@ -531,13 +535,13 @@ const ProjectCreate = (props) => {
                   setNewProject({ ...newProject, category: e.target.value })
                 }
               >
-                <MenuItem value={"Charity Initiative"}>
-                  Charity Initiative
-                </MenuItem>
-                <MenuItem value={"Club"}>Club</MenuItem>
-                <MenuItem value={"Fun Project"}>Fun Project</MenuItem>
-                <MenuItem value={"Learning Project"}>Learning Project</MenuItem>
-                <MenuItem value={"Startup"}>Startup</MenuItem>
+                {projectStrList.map((projectStr, index) => {
+                  return (
+                    <MenuItem key={index} value={projectStr}>
+                      {projectStr}
+                    </MenuItem>
+                  );
+                })}
               </Select>
               <FormHelperText
                 id="pc-category-helper-text"
@@ -550,7 +554,7 @@ const ProjectCreate = (props) => {
             <LocalizationProvider dateAdapter={AdapterMoment}>
               <DesktopDatePicker
                 renderInput={(props) => (
-                  <StyledTextField
+                  <DefaultTextField
                     sx={{ width: "30%" }}
                     helperText="Completion date"
                     {...props}
@@ -573,7 +577,7 @@ const ProjectCreate = (props) => {
               mt: 5,
             }}
           >
-            <StyledTextField
+            <DefaultTextField
               sx={{ mr: 5 }}
               fullWidth
               label="Details"
@@ -584,7 +588,7 @@ const ProjectCreate = (props) => {
                 setNewProject({ ...newProject, details: e.target.value })
               }
             />
-            <StyledTextField
+            <DefaultTextField
               sx={{ width: "30%" }}
               label="Team Size"
               margin="none"
@@ -599,7 +603,7 @@ const ProjectCreate = (props) => {
             />
           </Box>
           {/* Description */}
-          <StyledTextField
+          <DefaultTextField
             sx={{
               mt: 5,
             }}
@@ -653,7 +657,7 @@ const ProjectCreate = (props) => {
                     mt={2.5}
                   >
                     {/* Title */}
-                    <StyledTextField
+                    <DefaultTextField
                       required
                       sx={{ mr: 2.5 }}
                       fullWidth
@@ -666,7 +670,7 @@ const ProjectCreate = (props) => {
                       }}
                     />
                     {/* Weekly hour */}
-                    <StyledTextField
+                    <DefaultTextField
                       required
                       sx={{ mr: 2.5 }}
                       margin="none"
@@ -685,7 +689,7 @@ const ProjectCreate = (props) => {
                       }}
                     />
                     {/* Number of people */}
-                    <StyledTextField
+                    <DefaultTextField
                       required
                       margin="none"
                       type="number"
@@ -719,7 +723,7 @@ const ProjectCreate = (props) => {
                     mt={2.5}
                   >
                     {/* Responsibilities */}
-                    <StyledTextField
+                    <DefaultTextField
                       fullWidth
                       required
                       multiline
@@ -772,7 +776,7 @@ const ProjectCreate = (props) => {
             </Box>
           </Tooltip>
           {isCheckedAppForm && (
-            <StyledTextField
+            <DefaultTextField
               sx={{
                 mt: 2.5,
               }}
@@ -869,27 +873,3 @@ const ProjectCreate = (props) => {
 };
 
 export default ProjectCreate;
-
-// border is not working but borderWidth is
-const StyledTextField = styled(TextField)(({ theme }) => ({
-  "& .MuiOutlinedInput-root": {
-    borderRadius: "10px",
-    backgroundColor: "#f0f0f0",
-  },
-  "& .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
-    borderColor: "#dbdbdb",
-  },
-  "&:hover .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
-    borderColor: "#dbdbdb !important",
-  },
-  "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
-    borderColor: "#3e95c2 !important",
-  },
-  "& .MuiFormHelperText-root": {
-    color: "lightgray",
-    fontSize: "12px",
-  },
-}));

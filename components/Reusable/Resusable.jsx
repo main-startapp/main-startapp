@@ -4,10 +4,15 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
+  query,
   serverTimestamp,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { db } from "../../firebase";
+import { styled } from "@mui/material/styles";
+import { TextField } from "@mui/material";
 
 //============================================================
 // handle connect/message: if chat found, return; if not, create a chat with "request to connect" auto msg.
@@ -167,6 +172,28 @@ export const getDocFromDB = async (dbName, docID) => {
 };
 
 //============================================================
+// get docs using query from db assumed permission
+//============================================================
+export const getDocsByQueryFromDB = async (
+  dbName,
+  qSubject,
+  qOperator,
+  qObject
+) => {
+  const q = query(collection(db, dbName), where(qSubject, qOperator, qObject));
+  const querySnapshot = await getDocs(q).catch((error) => {
+    console.log(error?.message);
+  });
+  const retArray = [];
+  if (querySnapshot?.size > 0) {
+    querySnapshot.forEach((doc) => {
+      retArray.push({ id: doc.id, data: doc.data() });
+    });
+  }
+  return retArray;
+};
+
+//============================================================
 // find item from list using id, like projects, events
 //============================================================
 export const findItemFromList = (list, key, itemID) => {
@@ -180,6 +207,32 @@ export const getGooglePhotoURLwithRes = (photo_url, res) => {
   const newRes = "=s" + res + "-c";
   return photo_url.replace("=s96-c", newRes);
 };
+
+//============================================================
+// styled textfield
+//============================================================
+export const DefaultTextField = styled(TextField)(() => ({
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "10px",
+    backgroundColor: "#f0f0f0",
+  },
+  "& .MuiOutlinedInput-notchedOutline": {
+    borderWidth: 1.5,
+    borderColor: "#dbdbdb",
+  },
+  "&:hover .MuiOutlinedInput-notchedOutline": {
+    borderWidth: 1.5,
+    borderColor: "#dbdbdb !important",
+  },
+  "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    borderWidth: 1.5,
+    borderColor: "#3e95c2 !important",
+  },
+  "& .MuiFormHelperText-root": {
+    color: "lightgray",
+    fontSize: "12px",
+  },
+}));
 
 //============================================================
 // ADMIN: Duplicate Collections With New Name

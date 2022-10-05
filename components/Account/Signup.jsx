@@ -115,18 +115,12 @@ const Signup = (props) => {
   const formRef = useRef();
 
   return (
-    <>
+    <Box>
       <Divider
         sx={{
           mt: "2vh",
           width: isMobile ? "68vmin" : "38vmin",
           color: "lightgray",
-          ":before": {
-            top: 0,
-          },
-          ":after": {
-            top: 0,
-          },
         }}
       >
         {"Create an Account"}
@@ -210,7 +204,7 @@ const Signup = (props) => {
           {"Confirm"}
         </Button>
       </Box>
-      <Box sx={{ mt: "2vh", display: "flex" }}>
+      <Box sx={{ mt: "2vh", display: "flex", justifyContent: "center" }}>
         <Typography sx={{ fontSize: "0.9em" }}>
           {"Already on Edium? "} &nbsp;
         </Typography>
@@ -227,7 +221,7 @@ const Signup = (props) => {
           {"Sign in"}
         </Typography>
       </Box>
-    </>
+    </Box>
   );
 };
 

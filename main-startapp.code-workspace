@@ -16,9 +16,7 @@
     },
     "editor.formatOnSave": true,
     "editor.formatOnPaste": true,
-    "javascript.updateImportsOnFileMove.enabled": "always",
     "git.autofetch": true,
-    "window.zoomLevel": 1,
     "[html]": {
       "editor.defaultFormatter": "esbenp.prettier-vscode"
     },

@@ -43,8 +43,12 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
 import { useRouter } from "next/router";
 import { useAuth } from "../Context/AuthContext";
-import { eventStrList } from "../Header/EventsPageBar";
-import { findItemFromList, handleDeleteEntry } from "../Reusable/Resusable";
+import {
+  DefaultTextField,
+  findItemFromList,
+  handleDeleteEntry,
+} from "../Reusable/Resusable";
+import { eventStrList } from "../Reusable/MenuStringList";
 
 const EventCreate = (props) => {
   // context
@@ -356,7 +360,7 @@ const EventCreate = (props) => {
         <form ref={formRef}>
           {/* Title textfield & Upload logo button */}
           <Box display="flex" justifyContent="space-between" alignItems="start">
-            <StyledTextField
+            <DefaultTextField
               required
               fullWidth
               sx={{
@@ -484,7 +488,7 @@ const EventCreate = (props) => {
             <LocalizationProvider dateAdapter={AdapterMoment}>
               <DesktopDateTimePicker
                 renderInput={(props) => (
-                  <StyledTextField
+                  <DefaultTextField
                     sx={{ minWidth: "20%", mr: 5 }}
                     helperText="Start date and time"
                     {...props}
@@ -500,7 +504,7 @@ const EventCreate = (props) => {
             <LocalizationProvider dateAdapter={AdapterMoment}>
               <DesktopDateTimePicker
                 renderInput={(props) => (
-                  <StyledTextField
+                  <DefaultTextField
                     sx={{ minWidth: "20%" }}
                     helperText="End date and time"
                     {...props}
@@ -516,7 +520,7 @@ const EventCreate = (props) => {
           </Box>
           {/* Location */}
           {/* !todo: can use some services like google places or leaflet to autocomplete */}
-          <StyledTextField
+          <DefaultTextField
             sx={{
               mt: 5,
             }}
@@ -530,7 +534,7 @@ const EventCreate = (props) => {
             }
           />
           {/* Details */}
-          <StyledTextField
+          <DefaultTextField
             sx={{
               mt: 5,
             }}
@@ -544,7 +548,7 @@ const EventCreate = (props) => {
             }
           />
           {/* Description */}
-          <StyledTextField
+          <DefaultTextField
             sx={{
               mt: 5,
             }}
@@ -561,7 +565,7 @@ const EventCreate = (props) => {
             }
           />
           {/* Optional Banner */}
-          <StyledTextField
+          <DefaultTextField
             sx={{
               mt: 5,
               mb: 2.5,
@@ -615,7 +619,7 @@ const EventCreate = (props) => {
             </Typography> */}
           </Container>
           {isChecked && (
-            <StyledTextField
+            <DefaultTextField
               sx={{
                 mt: 2.5,
               }}
@@ -705,27 +709,3 @@ const EventCreate = (props) => {
 };
 
 export default EventCreate;
-
-// !todo: notchedOuline not working
-const StyledTextField = styled(TextField)(({ theme }) => ({
-  "& .MuiOutlinedInput-root": {
-    borderRadius: "10px",
-    backgroundColor: "#f0f0f0",
-  },
-  "& .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
-    borderColor: "#dbdbdb",
-  },
-  "&:hover .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
-    borderColor: "#dbdbdb !important",
-  },
-  "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
-    borderColor: "#3e95c2 !important",
-  },
-  "& .MuiFormHelperText-root": {
-    color: "lightgray",
-    fontSize: "12px",
-  },
-}));

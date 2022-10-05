@@ -1,0 +1,238 @@
+import { Box, Button, Grid, Typography } from "@mui/material";
+import { doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+import { db } from "../../firebase";
+import { useContext, useEffect, useRef, useState } from "react";
+import { useAuth } from "../Context/AuthContext";
+import { GlobalContext, StudentContext } from "../Context/ShareContexts";
+import { useRouter } from "next/router";
+import UserStudentCreate from "./UserStudentCreate";
+import UserOrgCreate from "./UserOrgCreate";
+
+const UserCreate = () => {
+  // context & hooks
+  const { currentUser } = useAuth();
+  const { ediumUser, winHeight, onMedia } = useContext(GlobalContext);
+  const { showAlert } = useContext(StudentContext);
+
+  // local vars
+  const [isStudentMode, setIsStudentMode] = useState(true);
+  const [isCreate, setIsCreate] = useState(true);
+  useEffect(() => {
+    if (!ediumUser) return;
+
+    setIsCreate(false);
+    if (ediumUser?.role !== "student") {
+      setIsStudentMode(false);
+    }
+  }, [ediumUser]);
+
+  const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
+
+  const formRef = useRef();
+  const router = useRouter();
+
+  // helper fun
+  const handleUserSubmit = async (newUser) => {
+    if (!isClickable) return;
+    if (!formRef.current.reportValidity()) return;
+
+    // button is clickable & form is valid
+    setIsClickable(false);
+    const uid = currentUser?.uid;
+    const docRef = doc(db, "users", uid);
+    let userRef = {
+      ...newUser,
+      last_timestamp: serverTimestamp(),
+    };
+    if (isStudentMode) {
+      userRef = {
+        ...userRef,
+        // remove empty strings
+        social_media: userRef.social_media.filter((ele) => ele),
+        //past_exp: newStudent.past_exp.filter((ele) => ele),
+      };
+    }
+    // remove uid to keep the doc consistent
+    delete userRef?.uid;
+
+    let userModRef;
+    if (userRef.create_timestamp) {
+      // update
+      // can't update partially
+      userModRef = updateDoc(docRef, userRef).catch((error) => {
+        console.log(error?.message);
+      });
+    } else {
+      // create; add create_timestamp
+      userRef = {
+        ...userRef,
+        create_timestamp: serverTimestamp(),
+      };
+      userModRef = setDoc(docRef, userRef).catch((error) => {
+        console.log(error?.message);
+      });
+
+      const extDocRef = doc(db, "users_ext", uid);
+      const userExtRef = {
+        my_project_ids: [],
+        joined_project_ids: [],
+        join_requests: [],
+        last_timestamp: serverTimestamp(),
+      };
+      const userExtModRef = setDoc(extDocRef, userExtRef).catch((error) => {
+        console.log(error?.message);
+      });
+
+      await userExtModRef;
+    }
+
+    await userModRef;
+
+    // !todo: check return
+    showAlert(
+      "success",
+      `"${userRef.name}" is updated successfully! Navigate to Students page.` // success -> green
+    );
+  };
+
+  const redirectTo = () => {
+    setTimeout(() => {
+      router.push(`/students`); // can be customized
+    }, 2000); // wait 2 seconds then go to `projects` page
+  };
+
+  return (
+    <Grid
+      container
+      spacing={0}
+      direction="row"
+      alignItems="center"
+      justifyContent="center"
+      sx={{
+        backgroundColor: "#fafafa",
+        height: onMedia.onDesktop
+          ? `calc(${winHeight}px - 64px)`
+          : `calc(${winHeight}px - 48px - 60px)`,
+        overflow: "auto",
+      }}
+    >
+      <Grid
+        item
+        xs={onMedia.onDesktop ? 8 : 10}
+        sx={{
+          backgroundColor: "#ffffff",
+          borderLeft: 1.5,
+          borderRight: 1.5,
+          borderColor: "#dbdbdb",
+          paddingX: 3,
+          minHeight: "100%",
+        }}
+      >
+        <Typography
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            fontSize: "2em",
+            fontWeight: "bold",
+            mt: 5,
+            mb: 5,
+          }}
+        >
+          {!ediumUser ? "Create New Profile" : "Update Profile"}
+        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            ":hover": { cursor: "pointer" },
+          }}
+        >
+          <Box
+            sx={{
+              height: "3em",
+              width: "300px",
+              borderRadius: "30px",
+              border: 1.5,
+              borderColor: "#dbdbdb",
+              backgroundColor: isCreate ? "#3e95c2" : "#e0e0e0",
+              display: "flex",
+              justifyContent: isStudentMode ? "start" : "end",
+              // justifyContent: "space-between",
+              alignItems: "center",
+            }}
+            onClick={() => {
+              if (isCreate) setIsStudentMode(!isStudentMode);
+            }}
+          >
+            {!isStudentMode && (
+              <Typography
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  width: "50%",
+                  color: isCreate ? "white" : "#e0e0e0",
+                }}
+              >
+                Student
+              </Typography>
+            )}
+            <Box
+              sx={{
+                height: "80%",
+                width: "50%",
+                mx: "2%",
+                borderRadius: "30px",
+                border: 1.5,
+                borderColor: "#dbdbdb",
+                backgroundColor: "white",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontWeight: "bold",
+                  color: isCreate ? "black" : "#b1b1b1",
+                }}
+              >
+                {isStudentMode ? "Student" : "Organization"}
+              </Typography>
+            </Box>
+            {isStudentMode && (
+              <Typography
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  width: "50%",
+                  color: isCreate ? "white" : "#e0e0e0",
+                }}
+              >
+                Organization
+              </Typography>
+            )}
+          </Box>
+        </Box>
+        <form ref={formRef}>
+          {isStudentMode ? (
+            <UserStudentCreate
+              isClickable={isClickable}
+              handleUserSubmit={handleUserSubmit}
+              redirectTo={redirectTo}
+            />
+          ) : (
+            <UserOrgCreate
+              isClickable={isClickable}
+              handleUserSubmit={handleUserSubmit}
+              redirectTo={redirectTo}
+            />
+          )}
+        </form>
+      </Grid>
+    </Grid>
+  );
+};
+
+export default UserCreate;

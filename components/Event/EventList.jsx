@@ -33,35 +33,19 @@ const EventList = () => {
     () =>
       sortedEvents.filter((event) => {
         if (!event.is_visible) return;
+        if (searchTerm === "" && searchCategory === "") return event;
 
         // !todo: is this optimized?
+        // lazy evaluation to avoid unnecessary expensive includes()
         const isInTitles =
           searchTerm !== "" &&
           event.title.toLowerCase().includes(searchTerm.toLowerCase());
 
         const isInCategory =
-          searchCategory !== "" && // lazy evaluation to avoid unnecessary expensive includes()
+          searchCategory !== "" &&
           event.category.toLowerCase().includes(searchCategory.toLowerCase());
 
-        if (searchTerm === "" && searchCategory === "") {
-          // no search
-          return event;
-        } else if (
-          searchCategory === "" &&
-          isInTitles // no Category, only search titles
-        ) {
-          return event;
-        } else if (
-          searchTerm === "" &&
-          isInCategory // no Term, only search category
-        ) {
-          return event;
-        } else if (
-          isInTitles &&
-          isInCategory // search both
-        ) {
-          return event;
-        }
+        if (isInTitles || isInCategory) return event;
       }),
     [sortedEvents, searchTerm, searchCategory]
   );

@@ -92,7 +92,7 @@ const Signin = () => {
   };
 
   const signinComp = (
-    <>
+    <Box>
       {/* <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} /> */}
       <StyledButton
         sx={{
@@ -146,12 +146,6 @@ const Signin = () => {
           mt: "2vh",
           width: isMobile ? "68vmin" : "38vmin",
           color: "lightgray",
-          ":before": {
-            top: 0,
-          },
-          ":after": {
-            top: 0,
-          },
         }}
       >
         {"or Sign in with Email"}
@@ -211,7 +205,7 @@ const Signin = () => {
           {"Sign in"}
         </Button>
       </Box>
-      <Box sx={{ mt: "2vh", display: "flex" }}>
+      <Box sx={{ mt: "2vh", display: "flex", justifyContent: "center" }}>
         <Typography sx={{ fontSize: "0.9em" }}>
           {"Not registered yet? "} &nbsp;
         </Typography>
@@ -228,7 +222,7 @@ const Signin = () => {
           {"Join now"}
         </Typography>
       </Box>
-    </>
+    </Box>
   );
 
   return (

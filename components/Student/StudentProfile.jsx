@@ -224,7 +224,7 @@ const StudentProfile = () => {
             })}
         </Box>
         {/* past experience */}
-        {student?.past_exp?.length > 0 && (
+        {/* {student?.past_exp?.length > 0 && (
           <Typography
             sx={{
               fontWeight: "bold",
@@ -250,7 +250,7 @@ const StudentProfile = () => {
                 &bull; &nbsp; {exp}
               </Typography>
             ))}
-        </Box>
+        </Box> */}
       </Box>
       {/* 3rd box; center; buttons */}
       {!!student && onMedia.onDesktop && (

@@ -14,20 +14,17 @@ const StudentList = () => {
   const filteredStudents = useMemo(
     () =>
       users.filter((user) => {
+        if (user?.role !== "student") return;
+        if (searchTerm === "") return user;
+
         const isInPosition = user.desired_position
           .toLowerCase()
           .includes(searchTerm.toLowerCase());
         const isInFoI = user.field_of_interest
           .toLowerCase()
           .includes(searchTerm.toLowerCase());
-        if (searchTerm === "" && user?.role == "student") {
-          // no search
-          return user;
-        }
-        if (user?.role == "student" && (isInPosition || isInFoI)) {
-          // in position title or in field of interest
-          return user;
-        }
+
+        if (isInPosition || isInFoI) return user;
       }),
     [users, searchTerm]
   );

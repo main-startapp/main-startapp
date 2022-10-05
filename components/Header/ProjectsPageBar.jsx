@@ -18,6 +18,7 @@ import {
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
+import { projectStrList } from "../Reusable/MenuStringList";
 
 const ProjectsPageBar = () => {
   // context
@@ -110,11 +111,13 @@ const ProjectsPageBar = () => {
         }}
       >
         <MenuItem value={""}>None</MenuItem>
-        <MenuItem value={"Charity Initiative"}>Charity Initiative</MenuItem>
-        <MenuItem value={"Club"}>Club</MenuItem>
-        <MenuItem value={"Fun Project"}>Fun Project</MenuItem>
-        <MenuItem value={"Learning Project"}>Learning Project</MenuItem>
-        <MenuItem value={"Startup"}>Startup</MenuItem>
+        {projectStrList.map((projectStr, index) => {
+          return (
+            <MenuItem key={index} value={projectStr}>
+              {projectStr}
+            </MenuItem>
+          );
+        })}
       </Select>
     </FormControl>
   );
