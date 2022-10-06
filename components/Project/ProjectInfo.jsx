@@ -5,7 +5,6 @@ import {
   Button,
   Divider,
   Grid,
-  IconButton,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -38,7 +37,7 @@ const ProjectInfo = () => {
     winHeight,
     onMedia,
   } = useContext(GlobalContext);
-  const { project, projects, setProject } = useContext(ProjectContext);
+  const { project } = useContext(ProjectContext);
 
   // local vars
   const currentUID = ediumUser?.uid;
@@ -341,7 +340,7 @@ const ProjectInfo = () => {
           {onMedia.onDesktop &&
             project?.creator_uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
             currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
-            !ediumUserExt.my_project_ids.includes(project?.id) && (
+            !ediumUserExt?.my_project_ids?.includes(project?.id) && (
               <Grid item xs={12}>
                 <Box
                   sx={{
