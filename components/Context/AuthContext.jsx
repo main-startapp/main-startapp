@@ -14,13 +14,12 @@ export const AuthProvider = ({ children }) => {
     // https://www.reddit.com/r/webdev/comments/us599i/what_is_the_difference_between_firebase/
     return auth.onIdTokenChanged(async (user) => {
       if (!user) {
-        // console.log("no user");
         setCurrentUser(null);
         setIsLoading(false);
         return;
       }
-      const token = await user.getIdToken().catch((err) => {
-        console.log("getIdToken() error: ", err);
+      const token = await user.getIdToken().catch((error) => {
+        console.log(error?.message);
       });
       // console.log(user.emailVerified);
       setCurrentUser(user);

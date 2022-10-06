@@ -1,17 +1,10 @@
 import { useContext, useState } from "react";
-import {
-  Avatar,
-  Box,
-  IconButton,
-  ListItem,
-  ListItemText,
-  Menu,
-  MenuItem,
-} from "@mui/material";
+import { Avatar, Box, IconButton, ListItem, ListItemText } from "@mui/material";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
-import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
+import ForumIcon from "@mui/icons-material/Forum";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useAuth } from "../Context/AuthContext";
+import { useRouter } from "next/router";
+import { handleConnect } from "../Reusable/Resusable";
 
 const StudentListItem = (props) => {
   const index = props.index;
@@ -19,9 +12,12 @@ const StudentListItem = (props) => {
   const last = props.last;
 
   // context
-  const { currentUser } = useAuth();
-  const { ediumUserExt } = useContext(GlobalContext);
+  const { chats, ediumUser, setChatPartner, setForceChatExpand } =
+    useContext(GlobalContext);
   const { setStudent } = useContext(StudentContext);
+
+  // local
+  const router = useRouter();
 
   // menu
   const [anchorEl, setAnchorEl] = useState(null);
@@ -95,14 +91,24 @@ const StudentListItem = (props) => {
             }
             secondaryTypographyProps={{ fontSize: "0.8em" }}
           />
-          {/* <IconButton
-            sx={{ mr: 1, backgroundColor: "lightgray" }}
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <QuestionAnswerIcon sx={{ color: "white" }} />
-          </IconButton> */}
+          {student?.uid !== ediumUser?.uid && (
+            <IconButton
+              sx={{ mr: 1, backgroundColor: "lightgray" }}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleConnect(
+                  chats,
+                  student,
+                  ediumUser,
+                  setChatPartner,
+                  setForceChatExpand
+                );
+                router.push("/chats");
+              }}
+            >
+              <ForumIcon sx={{ color: "white" }} />
+            </IconButton>
+          )}
         </Box>
       </ListItem>
     </Box>

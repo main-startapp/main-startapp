@@ -86,9 +86,6 @@ const StudentGridCard = (props) => {
                 color: "#ffffff",
                 backgroundColor: "#3e95c2",
                 fontSize: "0.8em",
-                "&:hover": {
-                  backgroundColor: "#f6f6f6",
-                },
                 paddingY: 0.1,
                 paddingX: 3,
                 textTransform: "none",

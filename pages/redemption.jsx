@@ -32,6 +32,7 @@ const Redemption = () => {
     setChatPartner,
     setShowChat,
     setShowMsg,
+    winHeight,
     onMedia,
   } = useContext(GlobalContext);
   useEffect(() => {
@@ -130,7 +131,7 @@ const Redemption = () => {
       myIds,
       failedCodes
     ) {
-      codeArray.forEach(async (code) => {
+      for (const code of codeArray) {
         let docID;
         let docExtData;
         // 1. use pCode to get doc id from doc ext
@@ -153,8 +154,8 @@ const Redemption = () => {
           creator_uid: ediumUser?.uid,
           last_timestamp: serverTimestamp(),
         };
-        const docModRef = updateDoc(docRef, docUpdateRef).catch((err) => {
-          console.log("updateDoc() error: ", err);
+        const docModRef = updateDoc(docRef, docUpdateRef).catch((error) => {
+          console.log(error?.message);
         });
         // 3. update doc ext
         const extDocRef = doc(db, docExtName, docID);
@@ -165,14 +166,16 @@ const Redemption = () => {
           members: [ediumUser?.uid],
           last_timestamp: serverTimestamp(),
         };
-        const docExtModRef = setDoc(extDocRef, docExtUpdateRef).catch((err) => {
-          failedCodes.push(code);
-          console.log("updateDoc() error: ", err);
-        });
+        const docExtModRef = setDoc(extDocRef, docExtUpdateRef).catch(
+          (error) => {
+            failedCodes.push(code);
+            console.log(error?.message);
+          }
+        );
 
         await docModRef;
         await docExtModRef;
-      });
+      }
     }
 
     // update projects and events
@@ -210,11 +213,11 @@ const Redemption = () => {
       my_event_ids: myEventIDs,
       last_timestamp: serverTimestamp(),
     };
-    console.log(userExtUpdateRef);
+
     const userExtModRef = updateDoc(userExtDocRef, userExtUpdateRef).catch(
-      (err) => {
+      (error) => {
         isFailedUserExt = true;
-        console.log("updateDoc() error: ", err);
+        console.log(error?.message);
       }
     );
 
@@ -272,10 +275,6 @@ const Redemption = () => {
               required
               fullWidth
               margin="none"
-              inputProps={{
-                maxLength: 50,
-              }}
-              // helperText="The name of your newProject (limit: 50)"
               value={code}
               onChange={(e) =>
                 handleChangeCodes(codesArray, setCodesArray, index, e)
@@ -364,8 +363,8 @@ const Redemption = () => {
       sx={{
         backgroundColor: "#fafafa",
         height: onMedia.onDesktop
-          ? "calc(100vh - 64px)"
-          : "calc(100vh - 48px - 60px)",
+          ? `calc(${winHeight}px - 64px)`
+          : `calc(${winHeight}px - 48px - 60px)`,
         overflow: "auto",
       }}
     >
@@ -465,7 +464,7 @@ const Redemption = () => {
         </Box>
         <Box
           sx={{
-            mt: "10vh",
+            mt: "15vh",
             width: "100%",
             display: "flex",
             flexDirection: "row",
@@ -494,9 +493,6 @@ const Redemption = () => {
               required
               fullWidth
               margin="none"
-              inputProps={{
-                maxLength: 50,
-              }}
               value={theCipher}
               onChange={(e) => setTheCipher(e.target.value)}
             />

@@ -11,7 +11,7 @@ import { useEffect } from "react";
 // behavior: filters projects based on the search term and/or search category
 const ProjectList = () => {
   // context
-  const { projects, ediumUser, onMedia } = useContext(GlobalContext);
+  const { projects, ediumUser, winHeight, onMedia } = useContext(GlobalContext);
   const { searchTerm, searchCategory, setProject } = useContext(ProjectContext);
 
   // local vars
@@ -21,39 +21,22 @@ const ProjectList = () => {
     () =>
       projects.filter((project) => {
         if (!project.is_visible) return;
+        if (searchTerm === "" && searchCategory === "") return project;
 
         // !todo: is this optimized?
+        // lazy evaluation
         const isInTitles =
-          searchTerm !== "" && // lazy evaluation
+          searchTerm !== "" &&
           (project.title.toLowerCase().includes(searchTerm.toLowerCase()) || // project title
             project.position_list.some(
               (position) =>
                 position.title.toLowerCase().includes(searchTerm.toLowerCase()) // position title
             ));
-
         const isInCategory =
           searchCategory !== "" && // lazy evaluation to avoid unnecessary expensive includes()
           project.category.toLowerCase().includes(searchCategory.toLowerCase());
 
-        if (searchTerm === "" && searchCategory === "") {
-          // no search
-          return project;
-        } else if (
-          searchCategory === "" &&
-          isInTitles // no Category, only search titles
-        ) {
-          return project;
-        } else if (
-          searchTerm === "" &&
-          isInCategory // no Term, only search category
-        ) {
-          return project;
-        } else if (
-          isInTitles &&
-          isInCategory // search both
-        ) {
-          return project;
-        }
+        if (isInTitles || isInCategory) return project;
       }),
     [projects, searchTerm, searchCategory]
   );
@@ -68,8 +51,8 @@ const ProjectList = () => {
       <Box
         sx={{
           height: onMedia.onDesktop
-            ? "calc(100vh - 64px - 64px - 1.5px - 36px - 24px)"
-            : "calc(100vh - 48px - 48px - 1.5px - 60px)", // navbar; projectbar; border; button; y-margins
+            ? `calc(${winHeight}px - 64px - 64px - 1.5px - 36px - 24px)`
+            : `calc(${winHeight}px - 48px - 48px - 1.5px - 60px)`, // navbar; projectbar; border; button; y-margins
           overflow: "auto",
         }}
       >

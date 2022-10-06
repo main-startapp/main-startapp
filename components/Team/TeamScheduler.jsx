@@ -89,10 +89,8 @@ const TeamScheduler = () => {
     const docID = projectExt?.id;
     let newSchedules = projectExt?.schedules ? projectExt.schedules : [];
     if (scheduleIndex < 0) {
-      console.log("pushed");
       newSchedules.push({ uid: currentUser?.uid, availability: schedule });
     } else {
-      console.log("found index", scheduleIndex);
       newSchedules[scheduleIndex].availability = schedule;
     }
     const docRef = doc(db, "projects_ext", docID);
@@ -104,8 +102,8 @@ const TeamScheduler = () => {
     };
     // remove id to keep the doc consistent
     delete projectExtRef?.id;
-    const projectExtModRef = updateDoc(docRef, projectExtRef).catch((err) => {
-      console.log("updateDoc() error: ", err);
+    const projectExtModRef = updateDoc(docRef, projectExtRef).catch((error) => {
+      console.log(error?.message);
     });
     await projectExtModRef;
   };

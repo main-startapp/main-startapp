@@ -18,6 +18,7 @@ import {
 import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
+import { eventStrList } from "../Reusable/MenuStringList";
 
 const EventsPageBar = () => {
   // context
@@ -269,17 +270,3 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
   },
 }));
-
-export const eventStrList = [
-  "Case Competition",
-  "Community Event",
-  "Concert",
-  "Conference",
-  "Expo",
-  "Festival",
-  "Hackathon",
-  "Info Session",
-  "Networking Session",
-  "Sports",
-  "Workshop",
-];

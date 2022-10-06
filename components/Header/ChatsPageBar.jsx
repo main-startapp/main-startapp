@@ -34,7 +34,7 @@ const ChatsPageBar = () => {
           }} // 1.5 to match navbar icon and listitem
           disableGutters // disable auto padding
         >
-          {(chat & chatPartner) === null ? (
+          {(chat && chatPartner) === null ? (
             // list version
             <Box sx={{ width: "100%", display: "flex" }} />
           ) : (

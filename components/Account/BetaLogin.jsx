@@ -10,8 +10,8 @@ import ExportedImage from "next-image-export-optimizer";
 
 const BetaLogin = ({ type, color }) => {
   const loginWithGoogle = () => {
-    signInWithPopup(auth, googleProvider).catch((err) => {
-      console.log("signInWithPopup() error: ", err);
+    signInWithPopup(auth, googleProvider).catch((error) => {
+      console.log(error?.message);
     });
   };
 

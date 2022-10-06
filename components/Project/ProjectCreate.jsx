@@ -20,7 +20,6 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
@@ -34,14 +33,19 @@ import {
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { db } from "../../firebase";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { useRouter } from "next/router";
-import { findItemFromList, handleDeleteEntry } from "../Reusable/Resusable";
+import {
+  DefaultTextField,
+  findItemFromList,
+  handleDeleteEntry,
+} from "../Reusable/Resusable";
 import { useAuth } from "../Context/AuthContext";
+import { projectStrList } from "../Reusable/MenuStringList";
 import TextEditor from "../TextEditor";
 
 const ProjectCreate = (props) => {
@@ -51,9 +55,9 @@ const ProjectCreate = (props) => {
     projectsExt,
     ediumUser,
     ediumUserExt,
-    setEdiumUserExt,
     oldProject,
     setOldProject,
+    winHeight,
     onMedia,
   } = useContext(GlobalContext);
   const { showAlert } = useContext(ProjectContext);
@@ -175,8 +179,8 @@ const ProjectCreate = (props) => {
         create_timestamp: serverTimestamp(),
         last_timestamp: serverTimestamp(),
       };
-      projectModRef = addDoc(collectionRef, projectRef).catch((err) => {
-        console.log("addDoc() error: ", err);
+      projectModRef = addDoc(collectionRef, projectRef).catch((error) => {
+        console.log(error?.message);
       });
     } else {
       // update an existing newProject
@@ -193,8 +197,8 @@ const ProjectCreate = (props) => {
         last_timestamp: serverTimestamp(),
       };
       delete projectRef.id;
-      projectModRef = updateDoc(docRef, projectRef).catch((err) => {
-        console.log("updateDoc() error: ", err);
+      projectModRef = updateDoc(docRef, projectRef).catch((error) => {
+        console.log(error?.message);
       });
     }
 
@@ -221,8 +225,8 @@ const ProjectCreate = (props) => {
           transfer_code: Math.random().toString(16).slice(2),
         };
         const projectExtModRef = setDoc(extDocRef, projectExtRef).catch(
-          (err) => {
-            console.log("setDoc() error: ", err);
+          (error) => {
+            console.log(error?.message);
           }
         );
 
@@ -238,8 +242,8 @@ const ProjectCreate = (props) => {
         const ediumUserExtModRef = updateDoc(
           ediumUserExtDocRef,
           ediumUserExtUpdateRef
-        ).catch((err) => {
-          console.log("updateDoc() error: ", err);
+        ).catch((error) => {
+          console.log(error?.message);
         });
 
         // create extension doc for team management if create
@@ -251,8 +255,8 @@ const ProjectCreate = (props) => {
           last_timestamp: serverTimestamp(),
         };
         const projectExtModRef = setDoc(extDocRef, projectExtRef).catch(
-          (err) => {
-            console.log("setDoc() error: ", err);
+          (error) => {
+            console.log(error?.message);
           }
         );
 
@@ -276,8 +280,8 @@ const ProjectCreate = (props) => {
           const ediumUserExtModRef = updateDoc(
             ediumUserExtDocRef,
             ediumUserExtUpdateRef
-          ).catch((err) => {
-            console.log("updateDoc() error: ", err);
+          ).catch((error) => {
+            console.log(error?.message);
           });
           await ediumUserExtModRef;
         }
@@ -290,8 +294,8 @@ const ProjectCreate = (props) => {
             transfer_code: Math.random().toString(16).slice(2),
           };
           const projectExtModRef = updateDoc(extDocRef, projectExtRef).catch(
-            (err) => {
-              console.log("updateDoc() error: ", err);
+            (error) => {
+              console.log(error?.message);
             }
           );
           await projectExtModRef;
@@ -416,8 +420,8 @@ const ProjectCreate = (props) => {
       sx={{
         backgroundColor: "#fafafa",
         height: onMedia.onDesktop
-          ? "calc(100vh - 64px)"
-          : "calc(100vh - 48px - 60px)",
+          ? `calc(${winHeight}px - 64px)`
+          : `calc(${winHeight}px - 48px - 60px)`,
         overflow: "auto",
       }}
     >
@@ -462,16 +466,12 @@ const ProjectCreate = (props) => {
         <form ref={formRef}>
           {/* Title textfield & Upload logo button */}
           <Box display="flex" justifyContent="space-between" alignItems="start">
-            <StyledTextField
+            <DefaultTextField
               sx={{ mr: 5 }}
               required
               fullWidth
               label="Project Title"
               margin="none"
-              inputProps={{
-                maxLength: 50,
-              }}
-              // helperText="The name of your newProject (limit: 50)"
               value={newProject.title}
               onChange={(e) =>
                 setNewProject({ ...newProject, title: e.target.value })
@@ -533,7 +533,6 @@ const ProjectCreate = (props) => {
                       url = url
                         .replace("https://imgur.com/", "https://i.imgur.com/")
                         .concat(".png");
-                      console.log(url);
                     }
                     setNewProject({
                       ...newProject,
@@ -588,13 +587,13 @@ const ProjectCreate = (props) => {
                   setNewProject({ ...newProject, category: e.target.value })
                 }
               >
-                <MenuItem value={"Charity Initiative"}>
-                  Charity Initiative
-                </MenuItem>
-                <MenuItem value={"Club"}>Club</MenuItem>
-                <MenuItem value={"Fun Project"}>Fun Project</MenuItem>
-                <MenuItem value={"Learning Project"}>Learning Project</MenuItem>
-                <MenuItem value={"Startup"}>Startup</MenuItem>
+                {projectStrList.map((projectStr, index) => {
+                  return (
+                    <MenuItem key={index} value={projectStr}>
+                      {projectStr}
+                    </MenuItem>
+                  );
+                })}
               </Select>
               <FormHelperText
                 id="pc-category-helper-text"
@@ -617,7 +616,7 @@ const ProjectCreate = (props) => {
                   <DesktopDatePicker
                     renderInput={(props) => {
                       return (
-                        <StyledTextField
+                        <DefaultTextField
                           {...props}
                           disabled={!isCheckedCompDate}
                         />
@@ -656,7 +655,7 @@ const ProjectCreate = (props) => {
               mb: 5,
             }}
           >
-            <StyledTextField
+            <DefaultTextField
               sx={{ mr: 5, width: "105%" }}
               fullWidth
               label="Details"
@@ -677,7 +676,7 @@ const ProjectCreate = (props) => {
                 alignContent="center"
                 gap="10%"
               >
-                <StyledTextField
+                <DefaultTextField
                   fullWidth
                   // label="Team Size"
                   type="number"
@@ -749,7 +748,7 @@ const ProjectCreate = (props) => {
                     mt={2.5}
                   >
                     {/* Title */}
-                    <StyledTextField
+                    <DefaultTextField
                       required
                       sx={{ mr: 2.5 }}
                       fullWidth
@@ -762,7 +761,7 @@ const ProjectCreate = (props) => {
                       }}
                     />
                     {/* Weekly hour */}
-                    <StyledTextField
+                    <DefaultTextField
                       required
                       sx={{ mr: 2.5 }}
                       margin="none"
@@ -781,7 +780,7 @@ const ProjectCreate = (props) => {
                       }}
                     />
                     {/* Number of people */}
-                    <StyledTextField
+                    <DefaultTextField
                       required
                       margin="none"
                       type="number"
@@ -815,7 +814,7 @@ const ProjectCreate = (props) => {
                     mt={2.5}
                   >
                     {/* Responsibilities */}
-                    <StyledTextField
+                    <DefaultTextField
                       fullWidth
                       required
                       multiline
@@ -836,7 +835,7 @@ const ProjectCreate = (props) => {
                     alignItems="center"
                     mt={2.5}
                   >
-                    <StyledTextField
+                    <DefaultTextField
                       fullWidth
                       margin="none"
                       name="url"
@@ -954,27 +953,3 @@ const ProjectCreate = (props) => {
 };
 
 export default ProjectCreate;
-
-// border is not working but borderWidth is
-const StyledTextField = styled(TextField)(({ theme }) => ({
-  "& .MuiOutlinedInput-root": {
-    borderRadius: "10px",
-    backgroundColor: "#f0f0f0",
-  },
-  "& .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
-    borderColor: "#dbdbdb",
-  },
-  "&:hover .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
-    borderColor: "#dbdbdb !important",
-  },
-  "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
-    borderColor: "#3e95c2 !important",
-  },
-  "& .MuiFormHelperText-root": {
-    color: "lightgray",
-    fontSize: "12px",
-  },
-}));

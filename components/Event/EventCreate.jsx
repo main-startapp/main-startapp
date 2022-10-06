@@ -43,14 +43,25 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
 import { useRouter } from "next/router";
 import { useAuth } from "../Context/AuthContext";
-import { eventStrList } from "../Header/EventsPageBar";
-import { findItemFromList, handleDeleteEntry } from "../Reusable/Resusable";
+import {
+  DefaultTextField,
+  findItemFromList,
+  handleDeleteEntry,
+} from "../Reusable/Resusable";
+import { eventStrList } from "../Reusable/MenuStringList";
 
 const EventCreate = (props) => {
   // context
   const { currentUser } = useAuth();
-  const { eventsExt, ediumUser, ediumUserExt, oldEvent, setOldEvent, onMedia } =
-    useContext(GlobalContext);
+  const {
+    eventsExt,
+    ediumUser,
+    ediumUserExt,
+    oldEvent,
+    setOldEvent,
+    winHeight,
+    onMedia,
+  } = useContext(GlobalContext);
   const { showAlert } = useContext(EventContext);
 
   // props from push query
@@ -126,8 +137,8 @@ const EventCreate = (props) => {
         create_timestamp: serverTimestamp(),
         last_timestamp: serverTimestamp(),
       };
-      eventModRef = addDoc(collectionRef, eventRef).catch((err) => {
-        console.log("addDoc() error: ", err);
+      eventModRef = addDoc(collectionRef, eventRef).catch((error) => {
+        console.log(error?.message);
       });
     } else {
       // update an existing event
@@ -138,8 +149,8 @@ const EventCreate = (props) => {
         last_timestamp: serverTimestamp(),
       };
       delete eventRef.id;
-      eventModRef = updateDoc(docRef, eventRef).catch((err) => {
-        console.log("updateDoc() error: ", err);
+      eventModRef = updateDoc(docRef, eventRef).catch((error) => {
+        console.log(error?.message);
       });
     }
 
@@ -166,8 +177,8 @@ const EventCreate = (props) => {
           last_timestamp: serverTimestamp(),
           transfer_code: Math.random().toString(16).slice(2),
         };
-        const eventExtModRef = setDoc(extDocRef, eventExtRef).catch((err) => {
-          console.log("setDoc() error: ", err);
+        const eventExtModRef = setDoc(extDocRef, eventExtRef).catch((error) => {
+          console.log(error?.message);
         });
 
         navigator.clipboard.writeText(eventExtRef.transfer_code);
@@ -184,8 +195,8 @@ const EventCreate = (props) => {
         const ediumUserExtModRef = updateDoc(
           ediumUserExtDocRef,
           ediumUserExtUpdateRef
-        ).catch((err) => {
-          console.log("updateDoc() error: ", err);
+        ).catch((error) => {
+          console.log(error?.message);
         });
 
         // create extension doc for team management if create
@@ -196,8 +207,8 @@ const EventCreate = (props) => {
           admins: [currentUID],
           last_timestamp: serverTimestamp(),
         };
-        const eventExtModRef = setDoc(extDocRef, eventExtRef).catch((err) => {
-          console.log("setDoc() error: ", err);
+        const eventExtModRef = setDoc(extDocRef, eventExtRef).catch((error) => {
+          console.log(error?.message);
         });
 
         await ediumUserExtModRef;
@@ -220,8 +231,8 @@ const EventCreate = (props) => {
           const ediumUserExtModRef = updateDoc(
             ediumUserExtDocRef,
             ediumUserExtUpdateRef
-          ).catch((err) => {
-            console.log("updateDoc() error: ", err);
+          ).catch((error) => {
+            console.log(error?.message);
           });
           await ediumUserExtModRef;
         }
@@ -234,8 +245,8 @@ const EventCreate = (props) => {
             transfer_code: Math.random().toString(16).slice(2),
           };
           const eventExtModRef = updateDoc(extDocRef, eventExtRef).catch(
-            (err) => {
-              console.log("updateDoc() error: ", err);
+            (error) => {
+              console.log(error?.message);
             }
           );
           await eventExtModRef;
@@ -303,8 +314,8 @@ const EventCreate = (props) => {
       sx={{
         backgroundColor: "#fafafa",
         height: onMedia.onDesktop
-          ? "calc(100vh - 64px)"
-          : "calc(100vh - 48px - 60px)",
+          ? `calc(${winHeight}px - 64px)`
+          : `calc(${winHeight}px - 48px - 60px)`,
         overflow: "auto",
       }}
     >
@@ -349,7 +360,7 @@ const EventCreate = (props) => {
         <form ref={formRef}>
           {/* Title textfield & Upload logo button */}
           <Box display="flex" justifyContent="space-between" alignItems="start">
-            <StyledTextField
+            <DefaultTextField
               required
               fullWidth
               sx={{
@@ -357,10 +368,6 @@ const EventCreate = (props) => {
               }}
               label="Event Title"
               margin="none"
-              inputProps={{
-                maxLength: 50,
-              }}
-              // helperText="The name of your newEvent (limit: 50)"
               value={newEvent.title}
               onChange={(e) =>
                 setNewEvent({ ...newEvent, title: e.target.value })
@@ -476,7 +483,7 @@ const EventCreate = (props) => {
             <LocalizationProvider dateAdapter={AdapterMoment}>
               <DesktopDateTimePicker
                 renderInput={(props) => (
-                  <StyledTextField
+                  <DefaultTextField
                     sx={{ minWidth: "20%", mr: 5 }}
                     helperText="Start date and time"
                     {...props}
@@ -492,7 +499,7 @@ const EventCreate = (props) => {
             <LocalizationProvider dateAdapter={AdapterMoment}>
               <DesktopDateTimePicker
                 renderInput={(props) => (
-                  <StyledTextField
+                  <DefaultTextField
                     sx={{ minWidth: "20%" }}
                     helperText="End date and time"
                     {...props}
@@ -508,7 +515,7 @@ const EventCreate = (props) => {
           </Box>
           {/* Location */}
           {/* !todo: can use some services like google places or leaflet to autocomplete */}
-          <StyledTextField
+          <DefaultTextField
             sx={{
               mt: 5,
             }}
@@ -522,7 +529,7 @@ const EventCreate = (props) => {
             }
           />
           {/* Details */}
-          <StyledTextField
+          <DefaultTextField
             sx={{
               mt: 5,
             }}
@@ -536,7 +543,7 @@ const EventCreate = (props) => {
             }
           />
           {/* Description */}
-          <StyledTextField
+          <DefaultTextField
             sx={{
               mt: 5,
             }}
@@ -554,7 +561,7 @@ const EventCreate = (props) => {
             }
           />
           {/* Optional Banner */}
-          <StyledTextField
+          <DefaultTextField
             sx={{
               mt: 5,
               mb: 0,
@@ -615,7 +622,7 @@ const EventCreate = (props) => {
             </Typography> */}
           </Container>
           {isChecked && (
-            <StyledTextField
+            <DefaultTextField
               sx={{
                 mt: 0,
               }}
@@ -705,28 +712,3 @@ const EventCreate = (props) => {
 };
 
 export default EventCreate;
-
-// !todo: notchedOuline not working
-const StyledTextField = styled(TextField)(({ theme }) => ({
-  "& .MuiOutlinedInput-root": {
-    borderRadius: "10px",
-    backgroundColor: "#f0f0f0",
-  },
-  "& .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
-    borderColor: "#dbdbdb",
-  },
-  "&:hover .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
-    borderColor: "#dbdbdb !important",
-  },
-  "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
-    borderColor: "#3e95c2 !important",
-  },
-  "& .MuiFormHelperText-root": {
-    color: "lightgray",
-    fontSize: "12px",
-    margin: "0",
-  },
-}));

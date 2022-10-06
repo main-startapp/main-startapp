@@ -13,6 +13,7 @@ import { styled } from "@mui/material/styles";
 import ExportedImage from "next-image-export-optimizer";
 import { useState } from "react";
 import { auth, googleProvider } from "../../firebase";
+import useWindowDimensions from "../Reusable/WindowDimensions";
 import GoogleIcon from "@mui/icons-material/Google";
 import AppleIcon from "@mui/icons-material/Apple";
 import FacebookIcon from "@mui/icons-material/Facebook";
@@ -31,6 +32,7 @@ const Signin = () => {
 
   // independent media query
   const isMobile = useMediaQuery("(max-width:767px)");
+  const { winWidth, winHeight } = useWindowDimensions();
 
   // Configure FirebaseUI.
   // const uiConfig = {
@@ -54,10 +56,10 @@ const Signin = () => {
 
   const handleSignIn = () => {
     signInWithEmailAndPassword(auth, input.email, input.password).catch(
-      (err) => {
+      (error) => {
         let emailMsg = "";
         let passwordMsg = "";
-        switch (err.code) {
+        switch (error.code) {
           case "auth/user-not-found":
             emailMsg = "User not found";
             passwordMsg = "";
@@ -84,17 +86,17 @@ const Signin = () => {
   };
 
   const signInWithGoogle = () => {
-    signInWithPopup(auth, googleProvider).catch((err) => {
-      console.log("signInWithPopup() error: ", err.message);
+    signInWithPopup(auth, googleProvider).catch((error) => {
+      console.log(error?.message);
     });
   };
 
   const signinComp = (
-    <>
+    <Box>
       {/* <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} /> */}
       <StyledButton
         sx={{
-          mt: "1vh",
+          mt: "2vh",
           width: isMobile ? "68vmin" : "38vmin",
           fontSize: "0.9em",
           border: 1.5,
@@ -149,34 +151,32 @@ const Signin = () => {
         {"or Sign in with Email"}
       </Divider>
       <Box sx={{ mt: "2vh", width: isMobile ? "68vmin" : "38vmin" }}>
-        <Tooltip title={errorMsg.email} placement="left">
-          <StyledTextField
-            sx={{ paddingY: 0, fontSize: "0.9em" }}
-            fullWidth
-            margin="none"
-            label="Email"
-            name="email"
-            type="email"
-            variant="outlined"
-            value={input.email}
-            onChange={(e) => setInput({ ...input, email: e.target.value })}
-            error={!!errorMsg.email}
-          />
-        </Tooltip>
-        <Tooltip title={errorMsg.password} placement="left">
-          <StyledTextField
-            sx={{ mt: "1.5vh", paddingY: 0, fontSize: "0.9em" }}
-            fullWidth
-            margin="none"
-            label="Password"
-            name="password"
-            type="password"
-            variant="outlined"
-            value={input.password}
-            onChange={(e) => setInput({ ...input, password: e.target.value })}
-            error={!!errorMsg.password}
-          />
-        </Tooltip>
+        <StyledTextField
+          sx={{ paddingY: 0, fontSize: "0.9em" }}
+          fullWidth
+          margin="none"
+          label="Email"
+          name="email"
+          type="email"
+          variant="outlined"
+          value={input.email}
+          onChange={(e) => setInput({ ...input, email: e.target.value })}
+          error={!!errorMsg.email}
+          helperText={errorMsg.email || " "}
+        />
+        <StyledTextField
+          sx={{ paddingY: 0, fontSize: "0.9em" }}
+          fullWidth
+          margin="none"
+          label="Password"
+          name="password"
+          type="password"
+          variant="outlined"
+          value={input.password}
+          onChange={(e) => setInput({ ...input, password: e.target.value })}
+          error={!!errorMsg.password}
+          helperText={errorMsg.password || " "}
+        />
       </Box>
       <Box
         sx={{
@@ -188,7 +188,7 @@ const Signin = () => {
         <Button
           disableElevation
           sx={{
-            mt: "1.5vh",
+            mt: "1vh",
             border: 1.5,
             borderColor: "#dbdbdb",
             borderRadius: "30px",
@@ -205,7 +205,7 @@ const Signin = () => {
           {"Sign in"}
         </Button>
       </Box>
-      <Box sx={{ mt: "2vh", display: "flex" }}>
+      <Box sx={{ mt: "2vh", display: "flex", justifyContent: "center" }}>
         <Typography sx={{ fontSize: "0.9em" }}>
           {"Not registered yet? "} &nbsp;
         </Typography>
@@ -222,7 +222,7 @@ const Signin = () => {
           {"Join now"}
         </Typography>
       </Box>
-    </>
+    </Box>
   );
 
   return (
@@ -245,7 +245,7 @@ const Signin = () => {
           borderRight: 1.5,
           borderColor: "#dbdbdb",
           paddingX: 3,
-          height: "100vh",
+          height: `${winHeight}px`,
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",

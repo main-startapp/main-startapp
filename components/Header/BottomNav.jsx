@@ -1,5 +1,5 @@
 import { BottomNavigation, BottomNavigationAction } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ListAltRoundedIcon from "@mui/icons-material/ListAltRounded";
 import EventRoundedIcon from "@mui/icons-material/EventRounded";
 import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
@@ -9,8 +9,15 @@ import { useRouter } from "next/router";
 // !todo: current implementation didn't fully utilize the bottom nav comp. It merely use it as some general layout then wrap the bottomNavAction with Nextlink.
 
 const BottomNav = () => {
-  const [destination, setDestination] = useState(null);
+  const [destination, setDestination] = useState("");
   const router = useRouter();
+
+  useEffect(() => {
+    router.pathname === "/" && setDestination("projects");
+    router.pathname === "/events" && setDestination("events");
+    router.pathname === "/students" && setDestination("students");
+    router.pathname === "/chats" && setDestination("chats");
+  }, [router.pathname]);
 
   return (
     <BottomNavigation
@@ -28,9 +35,6 @@ const BottomNav = () => {
         zIndex: 100,
       }}
       value={destination}
-      onChange={(event, newDestination) => {
-        setDestination(newDestination);
-      }}
     >
       <BottomNavigationAction
         value="projects"

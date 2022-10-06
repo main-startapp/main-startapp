@@ -1,6 +1,5 @@
 import { Box, Typography } from "@mui/material";
 import { useContext } from "react";
-import { useAuth } from "../Context/AuthContext";
 import { GlobalContext } from "../Context/ShareContexts";
 import moment from "moment";
 
@@ -11,7 +10,7 @@ const ChatMsgItem = (props) => {
   const isLastMsg = props.isLastMsg;
 
   // context
-  const { currentUser } = useAuth();
+  const { ediumUser } = useContext(GlobalContext);
 
   return (
     <>
@@ -36,7 +35,7 @@ const ChatMsgItem = (props) => {
           </Typography>
         </Box>
       )}
-      {!isSameAuthor && message.sent_by === currentUser?.uid && (
+      {!isSameAuthor && message.sent_by === ediumUser?.uid && (
         <Box
           sx={{
             mx: "12px",

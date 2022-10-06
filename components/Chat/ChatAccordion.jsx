@@ -8,7 +8,6 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useContext, useEffect, useMemo, useState } from "react";
-import { useAuth } from "../Context/AuthContext";
 import { GlobalContext } from "../Context/ShareContexts";
 import ChatAccordionContact from "./ChatAccordionContact";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -17,8 +16,8 @@ import { handleUnread } from "../Reusable/Resusable";
 
 const ChatAccordion = () => {
   // context
-  const { currentUser } = useAuth();
   const {
+    ediumUser,
     chats,
     setChat,
     setShowMsg,
@@ -33,7 +32,7 @@ const ChatAccordion = () => {
   const [expandState, setExpandState] = useState("collapseIt");
 
   // handle chat expansion called by handleConnect/handleJoinRequest
-  // connect or join request might create a new chat, this new chat must be found by this hook
+  // connect or join request might create a new chat, this new chat will be found by this hook
   useEffect(() => {
     if (!forceChatExpand) return;
 
@@ -42,23 +41,19 @@ const ChatAccordion = () => {
     );
 
     if (!foundChat) return;
-    setChat(foundChat);
 
-    var timeout = 200;
+    setChat(foundChat);
+    setForceChatExpand(false);
+
+    let timeout = 250;
     if (expandState !== "expandIt") {
       setExpandState("expandIt");
       timeout = 500; // wait more time
     }
-
+    handleUnread(foundChat, setChat, ediumUser, chatPartner); // simulate clicking the contact, won't do anything if my_unread is 0
     setTimeout(() => {
       setShowMsg(true);
     }, timeout); // delayed msg window
-
-    setTimeout(() => {
-      handleUnread(foundChat, setChat, currentUser);
-    }, 1000); // delayed reset unread
-
-    setForceChatExpand(false);
 
     return () => {
       foundChat;
@@ -71,14 +66,14 @@ const ChatAccordion = () => {
     chatPartner,
     setChat,
     setShowMsg,
-    currentUser,
+    ediumUser,
   ]);
 
   // unread signal
   const hasUnread = useMemo(() => {
-    const my_unread_key = currentUser?.uid + "_unread";
+    const my_unread_key = ediumUser?.uid + "_unread";
     return chats.some((chat) => chat[my_unread_key] > 0) ? true : false;
-  }, [currentUser?.uid, chats]);
+  }, [ediumUser?.uid, chats]);
 
   // helper func
   const handleExpand = (e) => {

@@ -25,7 +25,6 @@ import {
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { db } from "../../firebase";
 import { GlobalContext } from "../Context/ShareContexts";
-import { useAuth } from "../Context/AuthContext";
 import ChatMsgItem from "./ChatMsgItem";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import OpenInFullRoundedIcon from "@mui/icons-material/OpenInFullRounded";
@@ -36,8 +35,8 @@ import { findItemFromList } from "../Reusable/Resusable";
 
 const ChatMsg = (props) => {
   // context
-  const { currentUser } = useAuth();
   const {
+    ediumUser,
     chat,
     chatPartner,
     setChat,
@@ -53,7 +52,7 @@ const ChatMsg = (props) => {
   // !todo: either listen to the msg when necessary or using DBListener which one is better?
   const [message, setMessage] = useState({
     text: "",
-    sent_by: currentUser?.uid,
+    sent_by: ediumUser?.uid,
   });
   const [messages, setMessages] = useState([]);
   useEffect(() => {
@@ -131,24 +130,25 @@ const ChatMsg = (props) => {
 
     // add message
     const messageRef = { ...message, sent_at: serverTimestamp() };
-    setMessage({ text: "", sent_by: currentUser?.uid }); // reset msg locally
+    setMessage({ text: "", sent_by: ediumUser?.uid }); // reset msg locally
     const msgCollectionRef = collection(db, "chats", chat.id, "messages");
-    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
-      console.log("addDoc() error: ", err);
+    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((error) => {
+      console.log(error?.message);
     });
     // update chat
-    const my_unread_key = currentUser?.uid + "_unread";
+    const my_unread_key = ediumUser?.uid + "_unread";
     const partner_unread_key = chatPartner?.uid + "_unread";
     const chatDocRef = doc(db, "chats", chat.id);
-    const chatUpdateRef = {
+    let chatUpdateRef = {
       [my_unread_key]: 0,
       [partner_unread_key]: chat[partner_unread_key] + 1,
+      has_unread: true,
       last_text: message.text,
       last_timestamp: serverTimestamp(),
     };
     setChat({ ...chat, ...chatUpdateRef }); // second entry will overwrite first entry for the same keys
-    const chatModRef = updateDoc(chatDocRef, chatUpdateRef).catch((err) => {
-      console.log("updateDoc() error: ", err);
+    const chatModRef = updateDoc(chatDocRef, chatUpdateRef).catch((error) => {
+      console.log(error?.message);
     });
 
     await msgModRef;
@@ -169,8 +169,8 @@ const ChatMsg = (props) => {
     const projectExtModRef = updateDoc(
       projectExtDocRef,
       projectExtUpdateRef
-    ).catch((err) => {
-      console.log("updateDoc() error: ", err);
+    ).catch((error) => {
+      console.log(error?.message);
     });
 
     // update JR in project ext subcollection
@@ -188,8 +188,8 @@ const ChatMsg = (props) => {
     const projectExtJRModRef = updateDoc(
       projectExtJRDocRef,
       projectExtJRUpdateRef
-    ).catch((err) => {
-      console.log("updateDoc() error: ", err);
+    ).catch((error) => {
+      console.log(error?.message);
     });
 
     // send auto msg
@@ -200,15 +200,15 @@ const ChatMsg = (props) => {
       joinRequest.projectTitle;
     const messageRef = {
       text: msgStr,
-      sent_by: currentUser?.uid,
+      sent_by: ediumUser?.uid,
       sent_at: serverTimestamp(),
     };
     const msgCollectionRef = collection(db, "chats", chat.id, "messages");
-    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
-      console.log("addDoc() error: ", err);
+    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((error) => {
+      console.log(error?.message);
     });
     // remove JR in chat
-    const my_unread_key = currentUser?.uid + "_unread";
+    const my_unread_key = ediumUser?.uid + "_unread";
     const partner_unread_key = joinRequest.requester_uid + "_unread";
     const newJR = chat.join_requests.filter(
       (jr) => jr.join_request_doc_id !== joinRequest.join_request_doc_id
@@ -217,13 +217,14 @@ const ChatMsg = (props) => {
     const chatUpdateRef = {
       [my_unread_key]: 0,
       [partner_unread_key]: chat[partner_unread_key] + 1,
+      has_unread: true,
       join_requests: newJR,
       last_text: msgStr,
       last_timestamp: serverTimestamp(),
     };
     setChat({ ...chat, ...chatUpdateRef });
-    const chatModRef = updateDoc(chatDocRef, chatUpdateRef).catch((err) => {
-      console.log("updateDoc() error: ", err);
+    const chatModRef = updateDoc(chatDocRef, chatUpdateRef).catch((error) => {
+      console.log(error?.message);
     });
 
     // JR in user ext will not be changed
@@ -255,8 +256,8 @@ const ChatMsg = (props) => {
     const projectExtJRModRef = updateDoc(
       projectExtJRDocRef,
       projectExtJRUpdateRef
-    ).catch((err) => {
-      console.log("updateDoc() error: ", err);
+    ).catch((error) => {
+      console.log(error?.message);
     });
 
     // send msg
@@ -265,15 +266,15 @@ const ChatMsg = (props) => {
       : "Sorry. Creator didn't leave a note";
     const messageRef = {
       text: msgStr,
-      sent_by: currentUser?.uid,
+      sent_by: ediumUser?.uid,
       sent_at: serverTimestamp(),
     };
     const msgCollectionRef = collection(db, "chats", chat.id, "messages");
-    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((err) => {
-      console.log("addDoc() error: ", err);
+    const msgModRef = addDoc(msgCollectionRef, messageRef).catch((error) => {
+      console.log(error?.message);
     });
     // remove JR in chat
-    const my_unread_key = currentUser?.uid + "_unread";
+    const my_unread_key = ediumUser?.uid + "_unread";
     const partner_unread_key = joinRequest.requester_uid + "_unread";
     const newJR = chat.join_requests.filter(
       (jr) => jr.join_request_doc_id !== joinRequest.join_request_doc_id
@@ -282,13 +283,14 @@ const ChatMsg = (props) => {
     const chatUpdateRef = {
       [my_unread_key]: 0,
       [partner_unread_key]: chat[partner_unread_key] + 1,
+      has_unread: true,
       join_requests: newJR,
       last_text: msgStr,
       last_timestamp: serverTimestamp(),
     };
     setChat({ ...chat, ...chatUpdateRef });
-    const chatModRef = updateDoc(chatDocRef, chatUpdateRef).catch((err) => {
-      console.log("updateDoc() error: ", err);
+    const chatModRef = updateDoc(chatDocRef, chatUpdateRef).catch((error) => {
+      console.log(error?.message);
     });
 
     // await
