@@ -14,8 +14,6 @@ import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { handleDeleteEntry, handleVisibility } from "../Reusable/Resusable";
-import { useAuth } from "../Context/AuthContext";
-import { useEffect } from "react";
 
 // the project list item component in the project list: has full project data but only shows some brief information
 const ProjectListItem = (props) => {

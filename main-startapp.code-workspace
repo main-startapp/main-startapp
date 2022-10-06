@@ -16,7 +16,6 @@
     },
     "editor.formatOnSave": true,
     "editor.formatOnPaste": true,
-    "git.autofetch": true,
     "[html]": {
       "editor.defaultFormatter": "esbenp.prettier-vscode"
     },

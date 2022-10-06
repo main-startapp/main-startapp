@@ -1,10 +1,8 @@
-import { useContext, useMemo } from "react";
+import { useContext, useMemo, useEffect } from "react";
 import NextLink from "next/link";
 import { Box, Button, Tooltip } from "@mui/material";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import ProjectListItem from "./ProjectListItem";
-import { filter } from "lodash";
-import { useEffect } from "react";
 
 // link/router https://stackoverflow.com/questions/65086108/next-js-link-vs-router-push-vs-a-tag
 // description: a list of projects (project list items); a button to create new project (router.push)

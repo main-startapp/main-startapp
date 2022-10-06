@@ -36,7 +36,7 @@ const TeamProjectList = () => {
       }}
     >
       {/* my projects */}
-      {ediumUserExt?.my_project_ids.map((myProjectID) => {
+      {ediumUserExt?.my_project_ids?.map((myProjectID) => {
         return (
           <TeamProjectListItem
             key={myProjectID}
