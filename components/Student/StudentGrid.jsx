@@ -1,12 +1,12 @@
 import { Box, Grid } from "@mui/material";
-import { useContext, useMemo } from "react";
+import { useContext, useMemo, useEffect } from "react";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
 import StudentGridCard from "./StudentGridCard";
 
 const StudentGrid = () => {
   // context
   const { users, winWidth, winHeight } = useContext(GlobalContext);
-  const { searchTerm } = useContext(StudentContext);
+  const { searchTerm, setStudent } = useContext(StudentContext);
 
   // local vars
   const filteredStudents = useMemo(
@@ -26,6 +26,11 @@ const StudentGrid = () => {
       }),
     [users, searchTerm]
   );
+
+  // set initial student to be first in list to render out immediately
+  useEffect(() => {
+    setStudent(users.length > 0 ? users[0] : null);
+  }, [setStudent, users]);
 
   return (
     <Box

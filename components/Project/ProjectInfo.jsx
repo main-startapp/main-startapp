@@ -38,7 +38,7 @@ const ProjectInfo = () => {
     winHeight,
     onMedia,
   } = useContext(GlobalContext);
-  const { project } = useContext(ProjectContext);
+  const { project, projects, setProject } = useContext(ProjectContext);
 
   // local vars
   const currentUID = ediumUser?.uid;
@@ -131,17 +131,21 @@ const ProjectInfo = () => {
                 {"Details: "}
               </Typography>
               <Typography color="text.secondary">{project?.details}</Typography>
-              <Typography
-                sx={{ mt: onMedia.onDesktop ? 3 : 1.5, fontWeight: "bold" }}
-                color="text.primary"
-              >
-                {"Team size: "}
-              </Typography>
-              <Typography color="text.secondary">
-                {/* {project?.cur_member_count}
+              {project.max_member_count && (
+                <div>
+                  <Typography
+                    sx={{ mt: onMedia.onDesktop ? 3 : 1.5, fontWeight: "bold" }}
+                    color="text.primary"
+                  >
+                    {"Team size: "}
+                  </Typography>
+                  <Typography color="text.secondary">
+                    {/* {project?.cur_member_count}
                 {"/"} */}
-                {project?.max_member_count}
-              </Typography>
+                    {project?.max_member_count}
+                  </Typography>
+                </div>
+              )}
             </Box>
           </Grid>
 
@@ -286,7 +290,9 @@ const ProjectInfo = () => {
                     display: "inline",
                   }}
                 >
-                  {project?.description}
+                  <div
+                    dangerouslySetInnerHTML={{ __html: project?.description }}
+                  />
                 </pre>
               </Typography>
             </Box>
@@ -319,7 +325,13 @@ const ProjectInfo = () => {
                     posWeeklyHour={position.weekly_hour}
                     isCreator={isCreator}
                     creator={creatorUser}
-                    appFormURL={project?.application_form_url || ""}
+                    appFormURL={
+                      project.application_form_url !== ""
+                        ? project.application_form_url
+                        : position.url
+                        ? position.url
+                        : ""
+                    }
                   />
                 ))}
               </Box>

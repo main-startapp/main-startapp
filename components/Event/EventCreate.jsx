@@ -391,7 +391,7 @@ const EventCreate = (props) => {
               onClick={handleDialogOpen}
             >
               <UploadFileIcon sx={{ position: "absolute", left: "5%" }} />
-              <Typography>{"Logo"}</Typography>
+              <Typography>{"Logo Link"}</Typography>
             </Button>
             <Dialog
               open={isDialogOpen}
@@ -431,12 +431,7 @@ const EventCreate = (props) => {
             </Dialog>
           </Box>
           {/* Category select & start/end date */}
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mt={5}
-          >
+          <Box display="flex" justifyContent="space-between" mt={5}>
             <FormControl
               required
               fullWidth
@@ -553,6 +548,7 @@ const EventCreate = (props) => {
               mt: 5,
             }}
             fullWidth
+            required
             label="Description"
             margin="none"
             multiline
@@ -568,7 +564,7 @@ const EventCreate = (props) => {
           <DefaultTextField
             sx={{
               mt: 5,
-              mb: 2.5,
+              mb: 0,
             }}
             fullWidth
             label="Banner URL"
@@ -583,19 +579,26 @@ const EventCreate = (props) => {
               })
             }
           />
-          <Divider sx={{ borderBottomWidth: 1.5, borderColor: "#dbdbdb" }} />
-
           {/* application form */}
           <Container
             sx={{
-              mt: 2.5,
               mx: 0,
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
+              height: 40,
             }}
             disableGutters
           >
+            <Divider
+              sx={{
+                borderBottomWidth: 1.5,
+                borderColor: "#dbdbdb",
+                height: "10px",
+                width: "101.5%",
+                mb: 2.5,
+              }}
+            />
             {/* <Checkbox
               sx={{
                 mr: 1.5,
@@ -621,7 +624,7 @@ const EventCreate = (props) => {
           {isChecked && (
             <DefaultTextField
               sx={{
-                mt: 2.5,
+                mt: 0,
               }}
               required
               fullWidth

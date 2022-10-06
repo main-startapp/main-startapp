@@ -9,7 +9,7 @@ import cloneDeep from "lodash/cloneDeep";
 const EventList = () => {
   // context
   const { events, ediumUser, winHeight, onMedia } = useContext(GlobalContext);
-  const { searchTerm, searchCategory } = useContext(EventContext);
+  const { searchTerm, searchCategory, setEvent } = useContext(EventContext);
 
   // local vars
   const currentUID = ediumUser?.uid;
@@ -49,6 +49,11 @@ const EventList = () => {
       }),
     [sortedEvents, searchTerm, searchCategory]
   );
+
+  // set initial event to be first in list to render out immediately
+  useEffect(() => {
+    setEvent(events.length > 0 ? events[0] : null);
+  }, [setEvent, events]);
 
   return (
     <Box sx={{ backgroundColor: "#fafafa" }}>

@@ -15,6 +15,7 @@ import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { handleDeleteEntry, handleVisibility } from "../Reusable/Resusable";
 import { useAuth } from "../Context/AuthContext";
+import { useEffect } from "react";
 
 // the project list item component in the project list: has full project data but only shows some brief information
 const ProjectListItem = (props) => {
@@ -23,6 +24,7 @@ const ProjectListItem = (props) => {
   const last = props.last;
 
   // context
+
   const { ediumUser, onMedia } = useContext(GlobalContext);
   const { setProject } = useContext(ProjectContext);
 
@@ -34,6 +36,12 @@ const ProjectListItem = (props) => {
   };
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  // functions
+  const editDescString = (text) => {
+    if (text) return text.replace(/<img .*>/, "");
+    else return "";
   };
 
   return (
@@ -86,10 +94,8 @@ const ProjectListItem = (props) => {
             primaryTypographyProps={{ fontWeight: "bold" }}
             secondary={
               <>
-                {"Team size: "}
-                {/* {project.cur_member_count}
-                {"/"} */}
-                {project.max_member_count}
+                {project.max_member_count && "Team size: "}
+                {project.max_member_count && project.max_member_count}
                 <br />
               </>
             }
@@ -149,6 +155,7 @@ const ProjectListItem = (props) => {
           <ListItemText
             secondary={
               <Typography
+                component="span" // this fixed eror saying div cannot appear as descendant of p
                 sx={{
                   display: "-webkit-box",
                   overflow: "hidden",
@@ -161,7 +168,11 @@ const ProjectListItem = (props) => {
                   color: "rgba(0, 0, 0, 0.6)",
                 }}
               >
-                {project.description}
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: editDescString(project.description),
+                  }}
+                />
               </Typography>
             }
           />

@@ -54,7 +54,7 @@ const DBListener = () => {
             id: doc.id,
             completion_date: doc.data()?.completion_date
               ? doc.data().completion_date.toDate()
-              : null,
+              : "",
             create_timestamp: doc.data().create_timestamp?.toDate(),
             last_timestamp: doc.data().last_timestamp?.toDate(),
           }))
