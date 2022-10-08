@@ -41,7 +41,7 @@ const ProjectList = () => {
 
   // set initial project to be first in list to render out immediately
   useEffect(() => {
-    setProject(projects.length > 0 ? projects[0] : null);
+    if (onMedia.onDesktop) setProject(projects.length > 0 ? projects[0] : null);
   }, [setProject, projects]);
 
   return (

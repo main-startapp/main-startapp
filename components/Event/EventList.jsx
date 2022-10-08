@@ -52,7 +52,8 @@ const EventList = () => {
 
   // set initial event to be first in list to render out immediately
   useEffect(() => {
-    setEvent(filteredEvents.length > 0 ? filteredEvents[0] : null);
+    if (onMedia.onDesktop)
+      setEvent(filteredEvents.length > 0 ? filteredEvents[0] : null);
   }, [setEvent, filteredEvents]);
 
   return (
