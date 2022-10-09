@@ -354,7 +354,7 @@ const EventInfo = () => {
           {onMedia.onDesktop &&
             event?.creator_uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
             currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
-            !ediumUserExt.my_event_ids.includes(event?.id) && (
+            !ediumUserExt?.my_event_ids?.includes(event?.id) && (
               <Grid item xs={12}>
                 <Box
                   sx={{
