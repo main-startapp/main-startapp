@@ -31,7 +31,7 @@ const StudentGrid = () => {
   // set initial student to be first in list to render out immediately
   useEffect(() => {
     if (onMedia.onDesktop) setStudent(users.length > 0 ? users[0] : null);
-  }, [setStudent, users]);
+  }, [setStudent, users, onMedia.onDesktop]);
 
   return (
     <Box

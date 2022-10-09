@@ -42,7 +42,7 @@ const ProjectList = () => {
   // set initial project to be first in list to render out immediately
   useEffect(() => {
     if (onMedia.onDesktop) setProject(projects.length > 0 ? projects[0] : null);
-  }, [setProject, projects]);
+  }, [setProject, projects, onMedia.onDesktop]);
 
   return (
     <Box sx={{ backgroundColor: "#fafafa" }}>
