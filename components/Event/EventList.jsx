@@ -52,8 +52,9 @@ const EventList = () => {
 
   // set initial event to be first in list to render out immediately
   useEffect(() => {
-    setEvent(filteredEvents.length > 0 ? filteredEvents[0] : null);
-  }, [setEvent, filteredEvents]);
+    if (onMedia.onDesktop)
+      setEvent(filteredEvents.length > 0 ? filteredEvents[0] : null);
+  }, [setEvent, filteredEvents, onMedia.onDesktop]);
 
   return (
     <Box sx={{ backgroundColor: "#fafafa" }}>
