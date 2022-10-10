@@ -54,7 +54,7 @@ const EventList = () => {
   useEffect(() => {
     if (onMedia.onDesktop)
       setEvent(filteredEvents.length > 0 ? filteredEvents[0] : null);
-  }, [setEvent, filteredEvents]);
+  }, [setEvent, filteredEvents, onMedia.onDesktop]);
 
   return (
     <Box sx={{ backgroundColor: "#fafafa" }}>
