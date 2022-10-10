@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   Drawer,
   Box,
@@ -9,18 +9,34 @@ import {
   FormControlLabel,
   Select,
   MenuItem,
+  FormControl,
+  Grid,
+  TextField,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import {
+  GlobalContext,
+  EventContext,
+} from "../components/Context/ShareContexts";
+import AddIcon from "@mui/icons-material/Add";
 
 const Filter = ({ isToggled, toggleFilter }) => {
-  const drawerWidth = 300;
-  const departmentsList = ["Science", "Business", "Arts"];
+  const onMedia = useContext(GlobalContext);
+  const drawerWidth = 500;
+  const departmentsList = ["None", "Science", "Business", "Arts"];
   const majorList = [
+    "None",
     "Computer Science",
     "Biochemistry",
     "Biology",
     "Neuroscience",
   ];
+
+  // states
+  const [universityList, setUniversityList] = useState([]);
+  const [tagList, setTagList] = useState([]);
+  const [isCheckedAddUni, setIsCheckedAddUni] = useState(false);
+  const [isCheckedAddTag, setIsCheckedAddTag] = useState(false);
 
   const DrawerHeader = styled(Box)(({ theme }) => ({
     display: "flex",
@@ -30,6 +46,14 @@ const Filter = ({ isToggled, toggleFilter }) => {
   }));
 
   // reusable components
+
+  const Item = styled(Box)(({ theme }) => ({
+    padding: "6px",
+    display: "flex",
+    gap: "10px",
+    alignItems: "center",
+  }));
+
   const filterSection = (name, body) => {
     return (
       <Box
@@ -49,6 +73,132 @@ const Filter = ({ isToggled, toggleFilter }) => {
         {body}
       </Box>
     );
+  };
+
+  const categoryComp = (list, type) => {
+    return (
+      <FormControl
+        sx={{
+          width: "100%",
+          "& .MuiOutlinedInput-root": {
+            borderRadius: "10px",
+            backgroundColor: "#f0f0f0",
+          },
+          "&:hover .MuiOutlinedInput-root": {
+            backgroundColor: "#dbdbdb",
+          },
+          "& .MuiOutlinedInput-notchedOutline": {
+            border: 0,
+          },
+          "&:hover .MuiOutlinedInput-notchedOutline": {
+            border: 0,
+          },
+          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+            {
+              border: 1.5,
+              borderColor: "#3e95c2",
+            },
+          mb: 1.6,
+        }}
+        size="small"
+      >
+        <InputLabel />
+        <Select
+          defaultValue={list[0]}
+          sx={{
+            mt: 2,
+          }}
+        >
+          {list.map((name, index) => {
+            return (
+              <MenuItem key={index} value={name}>
+                {name}
+              </MenuItem>
+            );
+          })}
+        </Select>
+      </FormControl>
+    );
+  };
+
+  const multipleOptionComp = (list, add, type) => {
+    return (
+      <Grid container columns={16} spacing={"5px"}>
+        {list.map((name, index) => {
+          return (
+            <Grid key={index} item xs={8}>
+              <Item>
+                <FormControlLabel control={<Checkbox />} label={name} />
+              </Item>
+            </Grid>
+          );
+        })}
+        {add && !isCheckedAddUni && type === "University" && gridAddField(type)}
+        {add && isCheckedAddUni && type === "University" && gridAddInput(type)}
+        {add && !isCheckedAddTag && type === "Tag" && gridAddField(type)}
+        {add && isCheckedAddTag && type === "Tag" && gridAddInput(type)}
+      </Grid>
+    );
+  };
+
+  const gridAddInput = (type) => {
+    return (
+      <Grid item xs={8} sx={{ alignItems: "center" }}>
+        <Item>
+          <TextField
+            autoFocus
+            size="small"
+            helperText={`${type} name`}
+            onKeyPress={(e) => {
+              type === "University"
+                ? handleUniversityClick(e)
+                : handleTagClick(e);
+            }}
+          ></TextField>
+        </Item>
+      </Grid>
+    );
+  };
+
+  const gridAddField = (type) => {
+    return (
+      <Grid item xs={8}>
+        <Item sx={{ ml: 0.7 }}>
+          <FormControlLabel
+            control={<AddIcon />}
+            label={`Add a ${type}`}
+            sx={{
+              mt: 1.5,
+              padding: "1px 3px",
+              borderRadius: "4px",
+              "&:hover": {
+                backgroundColor: "#dbdbdb",
+              },
+              gap: "12px",
+            }}
+            onClick={(e) => {
+              type === "University"
+                ? setIsCheckedAddUni(true)
+                : setIsCheckedAddTag(true);
+            }}
+          />
+        </Item>
+      </Grid>
+    );
+  };
+
+  const handleUniversityClick = (e) => {
+    if (e.key === "Enter") {
+      setIsCheckedAddUni(false);
+      setUniversityList([...universityList, e.target.value]);
+    }
+  };
+
+  const handleTagClick = (e) => {
+    if (e.key === "Enter") {
+      setIsCheckedAddTag(false);
+      setTagList([...tagList, e.target.value]);
+    }
   };
 
   return (
@@ -72,62 +222,22 @@ const Filter = ({ isToggled, toggleFilter }) => {
         open={isToggled}
       >
         <DrawerHeader>Filter</DrawerHeader>
-        <Divider sx={{ mt: 1.5, mb: 1.5 }} />
-        {filterSection(
-          "Fees",
-          <Box
-            sx={{
-              display: "flex",
-              gap: "10px",
-              justifyContent: "flex-start",
-            }}
-          >
-            <FormControlLabel control={<Checkbox />} label="Free" />
-            <FormControlLabel control={<Checkbox />} label="Paid" />
-          </Box>
-        )}
-        <Divider sx={{ mt: 1.5, mb: 1.5 }} />
+        <Divider sx={{ mt: 1.5 }} />
+        {filterSection("Fees", multipleOptionComp(["Free", "Paid"], false))}
+        <Divider sx={{ mt: 1.5 }} />
         {filterSection(
           "Department",
-          <Box>
-            <Select
-              defaultValue={""}
-              sx={{
-                width: "100%",
-                mt: 1.6, // match the spacing with component on top
-              }}
-            >
-              {departmentsList.map((department, index) => {
-                return (
-                  <MenuItem key={index} value={department}>
-                    {department}
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </Box>
+          categoryComp(departmentsList, "Department")
         )}
-        <Divider sx={{ mt: 1.5, mb: 1.5 }} />
+        <Divider sx={{ mt: 1.5 }} />
+        {filterSection("Major", categoryComp(majorList, "Major"))}
+        <Divider sx={{ mt: 1.5 }} />
         {filterSection(
-          "Major",
-          <Box>
-            <Select
-              defaultValue={""}
-              sx={{
-                width: "100%",
-                mt: 1.6, // match the spacing with component on top
-              }}
-            >
-              {majorList.map((major, index) => {
-                return (
-                  <MenuItem key={index} value={major}>
-                    {major}
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </Box>
+          "University",
+          multipleOptionComp(universityList, true, "University")
         )}
+        <Divider sx={{ mt: 1.5 }} />
+        {filterSection("Tags", multipleOptionComp(tagList, true, "Tag"))}
       </Drawer>
     </ClickAwayListener>
   );
