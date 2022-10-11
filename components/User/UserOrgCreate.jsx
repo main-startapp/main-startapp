@@ -7,32 +7,39 @@ import {
   Typography,
 } from "@mui/material";
 import cloneDeep from "lodash.clonedeep";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../Context/AuthContext";
 import { GlobalContext } from "../Context/ShareContexts";
-import { studentDepartmentStrList } from "../Reusable/MenuStringList";
+import {
+  organizationTags,
+  studentDepartmentStrList,
+} from "../Reusable/MenuStringList";
 import { DefaultTextField, getDocsByQueryFromDB } from "../Reusable/Resusable";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
 import {
   addDoc,
+  arrayUnion,
   collection,
   doc,
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase";
+import stringSimilarity from "string-similarity";
 
 const UserOrgCreate = (props) => {
-  const isClickable = props.isClickable;
   const handleUserSubmit = props.handleUserSubmit;
   const redirectTo = props.redirectTo;
+  const userCreatedTags = props.userCreatedTags;
 
   // context & hooks
   const { currentUser } = useAuth();
   const { ediumUser, onMedia } = useContext(GlobalContext);
 
   // local vars
+  const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
+
   const [newOrgUser, setNewOrgUser] = useState({
     name: "",
     create_timestamp: "",
@@ -43,13 +50,19 @@ const UserOrgCreate = (props) => {
   const [newOrg, setNewOrg] = useState({
     title: "",
     department: "N/A",
+    tags: [],
     create_timestamp: "",
     social_media: [""],
     logo_url: "",
     admin_uid: currentUser?.uid,
     representatives: [currentUser?.uid],
   });
+
   const [orgDocID, setOrgDocID] = useState("");
+
+  const tagsOptions = useMemo(() => {
+    return organizationTags.concat(userCreatedTags?.string_list).sort();
+  }, [userCreatedTags?.string_list]);
 
   // update student data if ediumUser exists
   useEffect(() => {
@@ -77,11 +90,13 @@ const UserOrgCreate = (props) => {
     });
   }, [ediumUser]);
 
+  const formRef = useRef();
+
   // helper func
   const handleRemoveSocialMedia = (index) => {
-    let cur_social_media = newOrg.social_media;
-    cur_social_media.splice(index, 1);
-    setNewOrg({ ...newOrg, social_media: cur_social_media });
+    let currentSocialMedia = newOrg.social_media;
+    currentSocialMedia.splice(index, 1);
+    setNewOrg({ ...newOrg, social_media: currentSocialMedia });
   };
 
   const handleOrgSubmit = async () => {
@@ -89,6 +104,7 @@ const UserOrgCreate = (props) => {
     let orgRef = {
       ...newOrg,
       // remove empty entries
+      tags: newOrg.tags.filter((ele) => ele),
       social_media: newOrg.social_media.filter((ele) => ele),
       last_timestamp: serverTimestamp(),
     };
@@ -108,6 +124,53 @@ const UserOrgCreate = (props) => {
       });
     }
     await orgModRef;
+  };
+
+  const handleUserCreatedTagsSubmit = async () => {
+    const currentTags = newOrg.tags;
+    const newTags = [];
+
+    // traverse the list to see if the input is "unique"
+    // !todo: find a better threshold, for now using 0.8
+    // !todo: anyway to reduce calculation in the nested for loop?
+    const curLen = currentTags.length;
+    const optLen = tagsOptions.length;
+    for (let i = 0; i < curLen; i++) {
+      let isUnique = true;
+      const currentTag = currentTags[i]?.toLowerCase();
+      for (let j = 0; j < optLen; j++) {
+        const similarity = stringSimilarity.compareTwoStrings(
+          currentTag,
+          tagsOptions[j]
+        );
+        if (similarity > 0.8) {
+          isUnique = false;
+          break;
+        }
+      }
+      if (isUnique) newTags.push(currentTag);
+    }
+
+    // submit to the shared list
+    if (newTags.length) {
+      const docRef = doc(db, "user_created_lists", "organization_tags");
+      const updateRef = { string_list: arrayUnion(...newTags) };
+      const modRef = updateDoc(docRef, updateRef).catch((error) => {
+        console.log(error?.message);
+      });
+      await modRef;
+    }
+  };
+
+  const handleSubmit = () => {
+    if (!isClickable) return;
+    if (!formRef.current.reportValidity()) return;
+    setIsClickable(false);
+
+    handleUserSubmit(newOrgUser);
+    handleOrgSubmit();
+    handleUserCreatedTagsSubmit();
+    redirectTo();
   };
 
   // reuseable comps
@@ -143,8 +206,35 @@ const UserOrgCreate = (props) => {
     />
   );
 
+  const tagsAutoComplete = (
+    <Autocomplete
+      sx={{ width: "100%" }}
+      freeSolo
+      clearOnBlur
+      multiple
+      filterSelectedOptions
+      options={tagsOptions}
+      value={newOrg.tags}
+      onChange={(event, newValue) => {
+        setNewOrg({ ...newOrg, tags: newValue });
+      }}
+      renderInput={(params) => (
+        <DefaultTextField
+          {...params}
+          label="Details"
+          helperText="Tags to shortly describe the organization (e.g. mechanical, design, game dev, etc.)"
+          required
+          inputProps={{
+            ...params.inputProps,
+            required: newOrg.tags.length === 0,
+          }}
+        />
+      )}
+    />
+  );
+
   return (
-    <Box>
+    <form ref={formRef}>
       {onMedia.onDesktop ? (
         <Box
           sx={{
@@ -163,7 +253,7 @@ const UserOrgCreate = (props) => {
           {departmentAutoComplete}
         </Box>
       )}
-
+      <Box sx={{ mt: 5 }}>{tagsAutoComplete}</Box>
       {/* social media links list */}
       <Divider sx={{ my: 5 }}>
         <Typography sx={{ color: "gray" }}>Optional</Typography>
@@ -253,15 +343,13 @@ const UserOrgCreate = (props) => {
           disableElevation
           disabled={!isClickable}
           onClick={() => {
-            handleOrgSubmit();
-            handleUserSubmit(newOrgUser);
-            redirectTo();
+            handleSubmit();
           }}
         >
           {"Confirm"}
         </Button>
       </Box>
-    </Box>
+    </form>
   );
 };
 

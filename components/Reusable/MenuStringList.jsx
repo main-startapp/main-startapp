@@ -75,3 +75,11 @@ export const studentDepartmentStrList = [
   "Arts",
   "Audiology",
 ];
+
+// organization - tags
+export const organizationTags = [
+  "computer science",
+  "game dev",
+  "unity",
+  "software",
+];

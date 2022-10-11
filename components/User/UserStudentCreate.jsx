@@ -6,25 +6,30 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
 import { useAuth } from "../Context/AuthContext";
 import { GlobalContext } from "../Context/ShareContexts";
 import cloneDeep from "lodash/cloneDeep";
+import stringSimilarity from "string-similarity";
 import { studentFoIStrList } from "../Reusable/MenuStringList";
 import { DefaultTextField } from "../Reusable/Resusable";
+import { db } from "../../firebase";
+import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 
 const UserStudentCreate = (props) => {
-  const isClickable = props.isClickable;
   const handleUserSubmit = props.handleUserSubmit;
   const redirectTo = props.redirectTo;
+  const userCreatedFoI = props.userCreatedFoI;
 
   // context & hooks
   const { currentUser } = useAuth();
   const { ediumUser, onMedia } = useContext(GlobalContext);
 
   // local vars
+  const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
+
   const [newStudent, setNewStudent] = useState({
     name: "",
     year_of_ed: 0,
@@ -38,6 +43,10 @@ const UserStudentCreate = (props) => {
     photo_url: currentUser?.photoURL || "",
     role: "student",
   });
+
+  const foiOptions = useMemo(() => {
+    return studentFoIStrList.concat(userCreatedFoI?.string_list).sort();
+  }, [userCreatedFoI?.string_list]);
 
   // update student data if ediumUser exists
   useEffect(() => {
@@ -54,11 +63,13 @@ const UserStudentCreate = (props) => {
     setNewStudent(ediumUserRef);
   }, [ediumUser]);
 
+  const formRef = useRef();
+
   // helper func
   const handleRemoveSocialMedia = (index) => {
-    let cur_social_media = newStudent.social_media;
-    cur_social_media.splice(index, 1);
-    setNewStudent({ ...newStudent, social_media: cur_social_media });
+    let currentSocialMedia = newStudent.social_media;
+    currentSocialMedia.splice(index, 1);
+    setNewStudent({ ...newStudent, social_media: currentSocialMedia });
   };
 
   // const handleRemovePastExp = (index) => {
@@ -66,6 +77,49 @@ const UserStudentCreate = (props) => {
   //   cur_past_exp.splice(index, 1);
   //   setNewStudent({ ...newStudent, past_exp: cur_past_exp });
   // };
+
+  const handleUserCreatedFoISubmit = async () => {
+    const currentFoI = newStudent.field_of_interest;
+    let isUnique = true;
+
+    // traverse the list to see if the input is "unique"
+    // !todo: find a better threshold, for now using 0.8
+    const len = foiOptions.length;
+    for (let i = 0; i < len; i++) {
+      const similarity = stringSimilarity.compareTwoStrings(
+        foiOptions[i],
+        currentFoI
+      );
+      if (similarity > 0.8) {
+        isUnique = false;
+        break;
+      }
+    }
+
+    // submit to the shared list
+    if (isUnique) {
+      const docRef = doc(
+        db,
+        "user_created_lists",
+        "student_field_of_interests"
+      );
+      const updateRef = { string_list: arrayUnion(currentFoI) };
+      const modRef = updateDoc(docRef, updateRef).catch((error) => {
+        console.log(error?.message);
+      });
+      await modRef;
+    }
+  };
+
+  const handleSubmit = () => {
+    if (!isClickable) return;
+    if (!formRef.current.reportValidity()) return;
+    setIsClickable(false);
+
+    handleUserSubmit(newStudent);
+    handleUserCreatedFoISubmit();
+    redirectTo();
+  };
 
   // reuseable comps
   const nameTextField = (
@@ -177,10 +231,17 @@ const UserStudentCreate = (props) => {
     <Autocomplete
       sx={onMedia.onDesktop ? { width: "50%" } : { width: "100%" }}
       freeSolo
-      options={studentFoIStrList}
+      clearOnBlur
+      options={foiOptions}
       value={newStudent.field_of_interest}
       onChange={(event, newValue) => {
-        setNewStudent({ ...newStudent, field_of_interest: newValue });
+        if (newValue) {
+          newValue = newValue.charAt(0).toUpperCase() + newValue.slice(1);
+        }
+        setNewStudent({
+          ...newStudent,
+          field_of_interest: newValue,
+        });
       }}
       renderInput={(params) => (
         <DefaultTextField
@@ -194,7 +255,7 @@ const UserStudentCreate = (props) => {
   );
 
   return (
-    <Box>
+    <form ref={formRef}>
       {/* student's name and year */}
       {onMedia.onDesktop ? (
         <Box
@@ -367,14 +428,13 @@ const UserStudentCreate = (props) => {
           disableElevation
           disabled={!isClickable}
           onClick={() => {
-            handleUserSubmit(newStudent);
-            redirectTo();
+            handleSubmit();
           }}
         >
           {"Confirm"}
         </Button>
       </Box>
-    </Box>
+    </form>
   );
 };
 
