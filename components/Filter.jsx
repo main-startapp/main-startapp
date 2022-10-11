@@ -12,7 +12,6 @@ import {
   FormControl,
   Grid,
   TextField,
-  Button,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import {
@@ -22,8 +21,8 @@ import {
 import { Add, Close } from "@mui/icons-material";
 
 const Filter = ({ isToggled, toggleFilter }) => {
-  const onMedia = useContext(GlobalContext);
-  const drawerWidth = 500;
+  const { onMedia } = useContext(GlobalContext);
+  const drawerWidth = onMedia.onDesktop ? "500px" : 1;
   const departmentsList = ["None", "Science", "Business", "Arts"];
   const majorList = [
     "None",
@@ -228,7 +227,7 @@ const Filter = ({ isToggled, toggleFilter }) => {
           "& .MuiDrawer-paper": {
             width: drawerWidth,
             boxSizing: "border-box",
-            padding: "150px 2%",
+            padding: onMedia.onDesktop ? "150px 2%" : "120px 2%",
           },
         }}
         variant="persistent"

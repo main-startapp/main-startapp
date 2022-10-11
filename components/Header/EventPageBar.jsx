@@ -27,7 +27,7 @@ const EventPageBar = ({ toggleFilter, isFilterOpen }) => {
   const { onMedia } = useContext(GlobalContext);
   const { event, setEvent, setSearchTerm, searchCategory, setSearchCategory } =
     useContext(EventContext);
-
+  console.log(onMedia.onDesktop);
   // menu
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
