@@ -40,17 +40,17 @@ const ProjectInfo = () => {
   const { project } = useContext(ProjectContext);
 
   // local vars
-  const currentUID = ediumUser?.uid;
-  const router = useRouter();
   const [tCode, setTCode] = useState("");
   useEffect(() => {
     setTCode("");
   }, [project]);
 
+  const router = useRouter();
+
   // hooks
   const isCreator = useMemo(() => {
-    return currentUID === project?.creator_uid ? true : false;
-  }, [currentUID, project]);
+    return ediumUser?.uid === project?.creator_uid ? true : false;
+  }, [ediumUser?.uid, project]);
 
   const creatorUser = useMemo(() => {
     return findItemFromList(users, "uid", project?.creator_uid);
@@ -151,7 +151,7 @@ const ProjectInfo = () => {
           {/* Top right founder box */}
           {onMedia.onDesktop &&
             (project?.creator_uid !== "T5q6FqwJFcRTKxm11lu0zmaXl8x2" ||
-              currentUID === "T5q6FqwJFcRTKxm11lu0zmaXl8x2") && (
+              ediumUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2") && (
               <Grid item xs={3}>
                 <Box
                   sx={{
@@ -220,11 +220,11 @@ const ProjectInfo = () => {
                     </NextLink>
                   ) : (
                     <Tooltip
-                      title={currentUID ? "" : "Edit your profile first"}
+                      title={ediumUser?.uid ? "" : "Edit your profile first"}
                     >
                       <span>
                         <Button
-                          disabled={!currentUID}
+                          disabled={!ediumUser?.uid}
                           disableElevation
                           sx={{
                             mt: 1,

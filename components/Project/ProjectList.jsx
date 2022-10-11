@@ -13,8 +13,6 @@ const ProjectList = () => {
   const { searchTerm, searchCategory, setProject } = useContext(ProjectContext);
 
   // local vars
-  const currentUID = ediumUser?.uid;
-
   const filteredProjects = useMemo(
     () =>
       projects.filter((project) => {
@@ -72,7 +70,7 @@ const ProjectList = () => {
             mt: "12px",
           }}
         >
-          <Tooltip title={currentUID ? "" : "Edit your profile first"}>
+          <Tooltip title={ediumUser?.uid ? "" : "Edit your profile first"}>
             <span>
               <NextLink
                 href={{
@@ -83,7 +81,7 @@ const ProjectList = () => {
                 passHref
               >
                 <Button
-                  disabled={!currentUID}
+                  disabled={!ediumUser?.uid}
                   disableElevation
                   sx={{
                     border: 1.5,

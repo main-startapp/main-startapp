@@ -99,8 +99,8 @@ const UserOrgCreate = (props) => {
     setNewOrg({ ...newOrg, social_media: currentSocialMedia });
   };
 
+  // submit org doc to organization collection
   const handleOrgSubmit = async () => {
-    // check will be done my handleUserSubmit
     let orgRef = {
       ...newOrg,
       // remove empty entries
@@ -126,6 +126,7 @@ const UserOrgCreate = (props) => {
     await orgModRef;
   };
 
+  // submit new user created tags to user created list collection
   const handleUserCreatedTagsSubmit = async () => {
     const currentTags = newOrg.tags;
     const newTags = [];
@@ -151,7 +152,7 @@ const UserOrgCreate = (props) => {
       if (isUnique) newTags.push(currentTag);
     }
 
-    // submit to the shared list
+    // if submit to the shared list
     if (newTags.length) {
       const docRef = doc(db, "user_created_lists", "organization_tags");
       const updateRef = { string_list: arrayUnion(...newTags) };
@@ -161,6 +162,9 @@ const UserOrgCreate = (props) => {
       await modRef;
     }
   };
+
+  // update org tags in all projects
+  const handleProjectTagsSubmit = () => {};
 
   const handleSubmit = () => {
     if (!isClickable) return;

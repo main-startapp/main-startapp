@@ -42,7 +42,6 @@ const EventInfo = () => {
   const { event } = useContext(EventContext);
 
   // local vars
-  const currentUID = ediumUser?.uid;
   const router = useRouter();
   const [tCode, setTCode] = useState("");
   useEffect(() => {
@@ -68,8 +67,8 @@ const EventInfo = () => {
 
   // hook to find is the ediumUser the event creator
   const isCreator = useMemo(() => {
-    return currentUID === event?.creator_uid ? true : false;
-  }, [currentUID, event?.creator_uid]);
+    return ediumUser?.uid === event?.creator_uid ? true : false;
+  }, [ediumUser?.uid, event?.creator_uid]);
 
   // hook to get event creator data
   const creatorUser = useMemo(() => {
@@ -175,7 +174,7 @@ const EventInfo = () => {
           {/* Top right founder box */}
           {onMedia.onDesktop &&
             (event?.creator_uid !== "T5q6FqwJFcRTKxm11lu0zmaXl8x2" ||
-              currentUID === "T5q6FqwJFcRTKxm11lu0zmaXl8x2") && (
+              ediumUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2") && (
               <Grid item xs={3}>
                 <Box
                   sx={{
@@ -217,11 +216,11 @@ const EventInfo = () => {
 
                   {!isCreator && (
                     <Tooltip
-                      title={currentUID ? "" : "Edit your profile first"}
+                      title={ediumUser?.uid ? "" : "Edit your profile first"}
                     >
                       <span>
                         <Button
-                          disabled={!currentUID}
+                          disabled={!ediumUser?.uid}
                           disableElevation
                           sx={{
                             mt: 1,

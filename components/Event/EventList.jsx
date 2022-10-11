@@ -12,8 +12,6 @@ const EventList = () => {
   const { searchTerm, searchCategory, setEvent } = useContext(EventContext);
 
   // local vars
-  const currentUID = ediumUser?.uid;
-
   const sortedEvents = useMemo(() => {
     const tempEvents = cloneDeep(events);
     const eventsLength = tempEvents.length;
@@ -83,7 +81,7 @@ const EventList = () => {
             mt: "12px",
           }}
         >
-          <Tooltip title={currentUID ? "" : "Edit your profile first"}>
+          <Tooltip title={ediumUser?.uid ? "" : "Edit your profile first"}>
             <span>
               <NextLink
                 href={{
@@ -94,7 +92,7 @@ const EventList = () => {
                 passHref
               >
                 <Button
-                  disabled={!currentUID}
+                  disabled={!ediumUser?.uid}
                   disableElevation
                   sx={{
                     border: 1.5,

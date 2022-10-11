@@ -7,11 +7,9 @@ import TeamCommPanel from "./TeamCommPanel";
 import TeamScheduler from "./TeamScheduler";
 
 const TeamInfo = () => {
+  // context
   const { ediumUser } = useContext(GlobalContext);
   const { project, projectExt } = useContext(TeamContext);
-
-  // local var
-  const currentUID = ediumUser?.uid;
 
   return (
     <Box
@@ -40,7 +38,9 @@ const TeamInfo = () => {
           </Box>
           <Divider sx={{ mt: 3 }} />
           {/* join requests */}
-          {projectExt?.admins?.includes(currentUID) && <TeamJoinRequestList />}
+          {projectExt?.admins?.includes(ediumUser?.uid) && (
+            <TeamJoinRequestList />
+          )}
           {/* info panel + meeting panel */}
           <Box sx={{ display: "flex", flexDirection: "row", mt: 3 }}>
             <Box

@@ -121,8 +121,10 @@ function MyApp({ Component, pageProps }) {
             <DBListener />
             <Navbar />
             <Component {...pageProps} />
-            {onMedia.onDesktop && showMsg && <ChatMsgBox />}
-            {onMedia.onDesktop && showChat && <ChatAccordion />}
+            {onMedia.onDesktop && ediumUser?.uid && showMsg && <ChatMsgBox />}
+            {onMedia.onDesktop && ediumUser?.uid && showChat && (
+              <ChatAccordion />
+            )}
             {!onMedia.onDesktop && <BottomNav />}
           </GlobalContext.Provider>
         </LocalizationProvider>

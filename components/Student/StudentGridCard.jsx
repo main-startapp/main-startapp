@@ -12,8 +12,6 @@ const StudentGridCard = (props) => {
   const { setStudent } = useContext(StudentContext);
 
   // local vars
-  const currentUID = ediumUser?.uid;
-
   return (
     <Card
       variant="outlined"
@@ -72,10 +70,10 @@ const StudentGridCard = (props) => {
 
         <Box sx={{ flexGrow: 1 }} />
 
-        <Tooltip title={currentUID ? "" : "Please edit your profile first"}>
+        <Tooltip title={ediumUser?.uid ? "" : "Please edit your profile first"}>
           <span>
             <Button
-              disabled={!currentUID || currentUID === student.uid}
+              disabled={!ediumUser?.uid || ediumUser?.uid === student.uid}
               disableElevation
               size="small"
               sx={{

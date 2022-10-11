@@ -20,8 +20,6 @@ const TeamManagement = () => {
   }, [setChat, setChatPartner, setShowChat, setShowMsg]);
 
   // local vars
-  const currentUID = ediumUser?.uid;
-
   // team states init
   const [project, setProject] = useState(null);
   const [projectExt, setProjectExt] = useState(null);
@@ -34,7 +32,7 @@ const TeamManagement = () => {
 
     chats.forEach((chat) => {
       chat?.join_requests?.forEach((request) => {
-        if (currentUID === request.creator_uid) {
+        if (ediumUser?.uid === request.creator_uid) {
           requests.push({ ...request, chat_id: chat.id });
         }
       });
@@ -42,7 +40,7 @@ const TeamManagement = () => {
     setJoinRequests(requests);
 
     return requests;
-  }, [chats, currentUID]);
+  }, [chats, ediumUser?.uid]);
 
   return (
     // <TeamContext.Provider
