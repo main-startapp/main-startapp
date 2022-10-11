@@ -12,13 +12,14 @@ import {
   FormControl,
   Grid,
   TextField,
+  Button,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import {
   GlobalContext,
   EventContext,
 } from "../components/Context/ShareContexts";
-import AddIcon from "@mui/icons-material/Add";
+import { Add, Close } from "@mui/icons-material";
 
 const Filter = ({ isToggled, toggleFilter }) => {
   const onMedia = useContext(GlobalContext);
@@ -154,7 +155,14 @@ const Filter = ({ isToggled, toggleFilter }) => {
                 ? handleUniversityClick(e)
                 : handleTagClick(e);
             }}
-          ></TextField>
+          />
+          <Close
+            sx={{
+              mb: 3,
+              cursor: "pointer",
+            }}
+            onClick={() => handleCloseInput(type)}
+          />
         </Item>
       </Grid>
     );
@@ -165,10 +173,10 @@ const Filter = ({ isToggled, toggleFilter }) => {
       <Grid item xs={8}>
         <Item sx={{ ml: 0.7 }}>
           <FormControlLabel
-            control={<AddIcon />}
+            control={<Add />}
             label={`Add a ${type}`}
             sx={{
-              mt: 1.5,
+              mt: 1,
               padding: "1px 3px",
               borderRadius: "4px",
               "&:hover": {
@@ -199,6 +207,12 @@ const Filter = ({ isToggled, toggleFilter }) => {
       setIsCheckedAddTag(false);
       setTagList([...tagList, e.target.value]);
     }
+  };
+
+  const handleCloseInput = (type) => {
+    type === "University"
+      ? setIsCheckedAddUni(false)
+      : setIsCheckedAddTag(false);
   };
 
   return (
