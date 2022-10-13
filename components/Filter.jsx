@@ -22,6 +22,7 @@ import { Add, Close } from "@mui/icons-material";
 
 const Filter = ({ isToggled, toggleFilter }) => {
   const { onMedia } = useContext(GlobalContext);
+  const { filterOptions, setFilterOptions } = useContext(EventContext);
   const drawerWidth = onMedia.onDesktop ? "500px" : 1;
   const departmentsList = ["None", "Science", "Business", "Arts"];
   const majorList = [
@@ -37,6 +38,10 @@ const Filter = ({ isToggled, toggleFilter }) => {
   const [tagList, setTagList] = useState([]);
   const [isCheckedAddUni, setIsCheckedAddUni] = useState(false);
   const [isCheckedAddTag, setIsCheckedAddTag] = useState(false);
+
+  const [clickedUnis, setClickedUnis] = useState([]);
+  const [clickedTags, setClickedTags] = useState([]);
+  const [clickedFees, setClickedFees] = useState([]);
 
   const DrawerHeader = styled(Box)(({ theme }) => ({
     display: "flex",
@@ -128,7 +133,17 @@ const Filter = ({ isToggled, toggleFilter }) => {
           return (
             <Grid key={index} item xs={8}>
               <Item>
-                <FormControlLabel control={<Checkbox />} label={name} />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={checkClicked(name, type)}
+                      onClick={() => {
+                        updateFilter(name, type);
+                      }}
+                    />
+                  }
+                  label={name}
+                />
               </Item>
             </Grid>
           );
@@ -138,6 +153,14 @@ const Filter = ({ isToggled, toggleFilter }) => {
         {add && !isCheckedAddTag && type === "Tag" && gridAddField(type)}
         {add && isCheckedAddTag && type === "Tag" && gridAddInput(type)}
       </Grid>
+    );
+  };
+
+  const checkClicked = (name, type) => {
+    return (
+      (type === "University" && clickedUnis.includes(name)) ||
+      (type === "Tag" && clickedTags.includes(name)) ||
+      (type === "Fees" && clickedFees.includes(name))
     );
   };
 
@@ -151,8 +174,8 @@ const Filter = ({ isToggled, toggleFilter }) => {
             helperText={`${type} name`}
             onKeyPress={(e) => {
               type === "University"
-                ? handleUniversityClick(e)
-                : handleTagClick(e);
+                ? handleUniversityInput(e)
+                : handleTagInput(e);
             }}
           />
           <Close
@@ -183,7 +206,7 @@ const Filter = ({ isToggled, toggleFilter }) => {
               },
               gap: "12px",
             }}
-            onClick={(e) => {
+            onClick={() => {
               type === "University"
                 ? setIsCheckedAddUni(true)
                 : setIsCheckedAddTag(true);
@@ -194,14 +217,14 @@ const Filter = ({ isToggled, toggleFilter }) => {
     );
   };
 
-  const handleUniversityClick = (e) => {
+  const handleUniversityInput = (e) => {
     if (e.key === "Enter") {
       setIsCheckedAddUni(false);
       setUniversityList([...universityList, e.target.value]);
     }
   };
 
-  const handleTagClick = (e) => {
+  const handleTagInput = (e) => {
     if (e.key === "Enter") {
       setIsCheckedAddTag(false);
       setTagList([...tagList, e.target.value]);
@@ -212,6 +235,36 @@ const Filter = ({ isToggled, toggleFilter }) => {
     type === "University"
       ? setIsCheckedAddUni(false)
       : setIsCheckedAddTag(false);
+  };
+
+  const updateFilter = (name, type) => {
+    switch (type) {
+      case "University":
+        updateFilterCategory(clickedUnis, name, setClickedUnis);
+        break;
+      case "Tag":
+        updateFilterCategory(clickedTags, name, setClickedTags);
+        break;
+      default:
+        updateFilterCategory(clickedFees, name, setClickedFees);
+        break;
+    }
+  };
+
+  // adds to list of clicked or removes if already clicked
+  const updateFilterCategory = (category, name, updateFunction) => {
+    if (category.includes(name)) {
+      removeElementFromArr(category, name);
+      updateFunction([...category]);
+    } else {
+      updateFunction([...category, name]);
+    }
+  };
+
+  const removeElementFromArr = (arr, element) => {
+    const index = arr.indexOf(element);
+    if (index > -1) arr.splice(index, 1);
+    return arr;
   };
 
   return (
@@ -236,7 +289,10 @@ const Filter = ({ isToggled, toggleFilter }) => {
       >
         <DrawerHeader>Filter</DrawerHeader>
         <Divider sx={{ mt: 1.5 }} />
-        {filterSection("Fees", multipleOptionComp(["Free", "Paid"], false))}
+        {filterSection(
+          "Fees",
+          multipleOptionComp(["Free", "Paid"], false, "Fees")
+        )}
         <Divider sx={{ mt: 1.5 }} />
         {filterSection(
           "Department",

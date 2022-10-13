@@ -22,12 +22,12 @@ import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
 
-const EventPageBar = ({ toggleFilter, isFilterOpen }) => {
+const EventPageBar = ({ toggleFilter }) => {
   // context
   const { onMedia } = useContext(GlobalContext);
   const { event, setEvent, setSearchTerm, searchCategory, setSearchCategory } =
     useContext(EventContext);
-  console.log(onMedia.onDesktop);
+
   // menu
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);

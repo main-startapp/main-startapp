@@ -25,6 +25,7 @@ function Events() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
+  const [filterOptions, setFilterOptions] = useState({});
 
   return (
     <EventContext.Provider
@@ -35,10 +36,12 @@ function Events() {
         setSearchTerm,
         searchCategory,
         setSearchCategory,
+        filterOptions,
+        setFilterOptions,
       }}
     >
       {/* Toolbar for searching keywords, category and filter */}
-      <EventPageBar toggleFilter={setFilterOpen} isFilterOpen={filterOpen} />
+      <EventPageBar toggleFilter={setFilterOpen} />
 
       <Grid
         container
