@@ -70,10 +70,13 @@ const DBListener = () => {
 
   // listen to realtime projects ext collection, only doc's field: memebers contains currentUser will be pulled
   useEffect(() => {
+    const memberID = currentUser?.uid;
+    if (!memberID) return;
+
     const collectionRef = collection(db, "projects_ext");
     const q = query(
       collectionRef,
-      where("members", "array-contains", currentUser?.uid),
+      where("members", "array-contains", memberID),
       orderBy("last_timestamp", "desc")
     );
     const unsub = onSnapshot(
@@ -141,10 +144,13 @@ const DBListener = () => {
 
   // listen to realtime events ext collection, only doc's field: memebers contains currentUser will be pulled
   useEffect(() => {
+    const memberID = currentUser?.uid;
+    if (!memberID) return;
+
     const collectionRef = collection(db, "events_ext");
     const q = query(
       collectionRef,
-      where("members", "array-contains", currentUser?.uid),
+      where("members", "array-contains", memberID),
       orderBy("last_timestamp", "desc")
     );
     const unsub = onSnapshot(
@@ -236,10 +242,13 @@ const DBListener = () => {
 
   // listen to realtime chats collection, only doc's field: chat_user_ids contains currentUser will be pulled
   useEffect(() => {
+    const userID = currentUser?.uid;
+    if (!userID) return;
+
     const chatsRef = collection(db, "chats");
     const q = query(
       chatsRef,
-      where("chat_user_ids", "array-contains", currentUser?.uid),
+      where("chat_user_ids", "array-contains", userID),
       orderBy("last_timestamp", "desc")
     );
     const unsub = onSnapshot(

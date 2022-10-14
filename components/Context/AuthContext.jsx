@@ -30,8 +30,8 @@ export const AuthProvider = ({ children }) => {
   if (isLoading) {
     return <Loading type="spokes" color="#3e95c2" />;
   }
-
-  if (!currentUser) {
+  const url = new URL(window.location.href);
+  if (!currentUser && url.pathname !== "/") {
     return <Signin />;
   } else {
     return (

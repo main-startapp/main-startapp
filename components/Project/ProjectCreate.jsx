@@ -32,7 +32,7 @@ import {
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { db } from "../../firebase";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
@@ -62,7 +62,9 @@ const ProjectCreate = (props) => {
   const { showAlert } = useContext(ProjectContext);
 
   // props from push query
-  const isCreate = props.isCreateStr === "false" ? false : true; // null, undefined, "true" are all true isCreate
+  const isCreate = useMemo(() => {
+    return props.isCreateStr === "false" ? false : true; // null, undefined, "true" are all true isCreate
+  }, [props.isCreateStr]);
 
   const router = useRouter();
 
@@ -123,7 +125,8 @@ const ProjectCreate = (props) => {
 
   useEffect(() => {
     if (isCreate) {
-      // setIsCheckedPosition(true); what is this for??
+      // defalut to check the positions
+      setIsCheckedPosition(true);
     } else {
       // update, checked value depends on oldProject
       if (oldProject?.position_list?.length > 0) {
@@ -145,14 +148,12 @@ const ProjectCreate = (props) => {
   // helper functions
   const handleSubmit = async (e) => {
     if (!isClickable) return;
-    if (currentUser?.uid !== ediumUser?.uid) return;
     if (!formRef.current.reportValidity()) return;
 
     // button is clickable & form is valid
     setIsClickable(false);
 
-    // calucalte the team
-
+    // calucalte the team size ?
     // change field value into an int if not null
     let maxMemberCount = newProject.max_member_count
       ? parseInt(newProject.max_member_count)
@@ -227,7 +228,6 @@ const ProjectCreate = (props) => {
           }
         );
 
-        navigator.clipboard.writeText(projectExtRef.transfer_code);
         await projectExtModRef;
       } else {
         // add to my_project_ids in user ext data if create
