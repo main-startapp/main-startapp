@@ -71,8 +71,6 @@ const EventCreate = (props) => {
   const router = useRouter();
 
   // local vars
-  const currentUID = ediumUser?.uid;
-
   // Event State Initialization.
   const emptyEvent = {
     title: "",
@@ -82,7 +80,7 @@ const EventCreate = (props) => {
     location: "",
     details: "",
     description: "",
-    creator_uid: currentUID,
+    creator_uid: ediumUser?.uid,
     is_deleted: false,
     is_visible: true,
     icon_url: "",
@@ -123,7 +121,7 @@ const EventCreate = (props) => {
   // helper functions
   const handleSubmit = async (e) => {
     if (!isClickable) return;
-    if (currentUser?.uid !== currentUID) return;
+    if (currentUser?.uid !== ediumUser?.uid) return;
     if (!formRef.current.reportValidity()) return;
 
     // button is clickable & form is valid
@@ -172,8 +170,8 @@ const EventCreate = (props) => {
 
         const eventExtRef = {
           is_deleted: false,
-          members: [currentUID],
-          admins: [currentUID],
+          members: [ediumUser?.uid],
+          admins: [ediumUser?.uid],
           last_timestamp: serverTimestamp(),
           transfer_code: Math.random().toString(16).slice(2),
         };
@@ -185,7 +183,7 @@ const EventCreate = (props) => {
         await eventExtModRef;
       } else {
         // add to my_event_ids in user ext data if create
-        const ediumUserExtDocRef = doc(db, "users_ext", currentUID);
+        const ediumUserExtDocRef = doc(db, "users_ext", ediumUser?.uid);
         const ediumUserExtUpdateRef = {
           my_event_ids: ediumUserExt?.my_event_ids
             ? arrayUnion(retID)
@@ -203,8 +201,8 @@ const EventCreate = (props) => {
         const extDocRef = doc(db, "events_ext", retID);
         const eventExtRef = {
           is_deleted: false,
-          members: [currentUID],
-          admins: [currentUID],
+          members: [ediumUser?.uid],
+          admins: [ediumUser?.uid],
           last_timestamp: serverTimestamp(),
         };
         const eventExtModRef = setDoc(extDocRef, eventExtRef).catch((error) => {
@@ -223,7 +221,7 @@ const EventCreate = (props) => {
         // remove invalid ids
         const event_ids = ediumUserExt?.my_event_ids;
         if (event_ids.find((event_id) => event_id === oldEvent.id)) {
-          const ediumUserExtDocRef = doc(db, "users_ext", currentUID);
+          const ediumUserExtDocRef = doc(db, "users_ext", ediumUser?.uid);
           const ediumUserExtUpdateRef = {
             my_event_ids: arrayRemove(oldEvent.id),
             last_timestamp: serverTimestamp(),
@@ -283,7 +281,7 @@ const EventCreate = (props) => {
       "events_ext",
       "my_event_ids",
       docID,
-      currentUID
+      ediumUser?.uid
     );
 
     showAlert(
@@ -343,7 +341,7 @@ const EventCreate = (props) => {
         >
           {isCreate ? "Create New Event" : "Update Event"}
         </Typography>
-        {currentUID === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" && (
+        {ediumUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" && (
           <Box sx={{ mb: 5, display: "flex" }}>
             <Checkbox
               sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
@@ -657,7 +655,7 @@ const EventCreate = (props) => {
                 }}
                 variant="contained"
                 disableElevation
-                disabled={!isClickable || !currentUID}
+                disabled={!isClickable || !ediumUser?.uid}
                 onClick={() => handleDelete(newEvent.id)}
               >
                 {"Delete"}
@@ -679,7 +677,7 @@ const EventCreate = (props) => {
               }}
               variant="contained"
               disableElevation
-              disabled={!isClickable || !currentUID}
+              disabled={!isClickable || !ediumUser?.uid}
               onClick={(e) => handleDiscard(e)}
             >
               {"Discard"}
@@ -699,7 +697,7 @@ const EventCreate = (props) => {
               }}
               variant="contained"
               disableElevation
-              disabled={!isClickable || !currentUID}
+              disabled={!isClickable || !ediumUser?.uid}
               onClick={(e) => handleSubmit(e)}
             >
               {"Confirm"}

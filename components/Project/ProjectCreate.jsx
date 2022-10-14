@@ -32,7 +32,7 @@ import {
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { db } from "../../firebase";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
@@ -62,13 +62,13 @@ const ProjectCreate = (props) => {
   const { showAlert } = useContext(ProjectContext);
 
   // props from push query
-  const isCreate = props.isCreateStr === "false" ? false : true; // null, undefined, "true" are all true isCreate
+  const isCreate = useMemo(() => {
+    return props.isCreateStr === "false" ? false : true; // null, undefined, "true" are all true isCreate
+  }, [props.isCreateStr]);
 
   const router = useRouter();
 
   // local vars
-  const currentUID = ediumUser?.uid;
-
   // Project State Initialization.
   // https://stackoverflow.com/questions/68945060/react-make-usestate-initial-value-conditional
   const emptyProject = {
@@ -125,7 +125,8 @@ const ProjectCreate = (props) => {
 
   useEffect(() => {
     if (isCreate) {
-      // setIsCheckedPosition(true); what is this for??
+      // defalut to check the positions
+      setIsCheckedPosition(true);
     } else {
       // update, checked value depends on oldProject
       if (oldProject?.position_list?.length > 0) {
@@ -147,14 +148,12 @@ const ProjectCreate = (props) => {
   // helper functions
   const handleSubmit = async (e) => {
     if (!isClickable) return;
-    if (currentUser?.uid !== currentUID) return;
     if (!formRef.current.reportValidity()) return;
 
     // button is clickable & form is valid
     setIsClickable(false);
 
-    // calucalte the team
-
+    // calucalte the team size ?
     // change field value into an int if not null
     let maxMemberCount = newProject.max_member_count
       ? parseInt(newProject.max_member_count)
@@ -174,7 +173,7 @@ const ProjectCreate = (props) => {
         // update max num of members
         max_member_count: maxMemberCount,
         position_list: isCheckedPosition ? positionFields : [],
-        creator_uid: currentUID,
+        creator_uid: ediumUser?.uid,
         create_timestamp: serverTimestamp(),
         last_timestamp: serverTimestamp(),
       };
@@ -218,8 +217,8 @@ const ProjectCreate = (props) => {
         const extDocRef = doc(db, "projects_ext", retID);
         const projectExtRef = {
           is_deleted: false,
-          members: [currentUID],
-          admins: [currentUID],
+          members: [ediumUser?.uid],
+          admins: [ediumUser?.uid],
           last_timestamp: serverTimestamp(),
           transfer_code: Math.random().toString(16).slice(2),
         };
@@ -229,11 +228,10 @@ const ProjectCreate = (props) => {
           }
         );
 
-        navigator.clipboard.writeText(projectExtRef.transfer_code);
         await projectExtModRef;
       } else {
         // add to my_project_ids in user ext data if create
-        const ediumUserExtDocRef = doc(db, "users_ext", currentUID);
+        const ediumUserExtDocRef = doc(db, "users_ext", ediumUser?.uid);
         const ediumUserExtUpdateRef = {
           my_project_ids: arrayUnion(retID),
           last_timestamp: serverTimestamp(),
@@ -249,8 +247,8 @@ const ProjectCreate = (props) => {
         const extDocRef = doc(db, "projects_ext", retID);
         const projectExtRef = {
           is_deleted: false,
-          members: [currentUID],
-          admins: [currentUID],
+          members: [ediumUser?.uid],
+          admins: [ediumUser?.uid],
           last_timestamp: serverTimestamp(),
         };
         const projectExtModRef = setDoc(extDocRef, projectExtRef).catch(
@@ -271,7 +269,7 @@ const ProjectCreate = (props) => {
         // remove invalid ids
         const project_ids = ediumUserExt?.my_project_ids;
         if (project_ids.find((project_id) => project_id === oldProject.id)) {
-          const ediumUserExtDocRef = doc(db, "users_ext", currentUID);
+          const ediumUserExtDocRef = doc(db, "users_ext", ediumUser?.uid);
           const ediumUserExtUpdateRef = {
             my_project_ids: arrayRemove(oldProject.id),
             last_timestamp: serverTimestamp(),
@@ -332,7 +330,7 @@ const ProjectCreate = (props) => {
       "projects_ext",
       "my_project_ids",
       docID,
-      currentUID
+      ediumUser?.uid
     );
 
     showAlert(
@@ -448,7 +446,7 @@ const ProjectCreate = (props) => {
         >
           {isCreate ? "Create New Project" : "Update Project"}
         </Typography>
-        {currentUID === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" && (
+        {ediumUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" && (
           <Box sx={{ mb: 5, display: "flex" }}>
             <Checkbox
               sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
@@ -889,7 +887,7 @@ const ProjectCreate = (props) => {
                 }}
                 variant="contained"
                 disableElevation
-                disabled={!isClickable || !currentUID}
+                disabled={!isClickable || !ediumUser?.uid}
                 onClick={() => handleDelete(newProject.id)}
               >
                 {"Delete"}
@@ -919,7 +917,7 @@ const ProjectCreate = (props) => {
               }}
               variant="contained"
               disableElevation
-              disabled={!isClickable || !currentUID}
+              disabled={!isClickable || !ediumUser?.uid}
               onClick={(e) => handleDiscard(e)}
             >
               {"Discard"}
@@ -939,7 +937,7 @@ const ProjectCreate = (props) => {
               }}
               variant="contained"
               disableElevation
-              disabled={!isClickable || !currentUID}
+              disabled={!isClickable || !ediumUser?.uid}
               onClick={(e) => handleSubmit(e)}
             >
               {"Confirm"}

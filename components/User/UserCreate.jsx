@@ -1,5 +1,11 @@
-import { Box, Button, Grid, Typography } from "@mui/material";
-import { doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+import { Box, Grid, Typography } from "@mui/material";
+import {
+  doc,
+  onSnapshot,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../../firebase";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useAuth } from "../Context/AuthContext";
@@ -26,18 +32,43 @@ const UserCreate = () => {
     }
   }, [ediumUser]);
 
-  const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
+  const [userCreatedFoI, setUserCreatedFoI] = useState(null);
+  const [userCreatedTags, setUserCreatedTags] = useState(null);
+  useEffect(() => {
+    const unsub1 = onSnapshot(
+      doc(db, "user_created_lists", "student_field_of_interests"),
+      (doc) => {
+        if (doc.exists()) {
+          setUserCreatedFoI(doc.data());
+        }
+      },
+      (error) => {
+        console.log(error?.message);
+      }
+    );
 
-  const formRef = useRef();
+    const unsub2 = onSnapshot(
+      doc(db, "user_created_lists", "organization_tags"),
+      (doc) => {
+        if (doc.exists()) {
+          setUserCreatedTags(doc.data());
+        }
+      },
+      (error) => {
+        console.log(error?.message);
+      }
+    );
+
+    return () => {
+      unsub1;
+      unsub2;
+    };
+  }, []);
+
   const router = useRouter();
 
   // helper fun
   const handleUserSubmit = async (newUser) => {
-    if (!isClickable) return;
-    if (!formRef.current.reportValidity()) return;
-
-    // button is clickable & form is valid
-    setIsClickable(false);
     const uid = currentUser?.uid;
     const docRef = doc(db, "users", uid);
     let userRef = {
@@ -215,21 +246,19 @@ const UserCreate = () => {
             )}
           </Box>
         </Box>
-        <form ref={formRef}>
-          {isStudentMode ? (
-            <UserStudentCreate
-              isClickable={isClickable}
-              handleUserSubmit={handleUserSubmit}
-              redirectTo={redirectTo}
-            />
-          ) : (
-            <UserOrgCreate
-              isClickable={isClickable}
-              handleUserSubmit={handleUserSubmit}
-              redirectTo={redirectTo}
-            />
-          )}
-        </form>
+        {isStudentMode ? (
+          <UserStudentCreate
+            handleUserSubmit={handleUserSubmit}
+            redirectTo={redirectTo}
+            userCreatedFoI={userCreatedFoI}
+          />
+        ) : (
+          <UserOrgCreate
+            handleUserSubmit={handleUserSubmit}
+            redirectTo={redirectTo}
+            userCreatedTags={userCreatedTags}
+          />
+        )}
       </Grid>
     </Grid>
   );

@@ -49,8 +49,6 @@ const TeamJoinRequestListItem = (props) => {
     useContext(GlobalContext);
 
   // local vars
-  const currentUID = ediumUser?.uid;
-
   // requester's student data
   const [requestingStudent, setRequestingStudent] = useState(null);
   useEffect(() => {
@@ -87,7 +85,7 @@ const TeamJoinRequestListItem = (props) => {
       : "Sorry. Creator didn't leave a note";
     const messageRef = {
       text: msgStr,
-      sent_by: currentUID,
+      sent_by: ediumUser?.uid,
       sent_at: serverTimestamp(),
     };
     const receiver_unread_key = requesterUID + "_unread";

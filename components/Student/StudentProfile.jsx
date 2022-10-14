@@ -30,8 +30,6 @@ const StudentProfile = () => {
   const { student } = useContext(StudentContext);
 
   // local vars
-  const currentUID = ediumUser?.uid;
-
   // similar alg in components/Project/ProjectInfo
   // box ref to used by useEffect
   const boxRef = useRef();
@@ -264,10 +262,10 @@ const StudentProfile = () => {
         >
           {/* connect button */}
 
-          <Tooltip title={currentUID ? "" : "Edit your profile first"}>
+          <Tooltip title={ediumUser?.uid ? "" : "Edit your profile first"}>
             <span>
               <Button
-                disabled={!currentUID || currentUID === student?.uid}
+                disabled={!ediumUser?.uid || ediumUser?.uid === student?.uid}
                 disableElevation
                 size="large"
                 sx={{

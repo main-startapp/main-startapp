@@ -46,8 +46,6 @@ const PositionListItem = (props) => {
   const appFormURL = props.appFormURL;
 
   // local vars
-  const currentUID = ediumUser?.uid;
-
   // useEffect to reset accordion expansion
   const [expandState, setExpandState] = useState("collapseIt");
   useEffect(() => {
@@ -76,7 +74,7 @@ const PositionListItem = (props) => {
     );
     const jrDocRef = {
       position_id: posID,
-      requester_uid: currentUID,
+      requester_uid: ediumUser?.uid,
       status: "requesting",
       last_timestamp: serverTimestamp(),
     };
@@ -89,7 +87,7 @@ const PositionListItem = (props) => {
     });
 
     // add it to my user ext
-    const ediumUserExtDocRef = doc(db, "users_ext", currentUID);
+    const ediumUserExtDocRef = doc(db, "users_ext", ediumUser?.uid);
     const ediumUserExtJoinRequests = ediumUserExt.join_requests;
     ediumUserExtJoinRequests.push({
       project_id: project.id,
@@ -117,10 +115,10 @@ const PositionListItem = (props) => {
       " position";
     const messageRef = {
       text: msgStr,
-      sent_by: currentUID,
+      sent_by: ediumUser?.uid,
       sent_at: serverTimestamp(),
     };
-    const my_unread_key = currentUID + "_unread";
+    const my_unread_key = ediumUser?.uid + "_unread";
     const creator_unread_key = project?.creator_uid + "_unread";
     const foundChat = chats.find((chat) =>
       chat.chat_user_ids.some((uid) => uid === project.creator_uid)
@@ -128,7 +126,7 @@ const PositionListItem = (props) => {
     const chatJR = {
       project_id: project.id,
       position_id: posID,
-      requester_uid: currentUID,
+      requester_uid: ediumUser?.uid,
       join_request_doc_id: jrRetID || -1,
     };
     if (foundChat) {
@@ -152,12 +150,12 @@ const PositionListItem = (props) => {
     } else {
       // create
       const collectionRef = collection(db, "chats");
-      const my_name_key = currentUID + "_name";
+      const my_name_key = ediumUser?.uid + "_name";
       const creator_name_key = project?.creator_uid + "_name";
       const creatorUser = findItemFromList(users, "uid", project?.creator_uid);
       const chatRef = {
         // new
-        chat_user_ids: [currentUID, project.creator_uid],
+        chat_user_ids: [ediumUser?.uid, project.creator_uid],
         [my_name_key]: ediumUser?.name,
         [creator_name_key]: creatorUser?.name,
         [my_unread_key]: 0,
@@ -195,7 +193,7 @@ const PositionListItem = (props) => {
   // components
   const appFormButton = (
     <Button
-      disabled={!currentUID}
+      disabled={!ediumUser?.uid}
       disableElevation
       size="small"
       sx={{
@@ -221,7 +219,7 @@ const PositionListItem = (props) => {
   const joinRequestButton = (
     <Button
       disabled={
-        !currentUID ||
+        !ediumUser?.uid ||
         ediumUserExt?.join_requests?.some(
           (jr) => jr.project_id === project.id && jr.position_id === posID
         )
@@ -278,7 +276,7 @@ const PositionListItem = (props) => {
             <Typography color="text.primary">{posTitle}</Typography>
             <Box sx={{ flexGrow: 1 }} />
             {onMedia.onDesktop && !isCreator && (
-              <Tooltip title={currentUID ? "" : "Edit your profile first"}>
+              <Tooltip title={ediumUser?.uid ? "" : "Edit your profile first"}>
                 <span>{appFormURL ? appFormButton : joinRequestButton}</span>
               </Tooltip>
             )}
@@ -323,7 +321,9 @@ const PositionListItem = (props) => {
             </Typography>
             {!onMedia.onDesktop && !isCreator && (
               <Box sx={{ mt: 1.5, display: "flex", justifyContent: "end" }}>
-                <Tooltip title={currentUID ? "" : "Edit your profile first"}>
+                <Tooltip
+                  title={ediumUser?.uid ? "" : "Edit your profile first"}
+                >
                   <span>{appFormURL ? appFormButton : joinRequestButton}</span>
                 </Tooltip>
               </Box>
