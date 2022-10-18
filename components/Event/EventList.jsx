@@ -67,26 +67,8 @@ const EventList = () => {
           return event;
         }
       }),
-    // console.log(newEvents);
-    // newEvents.filter((event) => {
-    //   for (const optionKey in filterOptions) {
-    //     optionKey.values.forEach((option) => {
-    //       if (event.details.includes(option)) return event;
-    //     });
-    //   }
-    // });
     [events, searchTerm, searchCategory, filterOptions]
   );
-
-  // const filterOptionsFilteredEvents = useMemo(() => {
-  //   events.filter((event) => {
-  //     for (const optionKey in filterOptions) {
-  //       optionKey.values.forEach((option) => {
-  //         if (event.details.includes(option)) return event;
-  //       });
-  //     }
-  //   }
-  // })
 
   return (
     <Box
