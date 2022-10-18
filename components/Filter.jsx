@@ -138,6 +138,7 @@ const Filter = ({ isToggled, toggleFilter }) => {
                     <Checkbox
                       checked={checkClicked(name, type)}
                       onClick={() => {
+                        updateFilterOptions(name, type);
                         updateFilter(name, type);
                       }}
                     />
@@ -265,6 +266,19 @@ const Filter = ({ isToggled, toggleFilter }) => {
     const index = arr.indexOf(element);
     if (index > -1) arr.splice(index, 1);
     return arr;
+  };
+
+  const updateFilterOptions = (name, type) => {
+    if (type === "Tag") updateTagFilterOption(name, type);
+  };
+
+  const updateTagFilterOption = (name, type) => {
+    if (type in filterOptions)
+      if (!filterOptions[type].includes(name))
+        filterOptions[type] = [...filterOptions[type], name];
+      else removeElementFromArr(filterOptions[type], name);
+    else filterOptions[type] = [name];
+    setFilterOptions({ ...filterOptions });
   };
 
   return (

@@ -7,7 +7,8 @@ import EventListItem from "./EventListItem";
 const EventList = () => {
   // context
   const { events, ediumUser, onMedia } = useContext(GlobalContext);
-  const { searchTerm, searchCategory } = useContext(EventContext);
+  const { searchTerm, searchCategory, filterOptions, filterOpen } =
+    useContext(EventContext);
 
   // local vars
   const currentUID = ediumUser?.uid;
@@ -26,7 +27,26 @@ const EventList = () => {
           searchCategory !== "" && // lazy evaluation to avoid unnecessary expensive includes()
           event.category.toLowerCase().includes(searchCategory.toLowerCase());
 
-        if (searchTerm === "" && searchCategory === "") {
+        let isInFilterOptions = true;
+
+        for (const optionKey in filterOptions) {
+          let tempIsInFilterOptions = false;
+          let allOptionsEmpty = true;
+          filterOptions[optionKey].forEach((option) => {
+            if (
+              filterOptions[optionKey].length !== 0 &&
+              event.details.toLowerCase().includes(option.toLowerCase())
+            )
+              tempIsInFilterOptions = true;
+            else if (filterOptions[optionKey].length !== 0)
+              allOptionsEmpty = false;
+          });
+          isInFilterOptions = allOptionsEmpty
+            ? allOptionsEmpty
+            : tempIsInFilterOptions;
+        }
+
+        if (searchTerm === "" && searchCategory === "" && isInFilterOptions) {
           // no search
           return event;
         } else if (
@@ -36,7 +56,8 @@ const EventList = () => {
           return event;
         } else if (
           searchTerm === "" &&
-          isInCategory // no Term, only search category
+          isInCategory && // no Term, only search category
+          isInFilterOptions
         ) {
           return event;
         } else if (
@@ -46,8 +67,26 @@ const EventList = () => {
           return event;
         }
       }),
-    [events, searchTerm, searchCategory]
+    // console.log(newEvents);
+    // newEvents.filter((event) => {
+    //   for (const optionKey in filterOptions) {
+    //     optionKey.values.forEach((option) => {
+    //       if (event.details.includes(option)) return event;
+    //     });
+    //   }
+    // });
+    [events, searchTerm, searchCategory, filterOptions]
   );
+
+  // const filterOptionsFilteredEvents = useMemo(() => {
+  //   events.filter((event) => {
+  //     for (const optionKey in filterOptions) {
+  //       optionKey.values.forEach((option) => {
+  //         if (event.details.includes(option)) return event;
+  //       });
+  //     }
+  //   }
+  // })
 
   return (
     <Box
