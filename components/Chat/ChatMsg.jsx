@@ -328,6 +328,7 @@ const ChatMsg = (props) => {
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
+        borderRadius: "10px 10px 0 0",
         borderBottom: joinRequests?.length > 0 ? 1.5 : 2.5,
         borderColor: "#dbdbdb",
         zIndex: 1,

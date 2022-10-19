@@ -163,7 +163,7 @@ const UserOrgCreate = (props) => {
     }
   };
 
-  // update org tags in all projects
+  // update org tags in all projects if necessary
   const handleProjectTagsSubmit = () => {};
 
   const handleSubmit = () => {

@@ -159,10 +159,11 @@ const ProjectCreate = (props) => {
       ? parseInt(newProject.max_member_count)
       : null;
 
+    // !yichen: don't auto calculate the team size, use the num as is.
     // if checked position, add number of positions to count
-    if (maxMemberCount && isCheckedPosition) {
-      positionFields.forEach((position) => (maxMemberCount += position.count));
-    }
+    // if (maxMemberCount && isCheckedPosition) {
+    //   positionFields.forEach((position) => (maxMemberCount += position.count));
+    // }
 
     let projectModRef; // ref to addDoc() or updateDoc()
     if (isCreate) {

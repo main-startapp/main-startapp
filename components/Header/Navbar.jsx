@@ -142,6 +142,7 @@ const Navbar = () => {
         >
           <IconButton
             id="navbar-menu-button"
+            disabled={!currentUser}
             aria-controls={open ? "navbar-menu" : undefined}
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
