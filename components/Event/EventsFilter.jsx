@@ -14,13 +14,10 @@ import {
   TextField,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import {
-  GlobalContext,
-  EventContext,
-} from "../components/Context/ShareContexts";
+import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import { Add, Close } from "@mui/icons-material";
 
-const Filter = ({ isToggled, toggleFilter }) => {
+const EventsFilter = ({ isToggled, toggleFilter }) => {
   const { onMedia } = useContext(GlobalContext);
   const { filterOptions, setFilterOptions } = useContext(EventContext);
   const drawerWidth = onMedia.onDesktop ? "500px" : 1;
@@ -43,14 +40,14 @@ const Filter = ({ isToggled, toggleFilter }) => {
   const [clickedTags, setClickedTags] = useState([]);
   const [clickedFees, setClickedFees] = useState([]);
 
+  // reusable components
+
   const DrawerHeader = styled(Box)(({ theme }) => ({
     display: "flex",
     justifyContent: "flex-start",
     fontWeight: "bold",
     fontSize: "20px",
   }));
-
-  // reusable components
 
   const Item = styled(Box)(({ theme }) => ({
     padding: "6px",
@@ -157,14 +154,6 @@ const Filter = ({ isToggled, toggleFilter }) => {
     );
   };
 
-  const checkClicked = (name, type) => {
-    return (
-      (type === "University" && clickedUnis.includes(name)) ||
-      (type === "Tag" && clickedTags.includes(name)) ||
-      (type === "Fees" && clickedFees.includes(name))
-    );
-  };
-
   const gridAddInput = (type) => {
     return (
       <Grid item xs={8} sx={{ alignItems: "center" }}>
@@ -215,6 +204,16 @@ const Filter = ({ isToggled, toggleFilter }) => {
           />
         </Item>
       </Grid>
+    );
+  };
+
+  //helpers
+
+  const checkClicked = (name, type) => {
+    return (
+      (type === "University" && clickedUnis.includes(name)) ||
+      (type === "Tag" && clickedTags.includes(name)) ||
+      (type === "Fees" && clickedFees.includes(name))
     );
   };
 
@@ -326,4 +325,4 @@ const Filter = ({ isToggled, toggleFilter }) => {
   );
 };
 
-export default Filter;
+export default EventsFilter;
