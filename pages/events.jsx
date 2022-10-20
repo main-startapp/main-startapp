@@ -75,17 +75,10 @@ function Events() {
           )
         )}
       </Grid>
-      {/* <ClickAwayListener
-        mouseEvent="onMouseDown"
-        touchEvent="onTouchStart"
-        onClickAway={() => setFilterOpen(false)}
-        disableReactTree={true}
-      > */}
       <EventsFilter
         isToggled={filterOpen}
         toggleFilter={setFilterOpen}
       ></EventsFilter>
-      {/* </ClickAwayListener> */}
     </EventContext.Provider>
   );
 }
