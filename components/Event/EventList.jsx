@@ -46,6 +46,7 @@ const EventList = () => {
             : tempIsInFilterOptions;
         }
 
+        // true means either filter option is selected or none selected at all
         if (searchTerm === "" && searchCategory === "" && isInFilterOptions) {
           // no search
           return event;
@@ -57,7 +58,7 @@ const EventList = () => {
         } else if (
           searchTerm === "" &&
           isInCategory && // no Term, only search category
-          isInFilterOptions
+          isInFilterOptions // true means either filter option is selected or none selected at all
         ) {
           return event;
         } else if (
