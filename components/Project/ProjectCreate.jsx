@@ -66,9 +66,11 @@ const ProjectCreate = (props) => {
     return props.isCreateStr === "false" ? false : true; // null, undefined, "true" are all true isCreate
   }, [props.isCreateStr]);
 
-  const router = useRouter();
-
   // local vars
+  const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
+  const router = useRouter();
+  const formRef = useRef();
+
   // Project State Initialization.
   // https://stackoverflow.com/questions/68945060/react-make-usestate-initial-value-conditional
   const emptyProject = {
@@ -86,10 +88,6 @@ const ProjectCreate = (props) => {
   const [newProject, setNewProject] = useState(() =>
     isCreate ? emptyProject : oldProject
   );
-
-  // use effect to set project
-
-  const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
 
   const emptyPositionField = {
     id: Math.random().toString(16).slice(2),
@@ -122,7 +120,6 @@ const ProjectCreate = (props) => {
   const [isCheckedAppForm, setIsCheckedAppForm] = useState(false);
   const [isCheckedCompDate, setIsCheckedCompDate] = useState(false);
   const [isCheckedTeamSize, setIsCheckedTeamSize] = useState(false);
-
   useEffect(() => {
     if (isCreate) {
       // defalut to check the positions
@@ -153,13 +150,12 @@ const ProjectCreate = (props) => {
     // button is clickable & form is valid
     setIsClickable(false);
 
-    // calucalte the team size ?
     // change field value into an int if not null
     let maxMemberCount = newProject.max_member_count
       ? parseInt(newProject.max_member_count)
       : null;
 
-    // !yichen: don't auto calculate the team size, use the num as is.
+    // !yichen: don't auto calculate the team size, use this num as is.
     // if checked position, add number of positions to count
     // if (maxMemberCount && isCheckedPosition) {
     //   positionFields.forEach((position) => (maxMemberCount += position.count));
@@ -208,33 +204,130 @@ const ProjectCreate = (props) => {
 
     // retID: create; !retID: update
     if (retID) {
-      // check if admin creats transferable project first
-      if (
-        currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
-        isCheckedTransferable
-      ) {
-        // don't add project id to my_project_ids
-        // do create extenion doc with extra field
-        const extDocRef = doc(db, "projects_ext", retID);
-        const projectExtRef = {
-          is_deleted: false,
-          members: [ediumUser?.uid],
-          admins: [ediumUser?.uid],
-          last_timestamp: serverTimestamp(),
-          transfer_code: Math.random().toString(16).slice(2),
-        };
-        const projectExtModRef = setDoc(extDocRef, projectExtRef).catch(
-          (error) => {
-            console.log(error?.message);
-          }
-        );
+      // add to my_project_ids in user ext data if create
+      const ediumUserExtDocRef = doc(db, "users_ext", ediumUser?.uid);
+      const ediumUserExtUpdateRef = {
+        my_project_ids: arrayUnion(retID),
+        last_timestamp: serverTimestamp(),
+      };
+      const ediumUserExtModRef = updateDoc(
+        ediumUserExtDocRef,
+        ediumUserExtUpdateRef
+      ).catch((error) => {
+        console.log(error?.message);
+      });
 
-        await projectExtModRef;
-      } else {
-        // add to my_project_ids in user ext data if create
+      // create extension doc for team management if create
+      const extDocRef = doc(db, "projects_ext", retID);
+      const projectExtRef = {
+        is_deleted: false,
+        members: [ediumUser?.uid],
+        admins: [ediumUser?.uid],
+        last_timestamp: serverTimestamp(),
+      };
+      const projectExtModRef = setDoc(extDocRef, projectExtRef).catch(
+        (error) => {
+          console.log(error?.message);
+        }
+      );
+
+      await ediumUserExtModRef;
+      await projectExtModRef;
+    }
+
+    setOldProject(null);
+
+    // !todo: since updateDoc return Promise<void>, we need other method to check the results
+    showAlert(
+      "success",
+      `"${newProject.title}" is updated successfully! Navigate to Projects page.`
+    );
+
+    setTimeout(() => {
+      router.push(`/`); // can be customized
+    }, 2000); // wait 2 seconds then go to `projects` page
+  };
+
+  const handleSubmitTransferable = async () => {
+    if (!isClickable) return;
+    if (!formRef.current.reportValidity()) return;
+
+    // button is clickable & form is valid
+    setIsClickable(false);
+
+    // change field value into an int if not null
+    let maxMemberCount = newProject.max_member_count
+      ? parseInt(newProject.max_member_count)
+      : null;
+
+    let projectModRef; // ref to addDoc() or updateDoc()
+    if (isCreate) {
+      // create a new newProject
+      const collectionRef = collection(db, "projects");
+      let projectRef = {
+        ...newProject,
+        // update max num of members
+        max_member_count: maxMemberCount,
+        position_list: isCheckedPosition ? positionFields : [],
+        creator_uid: ediumUser?.uid,
+        create_timestamp: serverTimestamp(),
+        last_timestamp: serverTimestamp(),
+      };
+      projectModRef = addDoc(collectionRef, projectRef).catch((error) => {
+        console.log(error?.message);
+      });
+    } else {
+      // update an existing newProject
+      // since all changes are in newProject, can't just update partially
+      const docRef = doc(db, "projects", newProject.id);
+      const projectRef = {
+        ...newProject,
+        // update max num of members
+        max_member_count: maxMemberCount,
+        position_list: isCheckedPosition ? positionFields : [],
+        application_form_url: isCheckedAppForm
+          ? newProject.application_form_url
+          : "",
+        last_timestamp: serverTimestamp(),
+      };
+      delete projectRef.id;
+      projectModRef = updateDoc(docRef, projectRef).catch((error) => {
+        console.log(error?.message);
+      });
+    }
+
+    let retID;
+    await projectModRef.then((ret) => {
+      retID = ret?.id;
+    });
+
+    // retID: create; !retID: update
+    if (retID) {
+      // don't add project id to my_project_ids
+      // do create extenion doc with extra field
+      const extDocRef = doc(db, "projects_ext", retID);
+      const projectExtRef = {
+        is_deleted: false,
+        members: [ediumUser?.uid],
+        admins: [ediumUser?.uid],
+        last_timestamp: serverTimestamp(),
+        transfer_code: Math.random().toString(16).slice(2),
+      };
+      const projectExtModRef = setDoc(extDocRef, projectExtRef).catch(
+        (error) => {
+          console.log(error?.message);
+        }
+      );
+
+      await projectExtModRef;
+    } else {
+      // update a project to transferable
+      // remove ids from my project list
+      const project_ids = ediumUserExt?.my_project_ids;
+      if (project_ids.find((project_id) => project_id === oldProject.id)) {
         const ediumUserExtDocRef = doc(db, "users_ext", ediumUser?.uid);
         const ediumUserExtUpdateRef = {
-          my_project_ids: arrayUnion(retID),
+          my_project_ids: arrayRemove(oldProject.id),
           last_timestamp: serverTimestamp(),
         };
         const ediumUserExtModRef = updateDoc(
@@ -243,61 +336,22 @@ const ProjectCreate = (props) => {
         ).catch((error) => {
           console.log(error?.message);
         });
-
-        // create extension doc for team management if create
-        const extDocRef = doc(db, "projects_ext", retID);
+        await ediumUserExtModRef;
+      }
+      // add transfer code
+      const projectExt = findItemFromList(projectsExt, "id", oldProject.id);
+      if (!projectExt.transfer_code) {
+        const extDocRef = doc(db, "projects_ext", oldProject.id);
         const projectExtRef = {
-          is_deleted: false,
-          members: [ediumUser?.uid],
-          admins: [ediumUser?.uid],
           last_timestamp: serverTimestamp(),
+          transfer_code: Math.random().toString(16).slice(2),
         };
-        const projectExtModRef = setDoc(extDocRef, projectExtRef).catch(
+        const projectExtModRef = updateDoc(extDocRef, projectExtRef).catch(
           (error) => {
             console.log(error?.message);
           }
         );
-
-        await ediumUserExtModRef;
         await projectExtModRef;
-      }
-    } else {
-      // update
-      if (
-        currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
-        isCheckedTransferable
-      ) {
-        // remove invalid ids
-        const project_ids = ediumUserExt?.my_project_ids;
-        if (project_ids.find((project_id) => project_id === oldProject.id)) {
-          const ediumUserExtDocRef = doc(db, "users_ext", ediumUser?.uid);
-          const ediumUserExtUpdateRef = {
-            my_project_ids: arrayRemove(oldProject.id),
-            last_timestamp: serverTimestamp(),
-          };
-          const ediumUserExtModRef = updateDoc(
-            ediumUserExtDocRef,
-            ediumUserExtUpdateRef
-          ).catch((error) => {
-            console.log(error?.message);
-          });
-          await ediumUserExtModRef;
-        }
-        // add transfer code
-        const projectExt = findItemFromList(projectsExt, "id", oldProject.id);
-        if (!projectExt.transfer_code) {
-          const extDocRef = doc(db, "projects_ext", oldProject.id);
-          const projectExtRef = {
-            last_timestamp: serverTimestamp(),
-            transfer_code: Math.random().toString(16).slice(2),
-          };
-          const projectExtModRef = updateDoc(extDocRef, projectExtRef).catch(
-            (error) => {
-              console.log(error?.message);
-            }
-          );
-          await projectExtModRef;
-        }
       }
     }
 
@@ -314,6 +368,7 @@ const ProjectCreate = (props) => {
     }, 2000); // wait 2 seconds then go to `projects` page
   };
 
+  // clean the current page's state and redirect to Projects page
   const handleDiscard = () => {
     setOldProject(null);
     setNewProject(emptyProject);
@@ -325,6 +380,7 @@ const ProjectCreate = (props) => {
     }, 2000); // wait 2 seconds then go to `projects` page
   };
 
+  // call deleteEntry BE function
   const handleDelete = (docID) => {
     handleDeleteEntry(
       "projects",
@@ -344,7 +400,7 @@ const ProjectCreate = (props) => {
     }, 2000); // wait 2 seconds then go to `projects` page
   };
 
-  const handleChangePosInput = (index, e) => {
+  const handlePosInputChange = (index, e) => {
     let pFields = [...positionFields];
     let fieldValue =
       e.target.name === "weekly_hour" || e.target.name === "count"
@@ -373,8 +429,6 @@ const ProjectCreate = (props) => {
   const handleDateTimeChange = (e) => {
     setNewProject({ ...newProject, completion_date: e?._d });
   };
-
-  const formRef = useRef();
 
   const handleCompDateChange = (e) => {
     setIsCheckedCompDate(!isCheckedCompDate);
@@ -755,7 +809,7 @@ const ProjectCreate = (props) => {
                       label="Position Title"
                       value={positionField.title}
                       onChange={(e) => {
-                        handleChangePosInput(index, e);
+                        handlePosInputChange(index, e);
                       }}
                     />
                     {/* Weekly hour */}
@@ -774,7 +828,7 @@ const ProjectCreate = (props) => {
                         e.target.value > 1
                           ? e.target.value
                           : (e.target.value = 1);
-                        handleChangePosInput(index, e);
+                        handlePosInputChange(index, e);
                       }}
                     />
                     {/* Number of people */}
@@ -792,7 +846,7 @@ const ProjectCreate = (props) => {
                         e.target.value > 1
                           ? e.target.value
                           : (e.target.value = 1);
-                        handleChangePosInput(index, e);
+                        handlePosInputChange(index, e);
                       }}
                     />
                     {/* Add / Remove position button */}
@@ -823,7 +877,7 @@ const ProjectCreate = (props) => {
                       label="Responsibilities & Qualifications"
                       value={positionField.responsibility}
                       onChange={(e) => {
-                        handleChangePosInput(index, e);
+                        handlePosInputChange(index, e);
                       }}
                     />
                   </Box>
@@ -839,7 +893,7 @@ const ProjectCreate = (props) => {
                       name="url"
                       label="Application Form Link"
                       defaultValue={getAppLink(index)}
-                      onChange={(e) => handleChangePosInput(index, e)}
+                      onChange={(e) => handlePosInputChange(index, e)}
                     />
                   </Box>
                 </div>
@@ -939,7 +993,16 @@ const ProjectCreate = (props) => {
               variant="contained"
               disableElevation
               disabled={!isClickable || !ediumUser?.uid}
-              onClick={(e) => handleSubmit(e)}
+              onClick={(e) => {
+                if (
+                  currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
+                  isCheckedTransferable
+                ) {
+                  handleSubmitTransferable(e);
+                } else {
+                  handleSubmit(e);
+                }
+              }}
             >
               {"Confirm"}
             </Button>

@@ -14,16 +14,14 @@ import {
 import NextLink from "next/link";
 import { auth } from "../../firebase";
 import { useAuth } from "../Context/AuthContext";
-import { ThemeProvider, styled, createTheme } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import ExportedImage from "next-image-export-optimizer";
 import { GlobalContext } from "../Context/ShareContexts";
 
 const Navbar = () => {
-  // currentUser
-  const { currentUser } = useAuth();
-
   // context
-  const { onMedia } = useContext(GlobalContext);
+  const { currentUser } = useAuth();
+  const { ediumUser, onMedia } = useContext(GlobalContext);
 
   // menu
   const [anchorEl, setAnchorEl] = useState(null);
@@ -171,7 +169,7 @@ const Navbar = () => {
                       height: "36px",
                     }
               }
-              src={currentUser?.photoURL}
+              src={ediumUser?.photo_url}
               referrerPolicy="no-referrer"
             />
           </IconButton>
