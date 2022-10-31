@@ -19,7 +19,6 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import {
   collection,
@@ -31,7 +30,7 @@ import {
   arrayRemove,
   arrayUnion,
 } from "firebase/firestore";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { db } from "../../firebase";
 import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import {
@@ -65,12 +64,15 @@ const EventCreate = (props) => {
   const { showAlert } = useContext(EventContext);
 
   // props from push query
-  const isCreate = props.isCreateStr === "false" ? false : true; // null, undefined, "true" are all true isCreate
-
-  // router
-  const router = useRouter();
+  const isCreate = useMemo(() => {
+    return props.isCreateStr === "false" ? false : true; // null, undefined, "true" are all true isCreate
+  }, [props.isCreateStr]);
 
   // local vars
+  const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
+  const router = useRouter();
+  const formRef = useRef();
+
   // Event State Initialization.
   const emptyEvent = {
     title: "",
@@ -90,8 +92,6 @@ const EventCreate = (props) => {
   const [newEvent, setNewEvent] = useState(() =>
     isCreate ? emptyEvent : oldEvent
   );
-
-  const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
 
   // upload-icon dialog modal
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -121,7 +121,6 @@ const EventCreate = (props) => {
   // helper functions
   const handleSubmit = async (e) => {
     if (!isClickable) return;
-    if (currentUser?.uid !== ediumUser?.uid) return;
     if (!formRef.current.reportValidity()) return;
 
     // button is clickable & form is valid
@@ -159,35 +158,112 @@ const EventCreate = (props) => {
 
     // retID: create; !retID: update
     if (retID) {
-      // check if admin creats transferable event first
-      if (
-        currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
-        isCheckedTransferable
-      ) {
-        // don't add event id to my_event_ids
-        // do create extenion doc with extra field
-        const extDocRef = doc(db, "events_ext", retID);
+      // add to my_event_ids in user ext data if create
+      const ediumUserExtDocRef = doc(db, "users_ext", ediumUser?.uid);
+      const ediumUserExtUpdateRef = {
+        my_event_ids: ediumUserExt?.my_event_ids ? arrayUnion(retID) : [retID],
+        last_timestamp: serverTimestamp(),
+      };
+      const ediumUserExtModRef = updateDoc(
+        ediumUserExtDocRef,
+        ediumUserExtUpdateRef
+      ).catch((error) => {
+        console.log(error?.message);
+      });
 
-        const eventExtRef = {
-          is_deleted: false,
-          members: [ediumUser?.uid],
-          admins: [ediumUser?.uid],
-          last_timestamp: serverTimestamp(),
-          transfer_code: Math.random().toString(16).slice(2),
-        };
-        const eventExtModRef = setDoc(extDocRef, eventExtRef).catch((error) => {
-          console.log(error?.message);
-        });
+      // create extension doc for team management if create
+      const extDocRef = doc(db, "events_ext", retID);
+      const eventExtRef = {
+        is_deleted: false,
+        members: [ediumUser?.uid],
+        admins: [ediumUser?.uid],
+        last_timestamp: serverTimestamp(),
+      };
+      const eventExtModRef = setDoc(extDocRef, eventExtRef).catch((error) => {
+        console.log(error?.message);
+      });
 
-        navigator.clipboard.writeText(eventExtRef.transfer_code);
-        await eventExtModRef;
-      } else {
-        // add to my_event_ids in user ext data if create
+      await ediumUserExtModRef;
+      await eventExtModRef;
+    }
+
+    setOldEvent(null);
+
+    // !todo: since updateDoc return Promise<void>, we need other method to check the results
+    showAlert(
+      "success",
+      `"${newEvent.title}" is updated successfully! Navigate to Events page.`
+    );
+
+    setTimeout(() => {
+      router.push(`/events`); // can be customized
+    }, 2000); // wait 2 seconds then go to `events` page
+  };
+
+  const handleSubmitTransferable = async (e) => {
+    if (!isClickable) return;
+    if (!formRef.current.reportValidity()) return;
+
+    // button is clickable & form is valid
+    setIsClickable(false);
+    let eventModRef; // ref to addDoc() or updateDoc()
+    if (isCreate) {
+      // create a new event
+      const collectionRef = collection(db, "events");
+      const eventRef = {
+        ...newEvent,
+        create_timestamp: serverTimestamp(),
+        last_timestamp: serverTimestamp(),
+      };
+      eventModRef = addDoc(collectionRef, eventRef).catch((error) => {
+        console.log(error?.message);
+      });
+    } else {
+      // update an existing event
+      // since all the changes are in newEvent, can't just update partially
+      const docRef = doc(db, "events", newEvent.id);
+      const eventRef = {
+        ...newEvent,
+        last_timestamp: serverTimestamp(),
+      };
+      delete eventRef.id;
+      eventModRef = updateDoc(docRef, eventRef).catch((error) => {
+        console.log(error?.message);
+      });
+    }
+
+    let retID;
+    await eventModRef.then((ret) => {
+      retID = ret?.id;
+    });
+
+    // retID: create; !retID: update
+    if (retID) {
+      // don't add event id to my_event_ids
+      // do create extenion doc with extra field
+      const extDocRef = doc(db, "events_ext", retID);
+
+      const eventExtRef = {
+        is_deleted: false,
+        members: [ediumUser?.uid],
+        admins: [ediumUser?.uid],
+        last_timestamp: serverTimestamp(),
+        transfer_code: Math.random().toString(16).slice(2),
+      };
+      const eventExtModRef = setDoc(extDocRef, eventExtRef).catch((error) => {
+        console.log(error?.message);
+      });
+
+      navigator.clipboard.writeText(eventExtRef.transfer_code);
+      await eventExtModRef;
+    } else {
+      // update an event to transferable
+      // remove ids from my event list
+      const event_ids = ediumUserExt?.my_event_ids;
+      if (event_ids.find((event_id) => event_id === oldEvent.id)) {
         const ediumUserExtDocRef = doc(db, "users_ext", ediumUser?.uid);
         const ediumUserExtUpdateRef = {
-          my_event_ids: ediumUserExt?.my_event_ids
-            ? arrayUnion(retID)
-            : [retID],
+          my_event_ids: arrayRemove(oldEvent.id),
           last_timestamp: serverTimestamp(),
         };
         const ediumUserExtModRef = updateDoc(
@@ -196,59 +272,22 @@ const EventCreate = (props) => {
         ).catch((error) => {
           console.log(error?.message);
         });
-
-        // create extension doc for team management if create
-        const extDocRef = doc(db, "events_ext", retID);
-        const eventExtRef = {
-          is_deleted: false,
-          members: [ediumUser?.uid],
-          admins: [ediumUser?.uid],
-          last_timestamp: serverTimestamp(),
-        };
-        const eventExtModRef = setDoc(extDocRef, eventExtRef).catch((error) => {
-          console.log(error?.message);
-        });
-
         await ediumUserExtModRef;
-        await eventExtModRef;
       }
-    } else {
-      // update
-      if (
-        currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
-        isCheckedTransferable
-      ) {
-        // remove invalid ids
-        const event_ids = ediumUserExt?.my_event_ids;
-        if (event_ids.find((event_id) => event_id === oldEvent.id)) {
-          const ediumUserExtDocRef = doc(db, "users_ext", ediumUser?.uid);
-          const ediumUserExtUpdateRef = {
-            my_event_ids: arrayRemove(oldEvent.id),
-            last_timestamp: serverTimestamp(),
-          };
-          const ediumUserExtModRef = updateDoc(
-            ediumUserExtDocRef,
-            ediumUserExtUpdateRef
-          ).catch((error) => {
+      // add transfer code
+      const eventExt = findItemFromList(eventsExt, "id", oldEvent.id);
+      if (!eventExt.transfer_code) {
+        const extDocRef = doc(db, "events_ext", oldEvent.id);
+        const eventExtRef = {
+          last_timestamp: serverTimestamp(),
+          transfer_code: Math.random().toString(16).slice(2),
+        };
+        const eventExtModRef = updateDoc(extDocRef, eventExtRef).catch(
+          (error) => {
             console.log(error?.message);
-          });
-          await ediumUserExtModRef;
-        }
-        // add transfer code
-        const eventExt = findItemFromList(eventsExt, "id", oldEvent.id);
-        if (!eventExt.transfer_code) {
-          const extDocRef = doc(db, "events_ext", oldEvent.id);
-          const eventExtRef = {
-            last_timestamp: serverTimestamp(),
-            transfer_code: Math.random().toString(16).slice(2),
-          };
-          const eventExtModRef = updateDoc(extDocRef, eventExtRef).catch(
-            (error) => {
-              console.log(error?.message);
-            }
-          );
-          await eventExtModRef;
-        }
+          }
+        );
+        await eventExtModRef;
       }
     }
 
@@ -299,8 +338,6 @@ const EventCreate = (props) => {
       ? setNewEvent({ ...newEvent, start_date: e?._d })
       : setNewEvent({ ...newEvent, end_date: e?._d });
   };
-
-  const formRef = useRef();
 
   return (
     <Grid
@@ -698,7 +735,16 @@ const EventCreate = (props) => {
               variant="contained"
               disableElevation
               disabled={!isClickable || !ediumUser?.uid}
-              onClick={(e) => handleSubmit(e)}
+              onClick={(e) => {
+                if (
+                  currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
+                  isCheckedTransferable
+                ) {
+                  handleSubmitTransferable(e);
+                } else {
+                  handleSubmit(e);
+                }
+              }}
             >
               {"Confirm"}
             </Button>

@@ -322,7 +322,6 @@ const ChatMsg = (props) => {
   const headerBox = (
     <Box
       sx={{
-        backgroundColor: "#ffffff",
         position: "sticky",
         top: 0,
         display: "flex",
@@ -509,7 +508,6 @@ const ChatMsg = (props) => {
   const inputBox = (
     <Box
       sx={{
-        backgroundColor: "#ffffff",
         position: "sticky",
         bottom: 0,
         zIndex: 1,
