@@ -43,7 +43,7 @@ const ProjectList = () => {
   }, [setProject, projects, onMedia.onDesktop]);
 
   return (
-    <Box sx={{ backgroundColor: "#fafafa" }}>
+    <Box sx={{ backgroundColor: "white" }}>
       <Box
         sx={{
           height: onMedia.onDesktop

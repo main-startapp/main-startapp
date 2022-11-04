@@ -21,13 +21,9 @@ import useWindowDimensions from "../components/Reusable/WindowDimensions";
 
 // global font testing
 const globalTheme = createTheme({
-  typography: {
-    edium: {
-      fontFamily: ["Stick No Bills", "sans-serif"].join(","),
-    },
-  },
-
   palette: {
+    mode: "light",
+
     SteelBlue: {
       main: "#3e95c2",
     },
@@ -41,7 +37,7 @@ const globalTheme = createTheme({
     MuiButtonBase: {
       defaultProps: {
         // The props to apply
-        disableRipple: true, // No more ripple, on the whole application 💣!
+        disableRipple: true, // No more ripple, on the whole application!
       },
     },
   },

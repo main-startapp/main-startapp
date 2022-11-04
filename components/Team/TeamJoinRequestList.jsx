@@ -49,7 +49,7 @@ const TeamJoinRequestList = () => {
     .slick-prev:before,
     .slick-next:before {
       font-size: 50px;
-      color: SteelBlue;
+      color: blue;
     }
   `;
 

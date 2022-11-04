@@ -14,7 +14,7 @@ import {
 import NextLink from "next/link";
 import { auth } from "../../firebase";
 import { useAuth } from "../Context/AuthContext";
-import { ThemeProvider, styled, createTheme } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import ExportedImage from "next-image-export-optimizer";
 import { GlobalContext } from "../Context/ShareContexts";
 
@@ -43,16 +43,17 @@ const Navbar = () => {
   };
 
   return (
-    // https://www.color-hex.com/color/3e95c2
     <AppBar
+      color="background"
+      elevation={0}
       position="static"
       sx={{
-        backgroundColor: "#3e95c2",
+        borderBottom: 1.5,
+        borderColor: "divider",
         "&:hover": {
           cursor: "default",
         },
       }}
-      elevation={0}
     >
       <Toolbar
         sx={{
@@ -102,7 +103,7 @@ const Navbar = () => {
             <NextLink href="/">
               <PageLink>Projects</PageLink>
             </NextLink>
-            <Divider
+            {/* <Divider
               sx={{
                 ml: 3,
                 mr: 3,
@@ -111,11 +112,11 @@ const Navbar = () => {
               }}
               orientation="vertical"
               flexItem
-            />
+            /> */}
             <NextLink href="/events">
               <PageLink>Events</PageLink>
             </NextLink>
-            <Divider
+            {/* <Divider
               sx={{
                 ml: 3,
                 mr: 3,
@@ -124,7 +125,7 @@ const Navbar = () => {
               }}
               orientation="vertical"
               flexItem
-            />
+            /> */}
             <NextLink href="/students">
               <PageLink>Students</PageLink>
             </NextLink>
@@ -205,7 +206,7 @@ const Navbar = () => {
 export default Navbar;
 
 const PageLink = styled(MuiLink)(({ theme }) => ({
-  color: "#ffffff",
+  color: theme.palette.text.primary,
   textDecoration: "none",
   fontSize: "1.1em",
   ":hover": {
@@ -214,6 +215,6 @@ const PageLink = styled(MuiLink)(({ theme }) => ({
 }));
 
 const MenuItemLink = styled(MuiLink)(({ theme }) => ({
-  color: "#000000",
+  color: theme.palette.text.primary,
   textDecoration: "none",
 }));

@@ -35,9 +35,6 @@ const Home = () => {
         setSearchCategory,
       }}
     >
-      {/* Toolbar for searching keywords, category and filter */}
-      <ProjectsPageBar />
-
       <Grid
         container
         spaceing={0}

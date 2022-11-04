@@ -61,7 +61,7 @@ const DBListener = () => {
         );
       },
       (error) => {
-        console.log(error?.message);
+        console.log("projects ", error?.message);
       }
     );
 
@@ -101,7 +101,7 @@ const DBListener = () => {
         );
       },
       (error) => {
-        console.log(error?.message);
+        console.log("projects ext ", error?.message);
       }
     );
 
@@ -135,7 +135,7 @@ const DBListener = () => {
         );
       },
       (error) => {
-        console.log(error?.message);
+        console.log("events ", error?.message);
       }
     );
 
@@ -168,7 +168,7 @@ const DBListener = () => {
         );
       },
       (error) => {
-        console.log(error?.message);
+        console.log("events ext ", error?.message);
       }
     );
 
@@ -193,7 +193,7 @@ const DBListener = () => {
         );
       },
       (error) => {
-        console.log(error?.message);
+        console.log("users ", error?.message);
       }
     );
 
@@ -213,7 +213,7 @@ const DBListener = () => {
         }
       },
       (error) => {
-        console.log(error?.message);
+        console.log("edium user ", error?.message);
       }
     );
 
@@ -233,7 +233,7 @@ const DBListener = () => {
         }
       },
       (error) => {
-        console.log(error?.message);
+        console.log("edium user ext ", error?.message);
       }
     );
 
@@ -259,7 +259,7 @@ const DBListener = () => {
         );
       },
       (error) => {
-        console.log(error?.message);
+        console.log("chats ", error?.message);
       }
     );
 

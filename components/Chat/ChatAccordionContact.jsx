@@ -166,7 +166,7 @@ const ChatAccordionContact = (props) => {
             color: "#ffffff",
           }}
           badgeContent={chat[my_unread_key]}
-          color={"SteelBlue"}
+          color={"error"}
         />
       </Box>
     </ContactBox>
