@@ -12,7 +12,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { styled } from "@mui/material/styles";
-import { TextField } from "@mui/material";
+import { Box, InputBase, TextField } from "@mui/material";
 
 //============================================================
 // handle connect/message: if chat found, return; if not, create a chat with "request to connect" auto msg.
@@ -209,7 +209,7 @@ export const getGooglePhotoURLwithRes = (photo_url, res) => {
 };
 
 //============================================================
-// styled textfield
+// styled components
 //============================================================
 export const DefaultTextField = styled(TextField)(() => ({
   "& .MuiOutlinedInput-root": {
@@ -234,6 +234,38 @@ export const DefaultTextField = styled(TextField)(() => ({
   },
 }));
 
+export const SearchBox = styled(Box)(({ theme }) => ({
+  //position: "relative",
+  height: "36px",
+  border: 0,
+  borderRadius: "10px",
+  backgroundColor: theme.palette.searchBar.main,
+  // ":hover": { backgroundColor: "#3e95c2" },
+  display: "flex",
+  alignItems: "center",
+}));
+
+export const SearchIconWrapper = styled("div")(({ theme }) => ({
+  padding: theme.spacing(0, 1),
+  //height: "100%",
+  //position: "absolute",
+  pointerEvents: "none",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  color: "gray",
+}));
+
+export const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  "&.MuiInputBase-root": {
+    width: "100%",
+  },
+  "& .MuiInputBase-input": {
+    padding: theme.spacing(0, 2, 0, 0), // 2 units to the right
+    fontSize: "1rem",
+    color: theme.palette.text.primary,
+  },
+}));
 //============================================================
 // ADMIN: Duplicate Collections With New Name
 //============================================================

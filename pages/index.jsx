@@ -44,7 +44,7 @@ const Home = () => {
       >
         {/* left part: project list */}
         {onMedia.onDesktop ? (
-          <Grid item xs={4}>
+          <Grid item xs={3}>
             <ProjectList />
           </Grid>
         ) : (
@@ -56,7 +56,7 @@ const Home = () => {
         )}
         {/* right part: project info */}
         {onMedia.onDesktop ? (
-          <Grid item xs={8}>
+          <Grid item xs={7}>
             <ProjectInfo />
           </Grid>
         ) : (

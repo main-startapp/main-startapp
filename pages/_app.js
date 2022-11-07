@@ -14,6 +14,7 @@ import ChatMsgBox from "../components/Chat/ChatMsgBox";
 import DBListener from "../components/DBListener";
 import BottomNav from "../components/Header/BottomNav";
 import useWindowDimensions from "../components/Reusable/WindowDimensions";
+import { grey } from "@mui/material/colors";
 
 // makeStyles, useStyles, createStyles, withStyles, styled
 // https://smartdevpreneur.com/material-ui-makestyles-usestyles-createstyles-and-withstyles-explained/
@@ -23,6 +24,10 @@ import useWindowDimensions from "../components/Reusable/WindowDimensions";
 const globalTheme = createTheme({
   palette: {
     mode: "light",
+    secondary: { main: "#6ff9d1" },
+    unselectedIcon: { main: grey[600] },
+    searchBar: { main: grey[200] },
+    hoverBackground: { main: grey[100] },
 
     SteelBlue: {
       main: "#3e95c2",

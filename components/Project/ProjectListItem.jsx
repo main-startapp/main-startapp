@@ -22,7 +22,6 @@ const ProjectListItem = (props) => {
   const last = props.last;
 
   // context
-
   const { ediumUser, onMedia } = useContext(GlobalContext);
   const { setProject } = useContext(ProjectContext);
 
@@ -44,11 +43,11 @@ const ProjectListItem = (props) => {
 
   return (
     <Box
-      sx={{
-        mx: onMedia.onDesktop ? 3 : 1.5,
-        mt: onMedia.onDesktop ? (index === 0 ? 3 : 1.5) : 1.5,
-        mb: index === last ? (onMedia.onDesktop ? 3 : 1.5) : 0,
-      }}
+    // sx={{
+    //   mx: onMedia.onDesktop ? 3 : 1.5,
+    //   mt: onMedia.onDesktop ? (index === 0 ? 3 : 1.5) : 1.5,
+    //   mb: index === last ? (onMedia.onDesktop ? 3 : 1.5) : 0,
+    // }}
     >
       <ListItem
         onClick={() => setProject(project)}
@@ -56,16 +55,17 @@ const ProjectListItem = (props) => {
           display: "flex",
           flexDirection: "column",
           alignItems: "flex-start",
-          border: 1.5,
-          borderRadius: "30px",
-          borderColor: "#dbdbdb",
-          backgroundColor: "#ffffff",
+          borderBottom: 1.5,
+          //borderRadius: "30px",
+          borderColor: "divider",
+          backgroundColor: "background",
           "&:hover": {
-            backgroundColor: "#f6f6f6",
+            backgroundColor: "hoverBackground.main",
             cursor: "default",
           },
-          // height: "180px",
           overflow: "hidden",
+          paddingY: 2,
+          paddingX: 2,
         }}
       >
         <Box

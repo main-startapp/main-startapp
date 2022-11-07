@@ -36,7 +36,7 @@ const Students = () => {
         setSearchCategory,
       }}
     >
-      <StudentsPageBar />
+      {/* <StudentsPageBar /> */}
       <Grid
         container
         spaceing={0}

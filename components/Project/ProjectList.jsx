@@ -1,8 +1,9 @@
 import { useContext, useMemo, useEffect } from "react";
 import NextLink from "next/link";
-import { Box, Button, Tooltip } from "@mui/material";
+import { Box, Button, Paper, Tooltip, useTheme } from "@mui/material";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import ProjectListItem from "./ProjectListItem";
+import ProjectListHeader from "./ProjectListHeader";
 
 // link/router https://stackoverflow.com/questions/65086108/next-js-link-vs-router-push-vs-a-tag
 // description: a list of projects (project list items); a button to create new project (router.push)
@@ -11,8 +12,9 @@ const ProjectList = () => {
   // context
   const { projects, ediumUser, winHeight, onMedia } = useContext(GlobalContext);
   const { searchTerm, searchCategory, setProject } = useContext(ProjectContext);
+  const theme = useTheme();
 
-  // local vars
+  // project list with filtering
   const filteredProjects = useMemo(
     () =>
       projects.filter((project) => {
@@ -43,12 +45,27 @@ const ProjectList = () => {
   }, [setProject, projects, onMedia.onDesktop]);
 
   return (
-    <Box sx={{ backgroundColor: "white" }}>
+    <Paper
+      elevation={2}
+      sx={{
+        mt: 3,
+        mr: 3,
+        backgroundColor: "background",
+        border: 1.5,
+        borderColor: "divider",
+        borderRadius: "30px 30px 0px 0px",
+      }}
+    >
+      {onMedia.onDesktop && <ProjectListHeader />}
+
       <Box
+        id="projectlist-projectlistitem-box"
         sx={{
           height: onMedia.onDesktop
-            ? `calc(${winHeight}px - 64px - 64px - 1.5px - 36px - 24px)`
-            : `calc(${winHeight}px - 48px - 48px - 1.5px - 60px)`, // navbar; projectbar; border; button; y-margins
+            ? `calc(${winHeight}px - 64px - 1.5px - ${theme.spacing(
+                3
+              )} - 1.5px - 143px - 36px - 2*${theme.spacing(2)} - 1.5px)` // navbar; navbar b border; spacing; paper t border; header; button; 2*y-margins; paper b border
+            : `calc(${winHeight}px - 48px - 48px - 1.5px - 60px)`,
           overflow: "auto",
         }}
       >
@@ -64,47 +81,46 @@ const ProjectList = () => {
 
       {onMedia.onDesktop && (
         <Box
+          id="projectlist-button-box"
           sx={{
             display: "flex",
             justifyContent: "center",
-            mt: "12px",
+            mt: 2,
+            mb: 2,
+            paddingX: 2,
           }}
         >
-          <Tooltip title={ediumUser?.uid ? "" : "Edit your profile first"}>
-            <span>
-              <NextLink
-                href={{
-                  pathname: "/projects/create",
-                  query: { isCreateStr: "true" },
-                }}
-                as="/projects/create"
-                passHref
-              >
-                <Button
-                  disabled={!ediumUser?.uid}
-                  disableElevation
-                  sx={{
-                    border: 1.5,
-                    borderColor: "#dbdbdb",
-                    borderRadius: "30px",
-                    color: "text.primary",
-                    backgroundColor: "#ffffff",
-                    fontWeight: "bold",
-                    "&:hover": {
-                      backgroundColor: "#f6f6f6",
-                    },
-                    textTransform: "none",
-                  }}
-                  variant="contained"
-                >
-                  {"Create Project"}
-                </Button>
-              </NextLink>
-            </span>
-          </Tooltip>
+          {/* <Tooltip title={ediumUser?.uid ? "" : "Edit your profile first"}>
+            <span></span>
+          </Tooltip> */}
+          <NextLink
+            href={{
+              pathname: "/projects/create",
+              query: { isCreateStr: "true" },
+            }}
+            as="/projects/create"
+            passHref
+          >
+            <Button
+              color="secondary"
+              disabled={!ediumUser?.uid}
+              disableElevation
+              fullWidth
+              variant="contained"
+              sx={{
+                height: "36px",
+                borderRadius: "10px",
+                color: "text.primary",
+                fontWeight: "bold",
+                textTransform: "none",
+              }}
+            >
+              {"Create Project"}
+            </Button>
+          </NextLink>
         </Box>
       )}
-    </Box>
+    </Paper>
   );
 };
 

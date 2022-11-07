@@ -10,6 +10,9 @@ import {
   Link as MuiLink,
   Menu,
   MenuItem,
+  Stack,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import NextLink from "next/link";
 import { auth } from "../../firebase";
@@ -17,6 +20,10 @@ import { useAuth } from "../Context/AuthContext";
 import { styled } from "@mui/material/styles";
 import ExportedImage from "next-image-export-optimizer";
 import { GlobalContext } from "../Context/ShareContexts";
+import Diversity2Icon from "@mui/icons-material/Diversity2";
+import LocalActivityIcon from "@mui/icons-material/LocalActivity";
+import PersonSearchIcon from "@mui/icons-material/PersonSearch";
+import { useMemo } from "react";
 
 const Navbar = () => {
   // currentUser
@@ -41,6 +48,9 @@ const Navbar = () => {
     setAnchorEl(null);
     // window.location.reload();
   };
+
+  // url
+  const url = new URL(window.location.href);
 
   return (
     <AppBar
@@ -70,7 +80,7 @@ const Navbar = () => {
         }}
         disableGutters
       >
-        {/* icon */}
+        {/* edium icon */}
         <Box
           sx={{
             display: "flex",
@@ -83,8 +93,8 @@ const Navbar = () => {
           <ExportedImage
             src="/images/EDIUMPlatformLogo256.png"
             placeholder=""
-            width={onMedia.onDesktop ? 48 : 36}
-            height={onMedia.onDesktop ? 48 : 36}
+            width={onMedia.onDesktop ? 40 : 30}
+            height={onMedia.onDesktop ? 40 : 30}
           />
           {/* <Typography variant="edium" sx={{ fontSize: "2em", ml: 1 }}>
             Edium
@@ -100,35 +110,76 @@ const Navbar = () => {
               justifyContent: "center",
             }}
           >
-            <NextLink href="/">
-              <PageLink>Projects</PageLink>
-            </NextLink>
-            {/* <Divider
-              sx={{
-                ml: 3,
-                mr: 3,
-                borderRightWidth: 1.5,
-                borderColor: "black",
-              }}
-              orientation="vertical"
-              flexItem
-            /> */}
-            <NextLink href="/events">
-              <PageLink>Events</PageLink>
-            </NextLink>
-            {/* <Divider
-              sx={{
-                ml: 3,
-                mr: 3,
-                borderRightWidth: 1.5,
-                borderColor: "black",
-              }}
-              orientation="vertical"
-              flexItem
-            /> */}
-            <NextLink href="/students">
-              <PageLink>Students</PageLink>
-            </NextLink>
+            <Stack direction="row" spacing={8}>
+              <NextLink href="/">
+                <LinkIconBox sx={url.pathname === "/" && { borderBottom: 1.5 }}>
+                  <Diversity2Icon
+                    color={
+                      url.pathname === "/" ? "text.primary" : "unselectedIcon"
+                    }
+                    sx={{ mt: 1.5, mb: 0.5, fontSize: "32px" }}
+                  />
+                  <PageLink
+                    color={
+                      url.pathname === "/"
+                        ? "text.primary"
+                        : "unselectedIcon.main"
+                    }
+                    sx={{ mb: "3px" }}
+                  >
+                    Projects
+                  </PageLink>
+                </LinkIconBox>
+              </NextLink>
+              <NextLink href="/events/">
+                <LinkIconBox
+                  sx={url.pathname === "/events/" && { borderBottom: 1.5 }}
+                >
+                  <LocalActivityIcon
+                    color={
+                      url.pathname === "/events/"
+                        ? "text.primary"
+                        : "unselectedIcon"
+                    }
+                    sx={{ mt: 1.5, mb: 0.5, fontSize: "32px" }}
+                  />
+                  <PageLink
+                    color={
+                      url.pathname === "/events/"
+                        ? "text.primary"
+                        : "unselectedIcon.main"
+                    }
+                    sx={{ mb: "3px" }}
+                  >
+                    Events
+                  </PageLink>
+                </LinkIconBox>
+              </NextLink>
+              <NextLink href="/students/">
+                <LinkIconBox
+                  sx={url.pathname === "/students/" && { borderBottom: 1.5 }}
+                >
+                  <PersonSearchIcon
+                    color={
+                      url.pathname === "/students/"
+                        ? "text.primary"
+                        : "unselectedIcon"
+                    }
+                    sx={{ mt: 1.5, mb: 0.5, fontSize: "32px" }}
+                  />
+                  <PageLink
+                    color={
+                      url.pathname === "/students/"
+                        ? "text.primary"
+                        : "unselectedIcon.main"
+                    }
+                    sx={{ mb: "3px" }}
+                  >
+                    Students
+                  </PageLink>
+                </LinkIconBox>
+              </NextLink>
+            </Stack>
           </Box>
         )}
         {/* user */}
@@ -163,12 +214,12 @@ const Navbar = () => {
               sx={
                 onMedia.onDesktop
                   ? {
-                      width: "48px",
-                      height: "48px",
+                      width: "40px",
+                      height: "40px",
                     }
                   : {
-                      width: "36px",
-                      height: "36px",
+                      width: "30px",
+                      height: "30px",
                     }
               }
               src={currentUser?.photoURL}
@@ -205,10 +256,18 @@ const Navbar = () => {
 
 export default Navbar;
 
+const LinkIconBox = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "flex-start",
+  alignItems: "center",
+}));
+
+// since the nav bar is fixed height, the font should also use fixed size
 const PageLink = styled(MuiLink)(({ theme }) => ({
-  color: theme.palette.text.primary,
+  fontSize: "12px",
+  fontWeight: "600",
   textDecoration: "none",
-  fontSize: "1.1em",
   ":hover": {
     cursor: "pointer",
   },

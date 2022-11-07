@@ -36,7 +36,7 @@ const Events = () => {
       }}
     >
       {/* Toolbar for searching keywords, category and filter */}
-      <EventsPageBar />
+      {/* <EventsPageBar /> */}
 
       <Grid
         container
