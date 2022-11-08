@@ -26,11 +26,9 @@ import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import { useMemo } from "react";
 
 const Navbar = () => {
-  // currentUser
-  const { currentUser } = useAuth();
-
   // context
-  const { onMedia } = useContext(GlobalContext);
+  const { currentUser } = useAuth();
+  const { ediumUser, onMedia } = useContext(GlobalContext);
 
   // menu
   const [anchorEl, setAnchorEl] = useState(null);
@@ -194,6 +192,7 @@ const Navbar = () => {
         >
           <IconButton
             id="navbar-menu-button"
+            disabled={!currentUser}
             aria-controls={open ? "navbar-menu" : undefined}
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
@@ -222,7 +221,7 @@ const Navbar = () => {
                       height: "30px",
                     }
               }
-              src={currentUser?.photoURL}
+              src={ediumUser?.photo_url}
               referrerPolicy="no-referrer"
             />
           </IconButton>

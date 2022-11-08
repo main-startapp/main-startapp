@@ -59,6 +59,15 @@ const ProjectInfo = () => {
     return findItemFromList(users, "uid", project?.creator_uid);
   }, [users, project?.creator_uid]);
 
+  const orgTags = useMemo(() => {
+    if (creatorUser?.role !== "org_admin") return "";
+    let retStr = "";
+    creatorUser?.org_tags?.forEach((tag) => {
+      retStr += ", " + tag;
+    });
+    return retStr;
+  }, [creatorUser]);
+
   // box ref to used by useEffect
   const boxRef = useRef();
 

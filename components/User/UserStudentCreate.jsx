@@ -45,7 +45,11 @@ const UserStudentCreate = (props) => {
   });
 
   const foiOptions = useMemo(() => {
-    return studentFoIStrList.concat(userCreatedFoI?.string_list).sort();
+    if (userCreatedFoI?.string_list?.length > 0) {
+      return studentFoIStrList.concat(userCreatedFoI?.string_list).sort();
+    } else {
+      return studentFoIStrList.sort();
+    }
   }, [userCreatedFoI?.string_list]);
 
   // update student data if ediumUser exists

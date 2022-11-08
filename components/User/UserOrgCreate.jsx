@@ -14,17 +14,10 @@ import {
   organizationTags,
   studentDepartmentStrList,
 } from "../Reusable/MenuStringList";
-import { DefaultTextField, getDocsByQueryFromDB } from "../Reusable/Resusable";
+import { DefaultTextField } from "../Reusable/Resusable";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
-import {
-  addDoc,
-  arrayUnion,
-  collection,
-  doc,
-  serverTimestamp,
-  updateDoc,
-} from "firebase/firestore";
+import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import stringSimilarity from "string-similarity";
 
@@ -43,22 +36,14 @@ const UserOrgCreate = (props) => {
   const [newOrgUser, setNewOrgUser] = useState({
     name: "",
     create_timestamp: "",
-    photo_url: currentUser?.photoURL || "",
     role: "org_admin",
+    org_title: "",
+    org_department: "N/A",
+    org_tags: [],
+    org_social_media: [""],
+    org_logo_url: "",
+    org_agents: [],
   });
-
-  const [newOrg, setNewOrg] = useState({
-    title: "",
-    department: "N/A",
-    tags: [],
-    create_timestamp: "",
-    social_media: [""],
-    logo_url: "",
-    admin_uid: currentUser?.uid,
-    representatives: [currentUser?.uid],
-  });
-
-  const [orgDocID, setOrgDocID] = useState("");
 
   const tagsOptions = useMemo(() => {
     return organizationTags.concat(userCreatedTags?.string_list).sort();
@@ -71,64 +56,20 @@ const UserOrgCreate = (props) => {
     // user
     const ediumUserRef = cloneDeep(ediumUser);
     setNewOrgUser(ediumUserRef);
-
-    // org
-    getDocsByQueryFromDB(
-      "organizations",
-      "admin_uid",
-      "==",
-      ediumUser.uid
-    ).then((retArray) => {
-      // each user can only create 1 org, thus retArray[0]
-      const orgData = retArray[0].data;
-      // check empty array
-      if (!orgData?.social_media?.length) {
-        orgData.social_media = [""];
-      }
-      setNewOrg(orgData);
-      setOrgDocID(retArray[0].id);
-    });
   }, [ediumUser]);
 
   const formRef = useRef();
 
   // helper func
   const handleRemoveSocialMedia = (index) => {
-    let currentSocialMedia = newOrg.social_media;
+    let currentSocialMedia = newOrgUser.org_social_media;
     currentSocialMedia.splice(index, 1);
-    setNewOrg({ ...newOrg, social_media: currentSocialMedia });
-  };
-
-  // submit org doc to organization collection
-  const handleOrgSubmit = async () => {
-    let orgRef = {
-      ...newOrg,
-      // remove empty entries
-      tags: newOrg.tags.filter((ele) => ele),
-      social_media: newOrg.social_media.filter((ele) => ele),
-      last_timestamp: serverTimestamp(),
-    };
-    let orgModRef;
-    if (orgDocID) {
-      // update
-      const docRef = doc(db, "organizations", orgDocID);
-      orgModRef = updateDoc(docRef, orgRef).catch((error) => {
-        console.log(error?.message);
-      });
-    } else {
-      // create
-      const collectionRef = collection(db, "organizations");
-      orgRef = { ...orgRef, create_timestamp: serverTimestamp() };
-      orgModRef = addDoc(collectionRef, orgRef).catch((error) => {
-        console.log(error?.message);
-      });
-    }
-    await orgModRef;
+    setNewOrgUser({ ...newOrgUser, org_social_media: currentSocialMedia });
   };
 
   // submit new user created tags to user created list collection
   const handleUserCreatedTagsSubmit = async () => {
-    const currentTags = newOrg.tags;
+    const currentTags = newOrgUser.org_tags;
     const newTags = [];
 
     // traverse the list to see if the input is "unique"
@@ -163,16 +104,17 @@ const UserOrgCreate = (props) => {
     }
   };
 
-  // update org tags in all projects
-  const handleProjectTagsSubmit = () => {};
-
   const handleSubmit = () => {
     if (!isClickable) return;
     if (!formRef.current.reportValidity()) return;
     setIsClickable(false);
 
-    handleUserSubmit(newOrgUser);
-    handleOrgSubmit();
+    const orgUserRef = {
+      ...newOrgUser,
+      // remove empty entries
+      org_social_media: newOrgUser.org_social_media.filter((ele) => ele),
+    };
+    handleUserSubmit(orgUserRef);
     handleUserCreatedTagsSubmit();
     redirectTo();
   };
@@ -188,10 +130,13 @@ const UserOrgCreate = (props) => {
       }
       label="Organization Title"
       margin="none"
-      value={newOrg.title}
+      value={newOrgUser.org_title}
       onChange={(e) => {
-        setNewOrg({ ...newOrg, title: e.target.value });
-        setNewOrgUser({ ...newOrgUser, name: e.target.value + " Admin" });
+        setNewOrgUser({
+          ...newOrgUser,
+          org_title: e.target.value,
+          name: e.target.value + " Admin",
+        });
       }}
     />
   );
@@ -200,9 +145,9 @@ const UserOrgCreate = (props) => {
     <Autocomplete
       sx={onMedia.onDesktop ? { width: "25%" } : { width: "100%" }}
       options={studentDepartmentStrList}
-      value={newOrg.department}
+      value={newOrgUser.org_department}
       onChange={(event, newValue) => {
-        setNewOrg({ ...newOrg, department: newValue });
+        setNewOrgUser({ ...newOrgUser, org_department: newValue });
       }}
       renderInput={(params) => (
         <DefaultTextField {...params} label="Department" required />
@@ -218,9 +163,9 @@ const UserOrgCreate = (props) => {
       multiple
       filterSelectedOptions
       options={tagsOptions}
-      value={newOrg.tags}
+      value={newOrgUser.org_tags}
       onChange={(event, newValue) => {
-        setNewOrg({ ...newOrg, tags: newValue });
+        setNewOrgUser({ ...newOrgUser, org_tags: newValue });
       }}
       renderInput={(params) => (
         <DefaultTextField
@@ -230,7 +175,7 @@ const UserOrgCreate = (props) => {
           required
           inputProps={{
             ...params.inputProps,
-            required: newOrg.tags.length === 0,
+            required: newOrgUser.org_tags.length === 0,
           }}
         />
       )}
@@ -262,7 +207,7 @@ const UserOrgCreate = (props) => {
       <Divider sx={{ my: 5 }}>
         <Typography sx={{ color: "gray" }}>Optional</Typography>
       </Divider>
-      {newOrg.social_media.map((link, index) => {
+      {newOrgUser.org_social_media.map((link, index) => {
         return (
           <Box
             key={index}
@@ -279,11 +224,11 @@ const UserOrgCreate = (props) => {
               type="url"
               value={link}
               onChange={(e) => {
-                let cur_social_media = newOrg.social_media;
+                let cur_social_media = newOrgUser.org_social_media;
                 cur_social_media[index] = e.target.value;
-                setNewOrg({
-                  ...newOrg,
-                  social_media: cur_social_media,
+                setNewOrgUser({
+                  ...newOrgUser,
+                  org_social_media: cur_social_media,
                 });
               }}
             />
@@ -298,13 +243,13 @@ const UserOrgCreate = (props) => {
                 <RemoveRoundedIcon />
               </IconButton>
             )}
-            {index === newOrg.social_media.length - 1 && (
+            {index === newOrgUser.org_social_media.length - 1 && (
               <IconButton
                 sx={{ ml: 2.5, mt: "8px", backgroundColor: "#f0f0f0" }}
                 onClick={() => {
-                  setNewOrg({
-                    ...newOrg,
-                    social_media: [...newOrg.social_media, ""],
+                  setNewOrgUser({
+                    ...newOrgUser,
+                    org_social_media: [...newOrgUser.org_social_media, ""],
                   });
                 }}
               >
@@ -320,11 +265,12 @@ const UserOrgCreate = (props) => {
         margin="none"
         label={"Logo URL"}
         type="url"
-        value={newOrg.logo_url}
+        value={newOrgUser.org_logo_url}
         onChange={(e) => {
-          setNewOrg({
-            ...newOrg,
-            logo_url: e.target.value,
+          setNewOrgUser({
+            ...newOrgUser,
+            org_logo_url: e.target.value,
+            photo_url: e.target.value,
           });
         }}
       />

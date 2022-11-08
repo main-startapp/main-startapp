@@ -32,8 +32,8 @@ const UserCreate = () => {
     }
   }, [ediumUser]);
 
-  const [userCreatedFoI, setUserCreatedFoI] = useState(null);
-  const [userCreatedTags, setUserCreatedTags] = useState(null);
+  const [userCreatedFoI, setUserCreatedFoI] = useState([]);
+  const [userCreatedTags, setUserCreatedTags] = useState([]);
   useEffect(() => {
     const unsub1 = onSnapshot(
       doc(db, "user_created_lists", "student_field_of_interests"),
