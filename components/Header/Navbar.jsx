@@ -46,7 +46,7 @@ const Navbar = () => {
     // signout user -> close menu
     auth.signOut();
     setAnchorEl(null);
-    // window.location.reload();
+    window.location.reload(true); // do a server refresh
   };
 
   // url

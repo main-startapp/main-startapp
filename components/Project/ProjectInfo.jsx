@@ -23,6 +23,8 @@ import { useAuth } from "../Context/AuthContext";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { useRouter } from "next/router";
+import { Interweave } from "interweave";
+import { UrlMatcher } from "interweave-autolink";
 
 const ProjectInfo = () => {
   // context
@@ -287,7 +289,7 @@ const ProjectInfo = () => {
                 <Typography sx={{ fontWeight: "bold" }} color="text.primary">
                   {"Description:"}
                 </Typography>
-                <Typography component="span" color="text.secondary">
+                {/* <Typography component="span" color="text.secondary">
                   <pre
                     style={{
                       fontFamily: "inherit",
@@ -300,6 +302,12 @@ const ProjectInfo = () => {
                       dangerouslySetInnerHTML={{ __html: project?.description }}
                     />
                   </pre>
+                </Typography> */}
+                <Typography color="text.secondary">
+                  <Interweave
+                    content={project?.description}
+                    matchers={[new UrlMatcher("url")]}
+                  />
                 </Typography>
               </Box>
               {/* position details */}
