@@ -12,7 +12,10 @@ const ProjectListHeader = () => {
       id="projectlist-header-box"
       sx={{ paddingTop: 6, paddingBottom: 2, paddingX: 2 }}
     >
-      <Typography sx={{ mb: 2, fontSize: "18px", fontWeight: "bold" }}>
+      <Typography
+        variant="h1"
+        sx={{ mb: 2, fontSize: "18px", fontWeight: "bold" }}
+      >
         Project Board
       </Typography>
       <SearchBox>

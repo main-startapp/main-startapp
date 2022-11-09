@@ -1,6 +1,13 @@
 import { useContext, useMemo, useEffect } from "react";
 import NextLink from "next/link";
-import { Box, Button, Paper, Tooltip, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  Paper,
+  Tooltip,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import ProjectListItem from "./ProjectListItem";
 import ProjectListHeader from "./ProjectListHeader";
@@ -48,8 +55,8 @@ const ProjectList = () => {
     <Paper
       elevation={2}
       sx={{
-        mt: 3,
-        mr: 3,
+        mt: 4,
+        mr: 4,
         backgroundColor: "background",
         border: 1.5,
         borderColor: "divider",
@@ -63,8 +70,8 @@ const ProjectList = () => {
         sx={{
           height: onMedia.onDesktop
             ? `calc(${winHeight}px - 64px - 1.5px - ${theme.spacing(
-                3
-              )} - 1.5px - 143px - 36px - 2*${theme.spacing(2)} - 1.5px)` // navbar; navbar b border; spacing; paper t border; header; button; 2*y-margins; paper b border
+                4
+              )} - 1.5px - 137px - 36px - 2*${theme.spacing(2)} - 1.5px)` // navbar; navbar b border; spacing; paper t border; header; button; 2*y-margins; paper b border
             : `calc(${winHeight}px - 48px - 48px - 1.5px - 60px)`,
           overflow: "auto",
         }}
@@ -110,12 +117,9 @@ const ProjectList = () => {
               sx={{
                 height: "36px",
                 borderRadius: "10px",
-                color: "text.primary",
-                fontWeight: "bold",
-                textTransform: "none",
               }}
             >
-              {"Create Project"}
+              <Typography variant="button">{"Create Project"}</Typography>
             </Button>
           </NextLink>
         </Box>

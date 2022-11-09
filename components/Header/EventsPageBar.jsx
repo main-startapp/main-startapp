@@ -183,8 +183,8 @@ const EventsPageBar = () => {
                   borderRadius: "10px",
                   ml: 1.5,
                 }}
-                id="epb-menu-button"
-                aria-controls={open ? "epb-menu" : undefined}
+                id="eventpagebar-menu-button"
+                aria-controls={open ? "eventpagebar-menu" : undefined}
                 aria-haspopup="true"
                 aria-expanded={open ? "true" : undefined}
                 onClick={(e) => {
@@ -193,7 +193,7 @@ const EventsPageBar = () => {
               >
                 <TuneRoundedIcon />
                 <Menu
-                  id="epb-menu"
+                  id="eventpagebar-menu"
                   anchorEl={anchorEl}
                   // anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                   open={open}

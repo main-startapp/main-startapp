@@ -86,8 +86,8 @@ const TeamProjectListItem = (props) => {
             }
           />
           <IconButton
-            id="TPLI-menu-button"
-            aria-controls={open ? "TPLI-menu" : undefined}
+            id="teamprojectlistitem-menu-button"
+            aria-controls={open ? "teamprojectlistitem-menu" : undefined}
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
             onClick={(e) => {
@@ -97,12 +97,12 @@ const TeamProjectListItem = (props) => {
             <MoreVertIcon />
           </IconButton>
           <Menu
-            id="TPLI-menu"
+            id="teamprojectlistitem-menu"
             anchorEl={anchorEl}
             open={open}
             onClose={handleMenuClose}
             MenuListProps={{
-              "aria-labelledby": "TPLI-menu-button",
+              "aria-labelledby": "teamprojectlistitem-menu-button",
             }}
           >
             <MenuItem

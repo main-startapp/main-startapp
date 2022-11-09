@@ -456,7 +456,7 @@ const ChatMsg = (props) => {
             multiline
             minRows={5}
             margin="dense"
-            id="declineMsg"
+            id="chatmsg-decline-msg-textfield"
             // label="Message"
             value={declineMsg}
             fullWidth
@@ -516,7 +516,7 @@ const ChatMsg = (props) => {
       <Box
         sx={{
           borderTop: 2.5,
-          borderColor: focused ? "#3e95c2" : "#dbdbdb",
+          borderColor: focused ? "secondary.main" : "divider",
         }}
       >
         <TextField

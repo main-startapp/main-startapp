@@ -15,25 +15,48 @@ import DBListener from "../components/DBListener";
 import BottomNav from "../components/Header/BottomNav";
 import useWindowDimensions from "../components/Reusable/WindowDimensions";
 import { grey } from "@mui/material/colors";
+import { useMemo } from "react";
 
 // makeStyles, useStyles, createStyles, withStyles, styled
 // https://smartdevpreneur.com/material-ui-makestyles-usestyles-createstyles-and-withstyles-explained/
 // https://smartdevpreneur.com/material-ui-styled-components/
 
-// global font testing
-const globalTheme = createTheme({
+const getDesignTokens = (mode) => ({
   palette: {
-    mode: "light",
-    secondary: { main: "#6ff9d1" },
-    unselectedIcon: { main: grey[600] },
-    searchBar: { main: grey[200] },
-    hoverBackground: { main: grey[100] },
+    mode,
+    ...(mode === "light"
+      ? {
+          // palette values for light mode
+          primary: { main: "#193773" },
+          secondary: { main: "#6ff9d1" },
 
-    SteelBlue: {
-      main: "#3e95c2",
-    },
-    AdminOrange: {
-      main: "#f4511e",
+          unselectedIcon: { main: grey[600] },
+          searchBar: { main: grey[200] },
+          hoverBackground: { main: grey[100] },
+
+          adminOrange: {
+            main: "#f4511e",
+          },
+        }
+      : {
+          // palette values for dark mode
+          primary: { main: "#193773" },
+          secondary: { main: "#6ff9d1" },
+
+          unselectedIcon: { main: grey[600] },
+          searchBar: { main: grey[700] },
+          hoverBackground: { main: grey[800] },
+
+          adminOrange: {
+            main: "#f4511e",
+          },
+        }),
+  },
+
+  typography: {
+    button: {
+      fontWeight: 600,
+      textTransform: "none",
     },
   },
 
@@ -76,9 +99,21 @@ function MyApp({ Component, pageProps }) {
   onMedia.onDesktop = useMediaQuery("(min-width:1024px)");
   onMedia.onTablet = useMediaQuery("(min-width:768px) and (max-width:1023px)");
   onMedia.onMobile = useMediaQuery("(max-width:767px)");
+  // theme
+  const [mode, setMode] = useState("light");
+  const colorMode = useMemo(
+    () => ({
+      // The dark mode switch would invoke this method
+      toggleColorMode: () => {
+        setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
+      },
+    }),
+    []
+  );
+  const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
 
   return (
-    <ThemeProvider theme={globalTheme}>
+    <ThemeProvider theme={theme}>
       <AuthProvider>
         <LocalizationProvider dateAdapter={AdapterMoment}>
           <GlobalContext.Provider

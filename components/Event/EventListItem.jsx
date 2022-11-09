@@ -126,8 +126,8 @@ const EventListItem = (props) => {
             sx={{ height: "96px", display: "flex", alignItems: "flex-start" }}
           >
             <IconButton
-              id="PLI-menu-button"
-              aria-controls={open ? "PLI-menu" : undefined}
+              id="eventlistitem-menu-button"
+              aria-controls={open ? "eventlistitem-menu" : undefined}
               aria-haspopup="true"
               aria-expanded={open ? "true" : undefined}
               onClick={(e) => {
@@ -138,7 +138,7 @@ const EventListItem = (props) => {
               <MoreVertIcon />
             </IconButton>
             <Menu
-              id="PLI-menu"
+              id="eventlistitem-menu"
               anchorEl={anchorEl}
               open={open}
               onClose={handleMenuClose}

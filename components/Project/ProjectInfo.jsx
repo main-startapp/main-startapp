@@ -8,6 +8,7 @@ import {
   Paper,
   Tooltip,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import PositionListItem from "./PositionListItem";
@@ -41,6 +42,7 @@ const ProjectInfo = () => {
     onMedia,
   } = useContext(GlobalContext);
   const { project } = useContext(ProjectContext);
+  const theme = useTheme();
 
   // local vars
   const [tCode, setTCode] = useState("");
@@ -77,396 +79,260 @@ const ProjectInfo = () => {
   }, [project]); // every time project changes, this forces each accordion to collapse
 
   return (
-    <Paper>
-      <Box
-        ref={boxRef}
-        sx={{
-          height: onMedia.onDesktop
-            ? `calc(${winHeight}px - 64px - 1.5px)`
-            : `calc(${winHeight}px - 2*48px - 1.5px - 60px)`,
-          overflow: "auto",
-          backgroundColor: "#fafafa",
-        }}
-      >
-        {!!project && (
-          <Grid container>
-            {/* Top left info box */}
-            <Grid item xs={onMedia.onDesktop ? 9 : 12}>
-              <Box
-                sx={
-                  onMedia.onDesktop
-                    ? { mt: 3, ml: 3, mr: 1.5 }
-                    : { mt: 1.5, mx: 1.5 }
-                }
+    <Paper
+      elevation={2}
+      sx={{
+        mt: 4,
+        backgroundColor: "background",
+        border: 1.5,
+        borderColor: "divider",
+        borderRadius: "30px 30px 0px 0px",
+      }}
+    >
+      <Box id="projectinfo-box" ref={boxRef}>
+        <Box
+          id="projectinfo-header-box"
+          sx={{
+            paddingTop: 6,
+            paddingX: 4,
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <Avatar
+            sx={{
+              mr: onMedia.onDesktop ? 4 : 2,
+              height: "96px",
+              width: "96px",
+            }}
+            src={project?.icon_url}
+          >
+            <UploadFileIcon />
+          </Avatar>
+          <Typography
+            color="text.primary"
+            variant="h2"
+            sx={{
+              fontSize: onMedia.onDesktop ? "32px" : "16px",
+              fontWeight: "bold",
+            }}
+          >
+            {project?.title}
+          </Typography>
+        </Box>
+        <Divider
+          sx={{
+            mx: 4,
+            mt: onMedia.onDesktop ? 2 : 1,
+            borderBottomWidth: 1.5,
+            borderColor: "divider",
+          }}
+        />
+        <Box
+          id="projectinfo-content-box"
+          sx={{
+            height: onMedia.onDesktop
+              ? `calc(${winHeight}px - 64px - 1.5px - ${theme.spacing(
+                  4
+                )} - 1.5px - 144px - 1.5px - ${theme.spacing(2)} - 1.5px )` // window height; navbar; navbar border; spacing; paper top border; header; divider+margin; paper bottom border
+              : `calc(${winHeight}px - 2*48px - 1.5px - 60px)`,
+            overflow: "auto",
+            paddingY: 4,
+            paddingX: 4,
+          }}
+        >
+          <Typography
+            color="text.primary"
+            variant="h3"
+            sx={{ mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
+          >
+            {"Description:"}
+          </Typography>
+          <Typography color="text.secondary" variant="body1">
+            <Interweave
+              content={project?.description}
+              matchers={[new UrlMatcher("url")]}
+            />
+          </Typography>
+
+          <Typography
+            color="text.primary"
+            variant="h3"
+            sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
+          >
+            {"Details: "}
+          </Typography>
+          <Typography color="text.secondary">
+            {project?.details + orgTags}
+          </Typography>
+
+          {project?.position_list?.length > 0 && (
+            <Box
+              sx={{
+                mt: 4,
+                paddingX: 2,
+                paddingY: 2,
+                borderRadius: "10px",
+                backgroundColor: "primary.main",
+              }}
+            >
+              <Typography
+                color="white"
+                variant="h3"
+                sx={{ fontSize: "1.25rem", fontWeight: "bold" }}
               >
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                >
-                  {/* default unit is px */}
-                  <Avatar
-                    sx={{
-                      mr: onMedia.onDesktop ? 3 : 1.5,
-                      height: "72px",
-                      width: "72px",
-                    }}
-                    src={project?.icon_url}
-                  >
-                    <UploadFileIcon />
-                  </Avatar>
-                  <Typography
-                    sx={{
-                      fontWeight: "bold",
-                      fontSize: onMedia.onDesktop ? "2em" : "1em",
-                    }}
-                  >
-                    {project?.title}
-                  </Typography>
-                </Box>
-                <Divider
-                  sx={{
-                    mt: onMedia.onDesktop ? 3 : 1.5,
-                    mb: onMedia.onDesktop ? 3 : 1.5,
-                    borderBottomWidth: 1.5,
-                    borderColor: "#dbdbdb",
-                  }}
+                {"Positions:"}
+              </Typography>
+              {project?.position_list.map((position, index) => (
+                <PositionListItem
+                  key={index}
+                  posID={position.id}
+                  posTitle={position.title}
+                  posResp={position.responsibility}
+                  posWeeklyHour={position.weekly_hour}
+                  isCreator={isCreator}
+                  creator={creatorUser}
+                  appFormURL={
+                    project.application_form_url !== ""
+                      ? project.application_form_url
+                      : position.url
+                      ? position.url
+                      : ""
+                  }
                 />
-                <Typography
-                  sx={{
-                    fontWeight: "bold",
-                  }}
-                  color="text.primary"
-                >
-                  {"Details: "}
-                </Typography>
-                <Typography color="text.secondary">
-                  {project?.details}
-                </Typography>
-                {project.max_member_count && (
-                  <div>
-                    <Typography
-                      sx={{
-                        mt: onMedia.onDesktop ? 3 : 1.5,
-                        fontWeight: "bold",
-                      }}
-                      color="text.primary"
-                    >
-                      {"Team size: "}
-                    </Typography>
-                    <Typography color="text.secondary">
-                      {/* {project?.cur_member_count}
-                {"/"} */}
-                      {project?.max_member_count}
-                    </Typography>
-                  </div>
-                )}
-              </Box>
-            </Grid>
+              ))}
+            </Box>
+          )}
+        </Box>
+      </Box>
+    </Paper>
+  );
+};
 
-            {/* Top right founder box */}
-            {onMedia.onDesktop &&
-              (project?.creator_uid !== "T5q6FqwJFcRTKxm11lu0zmaXl8x2" ||
-                ediumUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2") && (
-                <Grid item xs={3}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      mt: 3,
-                      mr: 3,
-                      ml: 1.5,
-                    }}
-                  >
-                    <Avatar
-                      sx={{
-                        width: "96px",
-                        height: "96px",
-                        // color: "#dbdbdb",
-                        // backgroundColor: "#ffffff",
-                      }}
-                      src={creatorUser?.photo_url}
-                      referrerPolicy="no-referrer"
-                    />
+export default ProjectInfo;
 
-                    <Typography
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        fontWeight: "bold",
-                        fontSize: "1.1em",
-                        mt: 1,
-                      }}
-                    >
-                      {creatorUser?.name || "Founder"}
-                    </Typography>
+{
+  /* Top right founder box */
+}
+{
+  /*
+  onMedia.onDesktop &&
+    (project?.creator_uid !== "T5q6FqwJFcRTKxm11lu0zmaXl8x2" ||
+      ediumUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2") && (
+      <Grid item xs={3}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            mt: 3,
+            mr: 3,
+            ml: 1.5,
+          }}
+        >
+          <Avatar
+            sx={{
+              width: "96px",
+              height: "96px",
+              // color: "#dbdbdb",
+              // backgroundColor: "#ffffff",
+            }}
+            src={creatorUser?.photo_url}
+            referrerPolicy="no-referrer"
+          />
 
-                    {isCreator ? (
-                      <NextLink
-                        href={{
-                          pathname: "/projects/create",
-                          query: { isCreateStr: "false" },
-                        }}
-                        as="/projects/create"
-                        passHref
-                      >
-                        <Button
-                          onClick={() => setOldProject(project)}
-                          variant="contained"
-                          sx={{
-                            mt: 1,
-                            border: 1.5,
-                            borderColor: "#dbdbdb",
-                            borderRadius: "30px",
-                            color: "text.primary",
-                            backgroundColor: "#ffffff",
-                            fontWeight: "bold",
-                            fontSize: "0.8em",
-                            "&:hover": {
-                              backgroundColor: "#f6f6f6",
-                            },
-                            textTransform: "none",
-                          }}
-                          disableElevation
-                        >
-                          {"Modify"}
-                        </Button>
-                      </NextLink>
-                    ) : (
-                      <Tooltip
-                        title={ediumUser?.uid ? "" : "Edit your profile first"}
-                      >
-                        <span>
-                          <Button
-                            disabled={!ediumUser?.uid}
-                            disableElevation
-                            sx={{
-                              mt: 1,
-                              border: 1.5,
-                              borderColor: "#dbdbdb",
-                              borderRadius: "30px",
-                              color: "text.primary",
-                              backgroundColor: "#ffffff",
-                              fontWeight: "bold",
-                              fontSize: "0.8em",
-                              "&:hover": {
-                                backgroundColor: "#f6f6f6",
-                              },
-                              textTransform: "none",
-                            }}
-                            variant="contained"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleConnect(
-                                chats,
-                                creatorUser,
-                                ediumUser,
-                                setChatPartner,
-                                setForceChatExpand
-                              );
-                            }}
-                          >
-                            {"Connect"}
-                          </Button>
-                        </span>
-                      </Tooltip>
-                    )}
-                  </Box>
-                </Grid>
-              )}
+          <Typography
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              fontWeight: "bold",
+              fontSize: "1.1em",
+              mt: 1,
+            }}
+          >
+            {creatorUser?.name || "Founder"}
+          </Typography>
 
-            {/* Bottom description and position boxes */}
-            <Grid item xs={12}>
-              <Box
-                sx={
-                  onMedia.onDesktop
-                    ? {
-                        mt: 3,
-                        mx: 3,
-                        mb: project?.position_list?.length > 0 ? 0 : "64xp",
-                      }
-                    : {
-                        mt: 1.5,
-                        mx: 1.5,
-                      }
-                }
+          {isCreator ? (
+            <NextLink
+              href={{
+                pathname: "/projects/create",
+                query: { isCreateStr: "false" },
+              }}
+              as="/projects/create"
+              passHref
+            >
+              <Button
+                onClick={() => setOldProject(project)}
+                variant="contained"
+                sx={{
+                  mt: 1,
+                  border: 1.5,
+                  borderColor: "#dbdbdb",
+                  borderRadius: "30px",
+                  color: "text.primary",
+                  backgroundColor: "#ffffff",
+                  fontWeight: "bold",
+                  fontSize: "0.8em",
+                  "&:hover": {
+                    backgroundColor: "#f6f6f6",
+                  },
+                  textTransform: "none",
+                }}
+                disableElevation
               >
-                <Typography sx={{ fontWeight: "bold" }} color="text.primary">
-                  {"Description:"}
-                </Typography>
-                {/* <Typography component="span" color="text.secondary">
-                  <pre
-                    style={{
-                      fontFamily: "inherit",
-                      whiteSpace: "pre-wrap",
-                      wordWrap: "break-word",
-                      display: "inline",
-                    }}
-                  >
-                    <div
-                      dangerouslySetInnerHTML={{ __html: project?.description }}
-                    />
-                  </pre>
-                </Typography> */}
-                <Typography color="text.secondary">
-                  <Interweave
-                    content={project?.description}
-                    matchers={[new UrlMatcher("url")]}
-                  />
-                </Typography>
-              </Box>
-              {/* position details */}
-              {project?.position_list?.length > 0 && (
-                <Box
+                {"Modify"}
+              </Button>
+            </NextLink>
+          ) : (
+            <Tooltip title={ediumUser?.uid ? "" : "Edit your profile first"}>
+              <span>
+                <Button
+                  disabled={!ediumUser?.uid}
+                  disableElevation
                   sx={{
-                    mt: 3,
-                    mx: onMedia.onDesktop ? 3 : 0,
-                    mb: onMedia.onDesktop ? "64px" : 3,
-                    paddingY: 1.5,
+                    mt: 1,
                     border: 1.5,
                     borderColor: "#dbdbdb",
-                    borderRadius: "10px",
+                    borderRadius: "30px",
+                    color: "text.primary",
                     backgroundColor: "#ffffff",
+                    fontWeight: "bold",
+                    fontSize: "0.8em",
+                    "&:hover": {
+                      backgroundColor: "#f6f6f6",
+                    },
+                    textTransform: "none",
+                  }}
+                  variant="contained"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleConnect(
+                      chats,
+                      creatorUser,
+                      ediumUser,
+                      setChatPartner,
+                      setForceChatExpand
+                    );
                   }}
                 >
-                  <Typography
-                    sx={{ ml: 3, fontWeight: "bold" }}
-                    color="text.primary"
-                  >
-                    {"Positions:"}
-                  </Typography>
-                  {project?.position_list.map((position, index) => (
-                    <PositionListItem
-                      key={index}
-                      posID={position.id}
-                      posTitle={position.title}
-                      posResp={position.responsibility}
-                      posWeeklyHour={position.weekly_hour}
-                      isCreator={isCreator}
-                      creator={creatorUser}
-                      appFormURL={
-                        project.application_form_url !== ""
-                          ? project.application_form_url
-                          : position.url
-                          ? position.url
-                          : ""
-                      }
-                    />
-                  ))}
-                </Box>
-              )}
-            </Grid>
+                  {"Connect"}
+                </Button>
+              </span>
+            </Tooltip>
+          )}
+        </Box>
+      </Grid>
+    );
+*/
+}
 
-            {onMedia.onDesktop &&
-              project?.creator_uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
-              currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
-              !ediumUserExt?.my_project_ids?.includes(project?.id) && (
-                <Grid item xs={12}>
-                  <Box
-                    sx={{
-                      height: "100%",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      mt: 3,
-                      mr: 3,
-                      ml: 1.5,
-                    }}
-                  >
-                    <Button
-                      variant="contained"
-                      disableElevation
-                      color="AdminOrange"
-                      sx={{
-                        borderRadius: "0px",
-                        color: "white",
-                        mb: 1.5,
-                        width: "200px",
-                        height: "64px",
-                        textTransform: "none",
-                        fontWeight: "bold",
-                      }}
-                      onClick={() => {
-                        getDocFromDB("projects_ext", project?.id).then(
-                          (ret) => {
-                            setTCode(ret?.transfer_code);
-                            navigator.clipboard.writeText(
-                              ret?.transfer_code || "null"
-                            );
-                          }
-                        );
-                      }}
-                    >
-                      {"ADMIN"}
-                      <br />
-                      {"Get Transfer Code"}
-                    </Button>
-                    <Box
-                      sx={{
-                        width: "200px",
-                        height: "64px",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        ":hover": {
-                          cursor: "pointer",
-                        },
-                      }}
-                      onClick={() => {
-                        if (!(tCode === "Copied")) {
-                          navigator.clipboard.writeText(tCode);
-                        }
-                        setTCode("Copied");
-                      }}
-                    >
-                      {tCode ? (
-                        <>
-                          <KeyboardArrowRightIcon sx={{ color: "#f4511e" }} />
-                          <Typography
-                            sx={{ fontWeight: "bold", color: "#f4511e" }}
-                          >
-                            {tCode}
-                          </Typography>
-                          <KeyboardArrowLeftIcon sx={{ color: "#f4511e" }} />
-                        </>
-                      ) : (
-                        <br />
-                      )}
-                    </Box>
-                    {!!tCode && (
-                      <Button
-                        variant="contained"
-                        disableElevation
-                        color="AdminOrange"
-                        sx={{
-                          borderRadius: "0px",
-                          color: "white",
-                          mt: 1.5,
-                          width: "200px",
-                          height: "64px",
-                          textTransform: "none",
-                          fontWeight: "bold",
-                        }}
-                        onClick={() => {
-                          router.push(`/redemption`);
-                        }}
-                      >
-                        {"To the Redemption"}
-                      </Button>
-                    )}
-                  </Box>
-                </Grid>
-              )}
-          </Grid>
-        )}
-        {!project && (
+{
+  /* {!project && (
           <Box
-            id="logo placeholder container"
+            id="projectinfo-logo-placeholder-box"
             sx={{
               width: "100%",
               height: "100%",
@@ -476,7 +342,7 @@ const ProjectInfo = () => {
             }}
           >
             <Box
-              id="logo placeholder wrapper"
+              id="projectinfo-logo-placeholder-wrapper-box"
               sx={{
                 display: "flex",
                 justifyContent: "center",
@@ -491,10 +357,5 @@ const ProjectInfo = () => {
               />
             </Box>
           </Box>
-        )}
-      </Box>
-    </Paper>
-  );
-};
-
-export default ProjectInfo;
+        )} */
+}

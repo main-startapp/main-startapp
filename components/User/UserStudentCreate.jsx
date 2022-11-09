@@ -223,7 +223,7 @@ const UserStudentCreate = (props) => {
   //       <MenuItem value={"Other"}>Other</MenuItem>
   //     </Select>
   //     <FormHelperText
-  //       id="sc-category-helper-text"
+  //       id="userstudentcreate-category-helper-text"
   //       sx={{ color: "lightgray", fontSize: "12px" }}
   //     >
   //       {"Doesn't have to be related to your major"}

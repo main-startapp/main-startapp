@@ -24,6 +24,16 @@ import {
 import { findItemFromList } from "../Reusable/Resusable";
 
 const PositionListItem = (props) => {
+  // args
+  const key = props.key;
+  const posID = props.posID;
+  const posTitle = props.posTitle;
+  const posResp = props.posResp;
+  const posWeeklyHour = props.posWeeklyHour;
+  const isCreator = props.isCreator; // whether ediumUser is the creator
+  const creator = props.creator; // creator's user data
+  const appFormURL = props.appFormURL;
+
   // context
   const {
     chats,
@@ -35,15 +45,6 @@ const PositionListItem = (props) => {
     onMedia,
   } = useContext(GlobalContext);
   const { project } = useContext(ProjectContext);
-
-  // args
-  const posID = props.posID;
-  const posTitle = props.posTitle;
-  const posResp = props.posResp;
-  const posWeeklyHour = props.posWeeklyHour;
-  const isCreator = props.isCreator; // whether ediumUser is the creator
-  const creator = props.creator; // creator's user data
-  const appFormURL = props.appFormURL;
 
   // local vars
   // useEffect to reset accordion expansion
@@ -246,21 +247,26 @@ const PositionListItem = (props) => {
   );
 
   return (
-    <Box sx={onMedia.onDesktop ? { m: 3 } : { m: 1.5 }}>
+    <Box
+      id="positionlistitem-box"
+      sx={onMedia.onDesktop ? { my: 2 } : { my: 1 }}
+    >
       <Accordion
         square
+        elevation={2}
         expanded={expandState === "expandIt"}
         sx={{
-          border: 1.5,
+          boxShadow: "none",
           borderRadius: "10px",
-          borderColor: "#dbdbdb",
           "&:hover": {
-            backgroundColor: "#f6f6f6",
+            backgroundColor: "hoverBackground.main",
+            cursor: "default",
           },
         }}
-        elevation={0}
       >
         <StyledAccordionSummary
+          id={"accordion-" + key + "-header"}
+          aria-controls={"accordion-" + key + "-content"}
           expandIcon={<ExpandMoreIcon />}
           onClick={(e) => handleExpand(e)}
         >
@@ -283,9 +289,9 @@ const PositionListItem = (props) => {
           </Box>
         </StyledAccordionSummary>
         <AccordionDetails>
-          <Divider
+          {/* <Divider
             sx={{ mb: 1.5, borderBottomWidth: 1.5, borderColor: "#dbdbdb" }}
-          />
+          /> */}
 
           <Box sx={{ width: "100%", display: "flex", flexDirection: "column" }}>
             <Box

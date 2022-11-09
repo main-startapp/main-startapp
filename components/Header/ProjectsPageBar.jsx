@@ -188,8 +188,8 @@ const ProjectsPageBar = () => {
                   borderRadius: "10px",
                   ml: 1.5,
                 }}
-                id="ppb-menu-button"
-                aria-controls={open ? "ppb-menu" : undefined}
+                id="projectspagebar-menu-button"
+                aria-controls={open ? "projectspagebar-menu" : undefined}
                 aria-haspopup="true"
                 aria-expanded={open ? "true" : undefined}
                 onClick={(e) => {
@@ -198,7 +198,7 @@ const ProjectsPageBar = () => {
               >
                 <TuneRoundedIcon />
                 <Menu
-                  id="ppb-menu"
+                  id="projectspagebar-menu"
                   anchorEl={anchorEl}
                   // anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                   open={open}

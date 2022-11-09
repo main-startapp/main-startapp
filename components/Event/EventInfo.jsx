@@ -370,7 +370,7 @@ const EventInfo = () => {
                   <Button
                     variant="contained"
                     disableElevation
-                    color="AdminOrange"
+                    color="adminOrange"
                     sx={{
                       borderRadius: "0px",
                       color: "white",
@@ -429,7 +429,7 @@ const EventInfo = () => {
                     <Button
                       variant="contained"
                       disableElevation
-                      color="AdminOrange"
+                      color="adminOrange"
                       sx={{
                         borderRadius: "0px",
                         color: "white",
@@ -453,7 +453,7 @@ const EventInfo = () => {
       )}
       {!event && (
         <Box
-          id="logo placeholder container"
+          id="eventinfo-logo-placeholder-box"
           sx={{
             width: "100%",
             height: "100%",
@@ -463,7 +463,7 @@ const EventInfo = () => {
           }}
         >
           <Box
-            id="logo placeholder wrapper"
+            id="eventinfo-logo-placeholder-wrapper-box"
             sx={{
               display: "flex",
               justifyContent: "center",

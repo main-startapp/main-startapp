@@ -94,9 +94,6 @@ const Navbar = () => {
             width={onMedia.onDesktop ? 40 : 30}
             height={onMedia.onDesktop ? 40 : 30}
           />
-          {/* <Typography variant="edium" sx={{ fontSize: "2em", ml: 1 }}>
-            Edium
-          </Typography> */}
         </Box>
         {/* tabs */}
         {/* https://stackoverflow.com/questions/32378953/keep-the-middle-item-centered-when-side-items-have-different-widths */}

@@ -122,8 +122,8 @@ const ChatAccordion = () => {
             </Typography>
             {hasUnread && (
               <CircleIcon
+                color="secondary"
                 sx={{
-                  color: "#3e95c2",
                   fontSize: "0.8em",
                   position: "absolute",
                   right: "30%",

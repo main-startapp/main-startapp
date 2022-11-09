@@ -113,8 +113,8 @@ const StudentsPageBar = () => {
                   borderRadius: "10px",
                   ml: 1.5,
                 }}
-                id="ppb-menu-button"
-                aria-controls={open ? "ppb-menu" : undefined}
+                id="studentspagebar-menu-button"
+                aria-controls={open ? "studentspagebar-menu" : undefined}
                 aria-haspopup="true"
                 aria-expanded={open ? "true" : undefined}
                 onClick={(e) => {

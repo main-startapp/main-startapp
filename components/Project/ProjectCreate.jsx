@@ -648,7 +648,7 @@ const ProjectCreate = (props) => {
                 })}
               </Select>
               <FormHelperText
-                id="pc-category-helper-text"
+                id="projectcreate-category-helper-text"
                 sx={{ color: "lightgray", fontSize: "12px" }}
               >
                 {"A general category of your project"}

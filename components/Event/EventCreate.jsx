@@ -508,7 +508,7 @@ const EventCreate = (props) => {
                 })}
               </Select>
               <FormHelperText
-                id="ec-category-helper-text"
+                id="eventcreate-category-helper-text"
                 sx={{ color: "lightgray", fontSize: "12px" }}
               >
                 {"A general category of your event"}

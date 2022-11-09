@@ -301,7 +301,7 @@ const StudentProfile = () => {
 
       {!student && (
         <Box
-          id="logo placeholder wrapper"
+          id="studentprofile-logo-placeholder-box"
           sx={{
             height: "50%",
             display: "flex",
