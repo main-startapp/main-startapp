@@ -68,6 +68,36 @@ const getDesignTokens = (mode) => ({
         disableRipple: true, // No more ripple, on the whole application!
       },
     },
+
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          "*::-webkit-scrollbar": {
+            width: "0.4rem",
+          },
+          "*::-webkit-scrollbar-track": {
+            background: "transparent",
+          },
+          ...(mode === "light"
+            ? {
+                "*::-webkit-scrollbar-thumb": {
+                  background: grey[400],
+                },
+                "*::-webkit-scrollbar-thumb:hover": {
+                  background: grey[600],
+                },
+              }
+            : {
+                "*::-webkit-scrollbar-thumb": {
+                  background: grey[500],
+                },
+                "*::-webkit-scrollbar-thumb:hover": {
+                  background: grey[300],
+                },
+              }),
+        },
+      },
+    },
   },
 });
 
