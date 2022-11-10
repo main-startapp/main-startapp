@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Box,
   Button,
   Checkbox,
@@ -44,7 +45,7 @@ import {
   handleDeleteEntry,
 } from "../Reusable/Resusable";
 import { useAuth } from "../Context/AuthContext";
-import { projectStrList } from "../Reusable/MenuStringList";
+import { projectTags, projectStrList } from "../Reusable/MenuStringList";
 import TextEditor from "../TextEditor";
 
 const ProjectCreate = (props) => {
@@ -78,7 +79,7 @@ const ProjectCreate = (props) => {
     category: "",
     completion_date: "",
     max_member_count: 0,
-    details: "",
+    tags: [],
     description: "",
     is_visible: true,
     icon_url: "",
@@ -104,6 +105,11 @@ const ProjectCreate = (props) => {
       ? oldProject.position_list
       : [emptyPositionField]
   );
+
+  // details/tags
+  // const tagsOptions = useMemo(() => {
+  //   return organizationTags.concat(userCreatedTags?.string_list).sort();
+  // }, [userCreatedTags?.string_list]);
 
   // upload-icon dialog modal
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -371,8 +377,6 @@ const ProjectCreate = (props) => {
   // clean the current page's state and redirect to Projects page
   const handleDiscard = () => {
     setOldProject(null);
-    setNewProject(emptyProject);
-    setPositionFields([emptyPositionField]);
 
     showAlert("info", `Draft discarded! Navigate to Projects page.`);
     setTimeout(() => {
@@ -389,6 +393,8 @@ const ProjectCreate = (props) => {
       docID,
       ediumUser?.uid
     );
+
+    setOldProject(null);
 
     showAlert(
       "success",
@@ -611,7 +617,6 @@ const ProjectCreate = (props) => {
               fullWidth
               sx={{
                 mr: 5,
-                width: "105%",
                 "& .MuiOutlinedInput-root": {
                   borderRadius: "10px",
                   backgroundColor: "#f0f0f0",
@@ -648,7 +653,7 @@ const ProjectCreate = (props) => {
                 })}
               </Select>
               <FormHelperText
-                id="pc-category-helper-text"
+                id="projectcreate-category-helper-text"
                 sx={{ color: "lightgray", fontSize: "12px" }}
               >
                 {"A general category of your project"}
@@ -697,7 +702,7 @@ const ProjectCreate = (props) => {
             </Box>
           </Box>
 
-          {/* details and total team size */}
+          {/* tags and total team size */}
           <Box
             display="flex"
             justifyContent="space-between"
@@ -707,8 +712,8 @@ const ProjectCreate = (props) => {
               mb: 5,
             }}
           >
-            <DefaultTextField
-              sx={{ mr: 5, width: "105%" }}
+            {/* <DefaultTextField
+              sx={{ mr: 5 }}
               fullWidth
               label="Details"
               margin="none"
@@ -717,6 +722,31 @@ const ProjectCreate = (props) => {
               onChange={(e) =>
                 setNewProject({ ...newProject, details: e.target.value })
               }
+            /> */}
+            <Autocomplete
+              sx={{ mr: 5 }}
+              fullWidth
+              freeSolo
+              clearOnBlur
+              multiple
+              filterSelectedOptions
+              options={projectTags}
+              value={newProject?.tags}
+              onChange={(event, newValue) => {
+                setNewProject({ ...newProject, tags: newValue });
+              }}
+              renderInput={(params) => (
+                <DefaultTextField
+                  {...params}
+                  label="Details"
+                  helperText="Keywords to shortly describe the new project (e.g. tags)"
+                  required
+                  inputProps={{
+                    ...params.inputProps,
+                    required: newProject?.tags?.length === 0,
+                  }}
+                />
+              )}
             />
 
             {/* Team Size container */}

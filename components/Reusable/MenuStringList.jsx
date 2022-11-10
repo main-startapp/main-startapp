@@ -83,3 +83,11 @@ export const organizationTags = [
   "unity",
   "software",
 ];
+
+// project - tags
+export const projectTags = [
+  "computer science",
+  "game dev",
+  "unity",
+  "software",
+];
