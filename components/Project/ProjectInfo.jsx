@@ -149,7 +149,7 @@ const ProjectInfo = () => {
           >
             {"Description:"}
           </Typography>
-          <Typography color="text.secondary" variant="body1">
+          <Typography color="text.secondary" component="span" variant="body1">
             <Interweave
               content={project?.description}
               matchers={[new UrlMatcher("url")]}
@@ -187,6 +187,7 @@ const ProjectInfo = () => {
               {project?.position_list.map((position, index) => (
                 <PositionListItem
                   key={index}
+                  index={index}
                   posID={position.id}
                   posTitle={position.title}
                   posResp={position.responsibility}

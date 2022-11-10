@@ -25,7 +25,7 @@ import { findItemFromList } from "../Reusable/Resusable";
 
 const PositionListItem = (props) => {
   // args
-  const key = props.key;
+  const index = props.index;
   const posID = props.posID;
   const posTitle = props.posTitle;
   const posResp = props.posResp;
@@ -265,8 +265,8 @@ const PositionListItem = (props) => {
         }}
       >
         <StyledAccordionSummary
-          id={"accordion-" + key + "-header"}
-          aria-controls={"accordion-" + key + "-content"}
+          id={"accordion-" + index + "-header"}
+          aria-controls={"accordion-" + index + "-content"}
           expandIcon={<ExpandMoreIcon />}
           onClick={(e) => handleExpand(e)}
         >

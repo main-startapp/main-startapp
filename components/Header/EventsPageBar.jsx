@@ -199,7 +199,7 @@ const EventsPageBar = () => {
                   open={open}
                   onClose={handleUserMenuClose}
                   MenuListProps={{
-                    "aria-labelledby": "epb-menu-button",
+                    "aria-labelledby": "eventpagebar-menu-button",
                   }}
                   //onClick={(e) => e.stopPropagation()}
                 >

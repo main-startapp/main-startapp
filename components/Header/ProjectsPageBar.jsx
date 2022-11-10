@@ -204,7 +204,7 @@ const ProjectsPageBar = () => {
                   open={open}
                   onClose={handleUserMenuClose}
                   MenuListProps={{
-                    "aria-labelledby": "ppb-menu-button",
+                    "aria-labelledby": "projectspagebar-menu-button",
                   }}
                 >
                   <MenuItem>{categoryComp}</MenuItem>

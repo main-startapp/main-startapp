@@ -14,9 +14,14 @@ import moment from "moment";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { handleDeleteEntry, handleVisibility } from "../Reusable/Resusable";
+import {
+  handleDeleteEntry,
+  handleVisibility,
+  MenuItemLink,
+} from "../Reusable/Resusable";
 import { Interweave } from "interweave";
 import { convert } from "html-to-text";
+import NextLink from "next/link";
 
 // the project list item component in the project list: has full project data but only shows some brief information
 const ProjectListItem = (props) => {
@@ -25,7 +30,7 @@ const ProjectListItem = (props) => {
   const last = props.last;
 
   // context
-  const { ediumUser, onMedia } = useContext(GlobalContext);
+  const { setOldProject, ediumUser, onMedia } = useContext(GlobalContext);
   const { setProject } = useContext(ProjectContext);
   const theme = useTheme();
 
@@ -96,28 +101,49 @@ const ProjectListItem = (props) => {
           //   </>
           // }
         />
-        <IconButton
-          id="projectlistitem-menu-button"
-          aria-controls={open ? "projectlistitem-menu" : undefined}
-          aria-haspopup="true"
-          aria-expanded={open ? "true" : undefined}
-          onClick={(e) => {
-            if (ediumUser?.uid !== project?.creator_uid) return; // !todo: will be removed after there's at least one menu for regular user
-            handleMenuClick(e);
-          }}
-          sx={{ padding: 0 }}
-        >
-          <MoreVertIcon />
-        </IconButton>
+        {ediumUser?.uid === project?.creator_uid && (
+          <IconButton
+            id="projectlistitem-menu-button"
+            aria-controls={open ? "projectlistitem-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
+            onClick={(e) => {
+              if (ediumUser?.uid !== project?.creator_uid) return; // !todo: will be removed after there's at least one menu for regular user
+              handleMenuClick(e);
+            }}
+            sx={{ padding: 0 }}
+          >
+            <MoreVertIcon />
+          </IconButton>
+        )}
         <Menu
           id="projectlistitem-menu"
           anchorEl={anchorEl}
           open={open}
           onClose={handleMenuClose}
           MenuListProps={{
-            "aria-labelledby": "PLI-menu-button",
+            "aria-labelledby": "projectlistitem-menu-button",
           }}
         >
+          {ediumUser?.uid === project?.creator_uid && (
+            <MenuItem
+              onClick={() => {
+                setOldProject(project);
+                handleMenuClose();
+              }}
+            >
+              <NextLink
+                href={{
+                  pathname: "/projects/create",
+                  query: { isCreateStr: "false" },
+                }}
+                as="/projects/create"
+                passHref
+              >
+                <MenuItemLink>Modify</MenuItemLink>
+              </NextLink>
+            </MenuItem>
+          )}
           {ediumUser?.uid === project?.creator_uid && (
             <MenuItem
               onClick={() => {

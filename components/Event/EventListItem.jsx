@@ -143,7 +143,7 @@ const EventListItem = (props) => {
               open={open}
               onClose={handleMenuClose}
               MenuListProps={{
-                "aria-labelledby": "PLI-menu-button",
+                "aria-labelledby": "eventlistitem-menu-button",
               }}
             >
               {ediumUser?.uid === event?.creator_uid && (
