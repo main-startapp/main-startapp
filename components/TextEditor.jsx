@@ -30,6 +30,7 @@ const TextEditor = ({ update, project }) => {
     <ReactQuill
       theme="snow"
       modules={modules}
+      value={project?.description}
       onChange={(e) => handleTextOnChange(e)}
     />
   );
