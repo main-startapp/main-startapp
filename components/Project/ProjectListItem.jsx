@@ -2,11 +2,13 @@ import { useContext, useState } from "react";
 import {
   Avatar,
   Box,
+  Chip,
   IconButton,
   ListItem,
   ListItemText,
   Menu,
   MenuItem,
+  Stack,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -55,7 +57,7 @@ const ProjectListItem = (props) => {
         borderColor: "divider",
         backgroundColor: "background",
         "&:hover": {
-          backgroundColor: "hoverBackground.main",
+          backgroundColor: "hoverGray.main",
           cursor: "default",
         },
         overflow: "hidden",
@@ -83,24 +85,35 @@ const ProjectListItem = (props) => {
         >
           <UploadFileIcon />
         </Avatar>
-        <ListItemText
-          primary={
-            <Typography
-              variant="h2"
-              sx={{ fontSize: "1rem", fontWeight: "bold" }}
-            >
-              {project?.title}
-            </Typography>
-          }
-          //primaryTypographyProps={{ fontWeight: "bold" }}
-          // secondary={
-          //   <>
-          //     {project.max_member_count && "Team size: "}
-          //     {project.max_member_count && project.max_member_count}
-          //     <br />
-          //   </>
-          // }
-        />
+        <Stack sx={{ width: "100%" }}>
+          <ListItemText
+            primary={
+              <Typography
+                variant="h2"
+                sx={{ fontSize: "1rem", fontWeight: "bold" }}
+              >
+                {project?.title}
+              </Typography>
+            }
+          />
+          {project?.tags?.length > 0 && (
+            <Box sx={{ height: "1.5rem", overflow: "hidden" }}>
+              {project.tags.map((tag, index) => (
+                <Chip
+                  key={index}
+                  color={"lightPrimary"}
+                  label={tag}
+                  size="small"
+                  sx={{
+                    mr: 1,
+                    fontSize: "0.75rem",
+                    //fontWeight: "bold",
+                  }}
+                />
+              ))}
+            </Box>
+          )}
+        </Stack>
         {ediumUser?.uid === project?.creator_uid && (
           <IconButton
             id="projectlistitem-menu-button"
@@ -191,7 +204,7 @@ const ProjectListItem = (props) => {
                 WebkitLineClamp: 1,
               }}
             >
-              <Interweave content={convert(project?.description)} />
+              {convert(project?.description)}
             </Typography>
           }
           sx={{ margin: 0, mb: 2 }}

@@ -98,7 +98,7 @@ const EventList = () => {
                   sx={{
                     border: 1.5,
                     borderColor: "#dbdbdb",
-                    borderRadius: "30px",
+                    borderRadius: 8,
                     color: "text.primary",
                     backgroundColor: "#ffffff",
                     fontWeight: "bold",

@@ -11,17 +11,26 @@ import ProjectInfo from "../components/Project/ProjectInfo";
 // this page is also project homepage. Is this a good practice?
 const Home = () => {
   // global context
-  const { setChat, setChatPartner, setShowChat, setShowMsg, onMedia } =
-    useContext(GlobalContext);
+  const {
+    setChat,
+    setChatPartner,
+    setShowChat,
+    setShowMsg,
+    setOldProject,
+    onMedia,
+  } = useContext(GlobalContext);
+
   useEffect(() => {
     setShowChat(true);
     setShowMsg(false);
     setChat(null);
     setChatPartner(null);
-  }, [setChat, setChatPartner, setShowChat, setShowMsg]);
+    // project page related
+    setOldProject(null);
+  }, [setChat, setChatPartner, setShowChat, setShowMsg, setOldProject]);
 
   // project state init
-  const [project, setProject] = useState(null); // thec selected project
+  const [project, setProject] = useState(null); // the selected project
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
   return (
@@ -44,7 +53,7 @@ const Home = () => {
       >
         {/* left part: project list */}
         {onMedia.onDesktop ? (
-          <Grid item xs={3}>
+          <Grid item xs={3.5}>
             <ProjectList />
           </Grid>
         ) : (
@@ -56,7 +65,7 @@ const Home = () => {
         )}
         {/* right part: project info */}
         {onMedia.onDesktop ? (
-          <Grid item xs={7}>
+          <Grid item xs={5.5}>
             <ProjectInfo />
           </Grid>
         ) : (

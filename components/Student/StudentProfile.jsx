@@ -272,7 +272,7 @@ const StudentProfile = () => {
                   my: 3,
                   border: 1.5,
                   borderColor: "#dbdbdb",
-                  borderRadius: "30px",
+                  borderRadius: 8,
                   color: "#ffffff",
                   backgroundColor: "#3e95c2",
                   fontSize: "1.1em",

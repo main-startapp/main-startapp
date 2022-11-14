@@ -3,6 +3,7 @@ import {
   Avatar,
   Box,
   Button,
+  Chip,
   Divider,
   Grid,
   Paper,
@@ -21,8 +22,6 @@ import {
   handleConnect,
 } from "../Reusable/Resusable";
 import { useAuth } from "../Context/AuthContext";
-import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
-import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { useRouter } from "next/router";
 import { Interweave } from "interweave";
 import { UrlMatcher } from "interweave-autolink";
@@ -137,34 +136,33 @@ const ProjectInfo = () => {
                   4
                 )} - 1.5px - 144px - 1.5px - ${theme.spacing(2)} - 1.5px )` // window height; navbar; navbar border; spacing; paper top border; header; divider+margin; paper bottom border
               : `calc(${winHeight}px - 2*48px - 1.5px - 60px)`,
-            overflow: "auto",
+            overflowY: "scroll",
             paddingY: 4,
-            paddingX: 4,
+            paddingLeft: 4,
+            paddingRight: `calc(${theme.spacing(4)} - 0.4rem)`,
           }}
         >
           <Typography
             color="text.primary"
             variant="h3"
-            sx={{ mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
+            sx={{ mb: 2, fontSize: "1.25rem", fontWeight: "bold" }}
           >
             {"Description:"}
           </Typography>
           <Typography color="text.secondary" component="span" variant="body1">
-            <Interweave
-              content={project?.description}
-              matchers={[new UrlMatcher("url")]}
-            />
-          </Typography>
-
-          <Typography
-            color="text.primary"
-            variant="h3"
-            sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
-          >
-            {"Details: "}
-          </Typography>
-          <Typography color="text.secondary">
-            {project?.details + orgTags}
+            <pre
+              style={{
+                fontFamily: "inherit",
+                whiteSpace: "pre-wrap",
+                wordWrap: "break-word",
+                display: "inline",
+              }}
+            >
+              <Interweave
+                content={project?.description}
+                matchers={[new UrlMatcher("url")]}
+              />
+            </pre>
           </Typography>
 
           {project?.position_list?.length > 0 && (
@@ -173,7 +171,7 @@ const ProjectInfo = () => {
                 mt: 4,
                 paddingX: 2,
                 paddingY: 2,
-                borderRadius: "10px",
+                borderRadius: 2,
                 backgroundColor: "primary.main",
               }}
             >
@@ -201,6 +199,32 @@ const ProjectInfo = () => {
                       ? position.url
                       : ""
                   }
+                />
+              ))}
+            </Box>
+          )}
+
+          {project?.tags?.length > 0 && (
+            <Box>
+              <Typography
+                color="text.primary"
+                variant="h3"
+                sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
+              >
+                {"Details: "}
+              </Typography>
+
+              {project.tags.map((tag, index) => (
+                <Chip
+                  key={index}
+                  color={"lightPrimary"}
+                  label={tag}
+                  sx={{
+                    mt: 1,
+                    mr: 1,
+                    fontSize: "0.875rem",
+                    //fontWeight: "bold",
+                  }}
                 />
               ))}
             </Box>
@@ -272,7 +296,7 @@ export default ProjectInfo;
                   mt: 1,
                   border: 1.5,
                   borderColor: "#dbdbdb",
-                  borderRadius: "30px",
+                  borderRadius: 8,
                   color: "text.primary",
                   backgroundColor: "#ffffff",
                   fontWeight: "bold",
@@ -297,7 +321,7 @@ export default ProjectInfo;
                     mt: 1,
                     border: 1.5,
                     borderColor: "#dbdbdb",
-                    borderRadius: "30px",
+                    borderRadius: 8,
                     color: "text.primary",
                     backgroundColor: "#ffffff",
                     fontWeight: "bold",

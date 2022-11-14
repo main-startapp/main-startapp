@@ -184,7 +184,7 @@ const UserStudentCreate = (props) => {
   //       width: onMedia.onDesktop ? "50%" : "100%",
 
   //       "& .MuiOutlinedInput-root": {
-  //         borderRadius: "10px",
+  //         borderRadius: 2,
   //         backgroundColor: "#f0f0f0",
   //       },
   //       "& .MuiOutlinedInput-notchedOutline": {
@@ -423,7 +423,7 @@ const UserStudentCreate = (props) => {
             mb: 5,
             border: 1.5,
             borderColor: "#dbdbdb",
-            borderRadius: "30px",
+            borderRadius: 8,
             backgroundColor: "#3e95c2",
             textTransform: "none",
             paddingX: 5,

@@ -569,7 +569,7 @@ const ChatMsg = (props) => {
             backgroundColor: "#3e95c2",
             border: 1.5,
             borderColor: "#dbdbdb",
-            borderRadius: "30px",
+            borderRadius: 8,
             paddingX: 0,
             paddingY: 0,
             textTransform: "none",

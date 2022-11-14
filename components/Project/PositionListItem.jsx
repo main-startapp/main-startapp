@@ -198,12 +198,9 @@ const PositionListItem = (props) => {
       disableElevation
       size="small"
       sx={{
-        border: 1.5,
-        borderColor: "#dbdbdb",
-        borderRadius: "30px",
-        backgroundColor: "#3e95c2",
-        textTransform: "none",
-        paddingX: 3,
+        borderRadius: 8,
+        backgroundColor: "primary",
+        paddingX: 2,
         paddingY: 0,
       }}
       onClick={(e) => e.stopPropagation()}
@@ -213,7 +210,7 @@ const PositionListItem = (props) => {
       href={appFormURL}
       rel="noreferrer"
     >
-      {"Application Link"}
+      {"Apply"}
     </Button>
   );
 
@@ -228,12 +225,9 @@ const PositionListItem = (props) => {
       disableElevation
       size="small"
       sx={{
-        border: 1.5,
-        borderColor: "#dbdbdb",
-        borderRadius: "30px",
-        backgroundColor: "#3e95c2",
-        textTransform: "none",
-        paddingX: 3,
+        borderRadius: 8,
+        backgroundColor: "primary",
+        paddingX: 2,
         paddingY: 0,
       }}
       variant="contained"
@@ -242,7 +236,7 @@ const PositionListItem = (props) => {
         handleJoinRequest();
       }}
     >
-      {"Join Request"}
+      {"Apply"}
     </Button>
   );
 
@@ -257,9 +251,9 @@ const PositionListItem = (props) => {
         expanded={expandState === "expandIt"}
         sx={{
           boxShadow: "none",
-          borderRadius: "10px",
+          borderRadius: 2,
           "&:hover": {
-            backgroundColor: "hoverBackground.main",
+            backgroundColor: "hoverGray.main",
             cursor: "default",
           },
         }}
@@ -306,7 +300,7 @@ const PositionListItem = (props) => {
                 color="text.primary"
                 sx={{ fontSize: "1em", fontWeight: "bold" }}
               >
-                {"Responsibilities: "}
+                {"Role Description: "}
               </Typography>
               <Typography sx={{ fontSize: "1em", fontWeight: "bold" }}>
                 {"Weekly Hours: "}

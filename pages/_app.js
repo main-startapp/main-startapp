@@ -1,21 +1,24 @@
 import "../styles/globals.css";
 import "../styles/quill.snow.css";
+import "@fontsource/roboto/300.css";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
 import { CssBaseline } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { useState } from "react";
+import { grey } from "@mui/material/colors";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { AuthProvider } from "../components/Context/AuthContext";
+import { GlobalContext } from "../components/Context/ShareContexts";
 import Navbar from "../components/Header/Navbar";
 import ChatAccordion from "../components/Chat/ChatAccordion";
-import { GlobalContext } from "../components/Context/ShareContexts";
 import ChatMsgBox from "../components/Chat/ChatMsgBox";
 import DBListener from "../components/DBListener";
 import BottomNav from "../components/Header/BottomNav";
 import useWindowDimensions from "../components/Reusable/WindowDimensions";
-import { grey } from "@mui/material/colors";
-import { useMemo } from "react";
+import { useState, useMemo } from "react";
 
 // makeStyles, useStyles, createStyles, withStyles, styled
 // https://smartdevpreneur.com/material-ui-makestyles-usestyles-createstyles-and-withstyles-explained/
@@ -29,10 +32,18 @@ const getDesignTokens = (mode) => ({
           // palette values for light mode
           primary: { main: "#193773" },
           secondary: { main: "#6ff9d1" },
+          text: {
+            primary: "rgba(0, 0, 0, 1)",
+            secondary: "rgba(0, 0, 0, 87)",
+          },
 
+          lightPrimary: {
+            main: "#E5EEFF",
+            contrastText: "rgba(0, 0, 0, 0.87)",
+          },
           unselectedIcon: { main: grey[600] },
-          searchBar: { main: grey[200] },
-          hoverBackground: { main: grey[100] },
+          lightGary: { main: grey[200], contrastText: "rgba(0, 0, 0, 0.87)" },
+          hoverGray: { main: grey[100] },
 
           adminOrange: {
             main: "#f4511e",
@@ -43,9 +54,13 @@ const getDesignTokens = (mode) => ({
           primary: { main: "#193773" },
           secondary: { main: "#6ff9d1" },
 
+          lightPrimary: {
+            main: "#E5EEFF",
+            contrastText: "rgba(0, 0, 0, 0.87)",
+          },
           unselectedIcon: { main: grey[600] },
-          searchBar: { main: grey[700] },
-          hoverBackground: { main: grey[800] },
+          lightGary: { main: grey[700], contrastText: "#fff" },
+          hoverGray: { main: grey[800] },
 
           adminOrange: {
             main: "#f4511e",
@@ -61,11 +76,18 @@ const getDesignTokens = (mode) => ({
   },
 
   components: {
-    // Name of the component ⚛️
     MuiButtonBase: {
       defaultProps: {
         // The props to apply
         disableRipple: true, // No more ripple, on the whole application!
+      },
+    },
+
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          borderRadius: "8px",
+        },
       },
     },
 

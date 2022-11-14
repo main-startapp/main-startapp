@@ -19,7 +19,7 @@ const StudentGridCard = (props) => {
       sx={{
         backgroundColor: "#ffffff",
         border: 1.5,
-        borderRadius: "30px",
+        borderRadius: 8,
         borderColor: "#dbdbdb",
         height: "100%",
       }}
@@ -80,7 +80,7 @@ const StudentGridCard = (props) => {
                 my: 2,
                 border: 1.5,
                 borderColor: "#dbdbdb",
-                borderRadius: "30px",
+                borderRadius: 8,
                 color: "#ffffff",
                 backgroundColor: "#3e95c2",
                 fontSize: "0.8em",

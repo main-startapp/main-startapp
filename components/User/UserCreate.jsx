@@ -184,7 +184,7 @@ const UserCreate = () => {
             sx={{
               height: "3em",
               width: "300px",
-              borderRadius: "30px",
+              borderRadius: 8,
               border: 1.5,
               borderColor: "#dbdbdb",
               backgroundColor: isCreate ? "#3e95c2" : "#e0e0e0",
@@ -214,7 +214,7 @@ const UserCreate = () => {
                 height: "80%",
                 width: "50%",
                 mx: "2%",
-                borderRadius: "30px",
+                borderRadius: 8,
                 border: 1.5,
                 borderColor: "#dbdbdb",
                 backgroundColor: "white",

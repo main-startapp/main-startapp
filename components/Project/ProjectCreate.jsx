@@ -539,7 +539,7 @@ const ProjectCreate = (props) => {
               sx={{
                 backgroundColor: "#f0f0f0",
                 border: 1.5,
-                borderRadius: "10px",
+                borderRadius: 2,
                 borderColor: "#dbdbdb",
                 color: "rgba(0, 0, 0, 0.6)",
                 height: "56px",
@@ -618,7 +618,7 @@ const ProjectCreate = (props) => {
               sx={{
                 mr: 5,
                 "& .MuiOutlinedInput-root": {
-                  borderRadius: "10px",
+                  borderRadius: 2,
                   backgroundColor: "#f0f0f0",
                 },
                 "& .MuiOutlinedInput-notchedOutline": {
@@ -904,7 +904,7 @@ const ProjectCreate = (props) => {
                       maxRows={8}
                       margin="none"
                       name="responsibility"
-                      label="Responsibilities & Qualifications"
+                      label="Role Description"
                       value={positionField.responsibility}
                       onChange={(e) => {
                         handlePosInputChange(index, e);
@@ -943,7 +943,7 @@ const ProjectCreate = (props) => {
               <IconButton
                 sx={{
                   width: "12%",
-                  borderRadius: "30px",
+                  borderRadius: 8,
                   border: 1.5,
                   borderColor: "#dbdbdb",
                   backgroundColor: "#fafafa",
@@ -965,7 +965,7 @@ const ProjectCreate = (props) => {
                   mb: 5,
                   border: 1.5,
                   borderColor: "#dbdbdb",
-                  borderRadius: "30px",
+                  borderRadius: 8,
                   backgroundColor: "#3e95c2",
                   textTransform: "none",
                   paddingX: 5,
@@ -994,7 +994,7 @@ const ProjectCreate = (props) => {
                 mb: 5,
                 border: 1.5,
                 borderColor: "#dbdbdb",
-                borderRadius: "30px",
+                borderRadius: 8,
                 backgroundColor: "#fafafa",
                 color: "black",
                 textTransform: "none",
@@ -1015,7 +1015,7 @@ const ProjectCreate = (props) => {
                 mb: 5,
                 border: 1.5,
                 borderColor: "#dbdbdb",
-                borderRadius: "30px",
+                borderRadius: 8,
                 backgroundColor: "#3e95c2",
                 textTransform: "none",
                 paddingX: 5,

@@ -2,17 +2,13 @@ import { useContext, useState } from "react";
 import {
   AppBar,
   Toolbar,
-  Typography,
   Box,
   IconButton,
   Avatar,
-  Divider,
   Link as MuiLink,
   Menu,
   MenuItem,
   Stack,
-  Tabs,
-  Tab,
 } from "@mui/material";
 import NextLink from "next/link";
 import { auth } from "../../firebase";
@@ -20,10 +16,10 @@ import { useAuth } from "../Context/AuthContext";
 import { styled } from "@mui/material/styles";
 import ExportedImage from "next-image-export-optimizer";
 import { GlobalContext } from "../Context/ShareContexts";
-import Diversity2Icon from "@mui/icons-material/Diversity2";
+import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
 import LocalActivityIcon from "@mui/icons-material/LocalActivity";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
-import { useMemo } from "react";
+import { MenuItemLink } from "../Reusable/Resusable";
 
 const Navbar = () => {
   // context
@@ -74,7 +70,8 @@ const Navbar = () => {
             minHeight: 0,
           },
           height: onMedia.onDesktop ? "64px" : "48px",
-          paddingX: onMedia.onDesktop ? 3 : 1.5,
+          paddingLeft: onMedia.onDesktop ? "12.5%" : 1.5,
+          paddingRight: onMedia.onDesktop ? `calc(12.5% - 12px)` : 1.5,
         }}
         disableGutters
       >
@@ -108,7 +105,7 @@ const Navbar = () => {
             <Stack direction="row" spacing={8}>
               <NextLink href="/">
                 <LinkIconBox sx={url.pathname === "/" && { borderBottom: 1.5 }}>
-                  <Diversity2Icon
+                  <EmojiObjectsIcon
                     color={
                       url.pathname === "/" ? "text.primary" : "unselectedIcon"
                     }
@@ -193,17 +190,11 @@ const Navbar = () => {
             aria-controls={open ? "navbar-menu" : undefined}
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
-            sx={
-              onMedia.onDesktop
-                ? {
-                    width: "64px",
-                    height: "64px",
-                  }
-                : {
-                    width: "48px",
-                    height: "48px",
-                  }
-            }
+            sx={{
+              width: onMedia.onDesktop ? "64px" : "48px",
+              height: onMedia.onDesktop ? "64px" : "48px",
+              padding: 0,
+            }}
             onClick={(e) => handleUserMenu(e)}
           >
             <Avatar
@@ -267,9 +258,4 @@ const PageLink = styled(MuiLink)(({ theme }) => ({
   ":hover": {
     cursor: "pointer",
   },
-}));
-
-const MenuItemLink = styled(MuiLink)(({ theme }) => ({
-  color: theme.palette.text.primary,
-  textDecoration: "none",
 }));

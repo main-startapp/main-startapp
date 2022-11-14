@@ -190,7 +190,7 @@ const Signup = (props) => {
           sx={{
             border: 1.5,
             borderColor: "#dbdbdb",
-            borderRadius: "30px",
+            borderRadius: 8,
             color: "white",
             backgroundColor: "#3e95c2",
             fontSize: "0.8em",
@@ -237,7 +237,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   "& .MuiFormLabel-root.Mui-focused": { top: "0" }, // to counter root adjustment
 
   "& .MuiOutlinedInput-root": {
-    borderRadius: "10px",
+    borderRadius: 2,
     backgroundColor: "white",
   },
   "& .MuiOutlinedInput-notchedOutline": {

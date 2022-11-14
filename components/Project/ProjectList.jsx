@@ -71,9 +71,9 @@ const ProjectList = () => {
           height: onMedia.onDesktop
             ? `calc(${winHeight}px - 64px - 1.5px - ${theme.spacing(
                 4
-              )} - 1.5px - 137px - 36px - 2*${theme.spacing(2)} - 1.5px)` // navbar; navbar b border; spacing; paper t border; header; button; 2*y-margins; paper b border
+              )} - 1.5px - 137px - 48px - 2*${theme.spacing(3)} - 1.5px)` // navbar; navbar b border; spacing; paper t border; header; button; 2*y-margins; paper b border
             : `calc(${winHeight}px - 48px - 48px - 1.5px - 60px)`,
-          overflow: "auto",
+          overflowY: "scroll",
         }}
       >
         {filteredProjects.map((project, index) => (
@@ -92,8 +92,8 @@ const ProjectList = () => {
           sx={{
             display: "flex",
             justifyContent: "center",
-            mt: 2,
-            mb: 2,
+            mt: 3,
+            mb: 3,
             paddingX: 2,
           }}
         >
@@ -115,11 +115,13 @@ const ProjectList = () => {
               fullWidth
               variant="contained"
               sx={{
-                height: "36px",
-                borderRadius: "10px",
+                height: "48px",
+                borderRadius: 8,
               }}
             >
-              <Typography variant="button">{"Create Project"}</Typography>
+              <Typography variant="button" sx={{ fontSize: "18px" }}>
+                {"Create Project"}
+              </Typography>
             </Button>
           </NextLink>
         </Box>

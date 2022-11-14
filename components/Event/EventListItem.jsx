@@ -70,7 +70,7 @@ const EventListItem = (props) => {
           flexDirection: "column",
           alignItems: "flex-start",
           border: 1.5,
-          borderRadius: "30px",
+          borderRadius: 8,
           borderColor: "#dbdbdb",
           backgroundColor: "#ffffff",
           "&:hover": {

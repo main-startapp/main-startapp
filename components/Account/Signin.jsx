@@ -191,7 +191,7 @@ const Signin = () => {
             mt: "1vh",
             border: 1.5,
             borderColor: "#dbdbdb",
-            borderRadius: "30px",
+            borderRadius: 8,
             color: "white",
             backgroundColor: "#3e95c2",
             fontSize: "0.8em",
@@ -292,7 +292,7 @@ export default Signin;
 const StyledButton = styled(Button)(({ theme }) => ({
   color: "black",
   backgroundColor: "white",
-  borderRadius: "30px",
+  borderRadius: 8,
   textTransform: "none",
   display: "flex",
   justifyContent: "center",
@@ -306,7 +306,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   "& .MuiFormLabel-root.Mui-focused": { top: "0" }, // to counter root adjustment
 
   "& .MuiOutlinedInput-root": {
-    borderRadius: "10px",
+    borderRadius: 2,
     backgroundColor: "white",
   },
   "& .MuiOutlinedInput-notchedOutline": {

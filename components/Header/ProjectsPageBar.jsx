@@ -81,7 +81,7 @@ const ProjectsPageBar = () => {
         ml: onMedia.onDesktop ? 3 : 0,
         width: "300px",
         "& .MuiOutlinedInput-root": {
-          borderRadius: "10px",
+          borderRadius: 2,
           backgroundColor: "#f0f0f0",
         },
         "&:hover .MuiOutlinedInput-root": {
@@ -185,7 +185,7 @@ const ProjectsPageBar = () => {
                   height: "30px",
                   backgroundColor: "#f0f0f0",
                   color: "gray",
-                  borderRadius: "10px",
+                  borderRadius: 2,
                   ml: 1.5,
                 }}
                 id="projectspagebar-menu-button"
@@ -218,7 +218,7 @@ const ProjectsPageBar = () => {
                 sx={{
                   backgroundColor: "#f0f0f0",
                   color: "gray",
-                  borderRadius: "10px",
+                  borderRadius: 2,
                   height: "30px",
                 }}
                 onClick={() => setProject(null)}
@@ -238,7 +238,7 @@ export default ProjectsPageBar;
 const Search = styled(Box)(({ theme }) => ({
   // position: "relative",
   border: 0,
-  borderRadius: "10px",
+  borderRadius: 2,
   backgroundColor: "#f0f0f0",
   "&:hover": {
     backgroundColor: "#dbdbdb",

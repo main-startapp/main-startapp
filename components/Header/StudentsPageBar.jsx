@@ -110,7 +110,7 @@ const StudentsPageBar = () => {
                   width: "20%",
                   backgroundColor: "#f0f0f0",
                   color: "gray",
-                  borderRadius: "10px",
+                  borderRadius: 2,
                   ml: 1.5,
                 }}
                 id="studentspagebar-menu-button"
@@ -131,7 +131,7 @@ const StudentsPageBar = () => {
                 sx={{
                   backgroundColor: "#f0f0f0",
                   color: "gray",
-                  borderRadius: "10px",
+                  borderRadius: 2,
                 }}
                 onClick={() => setStudent(null)}
               >
@@ -150,7 +150,7 @@ export default StudentsPageBar;
 const Search = styled(Box)(({ theme }) => ({
   // position: "relative",
   border: 0,
-  borderRadius: "10px",
+  borderRadius: 2,
   backgroundColor: "#f0f0f0",
   "&:hover": {
     backgroundColor: "#dbdbdb",
