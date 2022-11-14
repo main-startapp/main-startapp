@@ -47,6 +47,7 @@ import {
 import { useAuth } from "../Context/AuthContext";
 import { projectTags, projectStrList } from "../Reusable/MenuStringList";
 import TextEditor from "../TextEditor";
+import moment from "moment/moment";
 
 const ProjectCreate = (props) => {
   // context
@@ -56,6 +57,8 @@ const ProjectCreate = (props) => {
   const { showAlert } = useContext(ProjectContext);
   const router = useRouter();
   const formRef = useRef();
+  const dateRef = useRef();
+  const teamSizeRef = useRef();
 
   // click spam
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
@@ -66,11 +69,14 @@ const ProjectCreate = (props) => {
     : null;
 
   // init new project
+  // Project State Initialization.
+  // https://stackoverflow.com/questions/68945060/react-make-usestate-initial-value-conditional
+  const currentTime = new Date();
   const emptyProject = {
     title: "",
     category: "",
-    completion_date: "",
-    max_member_count: 0,
+    completion_date: new Date(),
+    max_member_count: 0, 
     tags: [],
     description: "",
     is_visible: true,
@@ -136,6 +142,7 @@ const ProjectCreate = (props) => {
 
   // helper functions
   const handleSubmit = async (e) => {
+  
     if (!isClickable) return;
     if (!formRef.current.reportValidity()) return;
 
@@ -412,14 +419,17 @@ const ProjectCreate = (props) => {
   };
 
   const handleDateTimeChange = (e) => {
-    setNewProject({ ...newProject, completion_date: e?._d });
+    setNewProject({
+      ...newProject,
+      completion_date: e?._d,
+    });
   };
 
   const handleCompDateChange = (e) => {
     setIsCheckedCompDate(!isCheckedCompDate);
     setNewProject({
       ...newProject,
-      completion_date: isCheckedCompDate ? e.target.value : "",
+      completion_date: new Date()
     });
   };
 
@@ -427,7 +437,7 @@ const ProjectCreate = (props) => {
     setIsCheckedTeamSize(!isCheckedTeamSize);
     setNewProject({
       ...newProject,
-      max_member_count: isCheckedTeamSize ? e.target.value : 0,
+      max_member_count: teamSizeRef.current.children[0].firstChild.value
     });
   };
 
@@ -640,7 +650,7 @@ const ProjectCreate = (props) => {
             </FormControl>
 
             {/* completion date container */}
-            <Box display="flex" flexDirection="column" width="40%">
+            <Box display="flex" flexDirection="column">
               {/* date and checkbox */}
               <Box
                 display="flex"
@@ -650,10 +660,15 @@ const ProjectCreate = (props) => {
               >
                 <LocalizationProvider dateAdapter={AdapterMoment}>
                   <DesktopDatePicker
+                      ref = {dateRef}
                     renderInput={(props) => {
                       return (
                         <DefaultTextField
+                          sx={{
+                            width: onMedia.onDesktop ? "175px" : "100px",
+                          }}
                           {...props}
+                          required={true}
                           disabled={!isCheckedCompDate}
                         />
                       );
@@ -684,7 +699,6 @@ const ProjectCreate = (props) => {
           {/* tags and total team size */}
           <Box
             display="flex"
-            justifyContent="space-between"
             alignItems="start"
             sx={{
               mt: 5,
@@ -729,21 +743,33 @@ const ProjectCreate = (props) => {
             />
 
             {/* Team Size container */}
-            <Box display="flex" flexDirection="column" width="40%">
+            <Box display="flex" flexDirection="column">
               {/* Size and checkbox */}
               <Box
                 display="flex"
                 justifyContent="center"
                 alignContent="center"
                 gap="10%"
+                // sx={{
+                //   ml: 8,
+                //   border: "solid red 2px"
+                // }}
               >
                 <DefaultTextField
+                  sx={{
+                    width: onMedia.onDesktop ? "175px" : "100px",
+                  }}
+                  ref = {teamSizeRef}
                   fullWidth
                   // label="Team Size"
                   type="number"
                   margin="none"
                   disabled={!isCheckedTeamSize}
-                  value={newProject.max_member_count}
+                  value={
+                    newProject.max_member_count
+                      ? newProject.max_member_count
+                      : ""
+                  }
                   onChange={(e) =>
                     setNewProject({
                       ...newProject,
@@ -768,7 +794,7 @@ const ProjectCreate = (props) => {
           <TextEditor update={setNewProject} project={newProject} />
           <FormHelperText sx={{ color: "lightgray", fontSize: "12px", ml: 1 }}>
             {
-              "A brief description of the new project (e.g. scope, mission, work format, timeline)"
+              "A brief description of the new project (e.g. scope, mission, work format, timeline) *"
             }
           </FormHelperText>
           <Box
