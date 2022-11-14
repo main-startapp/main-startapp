@@ -139,7 +139,7 @@ const ProjectInfo = () => {
                 {"Details: "}
               </Typography>
               <Typography color="text.secondary">
-                {project?.details + orgTags}
+                {project?.tags}
               </Typography>
               {project.max_member_count && (
                 <div>
