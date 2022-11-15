@@ -327,8 +327,8 @@ const ChatMsg = (props) => {
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        borderBottom: joinRequests?.length > 0 ? 1.5 : 2.5,
-        borderColor: "#dbdbdb",
+        borderBottom: 1.5,
+        borderColor: "divider",
         zIndex: 1,
       }}
     >
@@ -345,7 +345,7 @@ const ChatMsg = (props) => {
         src={chatPartner?.photo_url}
         referrerPolicy="no-referrer"
       />
-      <Typography sx={{ fontWeight: "bold", fontSize: "1em" }}>
+      <Typography sx={{ fontWeight: "medium", fontSize: "1rem" }}>
         {chatPartner?.name}
       </Typography>
       <Box sx={{ flexGrow: 1 }} />
@@ -389,9 +389,9 @@ const ChatMsg = (props) => {
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        borderBottom: 2.5,
-        borderColor: "#dbdbdb",
-        backgroundColor: "#fafafa",
+        borderBottom: 1.5,
+        borderColor: "divider",
+        //backgroundColor: "searchGary.main",
         paddingRight: "3px",
       }}
     >
@@ -403,12 +403,13 @@ const ChatMsg = (props) => {
           flexDirection: "column",
         }}
       >
-        <Typography sx={{ fontSize: "0.8em", color: "#3e95c2" }}>
+        <Typography color="text.secondary" sx={{ fontSize: "0.75em" }}>
           Join Request
         </Typography>
         <Typography
+          color="text.secondary"
           sx={{
-            fontSize: "0.8em",
+            fontSize: "0.75em",
             display: "-webkit-box",
             overflow: "hidden",
             WebkitBoxOrient: "vertical",
@@ -484,7 +485,7 @@ const ChatMsg = (props) => {
         flexDirection: "column",
         overflow: "auto",
         flexGrow: 1,
-        borderColor: "#dbdbdb",
+        borderColor: "divider",
       }}
     >
       {messages.map((message, index) => {
@@ -526,7 +527,7 @@ const ChatMsg = (props) => {
             mx: "12px",
             "& .MuiInputBase-root": {
               padding: 0,
-              fontSize: "0.9em",
+              fontSize: "0.875rem",
             },
           }}
           variant="standard"
@@ -556,7 +557,7 @@ const ChatMsg = (props) => {
           flexDirection: "row",
           justifyContent: "flex-end",
           borderTop: 1.5,
-          borderColor: "#dbdbdb",
+          borderColor: "divider",
           paddingY: "6px",
           paddingX: "12px",
         }}
@@ -566,14 +567,11 @@ const ChatMsg = (props) => {
           disabled={!message.text || !isClickable}
           disableElevation
           sx={{
-            backgroundColor: "#3e95c2",
-            border: 1.5,
-            borderColor: "#dbdbdb",
+            backgroundColor: "secondary",
             borderRadius: 8,
             paddingX: 0,
             paddingY: 0,
-            textTransform: "none",
-            fontSize: "0.7em",
+            fontSize: "0.75rem",
             position: "relative",
           }}
           onClick={(e) => handleSubmit(e)}

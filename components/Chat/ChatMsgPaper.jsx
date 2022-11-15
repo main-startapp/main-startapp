@@ -1,30 +1,31 @@
-import { Box } from "@mui/material";
+import { Box, Paper } from "@mui/material";
 import { useState } from "react";
 import ChatMsg from "./ChatMsg";
 
-const ChatMsgBox = () => {
+const ChatMsgPaper = () => {
   // control comp size
   const [isMaximized, setIsMaximized] = useState(false);
   return (
-    <Box
+    <Paper
+      elevation={3}
       sx={{
         width: isMaximized ? "480px" : "320px",
         height: isMaximized ? "75vh" : "50vh",
         position: "fixed",
         right: "336px",
-        bottom: -1,
-        border: 1.5,
-        borderColor: "#dbdbdb",
-        borderRadius: "10px 10px 0 0",
-        backgroundColor: "#ffffff",
+        bottom: -1.5,
+        borderTop: 1.5,
+        borderBottom: 1.5,
+        borderColor: "divider",
+        borderRadius: "8px 8px 0 0",
+        backgroundColor: "background",
         display: "flex",
         flexDirection: "column",
-        boxShadow: 3,
       }}
     >
       <ChatMsg isMaximized={isMaximized} setIsMaximized={setIsMaximized} />
-    </Box>
+    </Paper>
   );
 };
 
-export default ChatMsgBox;
+export default ChatMsgPaper;

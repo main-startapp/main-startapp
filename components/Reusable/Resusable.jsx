@@ -239,7 +239,7 @@ export const SearchBox = styled(Box)(({ theme }) => ({
   height: "36px",
   border: 0,
   borderRadius: theme.shape.borderRadius * 2,
-  backgroundColor: theme.palette.lightGary.main,
+  backgroundColor: theme.palette.searchGary.main,
   // ":hover": { backgroundColor: "#3e95c2" },
   display: "flex",
   alignItems: "center",

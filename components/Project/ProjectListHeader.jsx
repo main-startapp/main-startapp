@@ -14,9 +14,9 @@ const ProjectListHeader = () => {
     >
       <Typography
         variant="h1"
-        sx={{ mb: 2, fontSize: "18px", fontWeight: "bold" }}
+        sx={{ mb: 2, fontSize: "24px", fontWeight: "bold" }}
       >
-        Project Board
+        {"Project Board"}
       </Typography>
       <SearchBox>
         <SearchIconWrapper>

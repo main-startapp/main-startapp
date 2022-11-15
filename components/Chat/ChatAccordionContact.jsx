@@ -72,7 +72,7 @@ const ChatAccordionContact = (props) => {
         }
         handleUnread(chat, setChat, ediumUser, contact);
       }}
-      sx={{ minHeight: "80px" }}
+      sx={{ height: "80px" }}
     >
       <Avatar
         sx={{
@@ -97,8 +97,8 @@ const ChatAccordionContact = (props) => {
           }}
         >
           <Typography
-            fontSize="1em"
-            fontWeight="bold"
+            fontSize="1rem"
+            fontWeight="medium"
             sx={{
               display: "-webkit-box",
               overflow: "hidden",
@@ -113,8 +113,8 @@ const ChatAccordionContact = (props) => {
           <Box>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <Typography
-                fontSize="0.8em"
-                color="#3e95c2"
+                color="text.secondary"
+                fontSize="0.75rem"
                 sx={{
                   display: "-webkit-box",
                   overflow: "hidden",
@@ -122,11 +122,12 @@ const ChatAccordionContact = (props) => {
                   WebkitLineClamp: 1,
                 }}
               >
-                Join Request
+                {"Join Request"}
               </Typography>
             </Box>
             <Typography
-              fontSize="0.8em"
+              color="text.secondary"
+              fontSize="0.75rem"
               sx={{
                 display: "-webkit-box",
                 overflow: "hidden",
@@ -139,7 +140,7 @@ const ChatAccordionContact = (props) => {
           </Box>
         ) : (
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Typography fontSize="0.8em">
+            <Typography fontSize="0.75rem">
               {contact?.desired_position}
             </Typography>
           </Box>
@@ -153,17 +154,15 @@ const ChatAccordionContact = (props) => {
           width: "104px",
           height: "56px",
           alignItems: "center",
-          mr: "12px",
         }}
       >
-        <Typography fontSize="0.8em">
+        <Typography fontSize="0.75rem">
           {moment(chat?.last_timestamp?.toDate().getTime()).format("MMM D")}
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
         <Badge
           sx={{
             mb: "12px",
-            color: "#ffffff",
           }}
           badgeContent={chat[my_unread_key]}
           color="secondary"
@@ -181,10 +180,10 @@ const ContactBox = styled(Box)(({ theme }) => ({
   alignItems: "center",
   height: "calc(56px + 2*12px)",
   cursor: "pointer",
-  borderBottom: "1.5px solid #dbdbdb",
-  "&:hover": {
-    backgroundColor: "#f6f6f6",
-  },
+  borderBottom: `1.5px solid ${theme.palette.divider}`,
+  // "&:hover": {
+  //   backgroundColor: "#f6f6f6",
+  // },
 }));
 
 const ChatInfo = styled("div")(({ theme }) => ({

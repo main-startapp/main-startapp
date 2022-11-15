@@ -83,9 +83,10 @@ const ProjectInfo = () => {
       sx={{
         mt: 4,
         backgroundColor: "background",
-        border: 1.5,
+        borderTop: 1.5,
+        borderBottom: 1.5,
         borderColor: "divider",
-        borderRadius: "30px 30px 0px 0px",
+        borderRadius: "32px 32px 0px 0px",
       }}
     >
       <Box id="projectinfo-box" ref={boxRef}>
@@ -190,6 +191,7 @@ const ProjectInfo = () => {
                   posTitle={position.title}
                   posResp={position.responsibility}
                   posWeeklyHour={position.weekly_hour}
+                  posLevel={position?.level || ""}
                   isCreator={isCreator}
                   creator={creatorUser}
                   appFormURL={
@@ -223,7 +225,7 @@ const ProjectInfo = () => {
                     mt: 1,
                     mr: 1,
                     fontSize: "0.875rem",
-                    //fontWeight: "bold",
+                    fontWeight: "medium",
                   }}
                 />
               ))}

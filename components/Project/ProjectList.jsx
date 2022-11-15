@@ -58,9 +58,10 @@ const ProjectList = () => {
         mt: 4,
         mr: 4,
         backgroundColor: "background",
-        border: 1.5,
+        borderTop: 1.5,
+        borderBottom: 1.5,
         borderColor: "divider",
-        borderRadius: "30px 30px 0px 0px",
+        borderRadius: "32px 32px 0px 0px",
       }}
     >
       {onMedia.onDesktop && <ProjectListHeader />}
@@ -71,7 +72,7 @@ const ProjectList = () => {
           height: onMedia.onDesktop
             ? `calc(${winHeight}px - 64px - 1.5px - ${theme.spacing(
                 4
-              )} - 1.5px - 137px - 48px - 2*${theme.spacing(3)} - 1.5px)` // navbar; navbar b border; spacing; paper t border; header; button; 2*y-margins; paper b border
+              )} - 1.5px - 144px - 48px - 2*${theme.spacing(3)} - 1.5px)` // navbar; navbar b border; spacing; paper t border; header; button; 2*y-margins; paper b border
             : `calc(${winHeight}px - 48px - 48px - 1.5px - 60px)`,
           overflowY: "scroll",
         }}
@@ -119,7 +120,7 @@ const ProjectList = () => {
                 borderRadius: 8,
               }}
             >
-              <Typography variant="button" sx={{ fontSize: "18px" }}>
+              <Typography variant="button" sx={{ fontSize: "1.125rem" }}>
                 {"Create Project"}
               </Typography>
             </Button>

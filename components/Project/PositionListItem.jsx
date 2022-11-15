@@ -4,6 +4,7 @@ import {
   AccordionSummary,
   Box,
   Button,
+  Chip,
   Divider,
   Link,
   Tooltip,
@@ -30,6 +31,7 @@ const PositionListItem = (props) => {
   const posTitle = props.posTitle;
   const posResp = props.posResp;
   const posWeeklyHour = props.posWeeklyHour;
+  const posLevel = props.posLevel;
   const isCreator = props.isCreator; // whether ediumUser is the creator
   const creator = props.creator; // creator's user data
   const appFormURL = props.appFormURL;
@@ -196,19 +198,20 @@ const PositionListItem = (props) => {
     <Button
       disabled={!ediumUser?.uid}
       disableElevation
+      variant="contained"
+      component={Link}
+      target="_blank"
+      href={appFormURL}
+      rel="noreferrer"
+      onClick={(e) => e.stopPropagation()}
       size="small"
       sx={{
         borderRadius: 8,
         backgroundColor: "primary",
         paddingX: 2,
         paddingY: 0,
+        fontSize: "0.75rem",
       }}
-      onClick={(e) => e.stopPropagation()}
-      variant="contained"
-      component={Link}
-      target="_blank"
-      href={appFormURL}
-      rel="noreferrer"
     >
       {"Apply"}
     </Button>
@@ -223,17 +226,18 @@ const PositionListItem = (props) => {
         )
       }
       disableElevation
+      variant="contained"
+      onClick={(e) => {
+        e.stopPropagation();
+        handleJoinRequest();
+      }}
       size="small"
       sx={{
         borderRadius: 8,
         backgroundColor: "primary",
         paddingX: 2,
         paddingY: 0,
-      }}
-      variant="contained"
-      onClick={(e) => {
-        e.stopPropagation();
-        handleJoinRequest();
+        fontSize: "0.75rem",
       }}
     >
       {"Apply"}
@@ -252,10 +256,10 @@ const PositionListItem = (props) => {
         sx={{
           boxShadow: "none",
           borderRadius: 2,
-          "&:hover": {
-            backgroundColor: "hoverGray.main",
-            cursor: "default",
-          },
+          // "&:hover": {
+          //   backgroundColor: "hoverGray.main",
+          //   cursor: "default",
+          // },
         }}
       >
         <StyledAccordionSummary
@@ -263,17 +267,37 @@ const PositionListItem = (props) => {
           aria-controls={"accordion-" + index + "-content"}
           expandIcon={<ExpandMoreIcon />}
           onClick={(e) => handleExpand(e)}
+          sx={{ borderRadius: 2, boxShadow: 2 }}
         >
           <Box
             sx={{
-              mr: 3,
+              mr: 2,
               width: "100%",
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
             }}
           >
-            <Typography color="text.primary">{posTitle}</Typography>
+            <Typography
+              variant="h4"
+              color="text.primary"
+              sx={{ fontSize: "1rem", fontWeight: "medium" }}
+            >
+              {posTitle}
+            </Typography>
+            {posLevel !== "" && (
+              <Chip
+                color={posLevel === "Beginner" ? "beginnerGreen" : "error"}
+                label={posLevel}
+                size="small"
+                sx={{
+                  ml: 1,
+                  height: "16px",
+                  borderRadius: 1.5,
+                  fontSize: "0.625rem",
+                }}
+              />
+            )}
             <Box sx={{ flexGrow: 1 }} />
             {onMedia.onDesktop && !isCreator && (
               <Tooltip title={ediumUser?.uid ? "" : "Edit your profile first"}>
@@ -282,32 +306,25 @@ const PositionListItem = (props) => {
             )}
           </Box>
         </StyledAccordionSummary>
-        <AccordionDetails>
+        <AccordionDetails sx={{ padding: 4 }}>
           {/* <Divider
             sx={{ mb: 1.5, borderBottomWidth: 1.5, borderColor: "#dbdbdb" }}
           /> */}
 
-          <Box sx={{ width: "100%", display: "flex", flexDirection: "column" }}>
-            <Box
-              sx={{
-                width: "100%",
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-              }}
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Typography
+              color="text.primary"
+              sx={{ fontSize: "1em", fontWeight: "medium" }}
             >
-              <Typography
-                color="text.primary"
-                sx={{ fontSize: "1em", fontWeight: "bold" }}
-              >
-                {"Role Description: "}
-              </Typography>
-              <Typography sx={{ fontSize: "1em", fontWeight: "bold" }}>
-                {"Weekly Hours: "}
-                {posWeeklyHour}
-              </Typography>
-            </Box>
-            <Typography component="span" color="text.secondary">
+              {"Role Description: "}
+            </Typography>
+            <Typography component="span" color="text.secondary" sx={{ mt: 1 }}>
               <pre
                 style={{
                   fontFamily: "inherit",

@@ -107,7 +107,7 @@ const ProjectListItem = (props) => {
                   sx={{
                     mr: 1,
                     fontSize: "0.75rem",
-                    //fontWeight: "bold",
+                    fontWeight: "medium",
                   }}
                 />
               ))}
@@ -214,7 +214,7 @@ const ProjectListItem = (props) => {
             sx={{ margin: 0, ml: "5%" }}
             key={index}
             secondary={
-              <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+              <Typography variant="body2" sx={{ fontWeight: "medium" }}>
                 {position.title}
               </Typography>
             }
@@ -224,7 +224,7 @@ const ProjectListItem = (props) => {
           <ListItemText
             sx={{ margin: 0, ml: "5%" }}
             secondary={
-              <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+              <Typography variant="body2" sx={{ fontWeight: "medium" }}>
                 {"and more..."}
               </Typography>
             }
@@ -237,10 +237,10 @@ const ProjectListItem = (props) => {
                 color="text.secondary"
                 variant="body2"
                 sx={{
-                  margion: 0,
                   mt: 2,
                   display: "flex",
                   justifyContent: "flex-end",
+                  fontWeight: "light",
                 }}
               >
                 {moment(project.last_timestamp).format("MMMM Do, YYYY")}

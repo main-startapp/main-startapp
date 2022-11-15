@@ -16,10 +16,10 @@ import { useAuth } from "../Context/AuthContext";
 import { styled } from "@mui/material/styles";
 import ExportedImage from "next-image-export-optimizer";
 import { GlobalContext } from "../Context/ShareContexts";
-import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
-import LocalActivityIcon from "@mui/icons-material/LocalActivity";
-import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import { MenuItemLink } from "../Reusable/Resusable";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import DateRangeIcon from "@mui/icons-material/DateRange";
+import PeopleIcon from "@mui/icons-material/People";
 
 const Navbar = () => {
   // context
@@ -65,13 +65,13 @@ const Navbar = () => {
           // flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          minHeight: 0,
-          "@media (min-width: 600px)": {
-            minHeight: 0,
-          },
-          height: onMedia.onDesktop ? "64px" : "48px",
-          paddingLeft: onMedia.onDesktop ? "12.5%" : 1.5,
-          paddingRight: onMedia.onDesktop ? `calc(12.5% - 12px)` : 1.5,
+          // minHeight: 0,
+          // "@media (min-width: 600px)": {
+          //   minHeight: 0,
+          // },
+          height: "64px",
+          paddingLeft: "12.5%",
+          paddingRight: `calc(12.5% - 12px)`,
         }}
         disableGutters
       >
@@ -88,92 +88,114 @@ const Navbar = () => {
           <ExportedImage
             src="/images/EDIUMPlatformLogo256.png"
             placeholder=""
-            width={onMedia.onDesktop ? 40 : 30}
-            height={onMedia.onDesktop ? 40 : 30}
+            width={40}
+            height={40}
           />
         </Box>
         {/* tabs */}
         {/* https://stackoverflow.com/questions/32378953/keep-the-middle-item-centered-when-side-items-have-different-widths */}
-        {onMedia.onDesktop && (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Stack direction="row" spacing={8}>
-              <NextLink href="/">
-                <LinkIconBox sx={url.pathname === "/" && { borderBottom: 1.5 }}>
-                  <EmojiObjectsIcon
-                    color={
-                      url.pathname === "/" ? "text.primary" : "unselectedIcon"
-                    }
-                    sx={{ mt: 1.5, mb: 0.5, fontSize: "32px" }}
-                  />
-                  <PageLink
-                    color={
-                      url.pathname === "/"
-                        ? "text.primary"
-                        : "unselectedIcon.main"
-                    }
-                    sx={{ mb: "3px" }}
-                  >
-                    Projects
-                  </PageLink>
-                </LinkIconBox>
-              </NextLink>
-              <NextLink href="/events/">
-                <LinkIconBox
-                  sx={url.pathname === "/events/" && { borderBottom: 1.5 }}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Stack direction="row" spacing={8}>
+            <NextLink href="/">
+              <LinkIconBox
+                sx={{
+                  ":hover": {
+                    cursor: "pointer",
+                  },
+                  borderBottom: url.pathname === "/" ? 2 : 0,
+                }}
+              >
+                <DashboardIcon
+                  color={
+                    url.pathname === "/" ? "text.primary" : "unselectedIcon"
+                  }
+                  sx={{
+                    height: "44px",
+                    fontSize: "28px",
+                  }}
+                />
+                <PageLink
+                  color={
+                    url.pathname === "/"
+                      ? "text.primary"
+                      : "unselectedIcon.main"
+                  }
                 >
-                  <LocalActivityIcon
-                    color={
-                      url.pathname === "/events/"
-                        ? "text.primary"
-                        : "unselectedIcon"
-                    }
-                    sx={{ mt: 1.5, mb: 0.5, fontSize: "32px" }}
-                  />
-                  <PageLink
-                    color={
-                      url.pathname === "/events/"
-                        ? "text.primary"
-                        : "unselectedIcon.main"
-                    }
-                    sx={{ mb: "3px" }}
-                  >
-                    Events
-                  </PageLink>
-                </LinkIconBox>
-              </NextLink>
-              <NextLink href="/students/">
-                <LinkIconBox
-                  sx={url.pathname === "/students/" && { borderBottom: 1.5 }}
+                  {"Projects"}
+                </PageLink>
+              </LinkIconBox>
+            </NextLink>
+            <NextLink href="/events/">
+              <LinkIconBox
+                sx={{
+                  ":hover": {
+                    cursor: "pointer",
+                  },
+                  borderBottom: url.pathname === "/events/" ? 2 : 0,
+                }}
+              >
+                <DateRangeIcon
+                  color={
+                    url.pathname === "/events/"
+                      ? "text.primary"
+                      : "unselectedIcon"
+                  }
+                  sx={{
+                    height: "44px",
+                    fontSize: "28px",
+                  }}
+                />
+                <PageLink
+                  color={
+                    url.pathname === "/events/"
+                      ? "text.primary"
+                      : "unselectedIcon.main"
+                  }
                 >
-                  <PersonSearchIcon
-                    color={
-                      url.pathname === "/students/"
-                        ? "text.primary"
-                        : "unselectedIcon"
-                    }
-                    sx={{ mt: 1.5, mb: 0.5, fontSize: "32px" }}
-                  />
-                  <PageLink
-                    color={
-                      url.pathname === "/students/"
-                        ? "text.primary"
-                        : "unselectedIcon.main"
-                    }
-                    sx={{ mb: "3px" }}
-                  >
-                    Students
-                  </PageLink>
-                </LinkIconBox>
-              </NextLink>
-            </Stack>
-          </Box>
-        )}
+                  {"Events"}
+                </PageLink>
+              </LinkIconBox>
+            </NextLink>
+            <NextLink href="/students/">
+              <LinkIconBox
+                sx={{
+                  ":hover": {
+                    cursor: "pointer",
+                  },
+                  borderBottom: url.pathname === "/students/" ? 2 : 0,
+                }}
+              >
+                <PeopleIcon
+                  color={
+                    url.pathname === "/students/"
+                      ? "text.primary"
+                      : "unselectedIcon"
+                  }
+                  sx={{
+                    height: "44px",
+                    fontSize: "28px",
+                  }}
+                />
+                <PageLink
+                  color={
+                    url.pathname === "/students/"
+                      ? "text.primary"
+                      : "unselectedIcon.main"
+                  }
+                >
+                  {"Students"}
+                </PageLink>
+              </LinkIconBox>
+            </NextLink>
+          </Stack>
+        </Box>
+
         {/* user */}
         <Box
           sx={{
@@ -191,24 +213,14 @@ const Navbar = () => {
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
             sx={{
-              width: onMedia.onDesktop ? "64px" : "48px",
-              height: onMedia.onDesktop ? "64px" : "48px",
+              width: "64px",
+              height: "64px",
               padding: 0,
             }}
             onClick={(e) => handleUserMenu(e)}
           >
             <Avatar
-              sx={
-                onMedia.onDesktop
-                  ? {
-                      width: "40px",
-                      height: "40px",
-                    }
-                  : {
-                      width: "30px",
-                      height: "30px",
-                    }
-              }
+              sx={{ height: "40px", width: "40px" }}
               src={ediumUser?.photo_url}
               referrerPolicy="no-referrer"
             />
@@ -221,6 +233,11 @@ const Navbar = () => {
             onClose={handleUserMenuClose}
             MenuListProps={{
               "aria-labelledby": "navbar-menu-button",
+            }}
+            sx={{
+              "& .MuiPaper-root": {
+                borderRadius: 2,
+              },
             }}
           >
             <MenuItem onClick={handleUserMenuClose}>
@@ -252,10 +269,10 @@ const LinkIconBox = styled(Box)(({ theme }) => ({
 
 // since the nav bar is fixed height, the font should also use fixed size
 const PageLink = styled(MuiLink)(({ theme }) => ({
-  fontSize: "12px",
-  fontWeight: "600",
+  fontSize: "16px",
+  fontWeight: theme.typography.fontWeightMedium,
   textDecoration: "none",
-  ":hover": {
-    cursor: "pointer",
-  },
+  height: "20px",
+  display: "flex",
+  alignItems: "end",
 }));

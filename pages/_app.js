@@ -14,7 +14,7 @@ import { AuthProvider } from "../components/Context/AuthContext";
 import { GlobalContext } from "../components/Context/ShareContexts";
 import Navbar from "../components/Header/Navbar";
 import ChatAccordion from "../components/Chat/ChatAccordion";
-import ChatMsgBox from "../components/Chat/ChatMsgBox";
+import ChatMsgPaper from "../components/Chat/ChatMsgPaper";
 import DBListener from "../components/DBListener";
 import BottomNav from "../components/Header/BottomNav";
 import useWindowDimensions from "../components/Reusable/WindowDimensions";
@@ -42,12 +42,11 @@ const getDesignTokens = (mode) => ({
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
           unselectedIcon: { main: grey[600] },
-          lightGary: { main: grey[200], contrastText: "rgba(0, 0, 0, 0.87)" },
+          searchGary: { main: grey[200], contrastText: "rgba(0, 0, 0, 0.87)" },
           hoverGray: { main: grey[100] },
 
-          adminOrange: {
-            main: "#f4511e",
-          },
+          adminOrange: { main: "#f4511e", contrastText: "#fff" },
+          beginnerGreen: { main: "#59B113", contrastText: "#fff" },
         }
       : {
           // palette values for dark mode
@@ -59,18 +58,17 @@ const getDesignTokens = (mode) => ({
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
           unselectedIcon: { main: grey[600] },
-          lightGary: { main: grey[700], contrastText: "#fff" },
+          searchGary: { main: grey[700], contrastText: "#fff" },
           hoverGray: { main: grey[800] },
 
-          adminOrange: {
-            main: "#f4511e",
-          },
+          adminOrange: { main: "#f4511e", contrastText: "#fff" },
+          beginnerGreen: { main: "#59B113", contrastText: "#fff" },
         }),
   },
 
   typography: {
     button: {
-      fontWeight: 600,
+      fontWeight: 500,
       textTransform: "none",
     },
   },
@@ -207,9 +205,9 @@ function MyApp({ Component, pageProps }) {
           >
             <CssBaseline />
             <DBListener />
-            <Navbar />
+            {onMedia.onDesktop && <Navbar />}
             <Component {...pageProps} />
-            {onMedia.onDesktop && ediumUser?.uid && showMsg && <ChatMsgBox />}
+            {onMedia.onDesktop && ediumUser?.uid && showMsg && <ChatMsgPaper />}
             {onMedia.onDesktop && ediumUser?.uid && showChat && (
               <ChatAccordion />
             )}
