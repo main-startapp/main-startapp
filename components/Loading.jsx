@@ -5,7 +5,7 @@ const Loading = ({ type, color }) => {
   return (
     <Grid
       container
-      spaceing={0}
+      spacing={0}
       direction="row"
       alignItems="center"
       justifyContent="center"

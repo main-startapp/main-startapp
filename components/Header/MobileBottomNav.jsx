@@ -1,14 +1,14 @@
 import { BottomNavigation, BottomNavigationAction } from "@mui/material";
 import { useState, useEffect } from "react";
-import ListAltRoundedIcon from "@mui/icons-material/ListAltRounded";
-import EventRoundedIcon from "@mui/icons-material/EventRounded";
-import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import DateRangeIcon from "@mui/icons-material/DateRange";
+import PeopleIcon from "@mui/icons-material/People";
 import ForumIcon from "@mui/icons-material/Forum";
 import { useRouter } from "next/router";
 
 // !todo: current implementation didn't fully utilize the bottom nav comp. It merely use it as some general layout then wrap the bottomNavAction with Nextlink.
 
-const BottomNav = () => {
+const MobileBottomNav = () => {
   const [destination, setDestination] = useState("");
   const router = useRouter();
 
@@ -21,25 +21,22 @@ const BottomNav = () => {
 
   return (
     <BottomNavigation
+      color="background"
+      value={destination}
       sx={{
         position: "fixed",
         bottom: 0,
+        height: "65px",
         width: "100%",
-        height: "60px",
-        borderTop: 1.5,
-        borderColor: "#dbdbdb",
-        backgroundColor: "#ffffff",
-        "&:hover": {
-          cursor: "default",
-        },
+        borderTop: 1,
+        borderColor: "divider",
         zIndex: 100,
       }}
-      value={destination}
     >
       <BottomNavigationAction
         value="projects"
         label="Projects"
-        icon={<ListAltRoundedIcon />}
+        icon={<DashboardIcon />}
         onClick={() => {
           router.push("/");
         }}
@@ -47,7 +44,7 @@ const BottomNav = () => {
       <BottomNavigationAction
         value="events"
         label="Events"
-        icon={<EventRoundedIcon />}
+        icon={<DateRangeIcon />}
         onClick={() => {
           router.push("/events");
         }}
@@ -56,7 +53,7 @@ const BottomNav = () => {
       <BottomNavigationAction
         value="students"
         label="Students"
-        icon={<PeopleRoundedIcon />}
+        icon={<PeopleIcon />}
         onClick={() => {
           router.push("/students");
         }}
@@ -74,4 +71,4 @@ const BottomNav = () => {
   );
 };
 
-export default BottomNav;
+export default MobileBottomNav;

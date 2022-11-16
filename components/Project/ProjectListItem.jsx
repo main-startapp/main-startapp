@@ -53,7 +53,7 @@ const ProjectListItem = (props) => {
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-start",
-        borderBottom: 1.5,
+        borderBottom: 1,
         borderColor: "divider",
         backgroundColor: "background",
         "&:hover": {
@@ -90,7 +90,7 @@ const ProjectListItem = (props) => {
             primary={
               <Typography
                 variant="h2"
-                sx={{ fontSize: "1rem", fontWeight: "bold" }}
+                sx={{ fontSize: "1rem", fontWeight: "medium" }}
               >
                 {project?.title}
               </Typography>

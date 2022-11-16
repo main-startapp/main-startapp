@@ -16,7 +16,7 @@ import Navbar from "../components/Header/Navbar";
 import ChatAccordion from "../components/Chat/ChatAccordion";
 import ChatMsgPaper from "../components/Chat/ChatMsgPaper";
 import DBListener from "../components/DBListener";
-import BottomNav from "../components/Header/BottomNav";
+import MobileBottomNav from "../components/Header/MobileBottomNav";
 import useWindowDimensions from "../components/Reusable/WindowDimensions";
 import { useState, useMemo } from "react";
 
@@ -38,11 +38,11 @@ const getDesignTokens = (mode) => ({
           },
 
           lightPrimary: {
-            main: "#E5EEFF",
+            main: "#e5eeff",
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
           unselectedIcon: { main: grey[600] },
-          searchGary: { main: grey[200], contrastText: "rgba(0, 0, 0, 0.87)" },
+          searchGary: { main: grey[300], contrastText: "rgba(0, 0, 0, 0.87)" },
           hoverGray: { main: grey[100] },
 
           adminOrange: { main: "#f4511e", contrastText: "#fff" },
@@ -58,7 +58,7 @@ const getDesignTokens = (mode) => ({
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
           unselectedIcon: { main: grey[600] },
-          searchGary: { main: grey[700], contrastText: "#fff" },
+          searchGary: { main: grey[600], contrastText: "#fff" },
           hoverGray: { main: grey[800] },
 
           adminOrange: { main: "#f4511e", contrastText: "#fff" },
@@ -211,7 +211,7 @@ function MyApp({ Component, pageProps }) {
             {onMedia.onDesktop && ediumUser?.uid && showChat && (
               <ChatAccordion />
             )}
-            {!onMedia.onDesktop && <BottomNav />}
+            {!onMedia.onDesktop && <MobileBottomNav />}
           </GlobalContext.Provider>
         </LocalizationProvider>
       </AuthProvider>

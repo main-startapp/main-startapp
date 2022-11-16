@@ -29,9 +29,8 @@ const ChatAccordion = () => {
     onMedia,
   } = useContext(GlobalContext);
 
-  // local
+  // accordion expansion
   const [expandState, setExpandState] = useState("collapseIt");
-
   // handle chat expansion called by handleConnect/handleJoinRequest
   // connect or join request might create a new chat, this new chat will be found by this hook
   useEffect(() => {
@@ -87,8 +86,6 @@ const ChatAccordion = () => {
   };
 
   return onMedia.onDesktop ? (
-    // box is essential for wrapping the accrodion to get rid of ugly top line
-
     <Accordion
       expanded={expandState === "expandIt"}
       square
@@ -97,9 +94,8 @@ const ChatAccordion = () => {
         width: "320px",
         position: "fixed",
         right: 0,
-        bottom: -1.5,
-        borderTop: 1.5,
-        borderBottom: 1.5,
+        bottom: -1,
+        borderTop: 1,
         borderRadius: "8px 8px 0px 0px",
         borderColor: "divider",
         "&.MuiAccordion-root::before": {
@@ -111,7 +107,7 @@ const ChatAccordion = () => {
       <StyledAccordionSummary
         sx={{
           height: "48px",
-          borderBottom: 1.5,
+          borderBottom: 1,
           borderColor: "divider",
           paddingX: 4,
         }}

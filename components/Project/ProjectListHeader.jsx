@@ -8,13 +8,10 @@ import SearchIcon from "@mui/icons-material/Search";
 
 const ProjectListHeader = () => {
   return (
-    <Box
-      id="projectlist-header-box"
-      sx={{ paddingTop: 6, paddingBottom: 2, paddingX: 2 }}
-    >
+    <Box id="projectlist-header-box" sx={{ padding: 2 }}>
       <Typography
         variant="h1"
-        sx={{ mb: 2, fontSize: "24px", fontWeight: "bold" }}
+        sx={{ mb: 2, fontSize: "1.5rem", fontWeight: "bold" }}
       >
         {"Project Board"}
       </Typography>

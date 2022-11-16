@@ -1,106 +1,52 @@
-import { useContext, useState } from "react";
-import {
-  AppBar,
-  Toolbar,
-  Box,
-  IconButton,
-  Avatar,
-  Link as MuiLink,
-  Menu,
-  MenuItem,
-  Stack,
-} from "@mui/material";
-import NextLink from "next/link";
-import { auth } from "../../firebase";
-import { useAuth } from "../Context/AuthContext";
+import { AppBar, Toolbar, Box, Link as MuiLink, Stack } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import NextLink from "next/link";
 import ExportedImage from "next-image-export-optimizer";
-import { GlobalContext } from "../Context/ShareContexts";
-import { MenuItemLink } from "../Reusable/Resusable";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import PeopleIcon from "@mui/icons-material/People";
+import UserIconMenu from "./UserIconMenu";
 
 const Navbar = () => {
-  // context
-  const { currentUser } = useAuth();
-  const { ediumUser, onMedia } = useContext(GlobalContext);
-
-  // menu
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-  const handleUserMenu = (e) => {
-    setAnchorEl(e.currentTarget);
-  };
-  const handleUserMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleUserMenuLogout = () => {
-    // signout user -> close menu
-    auth.signOut();
-    setAnchorEl(null);
-    window.location.reload(true); // do a server refresh
-  };
-
   // url
   const url = new URL(window.location.href);
 
   return (
-    <AppBar
-      color="background"
-      elevation={0}
-      position="static"
-      sx={{
-        borderBottom: 1.5,
-        borderColor: "divider",
-        "&:hover": {
-          cursor: "default",
-        },
-      }}
-    >
+    <AppBar color="background" elevation={0} position="static">
       <Toolbar
         sx={{
           display: "flex",
-          // flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
+          justifyContent: "center",
           // minHeight: 0,
           // "@media (min-width: 600px)": {
           //   minHeight: 0,
           // },
-          height: "64px",
-          paddingLeft: "12.5%",
-          paddingRight: `calc(12.5% - 12px)`,
+          height: "65px", // 64+border
+          borderBottom: 1,
+          borderColor: "divider",
         }}
         disableGutters
       >
-        {/* edium icon */}
         <Box
           sx={{
+            mx: 4,
             display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
             alignItems: "center",
-            flexGrow: 1,
-            flexBasis: 0,
-            justifyContent: "flex-start",
+            height: "100%",
+            width: "100%",
+            maxWidth: "1392px",
           }}
         >
           <ExportedImage
             src="/images/EDIUMPlatformLogo256.png"
             placeholder=""
-            width={40}
             height={40}
+            width={40}
           />
-        </Box>
-        {/* tabs */}
-        {/* https://stackoverflow.com/questions/32378953/keep-the-middle-item-centered-when-side-items-have-different-widths */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+          {/* tabs */}
+          {/* https://stackoverflow.com/questions/32378953/keep-the-middle-item-centered-when-side-items-have-different-widths */}
           <Stack direction="row" spacing={8}>
             <NextLink href="/">
               <LinkIconBox
@@ -194,64 +140,8 @@ const Navbar = () => {
               </LinkIconBox>
             </NextLink>
           </Stack>
-        </Box>
 
-        {/* user */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            flexGrow: 1,
-            flexBasis: 0,
-            justifyContent: "end",
-          }}
-        >
-          <IconButton
-            id="navbar-menu-button"
-            disabled={!currentUser}
-            aria-controls={open ? "navbar-menu" : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? "true" : undefined}
-            sx={{
-              width: "64px",
-              height: "64px",
-              padding: 0,
-            }}
-            onClick={(e) => handleUserMenu(e)}
-          >
-            <Avatar
-              sx={{ height: "40px", width: "40px" }}
-              src={ediumUser?.photo_url}
-              referrerPolicy="no-referrer"
-            />
-          </IconButton>
-          <Menu
-            id="navbar-menu"
-            anchorEl={anchorEl}
-            // anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-            open={open}
-            onClose={handleUserMenuClose}
-            MenuListProps={{
-              "aria-labelledby": "navbar-menu-button",
-            }}
-            sx={{
-              "& .MuiPaper-root": {
-                borderRadius: 2,
-              },
-            }}
-          >
-            <MenuItem onClick={handleUserMenuClose}>
-              <NextLink href="/students/create" passHref>
-                <MenuItemLink>Edit Profile</MenuItemLink>
-              </NextLink>
-            </MenuItem>
-            {/* <MenuItem onClick={handleUserMenuClose}>
-              <NextLink href="/team/management" passHref>
-                <MenuItemLink>Team Management</MenuItemLink>
-              </NextLink>
-            </MenuItem> */}
-            <MenuItem onClick={handleUserMenuLogout}>Log Out</MenuItem>
-          </Menu>
+          <UserIconMenu iconHeight="40px" avatarHeight="40px" />
         </Box>
       </Toolbar>
     </AppBar>

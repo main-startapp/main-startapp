@@ -23,6 +23,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { findItemFromList } from "../Reusable/Resusable";
+import { Interweave } from "interweave";
 
 const PositionListItem = (props) => {
   // args
@@ -320,11 +321,16 @@ const PositionListItem = (props) => {
           >
             <Typography
               color="text.primary"
-              sx={{ fontSize: "1em", fontWeight: "medium" }}
+              sx={{ mb: 1, fontSize: "1rem", fontWeight: "medium" }}
             >
               {"Role Description: "}
             </Typography>
-            <Typography component="span" color="text.secondary" sx={{ mt: 1 }}>
+            <Typography
+              color="text.secondary"
+              component="span"
+              variant="body1"
+              sx={{ fontSize: "0.875rem" }}
+            >
               <pre
                 style={{
                   fontFamily: "inherit",
@@ -333,7 +339,7 @@ const PositionListItem = (props) => {
                   display: "inline",
                 }}
               >
-                {posResp}
+                <Interweave content={posResp} />
               </pre>
             </Typography>
             {!onMedia.onDesktop && !isCreator && (

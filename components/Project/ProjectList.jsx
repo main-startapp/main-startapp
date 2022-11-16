@@ -53,15 +53,18 @@ const ProjectList = () => {
 
   return (
     <Paper
-      elevation={2}
+      elevation={onMedia.onDesktop ? 2 : 0}
       sx={{
-        mt: 4,
-        mr: 4,
+        // mt: onMedia.onDesktop ? 4 : 2,
+        // ml: onMedia.onDesktop ? 4 : 2,
+        // mr: onMedia.onDesktop ? 2 : 0,
         backgroundColor: "background",
-        borderTop: 1.5,
-        borderBottom: 1.5,
+        borderTop: onMedia.onDesktop ? 1 : 0,
         borderColor: "divider",
-        borderRadius: "32px 32px 0px 0px",
+        borderRadius: onMedia.onDesktop
+          ? "32px 32px 0px 0px"
+          : "32px 0px 0px 0px",
+        paddingTop: "32px",
       }}
     >
       {onMedia.onDesktop && <ProjectListHeader />}
@@ -70,10 +73,12 @@ const ProjectList = () => {
         id="projectlist-projectlistitem-box"
         sx={{
           height: onMedia.onDesktop
-            ? `calc(${winHeight}px - 64px - 1.5px - ${theme.spacing(
+            ? `calc(${winHeight}px - 65px - ${theme.spacing(
                 4
-              )} - 1.5px - 144px - 48px - 2*${theme.spacing(3)} - 1.5px)` // navbar; navbar b border; spacing; paper t border; header; button; 2*y-margins; paper b border
-            : `calc(${winHeight}px - 48px - 48px - 1.5px - 60px)`,
+              )} - 1px - 32px - 112px - 96px)` // navbar; spacing; paper t-border; paper t-padding; header; button box
+            : `calc(${winHeight}px - 64px - ${theme.spacing(
+                2
+              )} - 32px + 1px - 65px)`, // mobile bar; spacing margin; inner t-padding; last entry border; bottom navbar
           overflowY: "scroll",
         }}
       >
@@ -93,8 +98,7 @@ const ProjectList = () => {
           sx={{
             display: "flex",
             justifyContent: "center",
-            mt: 3,
-            mb: 3,
+            paddingY: 3,
             paddingX: 2,
           }}
         >

@@ -40,7 +40,7 @@ const Events = () => {
 
       <Grid
         container
-        spaceing={0}
+        spacing={0}
         direction="row"
         alignItems="start"
         justifyContent="center"

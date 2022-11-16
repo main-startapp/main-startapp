@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from "react";
-import { Grid } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import {
   GlobalContext,
   ProjectContext,
 } from "../components/Context/ShareContexts";
-import ProjectsPageBar from "../components/Header/ProjectsPageBar";
+import MobileProjectsBar from "../components/Header/MobileProjectsBar";
 import ProjectList from "../components/Project/ProjectList";
 import ProjectInfo from "../components/Project/ProjectInfo";
 
@@ -18,6 +18,7 @@ const Home = () => {
     setShowMsg,
     setOldProject,
     onMedia,
+    winWidth,
   } = useContext(GlobalContext);
 
   useEffect(() => {
@@ -44,14 +45,18 @@ const Home = () => {
         setSearchCategory,
       }}
     >
-      <Grid
+      {!onMedia.onDesktop && <MobileProjectsBar />}
+
+      {/* <Grid
         container
-        spaceing={0}
+        spacing={0}
         direction="row"
-        alignItems="start"
-        justifyContent="center"
+        sx={{
+          alignItems: "start",
+          justifyContent: "center",
+          backgroundColor: onMedia.onDesktop ? "background" : "hoverGray.main",
+        }}
       >
-        {/* left part: project list */}
         {onMedia.onDesktop ? (
           <Grid item xs={3.5}>
             <ProjectList />
@@ -63,7 +68,7 @@ const Home = () => {
             </Grid>
           )
         )}
-        {/* right part: project info */}
+
         {onMedia.onDesktop ? (
           <Grid item xs={5.5}>
             <ProjectInfo />
@@ -75,7 +80,62 @@ const Home = () => {
             </Grid>
           )
         )}
-      </Grid>
+      </Grid> */}
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        {onMedia.onDesktop ? (
+          <Box
+            sx={{
+              paddingTop: 4,
+              paddingLeft: 4,
+              paddingRight: 2,
+              width: "38.46%",
+              maxWidth: "560px",
+            }}
+          >
+            <ProjectList />
+          </Box>
+        ) : (
+          project === null && (
+            <Box
+              sx={{
+                paddingTop: 2,
+                paddingLeft: 2,
+                width: "100%",
+                backgroundColor: "hoverGray.main",
+              }}
+            >
+              <ProjectList />
+            </Box>
+          )
+        )}
+        {onMedia.onDesktop ? (
+          <Box
+            sx={{
+              paddingTop: 4,
+              paddingLeft: 2,
+              paddingRight: 4,
+              width: "61.54%",
+              maxWidth: "896px",
+            }}
+          >
+            <ProjectInfo />
+          </Box>
+        ) : (
+          project !== null && (
+            <Box
+              sx={{
+                paddingTop: 2,
+                paddingLeft: 2,
+                paddingRight: 2,
+                width: "100%",
+                backgroundColor: "hoverGray.main",
+              }}
+            >
+              <ProjectInfo />
+            </Box>
+          )
+        )}
+      </Box>
     </ProjectContext.Provider>
   );
 };

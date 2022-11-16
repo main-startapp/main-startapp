@@ -211,21 +211,21 @@ export const getGooglePhotoURLwithRes = (photo_url, res) => {
 //============================================================
 // styled components
 //============================================================
-export const DefaultTextField = styled(TextField)(() => ({
+export const DefaultTextField = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
-    borderRadius: 2,
+    borderRadius: theme.shape.borderRadius * 2,
     backgroundColor: "#f0f0f0",
   },
   "& .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: "#dbdbdb",
   },
   "&:hover .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: "#dbdbdb !important",
   },
   "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: "#3e95c2 !important",
   },
   "& .MuiFormHelperText-root": {
@@ -237,6 +237,7 @@ export const DefaultTextField = styled(TextField)(() => ({
 export const SearchBox = styled(Box)(({ theme }) => ({
   //position: "relative",
   height: "36px",
+  width: "100%",
   border: 0,
   borderRadius: theme.shape.borderRadius * 2,
   backgroundColor: theme.palette.searchGary.main,

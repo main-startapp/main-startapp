@@ -2,10 +2,8 @@ import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   Avatar,
   Box,
-  Button,
   Chip,
   Divider,
-  Grid,
   Paper,
   Tooltip,
   Typography,
@@ -13,33 +11,15 @@ import {
 } from "@mui/material";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import PositionListItem from "./PositionListItem";
-import ExportedImage from "next-image-export-optimizer";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
-import NextLink from "next/link";
-import {
-  findItemFromList,
-  getDocFromDB,
-  handleConnect,
-} from "../Reusable/Resusable";
-import { useAuth } from "../Context/AuthContext";
+import { findItemFromList } from "../Reusable/Resusable";
 import { useRouter } from "next/router";
 import { Interweave } from "interweave";
 import { UrlMatcher } from "interweave-autolink";
 
 const ProjectInfo = () => {
   // context
-  const { currentUser } = useAuth();
-  const {
-    setOldProject,
-    chats,
-    ediumUser,
-    ediumUserExt,
-    users,
-    setChatPartner,
-    setForceChatExpand,
-    winHeight,
-    onMedia,
-  } = useContext(GlobalContext);
+  const { ediumUser, users, winHeight, onMedia } = useContext(GlobalContext);
   const { project } = useContext(ProjectContext);
   const theme = useTheme();
 
@@ -81,72 +61,72 @@ const ProjectInfo = () => {
     <Paper
       elevation={2}
       sx={{
-        mt: 4,
+        // mt: onMedia.onDesktop ? 4 : 2,
+        // ml: onMedia.onDesktop ? 2 : 2,
+        // mr: onMedia.onDesktop ? 4 : 0,
         backgroundColor: "background",
-        borderTop: 1.5,
-        borderBottom: 1.5,
+        borderTop: onMedia.onDesktop ? 1 : 0,
         borderColor: "divider",
         borderRadius: "32px 32px 0px 0px",
+        paddingTop: "32px",
       }}
     >
       <Box id="projectinfo-box" ref={boxRef}>
         <Box
-          id="projectinfo-header-box"
-          sx={{
-            paddingTop: 6,
-            paddingX: 4,
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          <Avatar
-            sx={{
-              mr: onMedia.onDesktop ? 4 : 2,
-              height: "96px",
-              width: "96px",
-            }}
-            src={project?.icon_url}
-          >
-            <UploadFileIcon />
-          </Avatar>
-          <Typography
-            color="text.primary"
-            variant="h2"
-            sx={{
-              fontSize: onMedia.onDesktop ? "32px" : "16px",
-              fontWeight: "bold",
-            }}
-          >
-            {project?.title}
-          </Typography>
-        </Box>
-        <Divider
-          sx={{
-            mx: 4,
-            mt: onMedia.onDesktop ? 2 : 1,
-            borderBottomWidth: 1.5,
-            borderColor: "divider",
-          }}
-        />
-        <Box
           id="projectinfo-content-box"
           sx={{
             height: onMedia.onDesktop
-              ? `calc(${winHeight}px - 64px - 1.5px - ${theme.spacing(
-                  4
-                )} - 1.5px - 144px - 1.5px - ${theme.spacing(2)} - 1.5px )` // window height; navbar; navbar border; spacing; paper top border; header; divider+margin; paper bottom border
-              : `calc(${winHeight}px - 2*48px - 1.5px - 60px)`,
+              ? `calc(${winHeight}px - 65px - ${theme.spacing(4)} - 1px - 32px)` // navbar; spacing; paper t-border; paper t-padding
+              : `calc(${winHeight}px - 64px - ${theme.spacing(
+                  2
+                )} - 32px - 65px)`, // mobile bar; spacing; paper t-padding; bottom navbar
             overflowY: "scroll",
-            paddingY: 4,
+            paddingTop: 2,
+            paddingBottom: 4,
             paddingLeft: 4,
             paddingRight: `calc(${theme.spacing(4)} - 0.4rem)`,
           }}
         >
+          <Box
+            id="projectinfo-header-box"
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Avatar
+              sx={{
+                mr: onMedia.onDesktop ? 4 : 2,
+                height: "96px",
+                width: "96px",
+              }}
+              src={project?.icon_url}
+            >
+              <UploadFileIcon />
+            </Avatar>
+            <Typography
+              color="text.primary"
+              variant="h2"
+              sx={{
+                fontSize: onMedia.onDesktop ? "32px" : "16px",
+                fontWeight: "bold",
+              }}
+            >
+              {project?.title}
+            </Typography>
+          </Box>
+          <Divider
+            sx={{
+              mt: onMedia.onDesktop ? 2 : 1,
+              borderBottomWidth: 1,
+              borderColor: "divider",
+            }}
+          />
           <Typography
             color="text.primary"
             variant="h3"
-            sx={{ mb: 2, fontSize: "1.25rem", fontWeight: "bold" }}
+            sx={{ mt: 4, mb: 2, fontSize: "1.25rem", fontWeight: "medium" }}
           >
             {"Description:"}
           </Typography>
@@ -179,7 +159,7 @@ const ProjectInfo = () => {
               <Typography
                 color="white"
                 variant="h3"
-                sx={{ fontSize: "1.25rem", fontWeight: "bold" }}
+                sx={{ fontSize: "1.25rem", fontWeight: "medium" }}
               >
                 {"Positions:"}
               </Typography>
@@ -211,7 +191,7 @@ const ProjectInfo = () => {
               <Typography
                 color="text.primary"
                 variant="h3"
-                sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
+                sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "medium" }}
               >
                 {"Details: "}
               </Typography>
@@ -296,7 +276,7 @@ export default ProjectInfo;
                 variant="contained"
                 sx={{
                   mt: 1,
-                  border: 1.5,
+                  border: 1,
                   borderColor: "#dbdbdb",
                   borderRadius: 8,
                   color: "text.primary",
@@ -321,7 +301,7 @@ export default ProjectInfo;
                   disableElevation
                   sx={{
                     mt: 1,
-                    border: 1.5,
+                    border:1,
                     borderColor: "#dbdbdb",
                     borderRadius: 8,
                     color: "text.primary",

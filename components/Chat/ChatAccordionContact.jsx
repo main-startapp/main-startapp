@@ -180,7 +180,7 @@ const ContactBox = styled(Box)(({ theme }) => ({
   alignItems: "center",
   height: "calc(56px + 2*12px)",
   cursor: "pointer",
-  borderBottom: `1.5px solid ${theme.palette.divider}`,
+  borderBottom: `1px solid ${theme.palette.divider}`,
   // "&:hover": {
   //   backgroundColor: "#f6f6f6",
   // },

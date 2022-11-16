@@ -39,7 +39,7 @@ const Students = () => {
       {/* <StudentsPageBar /> */}
       <Grid
         container
-        spaceing={0}
+        spacing={0}
         direction="row"
         // alignItems="center"
         justifyContent="center"
