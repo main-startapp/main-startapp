@@ -29,11 +29,8 @@ const StudentProfile = () => {
   } = useContext(GlobalContext);
   const { student } = useContext(StudentContext);
 
-  // local vars
-  // similar alg in components/Project/ProjectInfo
-  // box ref to used by useEffect
-  const boxRef = useRef();
   // useEffect to reset box scrollbar position
+  const boxRef = useRef();
   useEffect(() => {
     boxRef.current.scrollTop = 0;
   }, [student]); // every time project changes, this forces each accordion to collapse

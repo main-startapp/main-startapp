@@ -7,13 +7,19 @@ import {
   ListItemText,
   Menu,
   MenuItem,
+  Typography,
 } from "@mui/material";
 import moment from "moment";
 import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useAuth } from "../Context/AuthContext";
-import { handleDeleteEntry } from "../Reusable/Resusable";
+import {
+  findItemFromList,
+  handleDeleteEntry,
+  handleVisibility,
+  MenuItemLink,
+} from "../Reusable/Resusable";
+import NextLink from "next/link";
 
 const EventListItem = (props) => {
   const index = props.index;
@@ -21,10 +27,10 @@ const EventListItem = (props) => {
   const last = props.last;
 
   // context
-  const { ediumUser, onMedia } = useContext(GlobalContext);
-  const { setEvent } = useContext(EventContext);
+  const { setOldEvent, users, ediumUser, onMedia } = useContext(GlobalContext);
+  const { setEvent, setCreatorUser } = useContext(EventContext);
 
-  // local
+  // time related
   const startMoment = useMemo(() => {
     return moment(event?.start_date);
   }, [event?.start_date]);
@@ -49,64 +55,80 @@ const EventListItem = (props) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleMenuClick = (e) => {
+    e.stopPropagation();
     setAnchorEl(e.currentTarget);
   };
-  const handleMenuClose = () => {
+  const handleMenuClose = (e) => {
+    e.stopPropagation();
     setAnchorEl(null);
   };
 
+  // creator's user data
+  const creatorUser = useMemo(() => {
+    return findItemFromList(users, "uid", event?.creator_uid);
+  }, [users, event?.creator_uid]);
+
+  // event + org tags
+  const allTags = useMemo(() => {
+    let retTags = [];
+    if (event?.tags?.length > 0) {
+      retTags = retTags.concat(event.tags);
+    }
+    if (
+      creatorUser?.role === "org_admin" &&
+      creatorUser?.org_tags?.length > 0
+    ) {
+      retTags = retTags.concat(creatorUser.org_tags);
+    }
+
+    return retTags;
+  }, [creatorUser, event]);
+
   return (
-    <Box
+    <ListItem
+      onClick={() => {
+        setEvent(event);
+        setCreatorUser(creatorUser);
+      }}
       sx={{
-        mx: onMedia.onDesktop ? 3 : 1.5,
-        mt: onMedia.onDesktop ? (index === 0 ? 3 : 1.5) : 1.5,
-        mb: index === last ? (onMedia.onDesktop ? 3 : 1.5) : 0,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        borderBottom: 1,
+        borderColor: "divider",
+        backgroundColor: "background",
+        "&:hover": {
+          backgroundColor: "hoverGray.main",
+          cursor: "default",
+        },
+        overflow: "hidden",
+        paddingY: 2,
+        paddingX: 2,
+        opacity: isExpired ? "50%" : "100%",
       }}
     >
-      <ListItem
-        onClick={() => setEvent(event)}
+      <Box
+        id="eventlistitem-upper-box"
         sx={{
           display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          border: 1.5,
-          borderRadius: 8,
-          borderColor: "#dbdbdb",
-          backgroundColor: "#ffffff",
-          "&:hover": {
-            backgroundColor: "#f6f6f6",
-            cursor: "default",
-          },
-          // height: "180px",
-          overflow: "hidden",
-          opacity: isExpired ? "50%" : "100%",
+          flexDirection: "row",
+          alignItems: "center",
+          width: "100%",
         }}
       >
-        <Box
+        {/* event icon uploaded by users*/}
+        <Avatar
           sx={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            width: "100%",
+            mr: 2,
+            height: "48px",
+            width: "48px",
           }}
-          // onClick={(e) => {
-          //   e.stopPropagation();
-          // }}
+          src={event?.icon_url}
         >
-          {/* event icon uploaded by users*/}
-          <Avatar
-            sx={{
-              my: 1,
-              ml: 1,
-              mr: 3,
-              height: "80px",
-              width: "80px",
-            }}
-            src={event?.icon_url}
-          >
-            <UploadFileIcon />
-          </Avatar>
-          <ListItemText
+          <UploadFileIcon />
+        </Avatar>
+        <Box sx={{ width: "100%" }}>
+          {/* <ListItemText
             primary={event.title}
             primaryTypographyProps={{ fontWeight: "bold" }}
             secondary={
@@ -121,63 +143,92 @@ const EventListItem = (props) => {
                     endMoment.format("MMM Do h:mm a")}
               </>
             }
+          /> */}
+          <ListItemText
+            primary={
+              <Typography
+                variant="h2"
+                sx={{ fontSize: "1rem", fontWeight: "bold" }}
+              >
+                {event?.title}
+              </Typography>
+            }
           />
-          <Box
-            sx={{ height: "96px", display: "flex", alignItems: "flex-start" }}
-          >
-            <IconButton
-              id="eventlistitem-menu-button"
-              aria-controls={open ? "eventlistitem-menu" : undefined}
-              aria-haspopup="true"
-              aria-expanded={open ? "true" : undefined}
-              onClick={(e) => {
-                if (ediumUser?.uid !== event?.creator_uid) return; // !todo: will be removed after there's at least one menu for regular user
-                handleMenuClick(e);
-              }}
-            >
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              id="eventlistitem-menu"
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleMenuClose}
-              MenuListProps={{
-                "aria-labelledby": "eventlistitem-menu-button",
-              }}
-            >
-              {ediumUser?.uid === event?.creator_uid && (
-                <MenuItem
-                  onClick={() => {
-                    handleMenuClose();
-                  }}
-                >
-                  {event?.is_visible ? "Hide" : "Display"}
-                </MenuItem>
-              )}
-              {ediumUser?.uid === event?.creator_uid && (
-                <MenuItem
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteEntry(
-                      "events",
-                      "evets_ext",
-                      "my_event_ids",
-                      event?.id,
-                      ediumUser?.uid
-                    );
-                    setEvent(null);
-                    handleMenuClose();
-                  }}
-                >
-                  Delete
-                </MenuItem>
-              )}
-            </Menu>
-          </Box>
         </Box>
-      </ListItem>
-    </Box>
+
+        <Box sx={{ height: "96px", display: "flex", alignItems: "flex-start" }}>
+          <IconButton
+            id="eventlistitem-menu-button"
+            aria-controls={open ? "eventlistitem-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
+            onClick={(e) => {
+              handleMenuClick(e);
+            }}
+          >
+            <MoreVertIcon />
+          </IconButton>
+          <Menu
+            id="eventlistitem-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={(e) => {
+              handleMenuClose(e);
+            }}
+            MenuListProps={{
+              "aria-labelledby": "eventlistitem-menu-button",
+            }}
+          >
+            {ediumUser?.uid === event?.creator_uid && (
+              <MenuItem
+                onClick={(e) => {
+                  setOldEvent(event);
+                  handleMenuClose(e);
+                }}
+              >
+                <NextLink
+                  href={{
+                    pathname: "/events/create",
+                    query: { isCreateStr: "false" },
+                  }}
+                  as="/events/create"
+                  passHref
+                >
+                  <MenuItemLink>Modify</MenuItemLink>
+                </NextLink>
+              </MenuItem>
+            )}
+            {ediumUser?.uid === event?.creator_uid && (
+              <MenuItem
+                onClick={(e) => {
+                  handleVisibility("events", event);
+                  handleMenuClose(e);
+                }}
+              >
+                {event?.is_visible ? "Hide" : "Display"}
+              </MenuItem>
+            )}
+            {ediumUser?.uid === event?.creator_uid && (
+              <MenuItem
+                onClick={(e) => {
+                  handleDeleteEntry(
+                    "events",
+                    "evets_ext",
+                    "my_event_ids",
+                    event?.id,
+                    ediumUser?.uid
+                  );
+                  setEvent(null);
+                  handleMenuClose(e);
+                }}
+              >
+                Delete
+              </MenuItem>
+            )}
+          </Menu>
+        </Box>
+      </Box>
+    </ListItem>
   );
 };
 

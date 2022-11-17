@@ -354,7 +354,6 @@ const ChatMsg = (props) => {
           {isMaximized ? (
             <IconButton
               onClick={(e) => {
-                e.stopPropagation();
                 handleMaximize();
               }}
             >
@@ -363,7 +362,6 @@ const ChatMsg = (props) => {
           ) : (
             <IconButton
               onClick={(e) => {
-                e.stopPropagation();
                 handleMaximize();
               }}
             >
@@ -372,7 +370,6 @@ const ChatMsg = (props) => {
           )}
           <IconButton
             onClick={(e) => {
-              e.stopPropagation();
               handleClose();
             }}
           >
@@ -422,7 +419,6 @@ const ChatMsg = (props) => {
       <Box sx={{ flexGrow: 1 }} />
       <IconButton
         onClick={(e) => {
-          e.stopPropagation();
           handleAccept(joinRequests[0], "title", "title");
         }}
       >
@@ -435,7 +431,6 @@ const ChatMsg = (props) => {
       </IconButton>
       <IconButton
         onClick={(e) => {
-          e.stopPropagation();
           handleDialogOpen();
         }}
       >

@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useMemo } from "react";
 import {
   Avatar,
   Box,
@@ -8,20 +8,18 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-  Stack,
   Typography,
-  useTheme,
 } from "@mui/material";
 import moment from "moment";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
+  findItemFromList,
   handleDeleteEntry,
   handleVisibility,
   MenuItemLink,
 } from "../Reusable/Resusable";
-import { Interweave } from "interweave";
 import { convert } from "html-to-text";
 import NextLink from "next/link";
 
@@ -32,23 +30,49 @@ const ProjectListItem = (props) => {
   const last = props.last;
 
   // context
-  const { setOldProject, ediumUser, onMedia } = useContext(GlobalContext);
-  const { setProject } = useContext(ProjectContext);
-  const theme = useTheme();
+  const { setOldProject, users, ediumUser, onMedia } =
+    useContext(GlobalContext);
+  const { setProject, setCreatorUser } = useContext(ProjectContext);
 
   // menu
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleMenuClick = (e) => {
+    e.stopPropagation();
     setAnchorEl(e.currentTarget);
   };
-  const handleMenuClose = () => {
+  const handleMenuClose = (e) => {
+    e.stopPropagation();
     setAnchorEl(null);
   };
 
+  // creator's user data
+  const creatorUser = useMemo(() => {
+    return findItemFromList(users, "uid", project?.creator_uid);
+  }, [users, project?.creator_uid]);
+
+  // project + org tags
+  const allTags = useMemo(() => {
+    let retTags = [];
+    if (project?.tags?.length > 0) {
+      retTags = retTags.concat(project.tags);
+    }
+    if (
+      creatorUser?.role === "org_admin" &&
+      creatorUser?.org_tags?.length > 0
+    ) {
+      retTags = retTags.concat(creatorUser.org_tags);
+    }
+
+    return retTags;
+  }, [creatorUser, project]);
+
   return (
     <ListItem
-      onClick={() => setProject(project)}
+      onClick={() => {
+        setProject(project);
+        setCreatorUser(creatorUser);
+      }}
       sx={{
         display: "flex",
         flexDirection: "column",
@@ -85,20 +109,20 @@ const ProjectListItem = (props) => {
         >
           <UploadFileIcon />
         </Avatar>
-        <Stack sx={{ width: "100%" }}>
+        <Box sx={{ width: "100%" }}>
           <ListItemText
             primary={
               <Typography
                 variant="h2"
-                sx={{ fontSize: "1rem", fontWeight: "medium" }}
+                sx={{ fontSize: "1rem", fontWeight: "bold" }}
               >
                 {project?.title}
               </Typography>
             }
           />
-          {project?.tags?.length > 0 && (
+          {allTags?.length > 0 && (
             <Box sx={{ height: "1.5rem", overflow: "hidden" }}>
-              {project.tags.map((tag, index) => (
+              {allTags.map((tag, index) => (
                 <Chip
                   key={index}
                   color={"lightPrimary"}
@@ -113,7 +137,7 @@ const ProjectListItem = (props) => {
               ))}
             </Box>
           )}
-        </Stack>
+        </Box>
         {ediumUser?.uid === project?.creator_uid && (
           <IconButton
             id="projectlistitem-menu-button"
@@ -121,7 +145,6 @@ const ProjectListItem = (props) => {
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
             onClick={(e) => {
-              if (ediumUser?.uid !== project?.creator_uid) return; // !todo: will be removed after there's at least one menu for regular user
               handleMenuClick(e);
             }}
             sx={{ padding: 0 }}
@@ -133,16 +156,18 @@ const ProjectListItem = (props) => {
           id="projectlistitem-menu"
           anchorEl={anchorEl}
           open={open}
-          onClose={handleMenuClose}
+          onClose={(e) => {
+            handleMenuClose(e);
+          }}
           MenuListProps={{
             "aria-labelledby": "projectlistitem-menu-button",
           }}
         >
           {ediumUser?.uid === project?.creator_uid && (
             <MenuItem
-              onClick={() => {
+              onClick={(e) => {
                 setOldProject(project);
-                handleMenuClose();
+                handleMenuClose(e);
               }}
             >
               <NextLink
@@ -159,9 +184,9 @@ const ProjectListItem = (props) => {
           )}
           {ediumUser?.uid === project?.creator_uid && (
             <MenuItem
-              onClick={() => {
+              onClick={(e) => {
                 handleVisibility("projects", project);
-                handleMenuClose();
+                handleMenuClose(e);
               }}
             >
               {project?.is_visible ? "Hide" : "Display"}
@@ -170,7 +195,6 @@ const ProjectListItem = (props) => {
           {ediumUser?.uid === project?.creator_uid && (
             <MenuItem
               onClick={(e) => {
-                e.stopPropagation();
                 handleDeleteEntry(
                   "projects",
                   "projects_ext",
@@ -179,7 +203,7 @@ const ProjectListItem = (props) => {
                   ediumUser?.uid
                 );
                 setProject(null);
-                handleMenuClose();
+                handleMenuClose(e);
               }}
             >
               Delete

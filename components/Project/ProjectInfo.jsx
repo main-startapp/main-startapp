@@ -5,22 +5,19 @@ import {
   Chip,
   Divider,
   Paper,
-  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import PositionListItem from "./PositionListItem";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
-import { findItemFromList } from "../Reusable/Resusable";
-import { useRouter } from "next/router";
 import { Interweave } from "interweave";
 import { UrlMatcher } from "interweave-autolink";
 
 const ProjectInfo = () => {
   // context
-  const { ediumUser, users, winHeight, onMedia } = useContext(GlobalContext);
-  const { project } = useContext(ProjectContext);
+  const { ediumUser, winHeight, onMedia } = useContext(GlobalContext);
+  const { project, creatorUser } = useContext(ProjectContext);
   const theme = useTheme();
 
   // local vars
@@ -29,30 +26,28 @@ const ProjectInfo = () => {
     setTCode("");
   }, [project]);
 
-  const router = useRouter();
-
   // hooks
   const isCreator = useMemo(() => {
     return ediumUser?.uid === project?.creator_uid ? true : false;
   }, [ediumUser?.uid, project]);
 
-  const creatorUser = useMemo(() => {
-    return findItemFromList(users, "uid", project?.creator_uid);
-  }, [users, project?.creator_uid]);
+  const allTags = useMemo(() => {
+    let retTags = [];
+    if (project?.tags?.length > 0) {
+      retTags = retTags.concat(project.tags);
+    }
+    if (
+      creatorUser?.role === "org_admin" &&
+      creatorUser?.org_tags?.length > 0
+    ) {
+      retTags = retTags.concat(creatorUser.org_tags);
+    }
 
-  const orgTags = useMemo(() => {
-    if (creatorUser?.role !== "org_admin") return "";
-    let retStr = "";
-    creatorUser?.org_tags?.forEach((tag) => {
-      retStr += ", " + tag;
-    });
-    return retStr;
-  }, [creatorUser]);
-
-  // box ref to used by useEffect
-  const boxRef = useRef();
+    return retTags;
+  }, [creatorUser, project]);
 
   // useEffect to reset box scrollbar position
+  const boxRef = useRef();
   useEffect(() => {
     boxRef.current.scrollTop = 0;
   }, [project]); // every time project changes, this forces each accordion to collapse
@@ -71,147 +66,147 @@ const ProjectInfo = () => {
         paddingTop: "32px",
       }}
     >
-      <Box id="projectinfo-box" ref={boxRef}>
+      <Box
+        id="projectinfo-box"
+        ref={boxRef}
+        sx={{
+          height: onMedia.onDesktop
+            ? `calc(${winHeight}px - 65px - ${theme.spacing(4)} - 1px - 32px)` // navbar; spacing; paper t-border; paper t-padding
+            : `calc(${winHeight}px - 64px - ${theme.spacing(2)} - 32px - 65px)`, // mobile bar; spacing; paper t-padding; bottom navbar
+          overflowY: "scroll",
+          paddingTop: 2, // align with project list
+          paddingBottom: 6, // enough space to not covered by messages
+          paddingLeft: 4,
+          paddingRight: `calc(${theme.spacing(4)} - 0.4rem)`, // considering scrollbar
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <Box
-          id="projectinfo-content-box"
+          id="projectinfo-header-box"
           sx={{
-            height: onMedia.onDesktop
-              ? `calc(${winHeight}px - 65px - ${theme.spacing(4)} - 1px - 32px)` // navbar; spacing; paper t-border; paper t-padding
-              : `calc(${winHeight}px - 64px - ${theme.spacing(
-                  2
-                )} - 32px - 65px)`, // mobile bar; spacing; paper t-padding; bottom navbar
-            overflowY: "scroll",
-            paddingTop: 2,
-            paddingBottom: 4,
-            paddingLeft: 4,
-            paddingRight: `calc(${theme.spacing(4)} - 0.4rem)`,
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
           }}
         >
-          <Box
-            id="projectinfo-header-box"
+          <Avatar
             sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
+              mr: onMedia.onDesktop ? 4 : 2,
+              height: "96px",
+              width: "96px",
             }}
+            src={project?.icon_url}
           >
-            <Avatar
-              sx={{
-                mr: onMedia.onDesktop ? 4 : 2,
-                height: "96px",
-                width: "96px",
-              }}
-              src={project?.icon_url}
-            >
-              <UploadFileIcon />
-            </Avatar>
-            <Typography
-              color="text.primary"
-              variant="h2"
-              sx={{
-                fontSize: onMedia.onDesktop ? "32px" : "16px",
-                fontWeight: "bold",
-              }}
-            >
-              {project?.title}
-            </Typography>
-          </Box>
-          <Divider
-            sx={{
-              mt: onMedia.onDesktop ? 2 : 1,
-              borderBottomWidth: 1,
-              borderColor: "divider",
-            }}
-          />
+            <UploadFileIcon />
+          </Avatar>
           <Typography
             color="text.primary"
-            variant="h3"
-            sx={{ mt: 4, mb: 2, fontSize: "1.25rem", fontWeight: "medium" }}
+            variant="h2"
+            sx={{
+              fontSize: onMedia.onDesktop ? "1.875rem" : "1.25rem",
+              fontWeight: "bold",
+            }}
           >
-            {"Description:"}
+            {project?.title}
           </Typography>
-          <Typography color="text.secondary" component="span" variant="body1">
-            <pre
-              style={{
-                fontFamily: "inherit",
-                whiteSpace: "pre-wrap",
-                wordWrap: "break-word",
-                display: "inline",
-              }}
-            >
-              <Interweave
-                content={project?.description}
-                matchers={[new UrlMatcher("url")]}
-              />
-            </pre>
-          </Typography>
-
-          {project?.position_list?.length > 0 && (
-            <Box
-              sx={{
-                mt: 4,
-                paddingX: 2,
-                paddingY: 2,
-                borderRadius: 2,
-                backgroundColor: "primary.main",
-              }}
-            >
-              <Typography
-                color="white"
-                variant="h3"
-                sx={{ fontSize: "1.25rem", fontWeight: "medium" }}
-              >
-                {"Positions:"}
-              </Typography>
-              {project?.position_list.map((position, index) => (
-                <PositionListItem
-                  key={index}
-                  index={index}
-                  posID={position.id}
-                  posTitle={position.title}
-                  posResp={position.responsibility}
-                  posWeeklyHour={position.weekly_hour}
-                  posLevel={position?.level || ""}
-                  isCreator={isCreator}
-                  creator={creatorUser}
-                  appFormURL={
-                    project.application_form_url !== ""
-                      ? project.application_form_url
-                      : position.url
-                      ? position.url
-                      : ""
-                  }
-                />
-              ))}
-            </Box>
-          )}
-
-          {project?.tags?.length > 0 && (
-            <Box>
-              <Typography
-                color="text.primary"
-                variant="h3"
-                sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "medium" }}
-              >
-                {"Details: "}
-              </Typography>
-
-              {project.tags.map((tag, index) => (
-                <Chip
-                  key={index}
-                  color={"lightPrimary"}
-                  label={tag}
-                  sx={{
-                    mt: 1,
-                    mr: 1,
-                    fontSize: "0.875rem",
-                    fontWeight: "medium",
-                  }}
-                />
-              ))}
-            </Box>
-          )}
         </Box>
+        <Divider
+          sx={{
+            mt: onMedia.onDesktop ? 2 : 1,
+            borderBottomWidth: 1,
+            borderColor: "divider",
+          }}
+        />
+        <Typography
+          color="text.primary"
+          variant="h3"
+          sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
+        >
+          {"Description:"}
+        </Typography>
+        <Typography color="text.secondary" component="span" variant="body1">
+          <pre
+            style={{
+              fontFamily: "inherit",
+              whiteSpace: "pre-wrap",
+              wordWrap: "break-word",
+              display: "inline",
+            }}
+          >
+            <Interweave
+              content={project?.description}
+              matchers={[new UrlMatcher("url")]}
+            />
+          </pre>
+        </Typography>
+
+        {project?.position_list?.length > 0 && (
+          <Box
+            id="projectinfo-positions-box"
+            sx={{
+              mt: 4,
+              paddingX: 2,
+              paddingY: 2,
+              borderRadius: 2,
+              backgroundColor: "primary.main",
+            }}
+          >
+            <Typography
+              color="white"
+              variant="h3"
+              sx={{ fontSize: "1.25rem", fontWeight: "bold" }}
+            >
+              {"Positions:"}
+            </Typography>
+            {project?.position_list.map((position, index) => (
+              <PositionListItem
+                key={index}
+                index={index}
+                posID={position.id}
+                posTitle={position.title}
+                posResp={position.responsibility}
+                posWeeklyHour={position.weekly_hour}
+                posLevel={position?.level || ""}
+                isCreator={isCreator}
+                creator={creatorUser}
+                appFormURL={
+                  project.application_form_url !== ""
+                    ? project.application_form_url
+                    : position.url
+                    ? position.url
+                    : ""
+                }
+              />
+            ))}
+          </Box>
+        )}
+
+        {allTags?.length > 0 && (
+          <Box id="projectinfo-details-box">
+            <Typography
+              color="text.primary"
+              variant="h3"
+              sx={{ mt: 4, fontSize: "1.25rem", fontWeight: "bold" }}
+            >
+              {"Details: "}
+            </Typography>
+
+            {allTags.map((tag, index) => (
+              <Chip
+                key={index}
+                color={"lightPrimary"}
+                label={tag}
+                sx={{
+                  mt: 1,
+                  mr: 1,
+                  fontSize: "0.875rem",
+                  fontWeight: "medium",
+                }}
+              />
+            ))}
+          </Box>
+        )}
       </Box>
     </Paper>
   );

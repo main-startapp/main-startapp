@@ -18,7 +18,6 @@ const Home = () => {
     setShowMsg,
     setOldProject,
     onMedia,
-    winWidth,
   } = useContext(GlobalContext);
 
   useEffect(() => {
@@ -32,6 +31,7 @@ const Home = () => {
 
   // project state init
   const [project, setProject] = useState(null); // the selected project
+  const [creatorUser, setCreatorUser] = useState(null); // the user info of project's creator
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
   return (
@@ -39,6 +39,8 @@ const Home = () => {
       value={{
         project,
         setProject,
+        creatorUser,
+        setCreatorUser,
         searchTerm,
         setSearchTerm,
         searchCategory,

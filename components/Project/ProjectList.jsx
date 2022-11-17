@@ -1,13 +1,6 @@
 import { useContext, useMemo, useEffect } from "react";
 import NextLink from "next/link";
-import {
-  Box,
-  Button,
-  Paper,
-  Tooltip,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Box, Button, Paper, Typography, useTheme } from "@mui/material";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import ProjectListItem from "./ProjectListItem";
 import ProjectListHeader from "./ProjectListHeader";
@@ -48,8 +41,9 @@ const ProjectList = () => {
 
   // set initial project to be first in list to render out immediately
   useEffect(() => {
-    if (onMedia.onDesktop) setProject(projects.length > 0 ? projects[0] : null);
-  }, [setProject, projects, onMedia.onDesktop]);
+    if (onMedia.onDesktop)
+      setProject(filteredProjects.length > 0 ? filteredProjects[0] : null);
+  }, [setProject, filteredProjects, onMedia.onDesktop]);
 
   return (
     <Paper

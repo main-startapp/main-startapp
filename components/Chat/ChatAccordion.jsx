@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Paper,
+  Stack,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -148,9 +149,7 @@ const ChatAccordion = () => {
 
 export default ChatAccordion;
 
-const ChatList = styled(Box)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
+const ChatList = styled(Stack)(({ theme }) => ({
   width: "100%",
 }));
 
