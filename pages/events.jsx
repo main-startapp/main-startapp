@@ -27,7 +27,7 @@ const Events = () => {
   }, [setChat, setChatPartner, setShowChat, setShowMsg, setOldEvent]);
 
   // event state init
-  const [event, setEvent] = useState(null); // thec selected project
+  const [event, setEvent] = useState(null); // the selected project
   const [creatorUser, setCreatorUser] = useState(null); // the user info of project's creator
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
@@ -81,7 +81,9 @@ const Events = () => {
         )}
       </Grid> */}
 
-      <Box sx={{ display: "flex", justifyContent: "center" }}>
+      <Box
+        sx={{ display: "flex", justifyContent: "center", overflow: "hidden" }}
+      >
         {onMedia.onDesktop ? (
           <Box
             sx={{

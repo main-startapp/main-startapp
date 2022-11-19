@@ -949,7 +949,7 @@ const ProjectCreate = (props) => {
                   backgroundColor: "#fafafa",
                   color: "black",
                 }}
-                onClick={() => handleAddPosField(positionFields.length - 1)}
+                onClick={() => handleAddPosField(positionFields?.length - 1)}
               >
                 <AddRoundedIcon />
               </IconButton>

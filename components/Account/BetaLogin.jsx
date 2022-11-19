@@ -19,7 +19,7 @@ const BetaLogin = ({ type, color }) => {
     <Container>
       <ExportedImage
         src="/images/EDIUMLogo.png"
-        placeholder=""
+        alt=""
         width="512px"
         height="512px"
         priority

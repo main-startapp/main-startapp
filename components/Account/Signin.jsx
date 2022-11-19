@@ -19,9 +19,6 @@ import AppleIcon from "@mui/icons-material/Apple";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import Signup from "./Signup";
 
-import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
-import { GoogleAuthProvider, EmailAuthProvider } from "firebase/auth";
-
 // sign in, sign up, log in
 // https://ux.stackexchange.com/questions/1080/using-sign-in-vs-using-log-in
 
@@ -261,7 +258,7 @@ const Signin = () => {
         >
           <ExportedImage
             src="/images/EDIUMLogo.png"
-            placeholder=""
+            alt=""
             layout="fill"
             priority
           />

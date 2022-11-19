@@ -1,8 +1,11 @@
-import { Box, Paper } from "@mui/material";
-import { useState } from "react";
+import { Paper, Slide } from "@mui/material";
+import { useContext, useState } from "react";
 import ChatMsg from "./ChatMsg";
+import { motion } from "framer-motion";
+import { GlobalContext } from "../Context/ShareContexts";
 
 const ChatMsgPaper = () => {
+  const { chat } = useContext(GlobalContext);
   // control comp size
   const [isMaximized, setIsMaximized] = useState(false);
   return (
@@ -13,7 +16,7 @@ const ChatMsgPaper = () => {
         height: isMaximized ? "75vh" : "50vh",
         position: "fixed",
         right: "336px",
-        bottom: -1,
+        bottom: 0,
         borderTop: 1,
         borderColor: "divider",
         borderRadius: "8px 8px 0 0",

@@ -95,7 +95,7 @@ const ChatAccordion = () => {
         width: "320px",
         position: "fixed",
         right: 0,
-        bottom: -1,
+        bottom: 0,
         borderTop: 1,
         borderRadius: "8px 8px 0px 0px",
         borderColor: "divider",

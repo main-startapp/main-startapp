@@ -1,4 +1,11 @@
-import { AppBar, Toolbar, Box, Link as MuiLink, Stack } from "@mui/material";
+import {
+  AppBar,
+  Toolbar,
+  Box,
+  Link as MuiLink,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
 import NextLink from "next/link";
 import ExportedImage from "next-image-export-optimizer";
@@ -34,14 +41,14 @@ const Navbar = () => {
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
-            height: "100%",
+            //height: "100%",
             width: "100%",
             maxWidth: "1392px",
           }}
         >
           <ExportedImage
             src="/images/EDIUMPlatformLogo256.png"
-            placeholder=""
+            alt=""
             height={40}
             width={40}
           />
@@ -49,43 +56,23 @@ const Navbar = () => {
           {/* https://stackoverflow.com/questions/32378953/keep-the-middle-item-centered-when-side-items-have-different-widths */}
           <Stack direction="row" spacing={8}>
             <NextLink href="/">
-              <LinkIconBox
-                sx={{
-                  ":hover": {
-                    cursor: "pointer",
-                  },
-                  borderBottom: url.pathname === "/" ? 2 : 0,
-                }}
-              >
+              <LinkIconBox url={url} pathname="/">
                 <DashboardIcon
                   color={
                     url.pathname === "/" ? "text.primary" : "unselectedIcon"
                   }
                   sx={{
-                    height: "44px",
+                    height: "40px",
                     fontSize: "28px",
                   }}
                 />
-                <PageLink
-                  color={
-                    url.pathname === "/"
-                      ? "text.primary"
-                      : "unselectedIcon.main"
-                  }
-                >
+                <LinkTypography url={url} pathname="/">
                   {"Projects"}
-                </PageLink>
+                </LinkTypography>
               </LinkIconBox>
             </NextLink>
             <NextLink href="/events/">
-              <LinkIconBox
-                sx={{
-                  ":hover": {
-                    cursor: "pointer",
-                  },
-                  borderBottom: url.pathname === "/events/" ? 2 : 0,
-                }}
-              >
+              <LinkIconBox url={url} pathname="/events/">
                 <DateRangeIcon
                   color={
                     url.pathname === "/events/"
@@ -93,30 +80,17 @@ const Navbar = () => {
                       : "unselectedIcon"
                   }
                   sx={{
-                    height: "44px",
+                    height: "40px",
                     fontSize: "28px",
                   }}
                 />
-                <PageLink
-                  color={
-                    url.pathname === "/events/"
-                      ? "text.primary"
-                      : "unselectedIcon.main"
-                  }
-                >
+                <LinkTypography url={url} pathname="/events/">
                   {"Events"}
-                </PageLink>
+                </LinkTypography>
               </LinkIconBox>
             </NextLink>
             <NextLink href="/students/">
-              <LinkIconBox
-                sx={{
-                  ":hover": {
-                    cursor: "pointer",
-                  },
-                  borderBottom: url.pathname === "/students/" ? 2 : 0,
-                }}
-              >
+              <LinkIconBox url={url} pathname="/students/">
                 <PeopleIcon
                   color={
                     url.pathname === "/students/"
@@ -124,19 +98,13 @@ const Navbar = () => {
                       : "unselectedIcon"
                   }
                   sx={{
-                    height: "44px",
+                    height: "40px",
                     fontSize: "28px",
                   }}
                 />
-                <PageLink
-                  color={
-                    url.pathname === "/students/"
-                      ? "text.primary"
-                      : "unselectedIcon.main"
-                  }
-                >
+                <LinkTypography url={url} pathname="/students/">
                   {"Students"}
-                </PageLink>
+                </LinkTypography>
               </LinkIconBox>
             </NextLink>
           </Stack>
@@ -150,19 +118,22 @@ const Navbar = () => {
 
 export default Navbar;
 
-const LinkIconBox = styled(Box)(({ theme }) => ({
+const LinkIconBox = styled(Box)(({ theme, url, pathname }) => ({
   display: "flex",
   flexDirection: "column",
   justifyContent: "flex-start",
   alignItems: "center",
+  borderBottomWidth: url.pathname === pathname ? 2 : 0,
+  borderBottomColor: theme.palette.text.primary,
+  borderBottomStyle: "solid",
 }));
 
-// since the nav bar is fixed height, the font should also use fixed size
-const PageLink = styled(MuiLink)(({ theme }) => ({
+const LinkTypography = styled(Typography)(({ theme, url, pathname }) => ({
+  height: "24px",
   fontSize: "16px",
   fontWeight: theme.typography.fontWeightMedium,
-  textDecoration: "none",
-  height: "20px",
-  display: "flex",
-  alignItems: "end",
+  color:
+    url.pathname === pathname
+      ? theme.palette.text.primary
+      : theme.palette.unselectedIcon.main,
 }));

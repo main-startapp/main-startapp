@@ -178,7 +178,7 @@ const ProjectListItem = (props) => {
                 as="/projects/create"
                 passHref
               >
-                <MenuItemLink>Modify</MenuItemLink>
+                Modify
               </NextLink>
             </MenuItem>
           )}
@@ -267,7 +267,7 @@ const ProjectListItem = (props) => {
                   fontWeight: "light",
                 }}
               >
-                {moment(project.last_timestamp).format("MMMM Do, YYYY")}
+                {moment(project.last_timestamp).format("MMM Do, YYYY")}
               </Typography>
             }
           />

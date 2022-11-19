@@ -308,7 +308,7 @@ const StudentProfile = () => {
         >
           <ExportedImage
             src="/images/EDIUMLogo.png"
-            placeholder=""
+            alt=""
             width={256}
             height={256}
             priority

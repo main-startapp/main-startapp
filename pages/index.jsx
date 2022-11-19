@@ -83,9 +83,13 @@ const Home = () => {
           )
         )}
       </Grid> */}
-      <Box sx={{ display: "flex", justifyContent: "center" }}>
+      <Box
+        id="projects-main-box"
+        sx={{ display: "flex", justifyContent: "center", overflow: "hidden" }}
+      >
         {onMedia.onDesktop ? (
           <Box
+            id="projects-desktop-list-box"
             sx={{
               paddingTop: 4,
               paddingLeft: 4,
@@ -99,6 +103,7 @@ const Home = () => {
         ) : (
           project === null && (
             <Box
+              id="projects-mobile-list-box"
               sx={{
                 paddingTop: 2,
                 paddingLeft: 2,
@@ -112,6 +117,7 @@ const Home = () => {
         )}
         {onMedia.onDesktop ? (
           <Box
+            id="projects-desktop-info-box"
             sx={{
               paddingTop: 4,
               paddingLeft: 2,
@@ -125,6 +131,7 @@ const Home = () => {
         ) : (
           project !== null && (
             <Box
+              id="projects-mobile-info-box"
               sx={{
                 paddingTop: 2,
                 paddingLeft: 2,

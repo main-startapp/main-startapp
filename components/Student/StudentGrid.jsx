@@ -1,13 +1,13 @@
-import { OndemandVideoSharp } from "@mui/icons-material";
 import { Box, Grid } from "@mui/material";
 import { useContext, useMemo, useEffect } from "react";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
 import StudentGridCard from "./StudentGridCard";
+import { motion } from "framer-motion";
 
 const StudentGrid = () => {
   // context
   const { users, winWidth, winHeight, onMedia } = useContext(GlobalContext);
-  const { searchTerm, setStudent } = useContext(StudentContext);
+  const { searchTerm, student, setStudent } = useContext(StudentContext);
 
   // local vars
   const filteredStudents = useMemo(
@@ -37,7 +37,8 @@ const StudentGrid = () => {
     <Box
       sx={{
         height: `calc(${winHeight}px - 64px - 64px - 1.5px)`,
-        overflow: "auto",
+        overflowX: "hidden",
+        overflowY: "scroll",
       }}
     >
       <Grid container spacing={1.5} padding={1.5}>
@@ -55,7 +56,12 @@ const StudentGrid = () => {
                 : 2
             }
           >
-            <StudentGridCard key={user.uid} student={user} />
+            <motion.div
+              whileHover={{ scale: 1.2, rotate: 360 }}
+              //transition={{ duration: 0.5 }}
+            >
+              <StudentGridCard key={user.uid} student={user} />
+            </motion.div>
           </Grid>
         ))}
       </Grid>

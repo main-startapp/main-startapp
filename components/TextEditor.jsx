@@ -1,8 +1,10 @@
-import React from "react";
-import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import ImageResize from "quill-image-resize-module-react";
-Quill.register("modules/imageResize", ImageResize);
+// import Quill from "quill";
+// import ImageResize from "quill-image-resize-module-react";
+import dynamic from "next/dynamic";
+import { useMemo } from "react";
+
+// Quill.register("modules/imageResize", ImageResize);
 
 const TextEditor = ({ update, project }) => {
   const modules = {
@@ -13,10 +15,10 @@ const TextEditor = ({ update, project }) => {
       [{ list: "ordered" }, { list: "bullet" }],
       ["clean"],
     ],
-    imageResize: {
-      // parchment: Quill.import("parchment"),
-      modules: ["Resize", "DisplaySize"],
-    },
+    // imageResize: {
+    //   // parchment: Quill.import("parchment"),
+    //   // modules: ["Resize", "DisplaySize"],
+    // },
   };
 
   const handleTextOnChange = (e) => {
@@ -25,6 +27,11 @@ const TextEditor = ({ update, project }) => {
       description: e,
     });
   };
+
+  const ReactQuill = useMemo(
+    () => dynamic(() => import("react-quill"), { ssr: false }),
+    []
+  );
 
   return (
     <ReactQuill
