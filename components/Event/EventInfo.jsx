@@ -6,7 +6,6 @@ import {
   Divider,
   Link,
   Paper,
-  Slide,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -59,166 +58,161 @@ const EventInfo = () => {
   // useEffect to reset box scrollbar position
   const boxRef = useRef();
   useEffect(() => {
-    if (boxRef?.current?.scrollTop) {
-      boxRef.current.scrollTop = 0;
-    }
+    if (boxRef?.current?.scrollTop) boxRef.current.scrollTop = 0;
   }, [event]);
 
   return (
-    <Slide direction="up" in={Boolean(event)}>
-      <Paper
-        elevation={2}
-        sx={{
-          // mt: onMedia.onDesktop ? 4 : 2,
-          // ml: onMedia.onDesktop ? 2 : 2,
-          // mr: onMedia.onDesktop ? 4 : 0,
-          backgroundColor: "background",
-          borderTop: onMedia.onDesktop ? 1 : 0,
-          borderColor: "divider",
-          borderRadius: "32px 32px 0px 0px",
-          paddingTop: "32px",
-        }}
+    <Paper
+      elevation={2}
+      sx={{
+        // mt: onMedia.onDesktop ? 4 : 2,
+        // ml: onMedia.onDesktop ? 2 : 2,
+        // mr: onMedia.onDesktop ? 4 : 0,
+        backgroundColor: "background",
+        borderTop: onMedia.onDesktop ? 1 : 0,
+        borderColor: "divider",
+        borderRadius: "32px 32px 0px 0px",
+        paddingTop: "32px",
+        minHeight: "100%",
+      }}
+    >
+      <motion.div
+        key={event?.title}
+        initial={{ opacity: 0, y: "1%" }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
       >
-        <motion.div
-          key={event?.title}
-          initial={{ opacity: 0, y: "1%" }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+        <Box
+          id="eventinfo-box"
+          ref={boxRef}
+          sx={{
+            height: onMedia.onDesktop
+              ? `calc(${winHeight}px - 65px - ${theme.spacing(4)} - 1px - 32px)` // navbar; spacing; paper t-border; paper t-padding
+              : `calc(${winHeight}px - 64px - ${theme.spacing(
+                  2
+                )} - 32px - 65px)`, // mobile bar; spacing; paper t-padding; bottom navbar
+            overflowY: "scroll",
+            paddingTop: 2, // align with project list
+            paddingBottom: 6, // enough space to not covered by messages
+            paddingLeft: 4,
+            paddingRight: `calc(${theme.spacing(4)} - 0.4rem)`, // considering scrollbar
+            display: "flex",
+            flexDirection: "column",
+          }}
         >
           <Box
-            id="eventinfo-box"
-            ref={boxRef}
+            id="eventinfo-header-box"
             sx={{
-              height: onMedia.onDesktop
-                ? `calc(${winHeight}px - 65px - ${theme.spacing(
-                    4
-                  )} - 1px - 32px)` // navbar; spacing; paper t-border; paper t-padding
-                : `calc(${winHeight}px - 64px - ${theme.spacing(
-                    2
-                  )} - 32px - 65px)`, // mobile bar; spacing; paper t-padding; bottom navbar
-              overflowY: "scroll",
-              paddingTop: 2, // align with project list
-              paddingBottom: 6, // enough space to not covered by messages
-              paddingLeft: 4,
-              paddingRight: `calc(${theme.spacing(4)} - 0.4rem)`, // considering scrollbar
               display: "flex",
-              flexDirection: "column",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Avatar
+              sx={{
+                mr: onMedia.onDesktop ? 4 : 2,
+                height: "96px",
+                width: "96px",
+              }}
+              src={event?.icon_url}
+            >
+              <UploadFileIcon />
+            </Avatar>
+            <Typography
+              color="text.primary"
+              variant="h2"
+              sx={{
+                fontSize: onMedia.onDesktop ? "32px" : "16px",
+                fontWeight: "bold",
+              }}
+            >
+              {event?.title}
+            </Typography>
+          </Box>
+          <Divider
+            sx={{
+              mt: 2,
+              borderBottomWidth: 1,
+              borderColor: "divider",
+            }}
+          />
+          <Typography
+            color="text.primary"
+            variant="h3"
+            sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
+          >
+            {"Time & Location: "}
+          </Typography>
+          <Typography color="text.secondary" variant="body1">
+            {isSameDay
+              ? startMoment.format("MMMM Do YYYY, h:mm a") +
+                (isSameTime ? "" : " - " + endMoment.format("h:mm a"))
+              : startMoment.format("MMMM Do YYYY, h:mm a") +
+                " - " +
+                endMoment.format("MMMM Do YYYY, h:mm a")}
+          </Typography>
+          <Typography color="text.secondary" variant="body1">
+            {event?.location}
+          </Typography>
+
+          <Typography
+            color="text.primary"
+            variant="h3"
+            sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
+          >
+            {"Description:"}
+          </Typography>
+          <Typography color="text.secondary" component="span" variant="body1">
+            <pre
+              style={{
+                fontFamily: "inherit",
+                whiteSpace: "pre-wrap",
+                wordWrap: "break-word",
+                display: "inline",
+              }}
+            >
+              <Interweave
+                content={event?.description}
+                matchers={[new UrlMatcher("url")]}
+              />
+            </pre>
+          </Typography>
+
+          <Button
+            disableElevation
+            sx={{
+              mt: 4,
+              borderRadius: 8,
+            }}
+            variant="contained"
+            component={Link}
+            target="_blank"
+            href={event?.registration_form_url}
+            rel="noreferrer"
+          >
+            {"Attend"}
+          </Button>
+
+          <Box
+            sx={{
+              mt: 4,
+              display: "flex",
+              justifyContent: "center",
+              visibility: isLoaded ? "visible" : "hidden",
             }}
           >
             <Box
-              id="eventinfo-header-box"
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
+              component="img"
+              onLoad={() => {
+                setIsLoaded(true);
               }}
-            >
-              <Avatar
-                sx={{
-                  mr: onMedia.onDesktop ? 4 : 2,
-                  height: "96px",
-                  width: "96px",
-                }}
-                src={event?.icon_url}
-              >
-                <UploadFileIcon />
-              </Avatar>
-              <Typography
-                color="text.primary"
-                variant="h2"
-                sx={{
-                  fontSize: onMedia.onDesktop ? "32px" : "16px",
-                  fontWeight: "bold",
-                }}
-              >
-                {event?.title}
-              </Typography>
-            </Box>
-            <Divider
-              sx={{
-                mt: onMedia.onDesktop ? 2 : 1,
-                borderBottomWidth: 1,
-                borderColor: "divider",
-              }}
+              src={event?.banner_url}
+              sx={{ maxWidth: "100%" }}
             />
-            <Typography
-              color="text.primary"
-              variant="h3"
-              sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
-            >
-              {"Time & Location: "}
-            </Typography>
-            <Typography color="text.secondary" variant="body1">
-              {isSameDay
-                ? startMoment.format("MMMM Do YYYY, h:mm a") +
-                  (isSameTime ? "" : " - " + endMoment.format("h:mm a"))
-                : startMoment.format("MMMM Do YYYY, h:mm a") +
-                  " - " +
-                  endMoment.format("MMMM Do YYYY, h:mm a")}
-            </Typography>
-            <Typography color="text.secondary" variant="body1">
-              {event?.location}
-            </Typography>
-
-            <Typography
-              color="text.primary"
-              variant="h3"
-              sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
-            >
-              {"Description:"}
-            </Typography>
-            <Typography color="text.secondary" component="span" variant="body1">
-              <pre
-                style={{
-                  fontFamily: "inherit",
-                  whiteSpace: "pre-wrap",
-                  wordWrap: "break-word",
-                  display: "inline",
-                }}
-              >
-                <Interweave
-                  content={event?.description}
-                  matchers={[new UrlMatcher("url")]}
-                />
-              </pre>
-            </Typography>
-
-            <Button
-              disableElevation
-              sx={{
-                mt: 4,
-                borderRadius: 8,
-              }}
-              variant="contained"
-              component={Link}
-              target="_blank"
-              href={event?.registration_form_url}
-              rel="noreferrer"
-            >
-              {"Attend"}
-            </Button>
-
-            <Box
-              sx={{
-                mt: 4,
-                display: "flex",
-                justifyContent: "center",
-                visibility: isLoaded ? "visible" : "hidden",
-              }}
-            >
-              <Box
-                component="img"
-                onLoad={() => {
-                  setIsLoaded(true);
-                }}
-                src={event?.banner_url}
-                sx={{ maxWidth: "100%" }}
-              />
-            </Box>
           </Box>
-        </motion.div>
-      </Paper>
-    </Slide>
+        </Box>
+      </motion.div>
+    </Paper>
   );
 };
 

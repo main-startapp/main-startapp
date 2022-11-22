@@ -1,11 +1,12 @@
 import { useContext, useEffect, useState } from "react";
-import { Box, Grid } from "@mui/material";
+import { Box } from "@mui/material";
 import {
   GlobalContext,
   EventContext,
 } from "../components/Context/ShareContexts";
 import EventList from "../components/Event/EventList";
 import EventInfo from "../components/Event/EventInfo";
+import { motion } from "framer-motion";
 
 const Events = () => {
   // global context
@@ -16,7 +17,11 @@ const Events = () => {
     setShowMsg,
     setOldEvent,
     onMedia,
+    isAnimated,
+    setIsAnimated,
   } = useContext(GlobalContext);
+
+  // page setup
   useEffect(() => {
     setShowChat(true);
     setShowMsg(false);
@@ -25,6 +30,12 @@ const Events = () => {
     // page related
     setOldEvent(null);
   }, [setChat, setChatPartner, setShowChat, setShowMsg, setOldEvent]);
+
+  // turn off introduction animation after initialization
+  useEffect(() => {
+    setIsAnimated({ ...isAnimated, events: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // event state init
   const [event, setEvent] = useState(null); // the selected project
@@ -48,39 +59,6 @@ const Events = () => {
       {/* Toolbar for searching keywords, category and filter */}
       {/* <EventsPageBar /> */}
 
-      {/* <Grid
-        container
-        spacing={0}
-        direction="row"
-        alignItems="start"
-        justifyContent="center"
-      >
-
-        {onMedia.onDesktop ? (
-          <Grid item xs={4}>
-            <EventList />
-          </Grid>
-        ) : (
-          event === null && (
-            <Grid item xs={12}>
-              <EventList />
-            </Grid>
-          )
-        )}
-
-        {onMedia.onDesktop ? (
-          <Grid item xs={8}>
-            <EventInfo />
-          </Grid>
-        ) : (
-          event !== null && (
-            <Grid item xs={12}>
-              <EventInfo />
-            </Grid>
-          )
-        )}
-      </Grid> */}
-
       <Box
         sx={{ display: "flex", justifyContent: "center", overflow: "hidden" }}
       >
@@ -94,7 +72,13 @@ const Events = () => {
               maxWidth: "560px",
             }}
           >
-            <EventList />
+            <motion.div
+              initial={isAnimated.events ? false : { x: -200, opacity: 0 }}
+              animate={isAnimated.events ? false : { x: 0, opacity: 1 }}
+              transition={{ delay: 1 }}
+            >
+              <EventList />
+            </motion.div>
           </Box>
         ) : (
           event === null && (
@@ -120,7 +104,13 @@ const Events = () => {
               maxWidth: "896px",
             }}
           >
-            <EventInfo />
+            <motion.div
+              initial={isAnimated.events ? false : { y: 200, opacity: 0 }}
+              animate={isAnimated.events ? false : { y: 0, opacity: 1 }}
+              transition={{ delay: 1 }}
+            >
+              <EventInfo />
+            </motion.div>
           </Box>
         ) : (
           event !== null && (

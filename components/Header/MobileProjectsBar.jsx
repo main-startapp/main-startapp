@@ -30,6 +30,7 @@ const MobileProjectsBar = () => {
     setSearchTerm,
     searchCategory,
     setSearchCategory,
+    setCreatorUser,
   } = useContext(ProjectContext);
 
   // ref
@@ -178,7 +179,10 @@ const MobileProjectsBar = () => {
                 borderRadius: 2,
                 height: "30px",
               }}
-              onClick={() => setProject(null)}
+              onClick={() => {
+                setProject(null);
+                setCreatorUser(null);
+              }}
             >
               <ArrowBackIosRoundedIcon />
             </Button>

@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Box, Grid } from "@mui/material";
+import { Box } from "@mui/material";
 import {
   GlobalContext,
   ProjectContext,
@@ -7,6 +7,7 @@ import {
 import MobileProjectsBar from "../components/Header/MobileProjectsBar";
 import ProjectList from "../components/Project/ProjectList";
 import ProjectInfo from "../components/Project/ProjectInfo";
+import { motion } from "framer-motion";
 
 // this page is also project homepage. Is this a good practice?
 const Home = () => {
@@ -18,8 +19,11 @@ const Home = () => {
     setShowMsg,
     setOldProject,
     onMedia,
+    isAnimated,
+    setIsAnimated,
   } = useContext(GlobalContext);
 
+  // page setup
   useEffect(() => {
     setShowChat(true);
     setShowMsg(false);
@@ -27,13 +31,20 @@ const Home = () => {
     setChatPartner(null);
     // project page related
     setOldProject(null);
-  }, [setChat, setChatPartner, setShowChat, setShowMsg, setOldProject]);
+  }, [setChat, setChatPartner, setOldProject, setShowChat, setShowMsg]);
+
+  // turn off introduction animation after initialization
+  useEffect(() => {
+    setIsAnimated({ ...isAnimated, projects: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // project state init
   const [project, setProject] = useState(null); // the selected project
   const [creatorUser, setCreatorUser] = useState(null); // the user info of project's creator
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
+
   return (
     <ProjectContext.Provider
       value={{
@@ -49,40 +60,6 @@ const Home = () => {
     >
       {!onMedia.onDesktop && <MobileProjectsBar />}
 
-      {/* <Grid
-        container
-        spacing={0}
-        direction="row"
-        sx={{
-          alignItems: "start",
-          justifyContent: "center",
-          backgroundColor: onMedia.onDesktop ? "background" : "hoverGray.main",
-        }}
-      >
-        {onMedia.onDesktop ? (
-          <Grid item xs={3.5}>
-            <ProjectList />
-          </Grid>
-        ) : (
-          project === null && (
-            <Grid item xs={12}>
-              <ProjectList />
-            </Grid>
-          )
-        )}
-
-        {onMedia.onDesktop ? (
-          <Grid item xs={5.5}>
-            <ProjectInfo />
-          </Grid>
-        ) : (
-          project !== null && (
-            <Grid item xs={12}>
-              <ProjectInfo />
-            </Grid>
-          )
-        )}
-      </Grid> */}
       <Box
         id="projects-main-box"
         sx={{ display: "flex", justifyContent: "center", overflow: "hidden" }}
@@ -98,7 +75,13 @@ const Home = () => {
               maxWidth: "560px",
             }}
           >
-            <ProjectList />
+            <motion.div
+              initial={isAnimated.projects ? false : { x: -200, opacity: 0 }}
+              animate={isAnimated.projects ? false : { x: 0, opacity: 1 }}
+              transition={{ delay: 1 }}
+            >
+              <ProjectList />
+            </motion.div>
           </Box>
         ) : (
           project === null && (
@@ -126,7 +109,13 @@ const Home = () => {
               maxWidth: "896px",
             }}
           >
-            <ProjectInfo />
+            <motion.div
+              initial={isAnimated.projects ? false : { y: 200, opacity: 0 }}
+              animate={isAnimated.projects ? false : { y: 0, opacity: 1 }}
+              transition={{ delay: 1 }}
+            >
+              <ProjectInfo />
+            </motion.div>
           </Box>
         ) : (
           project !== null && (

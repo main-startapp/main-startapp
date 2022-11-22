@@ -221,6 +221,7 @@ const EventListItem = (props) => {
                   ediumUser?.uid
                 );
                 setEvent(null);
+                setCreatorUser(null);
                 handleMenuClose(e);
               }}
             >

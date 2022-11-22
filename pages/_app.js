@@ -149,6 +149,11 @@ function MyApp({ Component, pageProps }) {
   onMedia.onDesktop = useMediaQuery("(min-width:1024px)");
   onMedia.onTablet = useMediaQuery("(min-width:768px) and (max-width:1023px)");
   onMedia.onMobile = useMediaQuery("(max-width:767px)");
+  // animation related
+  const [isAnimated, setIsAnimated] = useState({
+    projects: false,
+    events: false,
+  });
   // theme
   const [mode, setMode] = useState("light");
   const colorMode = useMemo(
@@ -201,6 +206,8 @@ function MyApp({ Component, pageProps }) {
               winWidth,
               winHeight,
               onMedia,
+              isAnimated,
+              setIsAnimated,
             }}
           >
             <CssBaseline />

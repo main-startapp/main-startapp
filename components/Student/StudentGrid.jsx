@@ -2,12 +2,11 @@ import { Box, Grid } from "@mui/material";
 import { useContext, useMemo, useEffect } from "react";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
 import StudentGridCard from "./StudentGridCard";
-import { motion } from "framer-motion";
 
 const StudentGrid = () => {
   // context
   const { users, winWidth, winHeight, onMedia } = useContext(GlobalContext);
-  const { searchTerm, student, setStudent } = useContext(StudentContext);
+  const { searchTerm, setStudent } = useContext(StudentContext);
 
   // local vars
   const filteredStudents = useMemo(
@@ -56,12 +55,7 @@ const StudentGrid = () => {
                 : 2
             }
           >
-            <motion.div
-              whileHover={{ scale: 1.2, rotate: 360 }}
-              //transition={{ duration: 0.5 }}
-            >
-              <StudentGridCard key={user.uid} student={user} />
-            </motion.div>
+            <StudentGridCard key={user.uid} student={user} />
           </Grid>
         ))}
       </Grid>

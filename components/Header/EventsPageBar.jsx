@@ -23,8 +23,14 @@ import { eventStrList } from "../Reusable/MenuStringList";
 const EventsPageBar = () => {
   // context
   const { onMedia } = useContext(GlobalContext);
-  const { event, setEvent, setSearchTerm, searchCategory, setSearchCategory } =
-    useContext(EventContext);
+  const {
+    event,
+    setEvent,
+    setSearchTerm,
+    searchCategory,
+    setSearchCategory,
+    setCreatorUser,
+  } = useContext(EventContext);
 
   // menu
   const [anchorEl, setAnchorEl] = useState(null);
@@ -225,7 +231,10 @@ const EventsPageBar = () => {
                   borderRadius: 2,
                   height: "30px",
                 }}
-                onClick={() => setEvent(null)}
+                onClick={() => {
+                  setEvent(null);
+                  setCreatorUser(null);
+                }}
               >
                 <ArrowBackIosRoundedIcon />
               </Button>

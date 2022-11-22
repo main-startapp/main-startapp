@@ -27,7 +27,6 @@ import { useContext, useEffect, useState, useRef, useMemo } from "react";
 import { db } from "../../firebase";
 import { GlobalContext } from "../Context/ShareContexts";
 import { handleConnect } from "../Reusable/Resusable";
-import ReactCardFlip from "react-card-flip";
 import FaceRetouchingNaturalOutlinedIcon from "@mui/icons-material/FaceRetouchingNaturalOutlined";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import FacebookIcon from "@mui/icons-material/Facebook";
@@ -140,7 +139,7 @@ const TeamJoinRequestListItem = (props) => {
   };
 
   return (
-    <ReactCardFlip isFlipped={isFlipped}>
+    <>
       <Card
         variant="outlined"
         sx={{
@@ -550,7 +549,7 @@ const TeamJoinRequestListItem = (props) => {
           </Typography>
         )}
       </Card>
-    </ReactCardFlip>
+    </>
   );
 };
 

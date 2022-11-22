@@ -203,6 +203,7 @@ const ProjectListItem = (props) => {
                   ediumUser?.uid
                 );
                 setProject(null);
+                setCreatorUser(null);
                 handleMenuClose(e);
               }}
             >

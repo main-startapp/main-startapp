@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Paper,
-  Slide,
   Tooltip,
   Typography,
   useTheme,
@@ -14,11 +13,14 @@ import EventListItem from "./EventListItem";
 import moment from "moment";
 import cloneDeep from "lodash/cloneDeep";
 import EventListHeader from "./EventListHeader";
+import { findItemFromList } from "../Reusable/Resusable";
 
 const EventList = () => {
   // context
-  const { events, ediumUser, winHeight, onMedia } = useContext(GlobalContext);
-  const { searchTerm, searchCategory, setEvent } = useContext(EventContext);
+  const { events, users, ediumUser, winHeight, onMedia } =
+    useContext(GlobalContext);
+  const { searchTerm, searchCategory, setEvent, setCreatorUser } =
+    useContext(EventContext);
   const theme = useTheme();
 
   // local vars
@@ -60,97 +62,104 @@ const EventList = () => {
 
   // set initial event to be first in list to render out immediately
   useEffect(() => {
-    if (onMedia.onDesktop)
-      setEvent(filteredEvents.length > 0 ? filteredEvents[0] : null);
-  }, [setEvent, filteredEvents, onMedia.onDesktop]);
+    if (!onMedia.onDesktop) return;
+
+    if (filteredEvents?.length > 0) {
+      setEvent(filteredEvents[0]);
+      setCreatorUser(
+        findItemFromList(users, "uid", filteredEvents[0]?.creator_uid)
+      );
+    } else {
+      setEvent(null);
+      setCreatorUser(null);
+    }
+  }, [setEvent, setCreatorUser, filteredEvents, onMedia.onDesktop, users]);
 
   return (
-    <Slide direction="right" in={Boolean(filteredEvents)}>
-      <Paper
-        elevation={onMedia.onDesktop ? 2 : 0}
+    <Paper
+      elevation={onMedia.onDesktop ? 2 : 0}
+      sx={{
+        // mt: onMedia.onDesktop ? 4 : 2,
+        // ml: onMedia.onDesktop ? 4 : 2,
+        // mr: onMedia.onDesktop ? 2 : 0,
+        backgroundColor: "background",
+        borderTop: onMedia.onDesktop ? 1 : 0,
+        borderColor: "divider",
+        borderRadius: onMedia.onDesktop
+          ? "32px 32px 0px 0px"
+          : "32px 0px 0px 0px",
+        paddingTop: "32px",
+      }}
+    >
+      {onMedia.onDesktop && <EventListHeader />}
+
+      <Box
+        id="eventlist-eventlistitem-box"
         sx={{
-          // mt: onMedia.onDesktop ? 4 : 2,
-          // ml: onMedia.onDesktop ? 4 : 2,
-          // mr: onMedia.onDesktop ? 2 : 0,
-          backgroundColor: "background",
-          borderTop: onMedia.onDesktop ? 1 : 0,
-          borderColor: "divider",
-          borderRadius: onMedia.onDesktop
-            ? "32px 32px 0px 0px"
-            : "32px 0px 0px 0px",
-          paddingTop: "32px",
+          height: onMedia.onDesktop
+            ? `calc(${winHeight}px - 65px - ${theme.spacing(
+                4
+              )} - 1px - 32px - 112px - 96px)` // navbar; spacing; paper t-border; paper t-padding; header; button box
+            : `calc(${winHeight}px - 64px - ${theme.spacing(
+                2
+              )} - 32px + 1px - 65px)`, // mobile bar; spacing margin; inner t-padding; last entry border; bottom navbar
+          overflowY: "scroll",
         }}
       >
-        {onMedia.onDesktop && <EventListHeader />}
+        {filteredEvents.map((event, index) => (
+          <EventListItem
+            key={event.id}
+            event={event}
+            index={index}
+            last={filteredEvents.length - 1}
+          />
+        ))}
+      </Box>
 
+      {onMedia.onDesktop && (
         <Box
-          id="eventlist-eventlistitem-box"
+          id="eventlist-button-box"
           sx={{
-            height: onMedia.onDesktop
-              ? `calc(${winHeight}px - 65px - ${theme.spacing(
-                  4
-                )} - 1px - 32px - 112px - 96px)` // navbar; spacing; paper t-border; paper t-padding; header; button box
-              : `calc(${winHeight}px - 64px - ${theme.spacing(
-                  2
-                )} - 32px + 1px - 65px)`, // mobile bar; spacing margin; inner t-padding; last entry border; bottom navbar
-            overflowY: "scroll",
+            display: "flex",
+            justifyContent: "center",
+            paddingY: 3,
+            paddingX: 2,
           }}
         >
-          {filteredEvents.map((event, index) => (
-            <EventListItem
-              key={event.id}
-              event={event}
-              index={index}
-              last={filteredEvents.length - 1}
-            />
-          ))}
-        </Box>
-
-        {onMedia.onDesktop && (
-          <Box
-            id="eventlist-button-box"
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              paddingY: 3,
-              paddingX: 2,
-            }}
+          <Tooltip
+            title={ediumUser?.uid ? "" : "Edit your profile first"}
+            style={{ width: "100%" }}
           >
-            <Tooltip
-              title={ediumUser?.uid ? "" : "Edit your profile first"}
-              style={{ width: "100%" }}
-            >
-              <span>
-                <NextLink
-                  href={{
-                    pathname: "/events/create",
-                    query: { isCreateStr: "true" },
+            <span>
+              <NextLink
+                href={{
+                  pathname: "/events/create",
+                  query: { isCreateStr: "true" },
+                }}
+                as="/events/create"
+                passHref
+              >
+                <Button
+                  color="secondary"
+                  disabled={!ediumUser?.uid}
+                  disableElevation
+                  fullWidth
+                  variant="contained"
+                  sx={{
+                    height: "48px",
+                    borderRadius: 8,
                   }}
-                  as="/events/create"
-                  passHref
                 >
-                  <Button
-                    color="secondary"
-                    disabled={!ediumUser?.uid}
-                    disableElevation
-                    fullWidth
-                    variant="contained"
-                    sx={{
-                      height: "48px",
-                      borderRadius: 8,
-                    }}
-                  >
-                    <Typography variant="button" sx={{ fontSize: "1.125rem" }}>
-                      {"Create Event"}
-                    </Typography>
-                  </Button>
-                </NextLink>
-              </span>
-            </Tooltip>
-          </Box>
-        )}
-      </Paper>
-    </Slide>
+                  <Typography variant="button" sx={{ fontSize: "1.125rem" }}>
+                    {"Create Event"}
+                  </Typography>
+                </Button>
+              </NextLink>
+            </span>
+          </Tooltip>
+        </Box>
+      )}
+    </Paper>
   );
 };
 

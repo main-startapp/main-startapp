@@ -5,7 +5,6 @@ import {
   Chip,
   Divider,
   Paper,
-  Slide,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -51,179 +50,181 @@ const ProjectInfo = () => {
   // useEffect to reset box scrollbar position
   const boxRef = useRef();
   useEffect(() => {
-    boxRef.current.scrollTop = 0;
+    if (boxRef?.current?.scrollTop) boxRef.current.scrollTop = 0;
   }, [project]); // every time project changes, this forces each accordion to collapse
 
   return (
-    <Slide direction="up" in={Boolean(project)}>
-      <Paper
-        elevation={2}
-        sx={{
-          // mt: onMedia.onDesktop ? 4 : 2,
-          // ml: onMedia.onDesktop ? 2 : 2,
-          // mr: onMedia.onDesktop ? 4 : 0,
-          backgroundColor: "background",
-          borderTop: onMedia.onDesktop ? 1 : 0,
-          borderColor: "divider",
-          borderRadius: "32px 32px 0px 0px",
-          paddingTop: "32px",
-        }}
+    <Paper
+      elevation={2}
+      sx={{
+        // mt: onMedia.onDesktop ? 4 : 2,
+        // ml: onMedia.onDesktop ? 2 : 2,
+        // mr: onMedia.onDesktop ? 4 : 0,
+        backgroundColor: "background",
+        borderTop: onMedia.onDesktop ? 1 : 0,
+        borderColor: "divider",
+        borderRadius: "32px 32px 0px 0px",
+        paddingTop: "32px",
+        minHeight: "100%",
+      }}
+    >
+      <motion.div
+        key={project?.title}
+        initial={{ opacity: 0, y: "1%" }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
       >
-        <motion.div
-          key={project?.title}
-          initial={{ opacity: 0, y: "1%" }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+        <Box
+          id="projectinfo-box"
+          ref={boxRef}
+          sx={{
+            height: onMedia.onDesktop
+              ? `calc(${winHeight}px - 65px - ${theme.spacing(4)} - 1px - 32px)` // navbar; spacing; paper t-border; paper t-padding
+              : `calc(${winHeight}px - 64px - ${theme.spacing(
+                  2
+                )} - 32px - 65px)`, // mobile bar; spacing; paper t-padding; bottom navbar
+            overflowY: "scroll",
+            paddingTop: 2, // align with project list
+            paddingBottom: 6, // enough space to not covered by messages
+            paddingLeft: 4,
+            paddingRight: `calc(${theme.spacing(4)} - 0.4rem)`, // considering scrollbar
+            display: "flex",
+            flexDirection: "column",
+          }}
         >
           <Box
-            id="projectinfo-box"
-            ref={boxRef}
+            id="projectinfo-header-box"
             sx={{
-              height: onMedia.onDesktop
-                ? `calc(${winHeight}px - 65px - ${theme.spacing(
-                    4
-                  )} - 1px - 32px)` // navbar; spacing; paper t-border; paper t-padding
-                : `calc(${winHeight}px - 64px - ${theme.spacing(
-                    2
-                  )} - 32px - 65px)`, // mobile bar; spacing; paper t-padding; bottom navbar
-              overflowY: "scroll",
-              paddingTop: 2, // align with project list
-              paddingBottom: 6, // enough space to not covered by messages
-              paddingLeft: 4,
-              paddingRight: `calc(${theme.spacing(4)} - 0.4rem)`, // considering scrollbar
               display: "flex",
-              flexDirection: "column",
+              flexDirection: "row",
+              alignItems: "center",
             }}
           >
-            <Box
-              id="projectinfo-header-box"
+            <Avatar
               sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
+                mr: onMedia.onDesktop ? 4 : 2,
+                height: "96px",
+                width: "96px",
               }}
+              src={project?.icon_url}
             >
-              <Avatar
-                sx={{
-                  mr: onMedia.onDesktop ? 4 : 2,
-                  height: "96px",
-                  width: "96px",
-                }}
-                src={project?.icon_url}
-              >
-                <UploadFileIcon />
-              </Avatar>
-              <Typography
-                color="text.primary"
-                variant="h2"
-                sx={{
-                  fontSize: onMedia.onDesktop ? "1.875rem" : "1.25rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {project?.title}
-              </Typography>
-            </Box>
-            <Divider
-              sx={{
-                mt: onMedia.onDesktop ? 2 : 1,
-                borderBottomWidth: 1,
-                borderColor: "divider",
-              }}
-            />
+              <UploadFileIcon />
+            </Avatar>
             <Typography
               color="text.primary"
-              variant="h3"
-              sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
+              variant="h2"
+              sx={{
+                fontSize: onMedia.onDesktop ? "1.875rem" : "1.25rem",
+                fontWeight: "bold",
+              }}
             >
-              {"Description:"}
+              {project?.title}
             </Typography>
-            <Typography color="text.secondary" component="span" variant="body1">
-              <pre
-                style={{
-                  fontFamily: "inherit",
-                  whiteSpace: "pre-wrap",
-                  wordWrap: "break-word",
-                  display: "inline",
-                }}
-              >
-                <Interweave
-                  content={project?.description}
-                  matchers={[new UrlMatcher("url")]}
-                />
-              </pre>
-            </Typography>
-
-            {project?.position_list?.length > 0 && (
-              <Box
-                id="projectinfo-positions-box"
-                sx={{
-                  mt: 4,
-                  paddingX: 2,
-                  paddingY: 2,
-                  borderRadius: 2,
-                  backgroundColor: "primary.main",
-                }}
-              >
-                <Typography
-                  color="white"
-                  variant="h3"
-                  sx={{ fontSize: "1.25rem", fontWeight: "bold" }}
-                >
-                  {"Positions:"}
-                </Typography>
-                {project?.position_list.map((position, index) => (
-                  <PositionListItem
-                    key={index}
-                    index={index}
-                    posID={position.id}
-                    posTitle={position.title}
-                    posResp={position.responsibility}
-                    posWeeklyHour={position.weekly_hour}
-                    posLevel={position?.level || ""}
-                    isCreator={isCreator}
-                    creator={creatorUser}
-                    appFormURL={
-                      project.application_form_url !== ""
-                        ? project.application_form_url
-                        : position.url
-                        ? position.url
-                        : ""
-                    }
-                  />
-                ))}
-              </Box>
-            )}
-
-            {allTags?.length > 0 && (
-              <Box id="projectinfo-details-box">
-                <Typography
-                  color="text.primary"
-                  variant="h3"
-                  sx={{ mt: 4, fontSize: "1.25rem", fontWeight: "bold" }}
-                >
-                  {"Details: "}
-                </Typography>
-
-                {allTags.map((tag, index) => (
-                  <Chip
-                    key={index}
-                    color={"lightPrimary"}
-                    label={tag}
-                    sx={{
-                      mt: 1,
-                      mr: 1,
-                      fontSize: "0.875rem",
-                      fontWeight: "medium",
-                    }}
-                  />
-                ))}
-              </Box>
-            )}
           </Box>
-        </motion.div>
-      </Paper>
-    </Slide>
+          <Divider
+            sx={{
+              mt: 2,
+              borderBottomWidth: 1,
+              borderColor: "divider",
+            }}
+          />
+          <Typography
+            color="text.primary"
+            variant="h3"
+            sx={{
+              mt: 4,
+              mb: 1,
+              fontSize: "1.25rem",
+              fontWeight: "bold",
+            }}
+          >
+            {"Description:"}
+          </Typography>
+          <Typography color="text.secondary" component="span" variant="body1">
+            <pre
+              style={{
+                fontFamily: "inherit",
+                whiteSpace: "pre-wrap",
+                wordWrap: "break-word",
+                display: "inline",
+              }}
+            >
+              <Interweave
+                content={project?.description}
+                matchers={[new UrlMatcher("url")]}
+              />
+            </pre>
+          </Typography>
+
+          {project?.position_list?.length > 0 && (
+            <Box
+              id="projectinfo-positions-box"
+              sx={{
+                mt: 4,
+                paddingX: 2,
+                paddingY: 2,
+                borderRadius: 2,
+                backgroundColor: "primary.main",
+              }}
+            >
+              <Typography
+                color="white"
+                variant="h3"
+                sx={{ fontSize: "1.25rem", fontWeight: "bold" }}
+              >
+                {"Positions:"}
+              </Typography>
+              {project?.position_list.map((position, index) => (
+                <PositionListItem
+                  key={index}
+                  index={index}
+                  posID={position.id}
+                  posTitle={position.title}
+                  posResp={position.responsibility}
+                  posWeeklyHour={position.weekly_hour}
+                  posLevel={position?.level || ""}
+                  isCreator={isCreator}
+                  creator={creatorUser}
+                  appFormURL={
+                    project.application_form_url !== ""
+                      ? project.application_form_url
+                      : position.url
+                      ? position.url
+                      : ""
+                  }
+                />
+              ))}
+            </Box>
+          )}
+
+          {allTags?.length > 0 && (
+            <Box id="projectinfo-details-box">
+              <Typography
+                color="text.primary"
+                variant="h3"
+                sx={{ mt: 4, fontSize: "1.25rem", fontWeight: "bold" }}
+              >
+                {"Details: "}
+              </Typography>
+
+              {allTags.map((tag, index) => (
+                <Chip
+                  key={index}
+                  color={"lightPrimary"}
+                  label={tag}
+                  sx={{
+                    mt: 1,
+                    mr: 1,
+                    fontSize: "0.875rem",
+                    fontWeight: "medium",
+                  }}
+                />
+              ))}
+            </Box>
+          )}
+        </Box>
+      </motion.div>
+    </Paper>
   );
 };
 
