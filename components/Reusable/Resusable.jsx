@@ -209,6 +209,17 @@ export const getGooglePhotoURLwithRes = (photo_url, res) => {
 };
 
 //============================================================
+// utility function: remove an element from array
+// better than filter?
+//============================================================
+export const removeValueFromArray = (array, value) => {
+  const index = array.findIndex((ele) => ele === value);
+  return index >= 0
+    ? [...array.slice(0, index), ...array.slice(index + 1)]
+    : array;
+};
+
+//============================================================
 // styled components
 //============================================================
 export const DefaultTextField = styled(TextField)(({ theme }) => ({
@@ -235,9 +246,7 @@ export const DefaultTextField = styled(TextField)(({ theme }) => ({
 }));
 
 export const SearchBox = styled(Box)(({ theme }) => ({
-  //position: "relative",
   height: "36px",
-  width: "100%",
   border: 0,
   borderRadius: theme.shape.borderRadius * 2,
   backgroundColor: theme.palette.searchGary.main,

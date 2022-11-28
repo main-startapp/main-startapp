@@ -1,14 +1,7 @@
 import { useContext, useMemo, useEffect } from "react";
 import NextLink from "next/link";
-import {
-  Box,
-  Button,
-  Paper,
-  Slide,
-  Tooltip,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Box, Button, Paper, Tooltip, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import ProjectListItem from "./ProjectListItem";
 import ProjectListHeader from "./ProjectListHeader";
@@ -21,7 +14,7 @@ const ProjectList = () => {
   // context
   const { projects, users, ediumUser, winHeight, onMedia } =
     useContext(GlobalContext);
-  const { searchTerm, searchCategory, setProject, setCreatorUser } =
+  const { searchTerm, searchCategory, searchType, setProject, setCreatorUser } =
     useContext(ProjectContext);
   const theme = useTheme();
 
@@ -29,11 +22,11 @@ const ProjectList = () => {
   const filteredProjects = useMemo(
     () =>
       projects.filter((project) => {
-        if (!project.is_visible) return;
-        if (searchTerm === "" && searchCategory === "") return project;
+        if (!project.is_visible) return false;
+        if (searchTerm === "" && searchType.length === 0) return true;
 
         // !todo: is this optimized?
-        // lazy evaluation
+        // lazy evaluation to avoid unnecessary expensive includes() / some()
         const isInTitles =
           searchTerm !== "" &&
           (project.title.toLowerCase().includes(searchTerm.toLowerCase()) || // project title
@@ -41,13 +34,16 @@ const ProjectList = () => {
               (position) =>
                 position.title.toLowerCase().includes(searchTerm.toLowerCase()) // position title
             ));
-        const isInCategory =
-          searchCategory !== "" && // lazy evaluation to avoid unnecessary expensive includes()
-          project.category.toLowerCase().includes(searchCategory.toLowerCase());
+        const isInType =
+          searchType !== [] &&
+          searchType.some(
+            (typeName) =>
+              typeName.toLowerCase() === project.category.toLowerCase()
+          );
 
-        if (isInTitles || isInCategory) return project;
+        if (isInTitles || isInType) return true;
       }),
-    [projects, searchTerm, searchCategory]
+    [projects, searchTerm, searchType]
   );
 
   // set initial project to be first in list to render out immediately; to simulate the click event, creator also needs to be set
@@ -72,7 +68,7 @@ const ProjectList = () => {
         // mt: onMedia.onDesktop ? 4 : 2,
         // ml: onMedia.onDesktop ? 4 : 2,
         // mr: onMedia.onDesktop ? 2 : 0,
-        backgroundColor: "background",
+        backgroundColor: "background.paper",
         borderTop: onMedia.onDesktop ? 1 : 0,
         borderColor: "divider",
         borderRadius: onMedia.onDesktop
@@ -89,7 +85,7 @@ const ProjectList = () => {
           height: onMedia.onDesktop
             ? `calc(${winHeight}px - 65px - ${theme.spacing(
                 4
-              )} - 1px - 32px - 112px - 96px)` // navbar; spacing; paper t-border; paper t-padding; header; button box
+              )} - 1px - 32px - 112px - 29px - 96px)` // navbar; spacing; paper t-border; paper t-padding; header; button box
             : `calc(${winHeight}px - 64px - ${theme.spacing(
                 2
               )} - 32px + 1px - 65px)`, // mobile bar; spacing margin; inner t-padding; last entry border; bottom navbar

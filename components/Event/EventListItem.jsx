@@ -97,7 +97,7 @@ const EventListItem = (props) => {
         alignItems: "flex-start",
         borderBottom: 1,
         borderColor: "divider",
-        backgroundColor: "background",
+        backgroundColor: "background.paper",
         "&:hover": {
           backgroundColor: "hoverGray.main",
           cursor: "default",
@@ -257,7 +257,7 @@ const EventListItem = (props) => {
                   endMoment.format("MMM Do h:mm a")}
             </Typography>
           }
-          sx={{ margin: 0, mb: 2 }}
+          sx={{ mb: 2 }}
         />
         {onMedia.onDesktop && (
           <ListItemText

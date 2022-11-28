@@ -250,6 +250,7 @@ const PositionListItem = (props) => {
       sx={onMedia.onDesktop ? { my: 2 } : { my: 1 }}
     >
       <Accordion
+        //disableGutters
         square
         elevation={2}
         expanded={expandState === "expandIt"}

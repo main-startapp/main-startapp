@@ -1,13 +1,7 @@
 import { useContext, useMemo, useEffect } from "react";
 import NextLink from "next/link";
-import {
-  Box,
-  Button,
-  Paper,
-  Tooltip,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Box, Button, Paper, Tooltip, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import EventListItem from "./EventListItem";
 import moment from "moment";
@@ -82,7 +76,7 @@ const EventList = () => {
         // mt: onMedia.onDesktop ? 4 : 2,
         // ml: onMedia.onDesktop ? 4 : 2,
         // mr: onMedia.onDesktop ? 2 : 0,
-        backgroundColor: "background",
+        backgroundColor: "background.paper",
         borderTop: onMedia.onDesktop ? 1 : 0,
         borderColor: "divider",
         borderRadius: onMedia.onDesktop

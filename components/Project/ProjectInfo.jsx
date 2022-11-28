@@ -1,13 +1,6 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import {
-  Avatar,
-  Box,
-  Chip,
-  Divider,
-  Paper,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Avatar, Box, Chip, Divider, Paper, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import PositionListItem from "./PositionListItem";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
@@ -60,7 +53,7 @@ const ProjectInfo = () => {
         // mt: onMedia.onDesktop ? 4 : 2,
         // ml: onMedia.onDesktop ? 2 : 2,
         // mr: onMedia.onDesktop ? 4 : 0,
-        backgroundColor: "background",
+        backgroundColor: "background.paper",
         borderTop: onMedia.onDesktop ? 1 : 0,
         borderColor: "divider",
         borderRadius: "32px 32px 0px 0px",
@@ -110,6 +103,7 @@ const ProjectInfo = () => {
             >
               <UploadFileIcon />
             </Avatar>
+
             <Typography
               color="text.primary"
               variant="h2"

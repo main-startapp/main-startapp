@@ -7,8 +7,8 @@ import {
   Link,
   Paper,
   Typography,
-  useTheme,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { EventContext, GlobalContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import moment from "moment";
@@ -68,7 +68,7 @@ const EventInfo = () => {
         // mt: onMedia.onDesktop ? 4 : 2,
         // ml: onMedia.onDesktop ? 2 : 2,
         // mr: onMedia.onDesktop ? 4 : 0,
-        backgroundColor: "background",
+        backgroundColor: "background.paper",
         borderTop: onMedia.onDesktop ? 1 : 0,
         borderColor: "divider",
         borderRadius: "32px 32px 0px 0px",

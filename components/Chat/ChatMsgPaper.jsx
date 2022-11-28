@@ -20,7 +20,7 @@ const ChatMsgPaper = () => {
         borderTop: 1,
         borderColor: "divider",
         borderRadius: "8px 8px 0 0",
-        backgroundColor: "background",
+        backgroundColor: "background.paper",
         display: "flex",
         flexDirection: "column",
       }}

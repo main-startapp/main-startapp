@@ -21,7 +21,6 @@ const MobileBottomNav = () => {
 
   return (
     <BottomNavigation
-      color="background"
       value={destination}
       sx={{
         position: "fixed",

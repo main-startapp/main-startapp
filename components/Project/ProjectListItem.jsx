@@ -79,7 +79,7 @@ const ProjectListItem = (props) => {
         alignItems: "flex-start",
         borderBottom: 1,
         borderColor: "divider",
-        backgroundColor: "background",
+        backgroundColor: "background.paper",
         "&:hover": {
           backgroundColor: "hoverGray.main",
           cursor: "default",
@@ -111,6 +111,7 @@ const ProjectListItem = (props) => {
         </Avatar>
         <Box sx={{ width: "100%" }}>
           <ListItemText
+            disableTypography
             primary={
               <Typography
                 variant="h2"
@@ -121,7 +122,7 @@ const ProjectListItem = (props) => {
             }
           />
           {allTags?.length > 0 && (
-            <Box sx={{ height: "1.5rem", overflow: "hidden" }}>
+            <Box sx={{ mt: 1, height: "1.5rem", overflow: "hidden" }}>
               {allTags.map((tag, index) => (
                 <Chip
                   key={index}
@@ -232,7 +233,7 @@ const ProjectListItem = (props) => {
               {convert(project?.description)}
             </Typography>
           }
-          sx={{ margin: 0, mb: 2 }}
+          sx={{ mb: 2 }}
         />
         {project.position_list.slice(0, 3).map((position, index) => (
           <ListItemText
@@ -247,12 +248,12 @@ const ProjectListItem = (props) => {
         ))}
         {project.position_list.length > 3 && (
           <ListItemText
-            sx={{ margin: 0, ml: "5%" }}
             secondary={
               <Typography variant="body2" sx={{ fontWeight: "medium" }}>
                 {"and more..."}
               </Typography>
             }
+            sx={{ ml: "5%" }}
           />
         )}
         {onMedia.onDesktop && (

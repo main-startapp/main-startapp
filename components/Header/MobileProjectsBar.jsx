@@ -36,35 +36,6 @@ const MobileProjectsBar = () => {
   // ref
   const textRef = useRef();
 
-  // reuseable comp
-  const ppSearch = (
-    <SearchBox
-      sx={{
-        mr: 2,
-        height: "32px",
-      }}
-    >
-      <SearchIconWrapper>
-        <SearchIcon />
-      </SearchIconWrapper>
-      <StyledInputBase
-        fullWidth={true}
-        placeholder="Search for projects or positions..."
-        inputProps={{ "aria-label": "search" }}
-        inputRef={textRef}
-        onChange={(e) => {
-          if (e.target.value.length !== 0) return;
-          setSearchTerm("");
-        }}
-        onKeyPress={(e) => {
-          if (e.key === "Enter") {
-            setSearchTerm(e.target.value);
-          }
-        }}
-      />
-    </SearchBox>
-  );
-
   // const categoryComp = (
   //   <FormControl
   //     sx={{
@@ -130,12 +101,31 @@ const MobileProjectsBar = () => {
           <Box
             sx={{
               display: "flex",
+              flexDirection: "row",
               alignItems: "center",
-              justifyContent: "space-between",
               width: "100%",
             }}
           >
-            {ppSearch}
+            <SearchBox sx={{ mr: 2, width: "100%" }}>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                fullWidth={true}
+                placeholder="Search for projects or positions..."
+                inputProps={{ "aria-label": "search" }}
+                inputRef={textRef}
+                onChange={(e) => {
+                  if (e.target.value.length !== 0) return;
+                  setSearchTerm("");
+                }}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    setSearchTerm(e.target.value);
+                  }
+                }}
+              />
+            </SearchBox>
             {/* <Button
               sx={{
                 width: "20%",

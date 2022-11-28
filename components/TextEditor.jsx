@@ -1,9 +1,8 @@
-import "react-quill/dist/quill.snow.css";
 // import Quill from "quill";
 // import ImageResize from "quill-image-resize-module-react";
 import dynamic from "next/dynamic";
-import { useMemo } from "react";
-
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+import "react-quill/dist/quill.snow.css";
 // Quill.register("modules/imageResize", ImageResize);
 
 const TextEditor = ({ update, project }) => {
@@ -27,12 +26,6 @@ const TextEditor = ({ update, project }) => {
       description: e,
     });
   };
-
-  const ReactQuill = useMemo(
-    () => dynamic(() => import("react-quill"), { ssr: false }),
-    []
-  );
-
   return (
     <ReactQuill
       theme="snow"

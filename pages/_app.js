@@ -89,6 +89,14 @@ const getDesignTokens = (mode) => ({
       },
     },
 
+    MuiListItemText: {
+      styleOverrides: {
+        root: {
+          margin: 0,
+        },
+      },
+    },
+
     MuiCssBaseline: {
       styleOverrides: {
         body: {

@@ -44,6 +44,7 @@ const Home = () => {
   const [creatorUser, setCreatorUser] = useState(null); // the user info of project's creator
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
+  const [searchType, setSearchType] = useState([]);
 
   return (
     <ProjectContext.Provider
@@ -56,6 +57,8 @@ const Home = () => {
         setSearchTerm,
         searchCategory,
         setSearchCategory,
+        searchType,
+        setSearchType,
       }}
     >
       {!onMedia.onDesktop && <MobileProjectsBar />}
