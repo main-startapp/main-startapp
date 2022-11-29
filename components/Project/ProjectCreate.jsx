@@ -75,7 +75,7 @@ const ProjectCreate = (props) => {
   const emptyProject = {
     title: "",
     category: "",
-    completion_date: new Date(),
+    completion_date: "",
     max_member_count: 0, 
     tags: [],
     description: "",
@@ -116,7 +116,7 @@ const ProjectCreate = (props) => {
   const [isCheckedTransferable, setIsCheckedTransferable] = useState(false);
   const [isCheckedPosition, setIsCheckedPosition] = useState(false);
   const [isCheckedAppForm, setIsCheckedAppForm] = useState(false);
-  const [isCheckedCompDate, setIsCheckedCompDate] = useState(false);
+  const [isCheckedCompDate, setIsCheckedCompDate] = useState(newProject.completion_date != "");
   const [isCheckedTeamSize, setIsCheckedTeamSize] = useState(false);
   useEffect(() => {
     if (!oldProject) {
@@ -427,10 +427,17 @@ const ProjectCreate = (props) => {
 
   const handleCompDateChange = (e) => {
     setIsCheckedCompDate(!isCheckedCompDate);
-    setNewProject({
-      ...newProject,
-      completion_date: new Date()
-    });
+    if (isCheckedCompDate) {
+       setNewProject({
+         ...newProject,
+         completion_date: "",
+       });
+    } else {
+       setNewProject({
+         ...newProject,
+         completion_date: new Date(),
+       });
+    }
   };
 
   const handleTeamSizeChange = (e) => {
@@ -660,7 +667,7 @@ const ProjectCreate = (props) => {
               >
                 <LocalizationProvider dateAdapter={AdapterMoment}>
                   <DesktopDatePicker
-                      ref = {dateRef}
+                    ref={dateRef}
                     renderInput={(props) => {
                       return (
                         <DefaultTextField
@@ -759,7 +766,7 @@ const ProjectCreate = (props) => {
                   sx={{
                     width: onMedia.onDesktop ? "175px" : "100px",
                   }}
-                  ref = {teamSizeRef}
+                  ref={teamSizeRef}
                   fullWidth
                   // label="Team Size"
                   type="number"
