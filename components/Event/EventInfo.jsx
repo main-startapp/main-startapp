@@ -1,8 +1,9 @@
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
   Avatar,
   Box,
   Button,
+  Chip,
   Divider,
   Link,
   Paper,
@@ -18,20 +19,24 @@ import { motion } from "framer-motion";
 
 const EventInfo = () => {
   // context
-  const { ediumUser, winHeight, onMedia } = useContext(GlobalContext);
-  const { event, creatorUser } = useContext(EventContext);
+  const { winHeight, onMedia } = useContext(GlobalContext);
+  const { fullEvent } = useContext(EventContext);
   const theme = useTheme();
 
   // local vars
+  const event = fullEvent?.event;
+  const eventCreator = fullEvent?.creator_uid;
+  const eventAllTags = fullEvent?.allTags;
+
   const [tCode, setTCode] = useState("");
   useEffect(() => {
     setTCode("");
-  }, [event]);
+  }, [fullEvent]);
 
   const [isLoaded, setIsLoaded] = useState(false);
   useEffect(() => {
     setIsLoaded(false);
-  }, [event]);
+  }, [fullEvent]);
 
   // moment
   const startMoment = moment(event?.start_date);
@@ -76,7 +81,7 @@ const EventInfo = () => {
                   2
                 )} - 32px - 65px)`, // mobile bar; spacing; paper t-padding; bottom navbar
             overflowY: "scroll",
-            paddingTop: 2, // align with project list
+            paddingTop: 2, // align with event list
             paddingBottom: 6, // enough space to not covered by messages
             paddingLeft: 4,
             paddingRight: `calc(${theme.spacing(4)} - 0.4rem)`, // considering scrollbar
@@ -106,7 +111,7 @@ const EventInfo = () => {
               color="text.primary"
               variant="h2"
               sx={{
-                fontSize: onMedia.onDesktop ? "32px" : "16px",
+                fontSize: onMedia.onDesktop ? "1.875rem" : "1.25rem",
                 fontWeight: "bold",
               }}
             >
@@ -176,6 +181,32 @@ const EventInfo = () => {
           >
             {"Attend"}
           </Button>
+
+          {eventAllTags?.length > 0 && (
+            <Box id="eventinfo-details-box">
+              <Typography
+                color="text.primary"
+                variant="h3"
+                sx={{ mt: 4, fontSize: "1.25rem", fontWeight: "bold" }}
+              >
+                {"Details: "}
+              </Typography>
+
+              {eventAllTags?.map((tag, index) => (
+                <Chip
+                  key={index}
+                  color={"lightPrimary"}
+                  label={tag}
+                  sx={{
+                    mt: 1,
+                    mr: 1,
+                    fontSize: "0.875rem",
+                    fontWeight: "medium",
+                  }}
+                />
+              ))}
+            </Box>
+          )}
 
           <Box
             sx={{

@@ -97,6 +97,16 @@ const getDesignTokens = (mode) => ({
       },
     },
 
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          "&.Mui-selected": {
+            color: "#000",
+          },
+        },
+      },
+    },
+
     MuiCssBaseline: {
       styleOverrides: {
         body: {

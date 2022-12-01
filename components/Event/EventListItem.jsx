@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from "react";
+import { useContext, useState } from "react";
 import {
   Avatar,
   Box,
@@ -15,31 +15,32 @@ import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
-  findItemFromList,
   handleDeleteEntry,
   handleVisibility,
-  MenuItemLink,
+  isStrInStrList,
 } from "../Reusable/Resusable";
 import NextLink from "next/link";
 
+// prefer not do any dynamic calculation in this leaf component
 const EventListItem = (props) => {
   const index = props.index;
-  const event = props.event;
+  const fullEvent = props.fullEvent;
   const last = props.last;
 
   // context
-  const { setOldEvent, users, ediumUser, onMedia } = useContext(GlobalContext);
-  const { setEvent, setCreatorUser } = useContext(EventContext);
+  const { setOldEvent, ediumUser, onMedia } = useContext(GlobalContext);
+  const { setFullEvent, searchTypeList } = useContext(EventContext);
+
+  // local vars
+  const event = fullEvent.event;
+  const eventCreator = fullEvent.creator_uid;
+  const eventAllTags = fullEvent.allTags;
 
   // time related
   const startMoment = moment(event?.start_date);
-
   const endMoment = moment(event?.end_date);
-
   const isExpired = moment({ hour: 23, minute: 59 }).isAfter(endMoment);
-
   const isSameDay = startMoment.format("L") === endMoment.format("L");
-
   const isSameTime = startMoment.format("LLL") === endMoment.format("LLL");
 
   // menu
@@ -54,32 +55,10 @@ const EventListItem = (props) => {
     setAnchorEl(null);
   };
 
-  // creator's user data
-  const creatorUser = useMemo(() => {
-    return findItemFromList(users, "uid", event?.creator_uid);
-  }, [users, event?.creator_uid]);
-
-  // event + org tags
-  const allTags = useMemo(() => {
-    let retTags = [];
-    if (event?.tags?.length > 0) {
-      retTags = retTags.concat(event.tags);
-    }
-    if (
-      creatorUser?.role === "org_admin" &&
-      creatorUser?.org_tags?.length > 0
-    ) {
-      retTags = retTags.concat(creatorUser.org_tags);
-    }
-
-    return retTags;
-  }, [creatorUser, event]);
-
   return (
     <ListItem
       onClick={() => {
-        setEvent(event);
-        setCreatorUser(creatorUser);
+        setFullEvent(fullEvent);
       }}
       sx={{
         display: "flex",
@@ -129,12 +108,16 @@ const EventListItem = (props) => {
               </Typography>
             }
           />
-          {allTags?.length > 0 && (
-            <Box sx={{ height: "1.5rem", overflow: "hidden" }}>
-              {allTags?.map((tag, index) => (
+          {eventAllTags?.length > 0 && (
+            <Box sx={{ mt: 1, height: "1.5rem", overflow: "hidden" }}>
+              {eventAllTags?.map((tag, index) => (
                 <Chip
                   key={index}
-                  color={"lightPrimary"}
+                  color={
+                    isStrInStrList(searchTypeList, tag, true)
+                      ? "primary"
+                      : "lightPrimary"
+                  }
                   label={tag}
                   size="small"
                   sx={{
@@ -210,8 +193,7 @@ const EventListItem = (props) => {
                   event?.id,
                   ediumUser?.uid
                 );
-                setEvent(null);
-                setCreatorUser(null);
+                setFullEvent(null);
                 handleMenuClose(e);
               }}
             >

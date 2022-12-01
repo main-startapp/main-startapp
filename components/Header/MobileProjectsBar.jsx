@@ -25,8 +25,6 @@ const MobileProjectsBar = () => {
 
   // local vars
   const project = fullProject?.project;
-
-  // ref
   const textRef = useRef();
 
   // const categoryComp = (
@@ -89,7 +87,7 @@ const MobileProjectsBar = () => {
         }}
         disableGutters // disable auto padding
       >
-        {project === null ? (
+        {fullProject === null ? (
           // projectList version
           <Box
             sx={{

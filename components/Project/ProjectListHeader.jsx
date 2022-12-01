@@ -16,10 +16,9 @@ import { useTheme } from "@mui/material/styles";
 const ProjectListHeader = () => {
   const { setSearchTerm, searchTypeList, setSearchTypeList } =
     useContext(ProjectContext);
-  const theme = useTheme();
 
   // tabs related
-  const [tabValue, setTabValue] = useState("1");
+  const [tabValue, setTabValue] = useState("2");
   const handleChange = (event, newValue) => {
     setTabValue(newValue);
   };
@@ -122,11 +121,11 @@ const ProjectListHeader = () => {
       <Box sx={{ position: "relative" }}>
         <TabContext value={tabValue}>
           <TabList
-            aria-label="lab API tabs example"
+            aria-label="projectlistheader-tabs"
             onChange={handleChange}
             sx={{ minHeight: 0, borderBottom: 1, borderColor: "divider" }}
           >
-            <StyledTab label="Category" value="1" />
+            {/* <StyledTab label="Category" value="1" /> */}
             <StyledTab label="Type" value="2" />
           </TabList>
           <Box id="projectlist-positionref-box" sx={{ position: "relative" }}>
@@ -141,7 +140,7 @@ const ProjectListHeader = () => {
                 zIndex: 1,
               }}
             >
-              <TabPanel
+              {/* <TabPanel
                 value="1"
                 sx={{
                   backgroundColor: "background.paper",
@@ -151,7 +150,7 @@ const ProjectListHeader = () => {
                 }}
               >
                 Item One
-              </TabPanel>
+              </TabPanel> */}
               <TabPanel
                 value="2"
                 sx={{

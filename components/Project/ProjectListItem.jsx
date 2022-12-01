@@ -1,4 +1,4 @@
-import { useContext, useState, useMemo, useEffect } from "react";
+import { useContext, useState } from "react";
 import {
   Avatar,
   Box,
@@ -15,7 +15,6 @@ import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
-  findItemFromList,
   handleDeleteEntry,
   handleVisibility,
   isStrInStrList,
@@ -161,7 +160,7 @@ const ProjectListItem = (props) => {
               <NextLink
                 href={{
                   pathname: "/projects/create",
-                  query: { isCreateStr: "false" },
+                  query: { isCreateStr: "false", projectID: project?.id },
                 }}
                 as="/projects/create"
                 passHref

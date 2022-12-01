@@ -42,13 +42,10 @@ const Home = () => {
   }, []);
 
   // project state init
-  const [fullProject, setFullProject] = useState(null); // the selected project with extra data
+  const [fullProject, setFullProject] = useState(null); // the selected project with extra data (creator, tags)
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
   const [searchTypeList, setSearchTypeList] = useState([]);
-
-  // local vars
-  const project = fullProject?.project;
 
   return (
     <ProjectContext.Provider
@@ -89,7 +86,7 @@ const Home = () => {
             </motion.div>
           </Box>
         ) : (
-          project === null && (
+          fullProject === null && (
             <Box
               id="projects-mobile-list-box"
               sx={{
@@ -123,7 +120,7 @@ const Home = () => {
             </motion.div>
           </Box>
         ) : (
-          project !== null && (
+          fullProject !== null && (
             <Box
               id="projects-mobile-info-box"
               sx={{

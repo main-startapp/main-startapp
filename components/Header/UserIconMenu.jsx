@@ -17,15 +17,18 @@ const UserIconMenu = (props) => {
   // menu
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const handleUserMenu = (e) => {
+  const handleMenu = (e) => {
+    e.stopPropagation();
     setAnchorEl(e.currentTarget);
   };
-  const handleUserMenuClose = () => {
+  const handleMenuClose = (e) => {
+    e.stopPropagation();
     setAnchorEl(null);
   };
 
-  const handleUserMenuLogout = () => {
+  const handleMenuLogout = (e) => {
     // signout user -> close menu
+    e.stopPropagation();
     auth.signOut();
     setAnchorEl(null);
     window.location.reload(true); // do a server refresh
@@ -44,7 +47,7 @@ const UserIconMenu = (props) => {
           width: iconHeight,
           padding: 0,
         }}
-        onClick={(e) => handleUserMenu(e)}
+        onClick={(e) => handleMenu(e)}
       >
         <Avatar
           sx={{ height: avatarHeight, width: avatarHeight }}
@@ -57,7 +60,9 @@ const UserIconMenu = (props) => {
         anchorEl={anchorEl}
         // anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         open={open}
-        onClose={handleUserMenuClose}
+        onClose={(e) => {
+          handleMenuClose(e);
+        }}
         MenuListProps={{
           "aria-labelledby": "navbar-menu-button",
         }}
@@ -67,9 +72,18 @@ const UserIconMenu = (props) => {
           },
         }}
       >
-        <MenuItem onClick={handleUserMenuClose}>
-          <NextLink href="/students/create" passHref>
-            <MenuItemLink>Edit Profile</MenuItemLink>
+        <MenuItem
+          onClick={(e) => {
+            handleMenuClose(e);
+          }}
+        >
+          <NextLink
+            href={{
+              pathname: "/students/create",
+            }}
+            passHref
+          >
+            Edit Profile
           </NextLink>
         </MenuItem>
         {/* <MenuItem onClick={handleUserMenuClose}>
@@ -77,7 +91,13 @@ const UserIconMenu = (props) => {
                 <MenuItemLink>Team Management</MenuItemLink>
               </NextLink>
             </MenuItem> */}
-        <MenuItem onClick={handleUserMenuLogout}>Log Out</MenuItem>
+        <MenuItem
+          onClick={(e) => {
+            handleMenuLogout(e);
+          }}
+        >
+          Log Out
+        </MenuItem>
       </Menu>
     </>
   );

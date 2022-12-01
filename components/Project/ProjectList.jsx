@@ -23,7 +23,7 @@ const ProjectList = () => {
     useContext(ProjectContext);
   const theme = useTheme();
 
-  // projects with extra info from other dataset (users, merged tags)
+  // projects with extra info from other dataset (creator, merged tags)
   const fullProjects = useMemo(() => {
     return projects?.map((project) => {
       // creator
@@ -32,7 +32,6 @@ const ProjectList = () => {
         "uid",
         project?.creator_uid
       );
-      console.log(projectCreator);
       // allTags
       let projectTags = [];
       if (project?.tags?.length > 0) {
@@ -72,13 +71,13 @@ const ProjectList = () => {
           )
         ); // only term: in project title || position title
       } else if (searchTerm === "" && searchTypeList.length > 0) {
-        return fullProject.allTags.some((tag) => {
-          return isStrInStrList(searchTypeList, tag, true);
-        });
+        return searchTypeList.some((type) => {
+          return isStrInStrList(fullProject.allTags, type, true);
+        }); // only tags
       } else {
         return (
-          fullProject.allTags.some((tag) => {
-            return isStrInStrList(searchTypeList, tag, true);
+          searchTypeList.some((type) => {
+            return isStrInStrList(fullProject.allTags, type, true);
           }) &&
           (isStrInStr(fullProject.project.title, searchTerm, false) ||
             isStrInObjList(
@@ -92,7 +91,7 @@ const ProjectList = () => {
     });
   }, [fullProjects, searchTerm, searchTypeList]);
 
-  // set initial project to be first in list to render out immediately; to simulate the click event, creator and alltags also need to be set
+  // set initial project to be the first in list to render out immediately
   useEffect(() => {
     if (!onMedia.onDesktop) return;
 
@@ -136,7 +135,7 @@ const ProjectList = () => {
       >
         {filteredFullProjects?.map((fullProject, index) => (
           <ProjectListItem
-            key={fullProject?.project.id}
+            key={fullProject?.project?.id}
             fullProject={fullProject}
             index={index}
             last={filteredFullProjects.length - 1}

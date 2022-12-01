@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Avatar, Box, Chip, Divider, Paper, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
@@ -22,13 +22,13 @@ const ProjectInfo = () => {
   const [tCode, setTCode] = useState("");
   useEffect(() => {
     setTCode("");
-  }, [project]);
+  }, [fullProject]);
 
   // useEffect to reset box scrollbar position
   const boxRef = useRef();
   useEffect(() => {
     if (boxRef?.current?.scrollTop) boxRef.current.scrollTop = 0;
-  }, [project]); // every time project changes, this forces each accordion to collapse
+  }, [fullProject]); // every time project changes, this forces each accordion to collapse
 
   return (
     <Paper
@@ -87,7 +87,6 @@ const ProjectInfo = () => {
             >
               <UploadFileIcon />
             </Avatar>
-
             <Typography
               color="text.primary"
               variant="h2"

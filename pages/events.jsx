@@ -38,32 +38,34 @@ const Events = () => {
   }, []);
 
   // event state init
-  const [event, setEvent] = useState(null); // the selected project
-  const [creatorUser, setCreatorUser] = useState(null); // the user info of project's creator
+  const [fullEvent, setFullEvent] = useState(null); // the selected event with extra data
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
+  const [searchTypeList, setSearchTypeList] = useState([]);
 
   return (
     <EventContext.Provider
       value={{
-        event,
-        setEvent,
-        creatorUser,
-        setCreatorUser,
+        fullEvent,
+        setFullEvent,
         searchTerm,
         setSearchTerm,
         searchCategory,
         setSearchCategory,
+        searchTypeList,
+        setSearchTypeList,
       }}
     >
       {/* Toolbar for searching keywords, category and filter */}
       {/* <EventsPageBar /> */}
 
       <Box
+        id="events-main-box"
         sx={{ display: "flex", justifyContent: "center", overflow: "hidden" }}
       >
         {onMedia.onDesktop ? (
           <Box
+            id="events-desktop-list-box"
             sx={{
               paddingTop: 4,
               paddingLeft: 4,
@@ -81,8 +83,9 @@ const Events = () => {
             </motion.div>
           </Box>
         ) : (
-          event === null && (
+          fullEvent === null && (
             <Box
+              id="events-mobile-list-box"
               sx={{
                 paddingTop: 2,
                 paddingLeft: 2,
@@ -96,6 +99,7 @@ const Events = () => {
         )}
         {onMedia.onDesktop ? (
           <Box
+            id="events-desktop-info-box"
             sx={{
               paddingTop: 4,
               paddingLeft: 2,
@@ -113,8 +117,9 @@ const Events = () => {
             </motion.div>
           </Box>
         ) : (
-          event !== null && (
+          fullEvent !== null && (
             <Box
+              id="events-mobile-info-box"
               sx={{
                 paddingTop: 2,
                 paddingLeft: 2,

@@ -5,70 +5,97 @@ import { useTheme } from "@mui/material/styles";
 import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import EventListItem from "./EventListItem";
 import moment from "moment";
-import cloneDeep from "lodash/cloneDeep";
 import EventListHeader from "./EventListHeader";
-import { findItemFromList } from "../Reusable/Resusable";
+import {
+  findItemFromList,
+  isStrInStr,
+  isStrInStrList,
+} from "../Reusable/Resusable";
 
 const EventList = () => {
   // context
   const { events, users, ediumUser, winHeight, onMedia } =
     useContext(GlobalContext);
-  const { searchTerm, searchCategory, setEvent, setCreatorUser } =
-    useContext(EventContext);
+  const { setFullEvent, searchTerm, searchTypeList } = useContext(EventContext);
   const theme = useTheme();
 
-  // local vars
-  const sortedEvents = useMemo(() => {
-    const tempEvents = cloneDeep(events);
-    const eventsLength = tempEvents.length;
+  // events with extra info from other dataset (creator, merged tags)
+  const fullEvents = useMemo(() => {
+    return events?.map((event) => {
+      // creator
+      const eventCreator = findItemFromList(users, "uid", event?.creator_uid);
+      // allTags
+      let eventTags = [];
+      if (event?.tags?.length > 0) {
+        eventTags = eventTags.concat(event.tags); // event tags
+      }
+      if (
+        eventCreator?.role === "org_admin" &&
+        eventCreator?.org_tags?.length > 0
+      ) {
+        eventTags = eventTags.concat(eventCreator.org_tags); // org tags
+      }
+      // category
+      eventTags.push(event?.category?.toLowerCase()); // type
+      return {
+        event: event,
+        creator: eventCreator,
+        allTags: eventTags,
+      };
+    });
+  }, [events, users]);
+
+  // event list with sorting
+  const sortedFullEvents = useMemo(() => {
+    const eventsLength = fullEvents.length;
     for (let i = eventsLength - 1; i > -1; i--) {
       if (
-        moment({ hour: 23, minute: 59 }).isAfter(moment(tempEvents[i].end_date))
+        moment({ hour: 23, minute: 59 }).isAfter(
+          moment(fullEvents[i].event.end_date)
+        )
       ) {
-        let temp = tempEvents[i];
-        tempEvents.splice(i, 1);
-        tempEvents.push(temp);
+        let temp = fullEvents[i];
+        fullEvents.splice(i, 1);
+        fullEvents.push(temp);
       }
     }
-    return tempEvents;
-  }, [events]);
+    return fullEvents;
+  }, [fullEvents]);
 
-  const filteredEvents = useMemo(
+  const filteredFullEvents = useMemo(
     () =>
-      sortedEvents.filter((event) => {
-        if (!event.is_visible) return;
-        if (searchTerm === "" && searchCategory === "") return event;
+      sortedFullEvents?.filter((fullEvent) => {
+        if (!fullEvent.event.is_visible) return;
 
-        // !todo: is this optimized?
-        // lazy evaluation to avoid unnecessary expensive includes()
-        const isInTitles =
-          searchTerm !== "" &&
-          event.title.toLowerCase().includes(searchTerm.toLowerCase());
-
-        const isInCategory =
-          searchCategory !== "" &&
-          event.category.toLowerCase().includes(searchCategory.toLowerCase());
-
-        if (isInTitles || isInCategory) return event;
+        if (searchTerm === "" && searchTypeList.length === 0) {
+          return true; // no search
+        } else if (searchTerm !== "" && searchTypeList.length === 0) {
+          return isStrInStr(fullEvent.event.title, searchTerm, false); // only term: in event title
+        } else if (searchTerm === "" && searchTypeList.length > 0) {
+          return searchTypeList.some((type) => {
+            return isStrInStrList(fullEvent.allTags, type, true);
+          }); // only tags
+        } else {
+          return (
+            searchTypeList.some((type) => {
+              return isStrInStrList(fullEvent.allTags, type, true);
+            }) && isStrInStr(fullEvent.event.title, searchTerm, false)
+          ); // term && tags
+        }
       }),
-    [sortedEvents, searchTerm, searchCategory]
+    [searchTerm, searchTypeList, sortedFullEvents]
   );
 
-  // set initial event to be first in list to render out immediately
+  // set initial event to be the first in list to render out immediately
   useEffect(() => {
     if (!onMedia.onDesktop) return;
 
-    if (filteredEvents?.length > 0) {
-      setEvent(filteredEvents[0]);
-      setCreatorUser(
-        findItemFromList(users, "uid", filteredEvents[0]?.creator_uid)
-      );
+    if (filteredFullEvents?.length > 0) {
+      setFullEvent(filteredFullEvents[0]);
     } else {
-      setEvent(null);
-      setCreatorUser(null);
+      setFullEvent(null);
     }
-  }, [filteredEvents, onMedia.onDesktop, setCreatorUser, setEvent, users]);
-
+  }, [filteredFullEvents, onMedia.onDesktop, setFullEvent]);
   return (
     <Paper
       elevation={onMedia.onDesktop ? 2 : 0}
@@ -93,19 +120,19 @@ const EventList = () => {
           height: onMedia.onDesktop
             ? `calc(${winHeight}px - 65px - ${theme.spacing(
                 4
-              )} - 1px - 32px - 112px - 96px)` // navbar; spacing; paper t-border; paper t-padding; header; button box
+              )} - 1px - 32px - 112px - 29px - 96px)` // navbar; spacing; paper t-border; paper t-padding; header; button box
             : `calc(${winHeight}px - 64px - ${theme.spacing(
                 2
               )} - 32px + 1px - 65px)`, // mobile bar; spacing margin; inner t-padding; last entry border; bottom navbar
           overflowY: "scroll",
         }}
       >
-        {filteredEvents?.map((event, index) => (
+        {filteredFullEvents?.map((fullEvent, index) => (
           <EventListItem
-            key={event.id}
-            event={event}
+            key={fullEvent?.event?.id}
+            fullEvent={fullEvent}
             index={index}
-            last={filteredEvents.length - 1}
+            last={filteredFullEvents.length - 1}
           />
         ))}
       </Box>

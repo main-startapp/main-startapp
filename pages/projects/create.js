@@ -23,6 +23,7 @@ const Create = () => {
   const [open, setOpen] = useState(false);
   const [alertType, setAlertType] = useState("success");
   const [alertMessage, setAlertMessage] = useState("");
+  console.log(query);
 
   const showAlert = (type, msg) => {
     setAlertType(type);
@@ -52,7 +53,10 @@ const Create = () => {
           {alertMessage}
         </Alert>
       </Snackbar>
-      <ProjectCreate isCreateStr={query.isCreateStr} />
+      <ProjectCreate
+        isCreateStr={query.isCreateStr}
+        projectID={query.projectID}
+      />
     </ProjectContext.Provider>
   );
 };
