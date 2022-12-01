@@ -21,15 +21,15 @@ const UserCreate = () => {
   const { showAlert } = useContext(StudentContext);
 
   // local vars
-  const [isStudentMode, setIsStudentMode] = useState(true);
   const [isCreate, setIsCreate] = useState(true);
+  const [isStudentMode, setIsStudentMode] = useState(true);
+
   useEffect(() => {
     if (!ediumUser) return;
 
-    setIsCreate(false);
-    if (ediumUser?.role !== "student") {
-      setIsStudentMode(false);
-    }
+    // found user data
+    setIsCreate(false); // update profile
+    setIsStudentMode(ediumUser?.role === "student"); // prev mode
   }, [ediumUser]);
 
   const [userCreatedFoI, setUserCreatedFoI] = useState([]);

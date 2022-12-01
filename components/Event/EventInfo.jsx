@@ -48,7 +48,7 @@ const EventInfo = () => {
   const boxRef = useRef();
   useEffect(() => {
     if (boxRef?.current?.scrollTop) boxRef.current.scrollTop = 0;
-  }, [event]);
+  }, [fullEvent]);
 
   return (
     <Paper
@@ -407,13 +407,12 @@ export default EventInfo;
                     <NextLink
                       href={{
                         pathname: "/events/create",
-                        query: { isCreateStr: "false" },
                       }}
                       as="/events/create"
                       passHref
                     >
                       <Button
-                        onClick={() => setOldEvent(event)}
+
                         variant="contained"
                         sx={{
                           mt: 1,

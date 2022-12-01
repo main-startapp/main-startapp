@@ -155,7 +155,6 @@ const EventList = () => {
               <NextLink
                 href={{
                   pathname: "/events/create",
-                  query: { isCreateStr: "true" },
                 }}
                 as="/events/create"
                 passHref

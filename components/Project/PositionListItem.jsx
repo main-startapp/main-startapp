@@ -23,8 +23,8 @@ import {
 } from "firebase/firestore";
 import { Interweave } from "interweave";
 
+// prefer not doing any dynamic calculation in this leaf component
 const PositionListItem = (props) => {
-  // args
   const index = props.index;
   const posID = props.posID;
   const posTitle = props.posTitle;
@@ -44,14 +44,16 @@ const PositionListItem = (props) => {
     setForceChatExpand,
     onMedia,
   } = useContext(GlobalContext);
-  const { project } = useContext(ProjectContext);
+  const { fullProject } = useContext(ProjectContext);
 
-  // local vars
+  // local var
+  const project = fullProject?.project;
+
   // useEffect to reset accordion expansion
   const [expandState, setExpandState] = useState("collapseIt");
   useEffect(() => {
     setExpandState("collpaseIt");
-  }, [project]); // every time project changes, this sets each accordion to collapse
+  }, [fullProject]); // every time project changes, this sets each accordion to collapse
 
   const handleExpand = (e) => {
     expandState === "expandIt"

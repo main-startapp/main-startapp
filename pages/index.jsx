@@ -19,7 +19,6 @@ const Home = () => {
     setChatPartner,
     setShowChat,
     setShowMsg,
-    setOldProject,
     onMedia,
     isAnimated,
     setIsAnimated,
@@ -31,9 +30,7 @@ const Home = () => {
     setShowMsg(false);
     setChat(null);
     setChatPartner(null);
-    // project page related
-    setOldProject(null);
-  }, [setChat, setChatPartner, setOldProject, setShowChat, setShowMsg]);
+  }, [setChat, setChatPartner, setShowChat, setShowMsg]);
 
   // turn off introduction animation after initialization
   useEffect(() => {

@@ -142,12 +142,10 @@ const getDesignTokens = (mode) => ({
 function MyApp({ Component, pageProps }) {
   // projects related
   const [projects, setProjects] = useState([]); // list of project
-  const [oldProject, setOldProject] = useState(null); // the project that needs to be updated
   // projects ext related
   const [projectsExt, setProjectsExt] = useState([]); // list of project exts that currentUser involves in
   // events related
   const [events, setEvents] = useState([]); // list of event
-  const [oldEvent, setOldEvent] = useState(null); // the event that needs to be updated
   // events ext related
   const [eventsExt, setEventsExt] = useState([]); // list of ext of event
   // users related
@@ -193,14 +191,10 @@ function MyApp({ Component, pageProps }) {
             value={{
               projects,
               setProjects,
-              oldProject,
-              setOldProject,
               projectsExt,
               setProjectsExt,
               events,
               setEvents,
-              oldEvent,
-              setOldEvent,
               eventsExt,
               setEventsExt,
               users,

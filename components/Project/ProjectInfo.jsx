@@ -253,13 +253,12 @@ export default ProjectInfo;
             <NextLink
               href={{
                 pathname: "/projects/create",
-                query: { isCreateStr: "false" },
               }}
               as="/projects/create"
               passHref
             >
               <Button
-                onClick={() => setOldProject(project)}
+                
                 variant="contained"
                 sx={{
                   mt: 1,

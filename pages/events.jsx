@@ -15,7 +15,6 @@ const Events = () => {
     setChatPartner,
     setShowChat,
     setShowMsg,
-    setOldEvent,
     onMedia,
     isAnimated,
     setIsAnimated,
@@ -27,9 +26,7 @@ const Events = () => {
     setShowMsg(false);
     setChat(null);
     setChatPartner(null);
-    // page related
-    setOldEvent(null);
-  }, [setChat, setChatPartner, setOldEvent, setShowChat, setShowMsg]);
+  }, [setChat, setChatPartner, setShowChat, setShowMsg]);
 
   // turn off introduction animation after initialization
   useEffect(() => {

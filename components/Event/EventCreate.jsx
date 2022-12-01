@@ -51,28 +51,21 @@ import { eventStrList } from "../Reusable/MenuStringList";
 const EventCreate = (props) => {
   // context
   const { currentUser } = useAuth();
-  const {
-    eventsExt,
-    ediumUser,
-    ediumUserExt,
-    oldEvent,
-    setOldEvent,
-    winHeight,
-    onMedia,
-  } = useContext(GlobalContext);
+  const { events, eventsExt, ediumUser, ediumUserExt, winHeight, onMedia } =
+    useContext(GlobalContext);
   const { showAlert } = useContext(EventContext);
   const router = useRouter();
   const formRef = useRef();
 
-  // props from push query
-  const isCreate = useMemo(() => {
-    return props.isCreateStr === "false" ? false : true; // null, undefined, "true" are all true isCreate
-  }, [props.isCreateStr]);
-
-  // local vars
+  // click spam
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
 
-  // Event State Initialization.
+  // can be wrapped up in useMemo if necessary, no premature optimization
+  const oldEvent = props.eventID
+    ? findItemFromList(events, "id", props.eventID)
+    : null;
+
+  // init new event
   const emptyEvent = {
     title: "",
     category: "",
@@ -89,7 +82,7 @@ const EventCreate = (props) => {
     registration_form_url: "",
   };
   const [newEvent, setNewEvent] = useState(() =>
-    isCreate ? emptyEvent : oldEvent
+    oldEvent ? oldEvent : emptyEvent
   );
 
   // upload-icon dialog modal
@@ -105,7 +98,7 @@ const EventCreate = (props) => {
   const [isCheckedTransferable, setIsCheckedTransferable] = useState(false);
   const [isChecked, setIsChecked] = useState(true);
   useEffect(() => {
-    if (!isCreate) {
+    if (oldEvent) {
       // update, checked value depends on oldEvent
       // if creator is admin, check if updating transferable event
       if (
@@ -115,7 +108,7 @@ const EventCreate = (props) => {
         setIsCheckedTransferable(true);
       }
     }
-  }, [currentUser?.uid, ediumUserExt?.my_event_ids, isCreate, oldEvent?.id]);
+  }, [currentUser?.uid, ediumUserExt?.my_event_ids, oldEvent]);
 
   // helper functions
   const handleSubmit = async (e) => {
@@ -125,7 +118,7 @@ const EventCreate = (props) => {
     // button is clickable & form is valid
     setIsClickable(false);
     let eventModRef; // ref to addDoc() or updateDoc()
-    if (isCreate) {
+    if (!oldEvent) {
       // create a new event
       const collectionRef = collection(db, "events");
       const eventRef = {
@@ -186,8 +179,6 @@ const EventCreate = (props) => {
       await eventExtModRef;
     }
 
-    setOldEvent(null);
-
     // !todo: since updateDoc return Promise<void>, we need other method to check the results
     showAlert(
       "success",
@@ -206,7 +197,7 @@ const EventCreate = (props) => {
     // button is clickable & form is valid
     setIsClickable(false);
     let eventModRef; // ref to addDoc() or updateDoc()
-    if (isCreate) {
+    if (!oldEvent) {
       // create a new event
       const collectionRef = collection(db, "events");
       const eventRef = {
@@ -290,8 +281,6 @@ const EventCreate = (props) => {
       }
     }
 
-    setOldEvent(null);
-
     // !todo: since updateDoc return Promise<void>, we need other method to check the results
     showAlert(
       "success",
@@ -304,10 +293,8 @@ const EventCreate = (props) => {
   };
 
   const handleDiscard = () => {
-    setOldEvent(null);
-    setNewEvent(emptyEvent);
-
     showAlert("info", `Draft discarded! Navigate to Events page.`);
+
     setTimeout(() => {
       router.push(`/events`); // can be customized
     }, 2000); // wait 2 seconds then go to `events` page
@@ -375,7 +362,7 @@ const EventCreate = (props) => {
             mb: 5,
           }}
         >
-          {isCreate ? "Create New Event" : "Update Event"}
+          {oldEvent ? "Update Event" : "Create New Event"}
         </Typography>
         {ediumUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" && (
           <Box sx={{ mb: 5, display: "flex" }}>
@@ -677,7 +664,7 @@ const EventCreate = (props) => {
           )}
           {/* Buttons */}
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            {!isCreate && (
+            {oldEvent && (
               <Button
                 sx={{
                   mt: 5,

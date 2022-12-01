@@ -161,7 +161,6 @@ const ProjectList = () => {
               <NextLink
                 href={{
                   pathname: "/projects/create",
-                  query: { isCreateStr: "true" },
                 }}
                 as="/projects/create"
                 passHref

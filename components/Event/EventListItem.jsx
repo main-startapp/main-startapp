@@ -21,14 +21,14 @@ import {
 } from "../Reusable/Resusable";
 import NextLink from "next/link";
 
-// prefer not do any dynamic calculation in this leaf component
+// prefer not doing any dynamic calculation in this leaf component
 const EventListItem = (props) => {
   const index = props.index;
   const fullEvent = props.fullEvent;
   const last = props.last;
 
   // context
-  const { setOldEvent, ediumUser, onMedia } = useContext(GlobalContext);
+  const { ediumUser, onMedia } = useContext(GlobalContext);
   const { setFullEvent, searchTypeList } = useContext(EventContext);
 
   // local vars
@@ -157,14 +157,13 @@ const EventListItem = (props) => {
           {ediumUser?.uid === event?.creator_uid && (
             <MenuItem
               onClick={(e) => {
-                setOldEvent(event);
                 handleMenuClose(e);
               }}
             >
               <NextLink
                 href={{
                   pathname: "/events/create",
-                  query: { isCreateStr: "false" },
+                  query: { eventID: event?.id },
                 }}
                 as="/events/create"
                 passHref

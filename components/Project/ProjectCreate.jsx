@@ -51,29 +51,21 @@ import TextEditor from "../TextEditor";
 const ProjectCreate = (props) => {
   // context
   const { currentUser } = useAuth();
-  const {
-    projectsExt,
-    ediumUser,
-    ediumUserExt,
-    oldProject,
-    setOldProject,
-    winHeight,
-    onMedia,
-  } = useContext(GlobalContext);
+  const { projects, projectsExt, ediumUser, ediumUserExt, winHeight, onMedia } =
+    useContext(GlobalContext);
   const { showAlert } = useContext(ProjectContext);
   const router = useRouter();
   const formRef = useRef();
 
-  // props from push query
-  const isCreate = useMemo(() => {
-    return props.isCreateStr === "false" ? false : true; // null, undefined, "true" are all true isCreate
-  }, [props.isCreateStr]);
-
-  // local vars
+  // click spam
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
 
-  // Project State Initialization.
-  // https://stackoverflow.com/questions/68945060/react-make-usestate-initial-value-conditional
+  // can be wrapped up in useMemo if necessary, no premature optimization
+  const oldProject = props.projectID
+    ? findItemFromList(projects, "id", props.projectID)
+    : null;
+
+  // init new project
   const emptyProject = {
     title: "",
     category: "",
@@ -87,9 +79,10 @@ const ProjectCreate = (props) => {
     is_deleted: false,
   };
   const [newProject, setNewProject] = useState(() =>
-    isCreate ? emptyProject : oldProject
+    oldProject ? oldProject : emptyProject
   );
 
+  // init new position fields
   const emptyPositionField = {
     id: Math.random().toString(16).slice(2),
     title: "",
@@ -99,17 +92,10 @@ const ProjectCreate = (props) => {
     url: "",
   };
   const [positionFields, setPositionFields] = useState(() =>
-    isCreate
-      ? [emptyPositionField]
-      : oldProject?.position_list?.length > 0
+    oldProject?.position_list?.length > 0
       ? oldProject.position_list
       : [emptyPositionField]
   );
-
-  // details/tags
-  // const tagsOptions = useMemo(() => {
-  //   return organizationTags.concat(userCreatedTags?.string_list).sort();
-  // }, [userCreatedTags?.string_list]);
 
   // upload-icon dialog modal
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -127,11 +113,11 @@ const ProjectCreate = (props) => {
   const [isCheckedCompDate, setIsCheckedCompDate] = useState(false);
   const [isCheckedTeamSize, setIsCheckedTeamSize] = useState(false);
   useEffect(() => {
-    if (isCreate) {
-      // defalut to check the positions
+    if (!oldProject) {
+      // create: defalut to check the positions
       setIsCheckedPosition(true);
     } else {
-      // update, checked value depends on oldProject
+      // update: checked value depends on oldProject
       if (oldProject?.position_list?.length > 0) {
         setIsCheckedPosition(true);
       }
@@ -141,19 +127,12 @@ const ProjectCreate = (props) => {
       // if creator is admin, check if updating transferable project
       if (
         currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
-        !ediumUserExt?.my_project_ids.includes(oldProject?.id)
+        !ediumUserExt?.my_project_ids?.includes(oldProject?.id)
       ) {
         setIsCheckedTransferable(true);
       }
     }
-  }, [
-    currentUser?.uid,
-    ediumUserExt?.my_project_ids,
-    isCreate,
-    oldProject?.application_form_url?.length,
-    oldProject?.id,
-    oldProject?.position_list?.length,
-  ]);
+  }, [currentUser?.uid, ediumUserExt?.my_project_ids, oldProject]);
 
   // helper functions
   const handleSubmit = async (e) => {
@@ -175,7 +154,7 @@ const ProjectCreate = (props) => {
     // }
 
     let projectModRef; // ref to addDoc() or updateDoc()
-    if (isCreate) {
+    if (!oldProject) {
       // create a new newProject
       const collectionRef = collection(db, "projects");
       let projectRef = {
@@ -248,8 +227,6 @@ const ProjectCreate = (props) => {
       await projectExtModRef;
     }
 
-    setOldProject(null);
-
     // !todo: since updateDoc return Promise<void>, we need other method to check the results
     showAlert(
       "success",
@@ -274,7 +251,7 @@ const ProjectCreate = (props) => {
       : null;
 
     let projectModRef; // ref to addDoc() or updateDoc()
-    if (isCreate) {
+    if (!oldProject) {
       // create a new newProject
       const collectionRef = collection(db, "projects");
       let projectRef = {
@@ -368,8 +345,6 @@ const ProjectCreate = (props) => {
       }
     }
 
-    setOldProject(null);
-
     // !todo: since updateDoc return Promise<void>, we need other method to check the results
     showAlert(
       "success",
@@ -383,9 +358,8 @@ const ProjectCreate = (props) => {
 
   // clean the current page's state and redirect to Projects page
   const handleDiscard = () => {
-    setOldProject(null);
-
     showAlert("info", `Draft discarded! Navigate to Projects page.`);
+
     setTimeout(() => {
       router.push(`/`); // can be customized
     }, 2000); // wait 2 seconds then go to `projects` page
@@ -400,8 +374,6 @@ const ProjectCreate = (props) => {
       docID,
       ediumUser?.uid
     );
-
-    setOldProject(null);
 
     showAlert(
       "success",
@@ -459,8 +431,8 @@ const ProjectCreate = (props) => {
     });
   };
 
-  // new projects will get link from the project.url attribute, old projects will get from
-  // project.application_form_url link
+  // new projects will get link from the project.url attribute,
+  // old projects will get from project.application_form_url link
   const getAppLink = (index) => {
     // old project versions will have this attribute set to a url
     if (newProject.application_form_url !== "")
@@ -512,7 +484,7 @@ const ProjectCreate = (props) => {
             mb: 5,
           }}
         >
-          {isCreate ? "Create New Project" : "Update Project"}
+          {oldProject ? "Update Project" : "Create New Project"}
         </Typography>
         {ediumUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" && (
           <Box sx={{ mb: 5, display: "flex" }}>
@@ -965,7 +937,7 @@ const ProjectCreate = (props) => {
 
           {/* Buttons */}
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            {!isCreate && (
+            {oldProject && (
               <Button
                 sx={{
                   mt: 5,

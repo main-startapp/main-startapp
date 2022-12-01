@@ -23,14 +23,14 @@ import { convert } from "html-to-text";
 import NextLink from "next/link";
 
 // the project list item component in the project list: has full project data but only shows some brief information
-// prefer not do any dynamic calculation in this leaf component
+// prefer not doing any dynamic calculation in this leaf component
 const ProjectListItem = (props) => {
   const index = props.index;
   const fullProject = props.fullProject;
   const last = props.last;
 
   // context
-  const { setOldProject, ediumUser, onMedia } = useContext(GlobalContext);
+  const { ediumUser, onMedia } = useContext(GlobalContext);
   const { setFullProject, searchTypeList } = useContext(ProjectContext);
 
   // local vars
@@ -153,14 +153,13 @@ const ProjectListItem = (props) => {
           {ediumUser?.uid === project?.creator_uid && (
             <MenuItem
               onClick={(e) => {
-                setOldProject(project);
                 handleMenuClose(e);
               }}
             >
               <NextLink
                 href={{
                   pathname: "/projects/create",
-                  query: { isCreateStr: "false", projectID: project?.id },
+                  query: { projectID: project?.id },
                 }}
                 as="/projects/create"
                 passHref
