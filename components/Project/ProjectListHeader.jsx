@@ -11,10 +11,12 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useContext, useEffect, useRef, useState } from "react";
 import { ProjectContext } from "../Context/ShareContexts";
 import { projectStrList } from "../Reusable/MenuStringList";
+import { useTheme } from "@mui/material/styles";
 
 const ProjectListHeader = () => {
-  const { setSearchTerm, searchType, setSearchType } =
+  const { setSearchTerm, searchTypeList, setSearchTypeList } =
     useContext(ProjectContext);
+  const theme = useTheme();
 
   // tabs related
   const [tabValue, setTabValue] = useState("1");
@@ -25,8 +27,8 @@ const ProjectListHeader = () => {
   // tabs expand collapse
   const tabsRef = useRef();
   const [expanded, setExpanded] = useState(false);
-  const handleExpand = (newValue) => {
-    setExpanded(newValue);
+  const handleExpand = () => {
+    setExpanded(true);
   };
   const handleCollapse = (event) => {
     if (
@@ -60,9 +62,9 @@ const ProjectListHeader = () => {
     };
     setTypeList(newTypeList);
     // update the project type state
-    let newSearchType = [...searchType];
+    let newSearchType = [...searchTypeList];
     newSearchType.push(newTypeList[i].name);
-    setSearchType(newSearchType);
+    setSearchTypeList(newSearchType);
   };
 
   const handleRemove = (i) => {
@@ -74,10 +76,13 @@ const ProjectListHeader = () => {
       isSelected: false,
     };
     setTypeList(newTypeList);
-    // update the project type state
-    let newSearchType = [...searchType];
-    newSearchType = removeValueFromArray(newSearchType, newTypeList[i].name);
-    setSearchType(newSearchType);
+    // update the project search type name list
+    let newSearchTypeList = [...searchTypeList];
+    newSearchTypeList = removeValueFromArray(
+      newSearchTypeList,
+      newTypeList[i].name
+    );
+    setSearchTypeList(newSearchTypeList);
   };
 
   return (
@@ -85,8 +90,7 @@ const ProjectListHeader = () => {
       id="projectlist-header-box"
       ref={tabsRef}
       onClick={() => {
-        if (expanded) return;
-        handleExpand(true);
+        if (!expanded) handleExpand();
       }}
     >
       <Typography
@@ -115,81 +119,105 @@ const ProjectListHeader = () => {
         />
       </SearchBox>
 
-      <TabContext value={tabValue}>
-        <TabList
-          aria-label="lab API tabs example"
-          onChange={handleChange}
-          sx={{ minHeight: 0, borderBottom: 1, borderColor: "divider" }}
-        >
-          <StyledTab label="Category" value="1" />
-          <StyledTab label="Type" value="2" />
-        </TabList>
-        <Box id="projectlist-positionref-box" sx={{ position: "relative" }}>
-          <Collapse
-            in={expanded}
-            timeout="auto"
+      <Box sx={{ position: "relative" }}>
+        <TabContext value={tabValue}>
+          <TabList
+            aria-label="lab API tabs example"
+            onChange={handleChange}
+            sx={{ minHeight: 0, borderBottom: 1, borderColor: "divider" }}
+          >
+            <StyledTab label="Category" value="1" />
+            <StyledTab label="Type" value="2" />
+          </TabList>
+          <Box id="projectlist-positionref-box" sx={{ position: "relative" }}>
+            <Collapse
+              in={expanded}
+              timeout="auto"
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                zIndex: 1,
+              }}
+            >
+              <TabPanel
+                value="1"
+                sx={{
+                  backgroundColor: "background.paper",
+                  borderRadius: "0px 0px 8px 8px",
+                  borderBottom: 1,
+                  borderColor: "divider",
+                }}
+              >
+                Item One
+              </TabPanel>
+              <TabPanel
+                value="2"
+                sx={{
+                  backgroundColor: "background.paper",
+                  borderRadius: "0px 0px 8px 8px",
+                  // borderBottom: 1,
+                  // borderColor: "divider",
+                  paddingTop: 1,
+                  paddingBottom: 2,
+                  paddingX: 2,
+                  boxShadow: 2,
+                }}
+              >
+                {typeList?.map((type, index) => (
+                  <Chip
+                    key={index}
+                    color={type.isSelected ? "primary" : "lightPrimary"}
+                    label={type.name}
+                    size="medium"
+                    onClick={() => {
+                      handleSelect(index);
+                    }}
+                    {...(type.isSelected && {
+                      onDelete: () => {
+                        handleRemove(index);
+                      },
+                    })}
+                    sx={{
+                      mt: 1,
+                      mr: 1,
+                      fontSize: "0.75rem",
+                      fontWeight: "medium",
+                      "&.MuiChip-root:hover": {
+                        backgroundColor: "primary.main",
+                        color: "#fff",
+                      },
+                    }}
+                  />
+                ))}
+              </TabPanel>
+            </Collapse>
+          </Box>
+        </TabContext>
+        {searchTypeList.length > 0 && (
+          <Chip
+            label={searchTypeList.length + " selected"}
+            color="primary"
+            size="small"
+            onDelete={() => {
+              const newTypeList = [...typeList];
+              newTypeList.forEach((type) => {
+                if (type.isSelected) type.isSelected = false;
+              });
+              setTypeList(newTypeList);
+              setSearchTypeList([]);
+              handleExpand(); // !todo: is this consistent behavior?
+            }}
             sx={{
+              height: "24px",
               position: "absolute",
               top: 0,
-              left: 0,
-              right: 0,
-              zIndex: 1,
+              right: 16,
             }}
-          >
-            <TabPanel
-              value="1"
-              sx={{
-                backgroundColor: "background.paper",
-                borderRadius: "0px 0px 8px 8px",
-                borderBottom: 1,
-                borderColor: "divider",
-              }}
-            >
-              Item One
-            </TabPanel>
-            <TabPanel
-              value="2"
-              sx={{
-                backgroundColor: "background.paper",
-                borderRadius: "0px 0px 8px 8px",
-                // borderBottom: 1,
-                // borderColor: "divider",
-                paddingTop: 1,
-                paddingBottom: 2,
-                paddingX: 2,
-                boxShadow: 2,
-              }}
-            >
-              {typeList.map((type, index) => (
-                <Chip
-                  key={index}
-                  color={type.isSelected ? "primary" : "lightPrimary"}
-                  label={type.name}
-                  size="medium"
-                  onClick={() => {
-                    handleSelect(index);
-                  }}
-                  sx={{
-                    mt: 1,
-                    mr: 1,
-                    fontSize: "0.75rem",
-                    fontWeight: "medium",
-                    "&.MuiChip-root:hover": {
-                      backgroundColor: "primary.main",
-                      color: "#fff",
-                    },
-                  }}
-                  {...(type.isSelected && {
-                    onDelete: () => {
-                      handleRemove(index);
-                    },
-                  })}
-                />
-              ))}
-            </TabPanel>
-          </Collapse>
-        </Box>
-      </TabContext>
+          />
+        )}
+      </Box>
     </Box>
   );
 };

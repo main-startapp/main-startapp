@@ -220,6 +220,26 @@ export const removeValueFromArray = (array, value) => {
 };
 
 //============================================================
+// utility function: isExact ? str is substr : str contains substr
+//============================================================
+export const isStrInStr = (str, subStr, isExact) => {
+  return isExact
+    ? str.toLowerCase() === subStr.toLowerCase()
+    : str.toLowerCase().includes(subStr.toLowerCase());
+};
+
+//============================================================
+// utility function: whether substring is in a list of obj / string
+//============================================================
+export const isStrInStrList = (strList, subStr, isExact) => {
+  return strList.some((str) => isStrInStr(str, subStr, isExact));
+};
+
+export const isStrInObjList = (objList, key, subStr, isExact) => {
+  return objList.some((obj) => isStrInStr(obj[key], subStr, isExact));
+};
+
+//============================================================
 // styled components
 //============================================================
 export const DefaultTextField = styled(TextField)(({ theme }) => ({

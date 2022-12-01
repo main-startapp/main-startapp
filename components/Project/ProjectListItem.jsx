@@ -1,4 +1,4 @@
-import { useContext, useState, useMemo } from "react";
+import { useContext, useState, useMemo, useEffect } from "react";
 import {
   Avatar,
   Box,
@@ -18,21 +18,26 @@ import {
   findItemFromList,
   handleDeleteEntry,
   handleVisibility,
-  MenuItemLink,
+  isStrInStrList,
 } from "../Reusable/Resusable";
 import { convert } from "html-to-text";
 import NextLink from "next/link";
 
 // the project list item component in the project list: has full project data but only shows some brief information
+// prefer not do any dynamic calculation in this leaf component
 const ProjectListItem = (props) => {
   const index = props.index;
-  const project = props.project;
+  const fullProject = props.fullProject;
   const last = props.last;
 
   // context
-  const { setOldProject, users, ediumUser, onMedia } =
-    useContext(GlobalContext);
-  const { setProject, setCreatorUser } = useContext(ProjectContext);
+  const { setOldProject, ediumUser, onMedia } = useContext(GlobalContext);
+  const { setFullProject, searchTypeList } = useContext(ProjectContext);
+
+  // local vars
+  const project = fullProject.project;
+  const projectCreator = fullProject.creator_uid;
+  const projectAllTags = fullProject.allTags;
 
   // menu
   const [anchorEl, setAnchorEl] = useState(null);
@@ -46,32 +51,10 @@ const ProjectListItem = (props) => {
     setAnchorEl(null);
   };
 
-  // creator's user data
-  const creatorUser = useMemo(() => {
-    return findItemFromList(users, "uid", project?.creator_uid);
-  }, [users, project?.creator_uid]);
-
-  // project + org tags
-  const allTags = useMemo(() => {
-    let retTags = [];
-    if (project?.tags?.length > 0) {
-      retTags = retTags.concat(project.tags);
-    }
-    if (
-      creatorUser?.role === "org_admin" &&
-      creatorUser?.org_tags?.length > 0
-    ) {
-      retTags = retTags.concat(creatorUser.org_tags);
-    }
-
-    return retTags;
-  }, [creatorUser, project]);
-
   return (
     <ListItem
       onClick={() => {
-        setProject(project);
-        setCreatorUser(creatorUser);
+        setFullProject(fullProject);
       }}
       sx={{
         display: "flex",
@@ -121,12 +104,16 @@ const ProjectListItem = (props) => {
               </Typography>
             }
           />
-          {allTags?.length > 0 && (
+          {projectAllTags?.length > 0 && (
             <Box sx={{ mt: 1, height: "1.5rem", overflow: "hidden" }}>
-              {allTags.map((tag, index) => (
+              {projectAllTags?.map((tag, index) => (
                 <Chip
                   key={index}
-                  color={"lightPrimary"}
+                  color={
+                    isStrInStrList(searchTypeList, tag, true)
+                      ? "primary"
+                      : "lightPrimary"
+                  }
                   label={tag}
                   size="small"
                   sx={{
@@ -203,8 +190,7 @@ const ProjectListItem = (props) => {
                   project?.id,
                   ediumUser?.uid
                 );
-                setProject(null);
-                setCreatorUser(null);
+                setFullProject(null);
                 handleMenuClose(e);
               }}
             >
@@ -235,7 +221,7 @@ const ProjectListItem = (props) => {
           }
           sx={{ mb: 2 }}
         />
-        {project.position_list.slice(0, 3).map((position, index) => (
+        {project.position_list.slice(0, 3)?.map((position, index) => (
           <ListItemText
             sx={{ margin: 0, ml: "5%" }}
             key={index}

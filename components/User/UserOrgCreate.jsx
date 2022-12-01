@@ -26,9 +26,10 @@ const UserOrgCreate = (props) => {
   const redirectTo = props.redirectTo;
   const userCreatedTags = props.userCreatedTags;
 
-  // context & hooks
+  // context & ref
   const { currentUser } = useAuth();
   const { ediumUser, onMedia } = useContext(GlobalContext);
+  const formRef = useRef();
 
   // local vars
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
@@ -57,8 +58,6 @@ const UserOrgCreate = (props) => {
     const ediumUserRef = cloneDeep(ediumUser);
     setNewOrgUser(ediumUserRef);
   }, [ediumUser]);
-
-  const formRef = useRef();
 
   // helper func
   const handleRemoveSocialMedia = (index) => {
@@ -207,7 +206,7 @@ const UserOrgCreate = (props) => {
       <Divider sx={{ my: 5 }}>
         <Typography sx={{ color: "gray" }}>Optional</Typography>
       </Divider>
-      {newOrgUser.org_social_media.map((link, index) => {
+      {newOrgUser.org_social_media?.map((link, index) => {
         return (
           <Box
             key={index}

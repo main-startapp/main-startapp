@@ -94,7 +94,7 @@ const TeamJoinRequestList = () => {
           }}
         >
           {/* <StyledSlider {...sliderSettings}>
-            {projectJoinRequests.map((request) => (
+            {projectJoinRequests?.map((request) => (
               <TeamJoinRequestListItem
                 key={request.project_id}
                 request={request}

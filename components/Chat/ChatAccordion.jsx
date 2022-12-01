@@ -55,19 +55,15 @@ const ChatAccordion = () => {
     setTimeout(() => {
       setShowMsg(true);
     }, timeout); // delayed msg window
-
-    return () => {
-      foundChat;
-    };
   }, [
-    forceChatExpand,
-    expandState,
-    setForceChatExpand,
-    chats,
     chatPartner,
-    setChat,
-    setShowMsg,
+    chats,
     ediumUser,
+    expandState,
+    forceChatExpand,
+    setChat,
+    setForceChatExpand,
+    setShowMsg,
   ]);
 
   // unread signal
@@ -138,7 +134,7 @@ const ChatAccordion = () => {
         sx={{ overflow: "auto", maxHeight: "75vh", padding: 0 }}
       >
         <ChatList>
-          {chats.map((chat) => (
+          {chats?.map((chat) => (
             <ChatAccordionContact key={chat.id} chat={chat} />
           ))}
         </ChatList>

@@ -34,26 +34,10 @@ const EventInfo = () => {
   }, [event]);
 
   // moment
-  const startMoment = useMemo(() => {
-    return moment(event?.start_date);
-  }, [event?.start_date]);
-
-  const endMoment = useMemo(() => {
-    return moment(event?.end_date);
-  }, [event?.end_date]);
-
-  const isSameDay = useMemo(() => {
-    return startMoment.format("L") === endMoment.format("L");
-  }, [startMoment, endMoment]);
-
-  const isSameTime = useMemo(() => {
-    return startMoment.format("LLL") === endMoment.format("LLL");
-  }, [startMoment, endMoment]);
-
-  // hook to find whether the ediumUser is the event creator
-  const isCreator = useMemo(() => {
-    return ediumUser?.uid === event?.creator_uid ? true : false;
-  }, [ediumUser?.uid, event?.creator_uid]);
+  const startMoment = moment(event?.start_date);
+  const endMoment = moment(event?.end_date);
+  const isSameDay = startMoment.format("L") === endMoment.format("L");
+  const isSameTime = startMoment.format("LLL") === endMoment.format("LLL");
 
   // useEffect to reset box scrollbar position
   const boxRef = useRef();

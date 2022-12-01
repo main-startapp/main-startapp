@@ -61,6 +61,8 @@ const EventCreate = (props) => {
     onMedia,
   } = useContext(GlobalContext);
   const { showAlert } = useContext(EventContext);
+  const router = useRouter();
+  const formRef = useRef();
 
   // props from push query
   const isCreate = useMemo(() => {
@@ -69,8 +71,6 @@ const EventCreate = (props) => {
 
   // local vars
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
-  const router = useRouter();
-  const formRef = useRef();
 
   // Event State Initialization.
   const emptyEvent = {
@@ -115,7 +115,7 @@ const EventCreate = (props) => {
         setIsCheckedTransferable(true);
       }
     }
-  }, [isCreate, oldEvent, currentUser?.uid, ediumUserExt?.my_event_ids]);
+  }, [currentUser?.uid, ediumUserExt?.my_event_ids, isCreate, oldEvent?.id]);
 
   // helper functions
   const handleSubmit = async (e) => {
@@ -498,7 +498,7 @@ const EventCreate = (props) => {
                   setNewEvent({ ...newEvent, category: e.target.value })
                 }
               >
-                {eventStrList.map((eventStr, index) => {
+                {eventStrList?.map((eventStr, index) => {
                   return (
                     <MenuItem key={index} value={eventStr}>
                       {eventStr}

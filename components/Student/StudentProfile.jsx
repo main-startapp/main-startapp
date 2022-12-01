@@ -146,7 +146,7 @@ const StudentProfile = () => {
         )}
         <Box sx={{ display: "flex", flexDirection: "row", width: "100%" }}>
           {student?.social_media?.length > 0 &&
-            student.social_media.map((link, index) => {
+            student.social_media?.map((link, index) => {
               if (link.toLowerCase().includes("linkedin")) {
                 return (
                   <Link
@@ -232,7 +232,7 @@ const StudentProfile = () => {
         )}
         <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
           {student?.past_exp?.length > 0 &&
-            student.past_exp.map((exp, index) => (
+            student.past_exp?.map((exp, index) => (
               <Typography
                 key={index}
                 sx={{

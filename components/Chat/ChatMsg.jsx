@@ -63,7 +63,7 @@ const ChatMsg = (props) => {
     const q = query(collectionRef, orderBy("sent_at", "asc"));
 
     const unsub = onSnapshot(q, (querySnapshot) => {
-      setMessages(querySnapshot.docs.map((doc) => ({ ...doc.data() })));
+      setMessages(querySnapshot.docs?.map((doc) => ({ ...doc.data() })));
     });
 
     return () => {
@@ -309,9 +309,8 @@ const ChatMsg = (props) => {
     setChatPartner(null);
   };
 
-  // box ref to used by useEffect
-  const scrollRef = useRef();
   // useEffect to reset box scrollbar position
+  const scrollRef = useRef();
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behaviour: "smooth" });
@@ -483,7 +482,7 @@ const ChatMsg = (props) => {
         borderColor: "divider",
       }}
     >
-      {messages.map((message, index) => {
+      {messages?.map((message, index) => {
         const isSameAuthor =
           index > 0 && messages[index - 1].sent_by === message.sent_by;
         const isLastMsg = messages.length - 1 === index;

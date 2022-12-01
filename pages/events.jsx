@@ -29,7 +29,7 @@ const Events = () => {
     setChatPartner(null);
     // page related
     setOldEvent(null);
-  }, [setChat, setChatPartner, setShowChat, setShowMsg, setOldEvent]);
+  }, [setChat, setChatPartner, setOldEvent, setShowChat, setShowMsg]);
 
   // turn off introduction animation after initialization
   useEffect(() => {

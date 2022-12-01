@@ -21,7 +21,6 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import { findItemFromList } from "../Reusable/Resusable";
 import { Interweave } from "interweave";
 
 const PositionListItem = (props) => {
@@ -32,7 +31,6 @@ const PositionListItem = (props) => {
   const posResp = props.posResp;
   const posWeeklyHour = props.posWeeklyHour;
   const posLevel = props.posLevel;
-  const isCreator = props.isCreator; // whether ediumUser is the creator
   const creator = props.creator; // creator's user data
   const appFormURL = props.appFormURL;
 
@@ -155,12 +153,11 @@ const PositionListItem = (props) => {
       const collectionRef = collection(db, "chats");
       const my_name_key = ediumUser?.uid + "_name";
       const creator_name_key = project?.creator_uid + "_name";
-      const creatorUser = findItemFromList(users, "uid", project?.creator_uid);
       const chatRef = {
         // new
         chat_user_ids: [ediumUser?.uid, project.creator_uid],
         [my_name_key]: ediumUser?.name,
-        [creator_name_key]: creatorUser?.name,
+        [creator_name_key]: creator?.name,
         [my_unread_key]: 0,
         [creator_unread_key]: 1,
         has_unread: true,
@@ -300,7 +297,7 @@ const PositionListItem = (props) => {
               />
             )}
             <Box sx={{ flexGrow: 1 }} />
-            {onMedia.onDesktop && !isCreator && (
+            {onMedia.onDesktop && ediumUser?.uid !== creator?.uid && (
               <Tooltip title={ediumUser?.uid ? "" : "Edit your profile first"}>
                 <span>{appFormURL ? appFormButton : joinRequestButton}</span>
               </Tooltip>
@@ -342,7 +339,7 @@ const PositionListItem = (props) => {
                 <Interweave content={posResp} />
               </pre>
             </Typography>
-            {!onMedia.onDesktop && !isCreator && (
+            {!onMedia.onDesktop && ediumUser?.uid !== creator?.uid && (
               <Box sx={{ mt: 1.5, display: "flex", justifyContent: "end" }}>
                 <Tooltip
                   title={ediumUser?.uid ? "" : "Edit your profile first"}

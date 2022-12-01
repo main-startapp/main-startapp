@@ -10,6 +10,8 @@ import ProjectInfo from "../components/Project/ProjectInfo";
 import { motion } from "framer-motion";
 
 // this page is also project homepage. Is this a good practice?
+// RoT: Reduce as many redundant local calculations (i.e., find project creator from Users). Don't put any calculation in the comp in ?.map()
+// perfer more centerized, easy-to-review/modify structure, especially for relatively heavy calculation
 const Home = () => {
   // global context
   const {
@@ -40,25 +42,25 @@ const Home = () => {
   }, []);
 
   // project state init
-  const [project, setProject] = useState(null); // the selected project
-  const [creatorUser, setCreatorUser] = useState(null); // the user info of project's creator
+  const [fullProject, setFullProject] = useState(null); // the selected project with extra data
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
-  const [searchType, setSearchType] = useState([]);
+  const [searchTypeList, setSearchTypeList] = useState([]);
+
+  // local vars
+  const project = fullProject?.project;
 
   return (
     <ProjectContext.Provider
       value={{
-        project,
-        setProject,
-        creatorUser,
-        setCreatorUser,
+        fullProject,
+        setFullProject,
         searchTerm,
         setSearchTerm,
         searchCategory,
         setSearchCategory,
-        searchType,
-        setSearchType,
+        searchTypeList,
+        setSearchTypeList,
       }}
     >
       {!onMedia.onDesktop && <MobileProjectsBar />}

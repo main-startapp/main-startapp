@@ -61,6 +61,8 @@ const ProjectCreate = (props) => {
     onMedia,
   } = useContext(GlobalContext);
   const { showAlert } = useContext(ProjectContext);
+  const router = useRouter();
+  const formRef = useRef();
 
   // props from push query
   const isCreate = useMemo(() => {
@@ -69,8 +71,6 @@ const ProjectCreate = (props) => {
 
   // local vars
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
-  const router = useRouter();
-  const formRef = useRef();
 
   // Project State Initialization.
   // https://stackoverflow.com/questions/68945060/react-make-usestate-initial-value-conditional
@@ -146,7 +146,14 @@ const ProjectCreate = (props) => {
         setIsCheckedTransferable(true);
       }
     }
-  }, [isCreate, oldProject, currentUser?.uid, ediumUserExt?.my_project_ids]);
+  }, [
+    currentUser?.uid,
+    ediumUserExt?.my_project_ids,
+    isCreate,
+    oldProject?.application_form_url?.length,
+    oldProject?.id,
+    oldProject?.position_list?.length,
+  ]);
 
   // helper functions
   const handleSubmit = async (e) => {
@@ -644,7 +651,7 @@ const ProjectCreate = (props) => {
                   setNewProject({ ...newProject, category: e.target.value })
                 }
               >
-                {projectStrList.map((projectStr, index) => {
+                {projectStrList?.map((projectStr, index) => {
                   return (
                     <MenuItem key={index} value={projectStr}>
                       {projectStr}
@@ -813,7 +820,7 @@ const ProjectCreate = (props) => {
           </Box>
           {/* firebase dynamic array: http://y2u.be/zgKH12s_95A */}
           {isCheckedPosition &&
-            positionFields.map((positionField, index) => {
+            positionFields?.map((positionField, index) => {
               return (
                 <div key={index}>
                   <Divider

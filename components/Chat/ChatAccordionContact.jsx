@@ -60,7 +60,7 @@ const ChatAccordionContact = (props) => {
       tempLastJRProject;
       tempLastJRPosition;
     };
-  }, [chat, projects]);
+  }, [chat.join_requests, projects]);
 
   return (
     <ContactBox

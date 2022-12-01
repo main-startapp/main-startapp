@@ -26,6 +26,7 @@ const UserStudentCreate = (props) => {
   // context & hooks
   const { currentUser } = useAuth();
   const { ediumUser, onMedia } = useContext(GlobalContext);
+  const formRef = useRef();
 
   // local vars
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
@@ -66,8 +67,6 @@ const UserStudentCreate = (props) => {
     // }
     setNewStudent(ediumUserRef);
   }, [ediumUser]);
-
-  const formRef = useRef();
 
   // helper func
   const handleRemoveSocialMedia = (index) => {
@@ -302,7 +301,7 @@ const UserStudentCreate = (props) => {
       <Divider sx={{ my: 5 }}>
         <Typography sx={{ color: "gray" }}>Optional</Typography>
       </Divider>
-      {newStudent.social_media.map((link, index) => {
+      {newStudent.social_media?.map((link, index) => {
         return (
           <Box
             key={index}
@@ -356,7 +355,7 @@ const UserStudentCreate = (props) => {
       })}
 
       {/* past experience list */}
-      {/*newStudent.past_exp.map((exp_desc, index) => {
+      {/*newStudent.past_exp?.map((exp_desc, index) => {
         return (
           <Box
             key={index}

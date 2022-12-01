@@ -76,9 +76,8 @@ const TeamCommPanel = () => {
     };
   }, [isClickable]); // reset send button in 1s
 
-  // box ref to used by useEffect
-  const scrollRef = useRef();
   // useEffect to reset box scrollbar position
+  const scrollRef = useRef();
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behaviour: "smooth" });

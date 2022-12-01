@@ -67,7 +67,7 @@ const EventList = () => {
       setEvent(null);
       setCreatorUser(null);
     }
-  }, [setEvent, setCreatorUser, filteredEvents, onMedia.onDesktop, users]);
+  }, [filteredEvents, onMedia.onDesktop, setCreatorUser, setEvent, users]);
 
   return (
     <Paper
@@ -100,7 +100,7 @@ const EventList = () => {
           overflowY: "scroll",
         }}
       >
-        {filteredEvents.map((event, index) => (
+        {filteredEvents?.map((event, index) => (
           <EventListItem
             key={event.id}
             event={event}

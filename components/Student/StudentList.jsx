@@ -38,7 +38,7 @@ const StudentList = () => {
           overflow: "auto",
         }}
       >
-        {filteredStudents.map((student, index) => (
+        {filteredStudents?.map((student, index) => (
           <StudentListItem
             key={student.uid}
             index={index}

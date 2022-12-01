@@ -3,17 +3,9 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import SearchIcon from "@mui/icons-material/Search";
-import {
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Tooltip,
-} from "@mui/material";
+import { Button } from "@mui/material";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
-import { projectStrList } from "../Reusable/MenuStringList";
 import {
   SearchBox,
   SearchIconWrapper,
@@ -23,15 +15,16 @@ import UserIconMenu from "./UserIconMenu";
 
 const MobileProjectsBar = () => {
   // context
-  const { onMedia } = useContext(GlobalContext);
   const {
-    project,
-    setProject,
+    fullProject,
+    setFullProject,
     setSearchTerm,
     searchCategory,
     setSearchCategory,
-    setCreatorUser,
   } = useContext(ProjectContext);
+
+  // local vars
+  const project = fullProject?.project;
 
   // ref
   const textRef = useRef();
@@ -72,7 +65,7 @@ const MobileProjectsBar = () => {
   //       }}
   //     >
   //       <MenuItem value={""}>None</MenuItem>
-  //       {projectStrList.map((projectStr, index) => {
+  //       {projectStrList?.map((projectStr, index) => {
   //         return (
   //           <MenuItem key={index} value={projectStr}>
   //             {projectStr}
@@ -170,8 +163,7 @@ const MobileProjectsBar = () => {
                 height: "30px",
               }}
               onClick={() => {
-                setProject(null);
-                setCreatorUser(null);
+                setFullProject(null);
               }}
             >
               <ArrowBackIosRoundedIcon />

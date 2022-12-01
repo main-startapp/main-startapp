@@ -45,13 +45,12 @@ const Chats = () => {
       foundChat;
     };
   }, [
-    forceChatExpand,
-    setForceChatExpand,
-    chats,
     chatPartner,
-    setChat,
-    setShowMsg,
+    chats,
     ediumUser,
+    forceChatExpand,
+    setChat,
+    setForceChatExpand,
   ]);
 
   return !onMedia.onDesktop ? (
@@ -66,7 +65,7 @@ const Chats = () => {
         }}
       >
         {(chat && chatPartner) === null ? (
-          chats.map((chat) => (
+          chats?.map((chat) => (
             <ChatAccordionContact key={chat.id} chat={chat} />
           ))
         ) : (

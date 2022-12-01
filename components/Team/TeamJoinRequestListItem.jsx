@@ -336,7 +336,7 @@ const TeamJoinRequestListItem = (props) => {
                   </Typography>
                 )}
                 {requestingStudent?.awards?.length > 0 &&
-                  requestingStudent.awards.map((awardStr, index) => {
+                  requestingStudent.awards?.map((awardStr, index) => {
                     if (awardStr.toLowerCase() === "betauser") {
                       return (
                         <Tooltip key={index} title="Beta User">
@@ -356,7 +356,7 @@ const TeamJoinRequestListItem = (props) => {
                   </Typography>
                 )}
                 {requestingStudent?.social_media?.length > 0 &&
-                  requestingStudent.social_media.map((link, index) => {
+                  requestingStudent.social_media?.map((link, index) => {
                     if (link.toLowerCase().includes("linkedin")) {
                       return (
                         <Link
@@ -420,7 +420,7 @@ const TeamJoinRequestListItem = (props) => {
                   </Typography>
                 )}
                 {requestingStudent?.past_exp?.length > 0 &&
-                  requestingStudent.past_exp.map((exp, index) => (
+                  requestingStudent.past_exp?.map((exp, index) => (
                     <Typography
                       key={index}
                       sx={{
@@ -442,7 +442,7 @@ const TeamJoinRequestListItem = (props) => {
             </Typography>
           )}
           {requestingStudent?.awards?.length > 0 &&
-            requestingStudent.awards.map((awardStr, index) => {
+            requestingStudent.awards?.map((awardStr, index) => {
               if (awardStr.toLowerCase() === "betauser") {
                 return (
                   <Tooltip key={index} title="Beta User">
@@ -460,7 +460,7 @@ const TeamJoinRequestListItem = (props) => {
             </Typography>
           )}
           {requestingStudent?.social_media?.length > 0 &&
-            requestingStudent.social_media.map((link, index) => {
+            requestingStudent.social_media?.map((link, index) => {
               // todo!: too hacky, is there any library can do this properly?
               if (link.toLowerCase().includes("linkedin")) {
                 return (
@@ -521,7 +521,7 @@ const TeamJoinRequestListItem = (props) => {
             </Typography>
           )}
           {requestingStudent?.past_exp?.length > 0 &&
-            requestingStudent.past_exp.map((exp, index) => (
+            requestingStudent.past_exp?.map((exp, index) => (
               <Typography
                 key={index}
                 sx={{

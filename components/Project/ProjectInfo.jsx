@@ -10,35 +10,19 @@ import { motion } from "framer-motion";
 
 const ProjectInfo = () => {
   // context
-  const { ediumUser, winHeight, onMedia } = useContext(GlobalContext);
-  const { project, creatorUser } = useContext(ProjectContext);
+  const { winHeight, onMedia } = useContext(GlobalContext);
+  const { fullProject } = useContext(ProjectContext);
   const theme = useTheme();
 
   // local vars
+  const project = fullProject?.project;
+  const projectCreator = fullProject?.creator_uid;
+  const projectAllTags = fullProject?.allTags;
+
   const [tCode, setTCode] = useState("");
   useEffect(() => {
     setTCode("");
   }, [project]);
-
-  // hooks
-  const isCreator = useMemo(() => {
-    return ediumUser?.uid === project?.creator_uid ? true : false;
-  }, [ediumUser?.uid, project]);
-
-  const allTags = useMemo(() => {
-    let retTags = [];
-    if (project?.tags?.length > 0) {
-      retTags = retTags.concat(project.tags);
-    }
-    if (
-      creatorUser?.role === "org_admin" &&
-      creatorUser?.org_tags?.length > 0
-    ) {
-      retTags = retTags.concat(creatorUser.org_tags);
-    }
-
-    return retTags;
-  }, [creatorUser, project]);
 
   // useEffect to reset box scrollbar position
   const boxRef = useRef();
@@ -168,7 +152,7 @@ const ProjectInfo = () => {
               >
                 {"Positions:"}
               </Typography>
-              {project?.position_list.map((position, index) => (
+              {project?.position_list?.map((position, index) => (
                 <PositionListItem
                   key={index}
                   index={index}
@@ -177,8 +161,7 @@ const ProjectInfo = () => {
                   posResp={position.responsibility}
                   posWeeklyHour={position.weekly_hour}
                   posLevel={position?.level || ""}
-                  isCreator={isCreator}
-                  creator={creatorUser}
+                  creator={projectCreator}
                   appFormURL={
                     project.application_form_url !== ""
                       ? project.application_form_url
@@ -191,7 +174,7 @@ const ProjectInfo = () => {
             </Box>
           )}
 
-          {allTags?.length > 0 && (
+          {projectAllTags?.length > 0 && (
             <Box id="projectinfo-details-box">
               <Typography
                 color="text.primary"
@@ -201,7 +184,7 @@ const ProjectInfo = () => {
                 {"Details: "}
               </Typography>
 
-              {allTags.map((tag, index) => (
+              {projectAllTags?.map((tag, index) => (
                 <Chip
                   key={index}
                   color={"lightPrimary"}
@@ -251,7 +234,7 @@ export default ProjectInfo;
               // color: "#dbdbdb",
               // backgroundColor: "#ffffff",
             }}
-            src={creatorUser?.photo_url}
+            src={projectCreator?.photo_url}
             referrerPolicy="no-referrer"
           />
 
@@ -264,7 +247,7 @@ export default ProjectInfo;
               mt: 1,
             }}
           >
-            {creatorUser?.name || "Founder"}
+            {projectCreator?.name || "Founder"}
           </Typography>
 
           {isCreator ? (
@@ -323,7 +306,7 @@ export default ProjectInfo;
                     e.stopPropagation();
                     handleConnect(
                       chats,
-                      creatorUser,
+                      projectCreator,
                       ediumUser,
                       setChatPartner,
                       setForceChatExpand

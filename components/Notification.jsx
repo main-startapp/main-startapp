@@ -32,7 +32,7 @@ const useNotification = () => {
         action,
       });
     }
-  }, [conf, enqueueSnackbar, closeSnackbar]);
+  }, [closeSnackbar, conf.msg, conf.variant, enqueueSnackbar]);
   return [conf, setConf];
 };
 

@@ -1,11 +1,16 @@
-import { useContext, useMemo, useEffect } from "react";
+import { useContext, useMemo, useEffect, useState } from "react";
 import NextLink from "next/link";
 import { Box, Button, Paper, Tooltip, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import ProjectListItem from "./ProjectListItem";
 import ProjectListHeader from "./ProjectListHeader";
-import { findItemFromList } from "../Reusable/Resusable";
+import {
+  findItemFromList,
+  isStrInObjList,
+  isStrInStr,
+  isStrInStrList,
+} from "../Reusable/Resusable";
 
 // link/router https://stackoverflow.com/questions/65086108/next-js-link-vs-router-push-vs-a-tag
 // description: a list of projects (project list items); a button to create new project (router.push)
@@ -14,52 +19,89 @@ const ProjectList = () => {
   // context
   const { projects, users, ediumUser, winHeight, onMedia } =
     useContext(GlobalContext);
-  const { searchTerm, searchCategory, searchType, setProject, setCreatorUser } =
+  const { setFullProject, searchTerm, searchTypeList } =
     useContext(ProjectContext);
   const theme = useTheme();
 
+  // projects with extra info from other dataset (users, merged tags)
+  const fullProjects = useMemo(() => {
+    return projects?.map((project) => {
+      // creator
+      const projectCreator = findItemFromList(
+        users,
+        "uid",
+        project?.creator_uid
+      );
+      console.log(projectCreator);
+      // allTags
+      let projectTags = [];
+      if (project?.tags?.length > 0) {
+        projectTags = projectTags.concat(project.tags); // project tags
+      }
+      if (
+        projectCreator?.role === "org_admin" &&
+        projectCreator?.org_tags?.length > 0
+      ) {
+        projectTags = projectTags.concat(projectCreator.org_tags); // org tags
+      }
+      // category
+      projectTags.push(project?.category?.toLowerCase()); // type
+      return {
+        project: project,
+        creator: projectCreator,
+        allTags: projectTags,
+      };
+    });
+  }, [projects, users]);
+
   // project list with filtering
-  const filteredProjects = useMemo(
-    () =>
-      projects.filter((project) => {
-        if (!project.is_visible) return false;
-        if (searchTerm === "" && searchType.length === 0) return true;
+  const filteredFullProjects = useMemo(() => {
+    return fullProjects?.filter((fullProject) => {
+      if (!fullProject.project.is_visible) return false;
 
-        // !todo: is this optimized?
-        // lazy evaluation to avoid unnecessary expensive includes() / some()
-        const isInTitles =
-          searchTerm !== "" &&
-          (project.title.toLowerCase().includes(searchTerm.toLowerCase()) || // project title
-            project.position_list.some(
-              (position) =>
-                position.title.toLowerCase().includes(searchTerm.toLowerCase()) // position title
-            ));
-        const isInType =
-          searchType !== [] &&
-          searchType.some(
-            (typeName) =>
-              typeName.toLowerCase() === project.category.toLowerCase()
-          );
+      if (searchTerm === "" && searchTypeList.length === 0) {
+        return true; // no search
+      } else if (searchTerm !== "" && searchTypeList.length === 0) {
+        return (
+          isStrInStr(fullProject.project.title, searchTerm, false) ||
+          isStrInObjList(
+            fullProject.project.position_list,
+            "title",
+            searchTerm,
+            false
+          )
+        ); // only term: in project title || position title
+      } else if (searchTerm === "" && searchTypeList.length > 0) {
+        return fullProject.allTags.some((tag) => {
+          return isStrInStrList(searchTypeList, tag, true);
+        });
+      } else {
+        return (
+          fullProject.allTags.some((tag) => {
+            return isStrInStrList(searchTypeList, tag, true);
+          }) &&
+          (isStrInStr(fullProject.project.title, searchTerm, false) ||
+            isStrInObjList(
+              fullProject.project.position_list,
+              "title",
+              searchTerm,
+              false
+            ))
+        ); // term && tags
+      }
+    });
+  }, [fullProjects, searchTerm, searchTypeList]);
 
-        if (isInTitles || isInType) return true;
-      }),
-    [projects, searchTerm, searchType]
-  );
-
-  // set initial project to be first in list to render out immediately; to simulate the click event, creator also needs to be set
+  // set initial project to be first in list to render out immediately; to simulate the click event, creator and alltags also need to be set
   useEffect(() => {
     if (!onMedia.onDesktop) return;
 
-    if (filteredProjects?.length > 0) {
-      setProject(filteredProjects[0]);
-      setCreatorUser(
-        findItemFromList(users, "uid", filteredProjects[0]?.creator_uid)
-      );
+    if (filteredFullProjects?.length > 0) {
+      setFullProject(filteredFullProjects[0]);
     } else {
-      setProject(null);
-      setCreatorUser(null);
+      setFullProject(null);
     }
-  }, [setProject, setCreatorUser, filteredProjects, onMedia.onDesktop, users]);
+  }, [filteredFullProjects, onMedia.onDesktop, setFullProject]);
 
   return (
     <Paper
@@ -92,12 +134,12 @@ const ProjectList = () => {
           overflowY: "scroll",
         }}
       >
-        {filteredProjects.map((project, index) => (
+        {filteredFullProjects?.map((fullProject, index) => (
           <ProjectListItem
-            key={project.id}
-            project={project}
+            key={fullProject?.project.id}
+            fullProject={fullProject}
             index={index}
-            last={filteredProjects.length - 1}
+            last={filteredFullProjects.length - 1}
           />
         ))}
       </Box>

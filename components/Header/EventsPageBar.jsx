@@ -112,7 +112,7 @@ const EventsPageBar = () => {
         }}
       >
         <MenuItem value={""}>None</MenuItem>
-        {eventStrList.map((eventStr, index) => {
+        {eventStrList?.map((eventStr, index) => {
           return (
             <MenuItem key={index} value={eventStr}>
               {eventStr}

@@ -32,25 +32,15 @@ const EventListItem = (props) => {
   const { setEvent, setCreatorUser } = useContext(EventContext);
 
   // time related
-  const startMoment = useMemo(() => {
-    return moment(event?.start_date);
-  }, [event?.start_date]);
+  const startMoment = moment(event?.start_date);
 
-  const endMoment = useMemo(() => {
-    return moment(event?.end_date);
-  }, [event?.end_date]);
+  const endMoment = moment(event?.end_date);
 
-  const isExpired = useMemo(() => {
-    return moment({ hour: 23, minute: 59 }).isAfter(endMoment);
-  }, [endMoment]);
+  const isExpired = moment({ hour: 23, minute: 59 }).isAfter(endMoment);
 
-  const isSameDay = useMemo(() => {
-    return startMoment.format("L") === endMoment.format("L");
-  }, [startMoment, endMoment]);
+  const isSameDay = startMoment.format("L") === endMoment.format("L");
 
-  const isSameTime = useMemo(() => {
-    return startMoment.format("LLL") === endMoment.format("LLL");
-  }, [startMoment, endMoment]);
+  const isSameTime = startMoment.format("LLL") === endMoment.format("LLL");
 
   // menu
   const [anchorEl, setAnchorEl] = useState(null);
@@ -141,7 +131,7 @@ const EventListItem = (props) => {
           />
           {allTags?.length > 0 && (
             <Box sx={{ height: "1.5rem", overflow: "hidden" }}>
-              {allTags.map((tag, index) => (
+              {allTags?.map((tag, index) => (
                 <Chip
                   key={index}
                   color={"lightPrimary"}

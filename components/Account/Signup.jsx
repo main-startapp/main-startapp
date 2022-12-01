@@ -15,8 +15,12 @@ import { useRef, useState } from "react";
 import { auth } from "../../firebase";
 
 const Signup = (props) => {
+  // props
   const setIsSignup = props.setIsSignup;
   const isMobile = props.isMobile;
+
+  // context / ref
+  const formRef = useRef();
 
   // https://www.cluemediator.com/password-and-confirm-password-validation-in-react
   const [input, setInput] = useState({
@@ -111,8 +115,6 @@ const Signup = (props) => {
         setErrorMsg({ email: msg, password: "", confirmPassword: "" });
       });
   };
-
-  const formRef = useRef();
 
   return (
     <Box>

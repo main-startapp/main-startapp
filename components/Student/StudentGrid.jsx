@@ -30,7 +30,7 @@ const StudentGrid = () => {
   // set initial student to be first in list to render out immediately
   useEffect(() => {
     if (onMedia.onDesktop) setStudent(users.length > 0 ? users[0] : null);
-  }, [setStudent, users, onMedia.onDesktop]);
+  }, [onMedia.onDesktop, setStudent, users]);
 
   return (
     <Box
@@ -41,7 +41,7 @@ const StudentGrid = () => {
       }}
     >
       <Grid container spacing={1.5} padding={1.5}>
-        {filteredStudents.map((user, index) => (
+        {filteredStudents?.map((user, index) => (
           <Grid
             key={index}
             item

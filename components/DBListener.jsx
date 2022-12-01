@@ -49,7 +49,7 @@ const DBListener = () => {
       q,
       (querySnapshot) => {
         setProjects(
-          querySnapshot.docs.map((doc) => ({
+          querySnapshot.docs?.map((doc) => ({
             ...doc.data(),
             id: doc.id,
             completion_date: doc.data()?.completion_date
@@ -83,7 +83,7 @@ const DBListener = () => {
       q,
       (querySnapshot) => {
         setProjectsExt(
-          querySnapshot.docs.map((doc) => {
+          querySnapshot.docs?.map((doc) => {
             const projectExt = {
               ...doc.data(),
               id: doc.id,
@@ -92,8 +92,8 @@ const DBListener = () => {
             if (!projectExt?.schedules) return projectExt; // return if there's no schedules
             projectExt.schedules.forEach(
               (schedule) =>
-                (schedule.availability = schedule.availability.map((dateTime) =>
-                  dateTime.toDate()
+                (schedule.availability = schedule.availability?.map(
+                  (dateTime) => dateTime.toDate()
                 ))
             );
             return projectExt;
@@ -124,7 +124,7 @@ const DBListener = () => {
       q,
       (querySnapshot) => {
         setEvents(
-          querySnapshot.docs.map((doc) => ({
+          querySnapshot.docs?.map((doc) => ({
             ...doc.data(),
             id: doc.id,
             create_timestamp: doc.data().create_timestamp?.toDate(),
@@ -157,7 +157,7 @@ const DBListener = () => {
       q,
       (querySnapshot) => {
         setEventsExt(
-          querySnapshot.docs.map((doc) => {
+          querySnapshot.docs?.map((doc) => {
             const eventExt = {
               ...doc.data(),
               id: doc.id,
@@ -186,7 +186,7 @@ const DBListener = () => {
       q,
       (querySnapshot) => {
         setUsers(
-          querySnapshot.docs.map((doc) => ({
+          querySnapshot.docs?.map((doc) => ({
             ...doc.data(),
             uid: doc.id,
           }))
@@ -255,7 +255,7 @@ const DBListener = () => {
       q,
       (querySnapshot) => {
         setChats(
-          querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+          querySnapshot.docs?.map((doc) => ({ ...doc.data(), id: doc.id }))
         );
       },
       (error) => {
