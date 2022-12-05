@@ -4,7 +4,6 @@ import {
   GlobalContext,
   StudentContext,
 } from "../components/Context/ShareContexts";
-import StudentsPageBar from "../components/Header/StudentsPageBar";
 import StudentProfile from "../components/Student/StudentProfile";
 import StudentGrid from "../components/Student/StudentGrid";
 import StudentList from "../components/Student/StudentList";

@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { ProjectContext } from "../Context/ShareContexts";
+import { EventContext } from "../Context/ShareContexts";
 import {
   removeValueFromArray,
   SearchBox,
@@ -20,19 +20,19 @@ import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 import SearchIcon from "@mui/icons-material/Search";
 import UserIconMenu from "./UserIconMenu";
 import TuneIcon from "@mui/icons-material/Tune";
-import { projectStrList } from "../Reusable/MenuStringList";
+import { eventStrList } from "../Reusable/MenuStringList";
 
-const MobileProjectsBar = () => {
+const MobileEventsBar = () => {
   // context
   const {
-    fullProject,
-    setFullProject,
+    fullEvent,
+    setFullEvent,
     setSearchTerm,
     searchCategory,
     setSearchCategory,
     searchTypeList,
     setSearchTypeList,
-  } = useContext(ProjectContext);
+  } = useContext(EventContext);
 
   // local vars
   const textRef = useRef();
@@ -44,7 +44,7 @@ const MobileProjectsBar = () => {
   const [typeList, setTypeList] = useState([]);
   useEffect(() => {
     const retList = [];
-    projectStrList.forEach((typeStr) => {
+    eventStrList.forEach((typeStr) => {
       retList.push({ name: typeStr, isSelected: false });
     });
     setTypeList(retList);
@@ -83,6 +83,37 @@ const MobileProjectsBar = () => {
     setSearchTypeList(newSearchTypeList);
   };
 
+  // // reuseable comp
+  // const ekSearch = (
+  //   <Search
+  //     sx={{
+  //       width: onMedia.onDesktop ? "300px" : "80%",
+  //       height: onMedia.onDesktop ? "40px" : "30px", // to match the small size category
+  //     }}
+  //   >
+  //     <SearchIconWrapper>
+  //       <SearchIcon />
+  //     </SearchIconWrapper>
+  //     <Tooltip title="Search for events or keywords...">
+  //       <StyledInputBase
+  //         fullWidth={true}
+  //         placeholder="Event or Keyword…"
+  //         inputProps={{ "aria-label": "search" }}
+  //         inputRef={textRef}
+  //         onChange={(e) => {
+  //           if (e.target.value.length !== 0) return;
+  //           setSearchTerm("");
+  //         }}
+  //         onKeyPress={(e) => {
+  //           if (e.key === "Enter") {
+  //             setSearchTerm(e.target.value);
+  //           }
+  //         }}
+  //       />
+  //     </Tooltip>
+  //   </Search>
+  // );
+
   // const categoryComp = (
   //   <FormControl
   //     sx={{
@@ -103,7 +134,7 @@ const MobileProjectsBar = () => {
   //       },
   //       "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
   //         {
-  //           border: 1,
+  //           border: 1.5,
   //           borderColor: "#3e95c2",
   //         },
   //     }}
@@ -119,10 +150,10 @@ const MobileProjectsBar = () => {
   //       }}
   //     >
   //       <MenuItem value={""}>None</MenuItem>
-  //       {projectStrList?.map((projectStr, index) => {
+  //       {eventStrList?.map((eventStr, index) => {
   //         return (
-  //           <MenuItem key={index} value={projectStr}>
-  //             {projectStr}
+  //           <MenuItem key={index} value={eventStr}>
+  //             {eventStr}
   //           </MenuItem>
   //         );
   //       })}
@@ -132,10 +163,10 @@ const MobileProjectsBar = () => {
 
   return (
     <>
-      {fullProject === null && (
+      {fullEvent === null && (
         <AppBar elevation={0} position="static">
           <Toolbar
-            id="mobileprojectsbar-searchbox"
+            id="mobileeventsbar-searchbox"
             disableGutters // disable auto padding
             sx={{
               // minHeight: 0,
@@ -162,7 +193,7 @@ const MobileProjectsBar = () => {
                 </SearchIconWrapper>
                 <StyledInputBase
                   fullWidth={true}
-                  placeholder="Search for projects or positions..."
+                  placeholder="Search for events or keywords..."
                   inputProps={{ "aria-label": "search" }}
                   inputRef={textRef}
                   onChange={(e) => {
@@ -179,7 +210,7 @@ const MobileProjectsBar = () => {
             </Box>
           </Toolbar>
           <Toolbar
-            id="mobileprojectsbar-tab"
+            id="mobileeventsbar-tab"
             disableGutters // disable auto padding
             sx={{
               alignItems: "flex-end",
@@ -246,7 +277,7 @@ const MobileProjectsBar = () => {
             )}
           </Toolbar>
           <Toolbar
-            id="mobileprojectsbar-tab-content"
+            id="mobileeventsbar-tab-content"
             disableGutters // disable auto padding
             sx={{
               alignItems: "flex-start",
@@ -294,12 +325,12 @@ const MobileProjectsBar = () => {
           </Toolbar>
         </AppBar>
       )}
-      {fullProject !== null && (
+      {fullEvent !== null && (
         <Fab
           color="primary"
           size="small"
           onClick={() => {
-            setFullProject(null);
+            setFullEvent(null);
           }}
           sx={{ position: "absolute", right: 16, bottom: 80 }}
         >
@@ -310,4 +341,4 @@ const MobileProjectsBar = () => {
   );
 };
 
-export default MobileProjectsBar;
+export default MobileEventsBar;

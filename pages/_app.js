@@ -4,6 +4,7 @@ import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
+import { useState, useMemo } from "react";
 import { CssBaseline } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { grey } from "@mui/material/colors";
@@ -18,13 +19,12 @@ import ChatMsgPaper from "../components/Chat/ChatMsgPaper";
 import DBListener from "../components/DBListener";
 import MobileBottomNav from "../components/Header/MobileBottomNav";
 import useWindowDimensions from "../components/Reusable/WindowDimensions";
-import { useState, useMemo } from "react";
 
 // makeStyles, useStyles, createStyles, withStyles, styled
 // https://smartdevpreneur.com/material-ui-makestyles-usestyles-createstyles-and-withstyles-explained/
 // https://smartdevpreneur.com/material-ui-styled-components/
 
-const getDesignTokens = (mode) => ({
+const getDesignTokens = (mode, onMedia) => ({
   palette: {
     mode,
     ...(mode === "light"
@@ -41,6 +41,10 @@ const getDesignTokens = (mode) => ({
             main: "#e5eeff",
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
+          selectedWhite: {
+            main: "#fff",
+            contrastText: "rgba(0, 0, 0, 1)",
+          },
           unselectedIcon: { main: grey[600] },
           searchGary: { main: grey[300], contrastText: "rgba(0, 0, 0, 0.87)" },
           hoverGray: { main: grey[100] },
@@ -56,6 +60,10 @@ const getDesignTokens = (mode) => ({
           lightPrimary: {
             main: "#E5EEFF",
             contrastText: "rgba(0, 0, 0, 0.87)",
+          },
+          selectedWhite: {
+            main: "#fff",
+            contrastText: "rgba(0, 0, 0, 1)",
           },
           unselectedIcon: { main: grey[600] },
           searchGary: { main: grey[600], contrastText: "#fff" },
@@ -101,14 +109,22 @@ const getDesignTokens = (mode) => ({
       styleOverrides: {
         root: {
           "&.Mui-selected": {
-            color: "#000",
+            color: mode === "light" ? "#000" : "#fff",
           },
         },
       },
     },
 
-    MuiCssBaseline: {
+    MuiTabs: {
       styleOverrides: {
+        indicator: {
+          backgroundColor: mode === "light" ? "#000" : "#fff",
+        },
+      },
+    },
+
+    MuiCssBaseline: {
+      styleOverrides: onMedia.onDesktop && {
         body: {
           "*::-webkit-scrollbar": {
             width: "0.4rem",
@@ -119,18 +135,18 @@ const getDesignTokens = (mode) => ({
           ...(mode === "light"
             ? {
                 "*::-webkit-scrollbar-thumb": {
-                  background: grey[400],
+                  background: grey[300],
                 },
                 "*::-webkit-scrollbar-thumb:hover": {
-                  background: grey[600],
+                  background: grey[400],
                 },
               }
             : {
                 "*::-webkit-scrollbar-thumb": {
-                  background: grey[500],
+                  background: grey[600],
                 },
                 "*::-webkit-scrollbar-thumb:hover": {
-                  background: grey[300],
+                  background: grey[500],
                 },
               }),
         },
@@ -141,20 +157,20 @@ const getDesignTokens = (mode) => ({
 
 function MyApp({ Component, pageProps }) {
   // projects related
-  const [projects, setProjects] = useState([]); // list of project
+  const [projects, setProjects] = useState([]); // list of projects from DB
   // projects ext related
-  const [projectsExt, setProjectsExt] = useState([]); // list of project exts that currentUser involves in
+  const [projectsExt, setProjectsExt] = useState([]); // list of project exts that currentUser involves from DB
   // events related
-  const [events, setEvents] = useState([]); // list of event
+  const [events, setEvents] = useState([]); // list of events from DB
   // events ext related
-  const [eventsExt, setEventsExt] = useState([]); // list of ext of event
+  const [eventsExt, setEventsExt] = useState([]); // list of event exts from DB
   // users related
-  const [users, setUsers] = useState([]); // all users data
-  const [ediumUser, setEdiumUser] = useState(null); // currentUser's data
-  const [ediumUserExt, setEdiumUserExt] = useState(null); // currentUser's ext data
+  const [users, setUsers] = useState([]); // list of users from DB
+  const [ediumUser, setEdiumUser] = useState(null); // currentUser's user data from DB
+  const [ediumUserExt, setEdiumUserExt] = useState(null); // currentUser's user ext data from DB
   // chats related
+  const [chats, setChats] = useState([]); // list of chats that currentUSer involves from DB
   const [chat, setChat] = useState(null);
-  const [chats, setChats] = useState([]);
   const [chatPartner, setChatPartner] = useState(null);
   const [showMsg, setShowMsg] = useState(false);
   const [showChat, setShowChat] = useState(true);
@@ -181,7 +197,7 @@ function MyApp({ Component, pageProps }) {
     }),
     []
   );
-  const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
+  const theme = createTheme(getDesignTokens(mode, onMedia));
 
   return (
     <ThemeProvider theme={theme}>
@@ -222,7 +238,7 @@ function MyApp({ Component, pageProps }) {
               setIsAnimated,
             }}
           >
-            <CssBaseline />
+            <CssBaseline enableColorScheme />
             <DBListener />
             {onMedia.onDesktop && <Navbar />}
             <Component {...pageProps} />

@@ -60,7 +60,9 @@ const EventInfo = () => {
         backgroundColor: "background.paper",
         borderTop: onMedia.onDesktop ? 1 : 0,
         borderColor: "divider",
-        borderRadius: "32px 32px 0px 0px",
+        borderRadius: onMedia.onDesktop
+          ? "32px 32px 0px 0px"
+          : "32px 0px 0px 0px",
         paddingTop: "32px",
         minHeight: "100%",
       }}
@@ -77,14 +79,14 @@ const EventInfo = () => {
           sx={{
             height: onMedia.onDesktop
               ? `calc(${winHeight}px - 65px - ${theme.spacing(4)} - 1px - 32px)` // navbar; spacing; paper t-border; paper t-padding
-              : `calc(${winHeight}px - 64px - ${theme.spacing(
-                  2
-                )} - 32px - 65px)`, // mobile bar; spacing; paper t-padding; bottom navbar
+              : `calc(${winHeight}px - ${theme.spacing(2)} - 32px - 65px)`, // mobile bar; spacing; paper t-padding; bottom navbar
             overflowY: "scroll",
-            paddingTop: 2, // align with event list
-            paddingBottom: 6, // enough space to not covered by messages
-            paddingLeft: 4,
-            paddingRight: `calc(${theme.spacing(4)} - 0.4rem)`, // considering scrollbar
+            paddingTop: onMedia.onDesktop ? 2 : 0, // align with project list
+            paddingBottom: onMedia.onDesktop ? 6 : 4, // enough space to not covered by messages
+            paddingLeft: onMedia.onDesktop ? 4 : 2,
+            paddingRight: onMedia.onDesktop
+              ? `calc(${theme.spacing(4)} - 0.4rem)`
+              : 2, // considering scrollbar
             display: "flex",
             flexDirection: "column",
           }}
@@ -210,10 +212,10 @@ const EventInfo = () => {
 
           <Box
             sx={{
-              mt: 4,
+              mt: isLoaded ? 4 : 0,
               display: "flex",
               justifyContent: "center",
-              visibility: isLoaded ? "visible" : "hidden",
+              visibility: isLoaded ? "visible" : "collapse",
             }}
           >
             <Box

@@ -32,7 +32,7 @@ const ChatAccordionContact = (props) => {
   const my_unread_key = ediumUser?.uid + "_unread"; // the key to get unread msg no.
 
   // find the last join request's project and position info
-  // !todo: use a map to reduce searching
+  // !todo: will be calculated in ChatAccordionList
   const [lastJR, setLastJR] = useState(null);
   useEffect(() => {
     if (!(chat?.join_requests?.length > 0)) return;

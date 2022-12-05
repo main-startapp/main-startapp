@@ -158,8 +158,8 @@ const ProjectListHeader = () => {
                   borderRadius: "0px 0px 8px 8px",
                   // borderBottom: 1,
                   // borderColor: "divider",
-                  paddingTop: 1,
-                  paddingBottom: 2,
+                  paddingTop: 2,
+                  paddingBottom: 1,
                   paddingX: 2,
                   boxShadow: 2,
                 }}
@@ -179,13 +179,14 @@ const ProjectListHeader = () => {
                       },
                     })}
                     sx={{
-                      mt: 1,
                       mr: 1,
+                      mb: 1,
                       fontSize: "0.75rem",
                       fontWeight: "medium",
                       "&.MuiChip-root:hover": {
-                        backgroundColor: "primary.main",
-                        color: "#fff",
+                        backgroundColor: type.isSelected
+                          ? "primary.main"
+                          : "lightPrimary.main",
                       },
                     }}
                   />
@@ -209,10 +210,10 @@ const ProjectListHeader = () => {
               handleExpand(); // !todo: is this consistent behavior?
             }}
             sx={{
-              height: "24px",
               position: "absolute",
               top: 0,
               right: 16,
+              height: "24px",
             }}
           />
         )}

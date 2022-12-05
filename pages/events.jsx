@@ -7,6 +7,7 @@ import {
 import EventList from "../components/Event/EventList";
 import EventInfo from "../components/Event/EventInfo";
 import { motion } from "framer-motion";
+import MobileEventsBar from "../components/Header/MobileEventsBar";
 
 const Events = () => {
   // global context
@@ -53,81 +54,75 @@ const Events = () => {
         setSearchTypeList,
       }}
     >
-      {/* Toolbar for searching keywords, category and filter */}
-      {/* <EventsPageBar /> */}
+      {!onMedia.onDesktop && <MobileEventsBar />}
 
       <Box
         id="events-main-box"
         sx={{ display: "flex", justifyContent: "center", overflow: "hidden" }}
       >
         {onMedia.onDesktop ? (
-          <Box
-            id="events-desktop-list-box"
-            sx={{
-              paddingTop: 4,
-              paddingLeft: 4,
-              paddingRight: 2,
-              width: "38.46%",
-              maxWidth: "560px",
-            }}
-          >
-            <motion.div
-              initial={isAnimated.events ? false : { x: -200, opacity: 0 }}
-              animate={isAnimated.events ? false : { x: 0, opacity: 1 }}
-              transition={{ delay: 1 }}
-            >
-              <EventList />
-            </motion.div>
-          </Box>
-        ) : (
-          fullEvent === null && (
+          <>
             <Box
-              id="events-mobile-list-box"
+              id="events-desktop-list-box"
               sx={{
-                paddingTop: 2,
-                paddingLeft: 2,
-                width: "100%",
-                backgroundColor: "hoverGray.main",
-              }}
-            >
-              <EventList />
-            </Box>
-          )
-        )}
-        {onMedia.onDesktop ? (
-          <Box
-            id="events-desktop-info-box"
-            sx={{
-              paddingTop: 4,
-              paddingLeft: 2,
-              paddingRight: 4,
-              width: "61.54%",
-              maxWidth: "896px",
-            }}
-          >
-            <motion.div
-              initial={isAnimated.events ? false : { y: 200, opacity: 0 }}
-              animate={isAnimated.events ? false : { y: 0, opacity: 1 }}
-              transition={{ delay: 1 }}
-            >
-              <EventInfo />
-            </motion.div>
-          </Box>
-        ) : (
-          fullEvent !== null && (
-            <Box
-              id="events-mobile-info-box"
-              sx={{
-                paddingTop: 2,
-                paddingLeft: 2,
+                paddingTop: 4,
+                paddingLeft: 4,
                 paddingRight: 2,
-                width: "100%",
-                backgroundColor: "hoverGray.main",
+                width: "38.46%",
+                maxWidth: "560px",
               }}
             >
-              <EventInfo />
+              <motion.div
+                initial={isAnimated.events ? false : { x: -200, opacity: 0 }}
+                animate={isAnimated.events ? false : { x: 0, opacity: 1 }}
+                transition={{ delay: 1 }}
+              >
+                <EventList />
+              </motion.div>
             </Box>
-          )
+            <Box
+              id="events-desktop-info-box"
+              sx={{
+                paddingTop: 4,
+                paddingLeft: 2,
+                paddingRight: 4,
+                width: "61.54%",
+                maxWidth: "896px",
+              }}
+            >
+              <motion.div
+                initial={isAnimated.events ? false : { y: 200, opacity: 0 }}
+                animate={isAnimated.events ? false : { y: 0, opacity: 1 }}
+                transition={{ delay: 1 }}
+              >
+                <EventInfo />
+              </motion.div>
+            </Box>
+          </>
+        ) : fullEvent === null ? (
+          <Box
+            id="events-mobile-list-box"
+            sx={{
+              paddingTop: 2,
+              paddingLeft: 2,
+              width: "100%",
+              backgroundColor: "hoverGray.main",
+            }}
+          >
+            <EventList />
+          </Box>
+        ) : (
+          <Box
+            id="events-mobile-info-box"
+            sx={{
+              paddingTop: 2,
+              paddingLeft: 2,
+              width: "100%",
+              backgroundColor: "hoverGray.main",
+            }}
+          >
+            <EventInfo />
+          </Box>
         )}
       </Box>
     </EventContext.Provider>

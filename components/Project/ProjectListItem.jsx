@@ -61,7 +61,7 @@ const ProjectListItem = (props) => {
         alignItems: "flex-start",
         borderBottom: 1,
         borderColor: "divider",
-        backgroundColor: "background.paper",
+        //backgroundColor: "background.paper",
         "&:hover": {
           backgroundColor: "hoverGray.main",
           cursor: "default",
@@ -104,7 +104,7 @@ const ProjectListItem = (props) => {
             }
           />
           {projectAllTags?.length > 0 && (
-            <Box sx={{ mt: 1, height: "1.5rem", overflow: "hidden" }}>
+            <Box sx={{ mt: 1, height: "1.75rem", overflow: "hidden" }}>
               {projectAllTags?.map((tag, index) => (
                 <Chip
                   key={index}
@@ -114,11 +114,12 @@ const ProjectListItem = (props) => {
                       : "lightPrimary"
                   }
                   label={tag}
-                  size="small"
                   sx={{
                     mr: 1,
+                    mb: 1,
                     fontSize: "0.75rem",
                     fontWeight: "medium",
+                    height: "1.5rem",
                   }}
                 />
               ))}
@@ -221,13 +222,13 @@ const ProjectListItem = (props) => {
         />
         {project.position_list.slice(0, 3)?.map((position, index) => (
           <ListItemText
-            sx={{ margin: 0, ml: "5%" }}
             key={index}
             secondary={
               <Typography variant="body2" sx={{ fontWeight: "medium" }}>
                 {position.title}
               </Typography>
             }
+            sx={{ margin: 0, ml: "5%" }}
           />
         ))}
         {project.position_list.length > 3 && (
@@ -237,7 +238,7 @@ const ProjectListItem = (props) => {
                 {"and more..."}
               </Typography>
             }
-            sx={{ ml: "5%" }}
+            sx={{ margin: 0, ml: "5%" }}
           />
         )}
         {onMedia.onDesktop && (
@@ -247,7 +248,6 @@ const ProjectListItem = (props) => {
                 color="text.secondary"
                 variant="body2"
                 sx={{
-                  mt: 2,
                   display: "flex",
                   justifyContent: "flex-end",
                   fontWeight: "light",
@@ -256,6 +256,7 @@ const ProjectListItem = (props) => {
                 {moment(project.last_timestamp).format("MMM Do, YYYY")}
               </Typography>
             }
+            sx={{ mt: 2 }}
           />
         )}
       </Box>

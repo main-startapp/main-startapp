@@ -109,7 +109,7 @@ const EventListItem = (props) => {
             }
           />
           {eventAllTags?.length > 0 && (
-            <Box sx={{ mt: 1, height: "1.5rem", overflow: "hidden" }}>
+            <Box sx={{ mt: 1, height: "1.75rem", overflow: "hidden" }}>
               {eventAllTags?.map((tag, index) => (
                 <Chip
                   key={index}
@@ -119,11 +119,12 @@ const EventListItem = (props) => {
                       : "lightPrimary"
                   }
                   label={tag}
-                  size="small"
                   sx={{
                     mr: 1,
+                    mb: 1,
                     fontSize: "0.75rem",
                     fontWeight: "medium",
+                    height: "1.5rem",
                   }}
                 />
               ))}
@@ -139,6 +140,7 @@ const EventListItem = (props) => {
             onClick={(e) => {
               handleMenuClick(e);
             }}
+            sx={{ padding: 0 }}
           >
             <MoreVertIcon />
           </IconButton>
@@ -228,7 +230,6 @@ const EventListItem = (props) => {
                   endMoment.format("MMM Do h:mm a")}
             </Typography>
           }
-          sx={{ mb: 2 }}
         />
         {onMedia.onDesktop && (
           <ListItemText
@@ -237,7 +238,6 @@ const EventListItem = (props) => {
                 color="text.secondary"
                 variant="body2"
                 sx={{
-                  mt: 2,
                   display: "flex",
                   justifyContent: "flex-end",
                   fontWeight: "light",
@@ -246,6 +246,7 @@ const EventListItem = (props) => {
                 {moment(event.last_timestamp).format("MMM Do, YYYY")}
               </Typography>
             }
+            sx={{ mt: 2 }}
           />
         )}
       </Box>

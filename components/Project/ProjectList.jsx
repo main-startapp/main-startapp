@@ -127,7 +127,7 @@ const ProjectList = () => {
             ? `calc(${winHeight}px - 65px - ${theme.spacing(
                 4
               )} - 1px - 32px - 112px - 29px - 96px)` // navbar; spacing; paper t-border; paper t-padding; header; button box
-            : `calc(${winHeight}px - 64px - ${theme.spacing(
+            : `calc(${winHeight}px - 160px - ${theme.spacing(
                 2
               )} - 32px + 1px - 65px)`, // mobile bar; spacing margin; inner t-padding; last entry border; bottom navbar
           overflowY: "scroll",

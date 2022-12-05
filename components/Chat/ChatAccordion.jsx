@@ -3,8 +3,6 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
-  Button,
-  Paper,
   Stack,
   Typography,
 } from "@mui/material";
@@ -32,6 +30,15 @@ const ChatAccordion = () => {
 
   // accordion expansion
   const [expandState, setExpandState] = useState("collapseIt");
+  const handleExpand = (e) => {
+    expandState === "expandIt"
+      ? setExpandState("collapseIt")
+      : setExpandState("expandIt");
+    setShowMsg(false);
+    setChat(null);
+    setChatPartner(null);
+  };
+
   // handle chat expansion called by handleConnect/handleJoinRequest
   // connect or join request might create a new chat, this new chat will be found by this hook
   useEffect(() => {
@@ -71,16 +78,6 @@ const ChatAccordion = () => {
     const my_unread_key = ediumUser?.uid + "_unread";
     return chats.some((chat) => chat[my_unread_key] > 0) ? true : false;
   }, [ediumUser?.uid, chats]);
-
-  // helper func
-  const handleExpand = (e) => {
-    expandState === "expandIt"
-      ? setExpandState("collapseIt")
-      : setExpandState("expandIt");
-    setShowMsg(false);
-    setChat(null);
-    setChatPartner(null);
-  };
 
   return onMedia.onDesktop ? (
     <Accordion
@@ -133,21 +130,15 @@ const ChatAccordion = () => {
       <AccordionDetails
         sx={{ overflow: "auto", maxHeight: "75vh", padding: 0 }}
       >
-        <ChatList>
-          {chats?.map((chat) => (
-            <ChatAccordionContact key={chat.id} chat={chat} />
-          ))}
-        </ChatList>
+        {chats?.map((chat) => (
+          <ChatAccordionContact key={chat.id} chat={chat} />
+        ))}
       </AccordionDetails>
     </Accordion>
   ) : null;
 };
 
 export default ChatAccordion;
-
-const ChatList = styled(Stack)(({ theme }) => ({
-  width: "100%",
-}));
 
 const StyledAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
   "& .MuiAccordionSummary-content": {

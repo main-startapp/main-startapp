@@ -64,73 +64,68 @@ const Home = () => {
         sx={{ display: "flex", justifyContent: "center", overflow: "hidden" }}
       >
         {onMedia.onDesktop ? (
-          <Box
-            id="projects-desktop-list-box"
-            sx={{
-              paddingTop: 4,
-              paddingLeft: 4,
-              paddingRight: 2,
-              width: "38.46%",
-              maxWidth: "560px",
-            }}
-          >
-            <motion.div
-              initial={isAnimated.projects ? false : { x: -200, opacity: 0 }}
-              animate={isAnimated.projects ? false : { x: 0, opacity: 1 }}
-              transition={{ delay: 1 }}
-            >
-              <ProjectList />
-            </motion.div>
-          </Box>
-        ) : (
-          fullProject === null && (
+          <>
             <Box
-              id="projects-mobile-list-box"
+              id="projects-desktop-list-box"
               sx={{
-                paddingTop: 2,
-                paddingLeft: 2,
-                width: "100%",
-                backgroundColor: "hoverGray.main",
-              }}
-            >
-              <ProjectList />
-            </Box>
-          )
-        )}
-        {onMedia.onDesktop ? (
-          <Box
-            id="projects-desktop-info-box"
-            sx={{
-              paddingTop: 4,
-              paddingLeft: 2,
-              paddingRight: 4,
-              width: "61.54%",
-              maxWidth: "896px",
-            }}
-          >
-            <motion.div
-              initial={isAnimated.projects ? false : { y: 200, opacity: 0 }}
-              animate={isAnimated.projects ? false : { y: 0, opacity: 1 }}
-              transition={{ delay: 1 }}
-            >
-              <ProjectInfo />
-            </motion.div>
-          </Box>
-        ) : (
-          fullProject !== null && (
-            <Box
-              id="projects-mobile-info-box"
-              sx={{
-                paddingTop: 2,
-                paddingLeft: 2,
+                paddingTop: 4,
+                paddingLeft: 4,
                 paddingRight: 2,
-                width: "100%",
-                backgroundColor: "hoverGray.main",
+                width: "38.46%",
+                maxWidth: "560px",
               }}
             >
-              <ProjectInfo />
+              <motion.div
+                initial={isAnimated.projects ? false : { x: -200, opacity: 0 }}
+                animate={isAnimated.projects ? false : { x: 0, opacity: 1 }}
+                transition={{ delay: 1 }}
+              >
+                <ProjectList />
+              </motion.div>
             </Box>
-          )
+            <Box
+              id="projects-desktop-info-box"
+              sx={{
+                paddingTop: 4,
+                paddingLeft: 2,
+                paddingRight: 4,
+                width: "61.54%",
+                maxWidth: "896px",
+              }}
+            >
+              <motion.div
+                initial={isAnimated.projects ? false : { y: 200, opacity: 0 }}
+                animate={isAnimated.projects ? false : { y: 0, opacity: 1 }}
+                transition={{ delay: 1 }}
+              >
+                <ProjectInfo />
+              </motion.div>
+            </Box>
+          </>
+        ) : fullProject === null ? (
+          <Box
+            id="projects-mobile-list-box"
+            sx={{
+              paddingTop: 2,
+              paddingLeft: 2,
+              width: "100%",
+              backgroundColor: "hoverGray.main",
+            }}
+          >
+            <ProjectList />
+          </Box>
+        ) : (
+          <Box
+            id="projects-mobile-info-box"
+            sx={{
+              paddingTop: 2,
+              paddingLeft: 2,
+              width: "100%",
+              backgroundColor: "hoverGray.main",
+            }}
+          >
+            <ProjectInfo />
+          </Box>
         )}
       </Box>
     </ProjectContext.Provider>
