@@ -2,7 +2,6 @@ import { useContext, useMemo } from "react";
 import { Box } from "@mui/material";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
 import StudentListItem from "./StudentListItem";
-import { useEffect } from "react";
 
 // always !onDesktop
 

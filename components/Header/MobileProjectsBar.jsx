@@ -1,13 +1,5 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import {
-  AppBar,
-  Box,
-  Chip,
-  Fab,
-  Tab,
-  Toolbar,
-  Typography,
-} from "@mui/material";
+import { AppBar, Box, Chip, Fab, Toolbar, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { ProjectContext } from "../Context/ShareContexts";
 import {
@@ -132,168 +124,166 @@ const MobileProjectsBar = () => {
 
   return (
     <>
-      {fullProject === null && (
-        <AppBar elevation={0} position="static">
-          <Toolbar
-            id="mobileprojectsbar-searchbox"
-            disableGutters // disable auto padding
+      <AppBar elevation={0} position="fixed">
+        <Toolbar
+          id="mobileprojectsbar-searchbox"
+          disableGutters // disable auto padding
+          sx={{
+            // minHeight: 0,
+            // "@media (min-width: 600px)": {
+            //   minHeight: 0,
+            // },
+            height: "80px",
+            paddingX: 2,
+            backgroundColor: "background.default",
+          }}
+        >
+          <Box
             sx={{
-              // minHeight: 0,
-              // "@media (min-width: 600px)": {
-              //   minHeight: 0,
-              // },
-              height: "80px",
-              paddingX: 2,
-              backgroundColor: "background.default",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              width: "100%",
             }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              <UserIconMenu iconHeight="32px" avatarHeight="32px" />
-              <SearchBox sx={{ ml: 2, width: "100%" }}>
-                <SearchIconWrapper>
-                  <SearchIcon />
-                </SearchIconWrapper>
-                <StyledInputBase
-                  fullWidth={true}
-                  placeholder="Search for projects or positions..."
-                  inputProps={{ "aria-label": "search" }}
-                  inputRef={textRef}
-                  onChange={(e) => {
-                    if (e.target.value.length !== 0) return;
-                    setSearchTerm("");
-                  }}
-                  onKeyPress={(e) => {
-                    if (e.key === "Enter") {
-                      setSearchTerm(e.target.value);
-                    }
-                  }}
-                />
-              </SearchBox>
-            </Box>
-          </Toolbar>
-          <Toolbar
-            id="mobileprojectsbar-tab"
-            disableGutters // disable auto padding
-            sx={{
-              alignItems: "flex-end",
-              minHeight: 0,
-              height: "40px",
-              paddingX: 2,
-              paddingBottom: 0.5,
-              backgroundColor: "primary.main",
-              position: "relative",
-              // overflow: "scroll",
-              // "&::-webkit-scrollbar": {
-              //   display: "none",
-              // },
-            }}
-          >
-            <TuneIcon sx={{ mr: 2 }} />
-            <Typography
-              sx={{
-                mr: 2,
-                fontSize: selected === "1" ? "1rem" : "0.75rem",
-                fontWeight: selected === "1" ? "medium" : "regular",
-              }}
-              onClick={() => {
-                setSelected("1");
-              }}
-            >
-              Category
-            </Typography>
-            <Typography
-              sx={{
-                mr: 2,
-                fontSize: selected === "2" ? "1rem" : "0.75rem",
-                fontWeight: selected === "2" ? "medium" : "regular",
-              }}
-              onClick={() => {
-                setSelected("2");
-              }}
-            >
-              Type
-            </Typography>
-            {searchTypeList.length > 0 && (
-              <Chip
-                label={searchTypeList.length + " selected"}
-                color="selectedWhite"
-                size="small"
-                onDelete={() => {
-                  const newTypeList = [...typeList];
-                  newTypeList.forEach((type) => {
-                    if (type.isSelected) type.isSelected = false;
-                  });
-                  setTypeList(newTypeList);
-                  setSearchTypeList([]);
+            <UserIconMenu iconHeight="32px" avatarHeight="32px" />
+            <SearchBox sx={{ ml: 2, width: "100%" }}>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                fullWidth={true}
+                placeholder="Search for projects or positions..."
+                inputProps={{ "aria-label": "search" }}
+                inputRef={textRef}
+                onChange={(e) => {
+                  if (e.target.value.length !== 0) return;
+                  setSearchTerm("");
                 }}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    setSearchTerm(e.target.value);
+                  }
+                }}
+              />
+            </SearchBox>
+          </Box>
+        </Toolbar>
+        <Toolbar
+          id="mobileprojectsbar-tab"
+          disableGutters // disable auto padding
+          sx={{
+            alignItems: "flex-end",
+            minHeight: 0,
+            height: "40px",
+            paddingX: 2,
+            paddingBottom: 0.5,
+            backgroundColor: "primary.main",
+            position: "relative",
+            // overflow: "scroll",
+            // "&::-webkit-scrollbar": {
+            //   display: "none",
+            // },
+          }}
+        >
+          <TuneIcon sx={{ mr: 2 }} />
+          <Typography
+            sx={{
+              mr: 2,
+              fontSize: selected === "1" ? "1rem" : "0.75rem",
+              fontWeight: selected === "1" ? "medium" : "regular",
+            }}
+            onClick={() => {
+              setSelected("1");
+            }}
+          >
+            Category
+          </Typography>
+          <Typography
+            sx={{
+              mr: 2,
+              fontSize: selected === "2" ? "1rem" : "0.75rem",
+              fontWeight: selected === "2" ? "medium" : "regular",
+            }}
+            onClick={() => {
+              setSelected("2");
+            }}
+          >
+            Type
+          </Typography>
+          {searchTypeList.length > 0 && (
+            <Chip
+              label={searchTypeList.length + " selected"}
+              color="selectedWhite"
+              size="small"
+              onDelete={() => {
+                const newTypeList = [...typeList];
+                newTypeList.forEach((type) => {
+                  if (type.isSelected) type.isSelected = false;
+                });
+                setTypeList(newTypeList);
+                setSearchTypeList([]);
+              }}
+              sx={{
+                position: "absolute",
+                bottom: 4,
+                right: 16,
+                height: "24px",
+                "& .MuiChip-deleteIcon": {
+                  color: "primary.main",
+                },
+              }}
+            />
+          )}
+        </Toolbar>
+        <Toolbar
+          id="mobileprojectsbar-tab-content"
+          disableGutters // disable auto padding
+          sx={{
+            alignItems: "flex-start",
+            minHeight: 0,
+            height: "40px",
+            paddingX: 2,
+            paddingTop: 0.5,
+            backgroundColor: "primary.main",
+            overflow: "scroll",
+            "&::-webkit-scrollbar": {
+              display: "none",
+            },
+          }}
+        >
+          {selected === "2" &&
+            typeList?.map((type, index) => (
+              <Chip
+                key={index}
+                color={type.isSelected ? "selectedWhite" : "lightPrimary"}
+                label={type.name}
+                size="small"
+                onClick={() => {
+                  handleSelect(index);
+                }}
+                {...(type.isSelected && {
+                  onDelete: () => {
+                    handleRemove(index);
+                  },
+                })}
                 sx={{
-                  position: "absolute",
-                  bottom: 4,
-                  right: 16,
-                  height: "24px",
+                  mr: 1,
+                  fontSize: "0.75rem",
+                  fontWeight: "medium",
+                  "&.MuiChip-root:hover": {
+                    backgroundColor: type.isSelected
+                      ? "selectedWhite.main"
+                      : "lightPrimary.main",
+                  },
                   "& .MuiChip-deleteIcon": {
                     color: "primary.main",
                   },
                 }}
               />
-            )}
-          </Toolbar>
-          <Toolbar
-            id="mobileprojectsbar-tab-content"
-            disableGutters // disable auto padding
-            sx={{
-              alignItems: "flex-start",
-              minHeight: 0,
-              height: "40px",
-              paddingX: 2,
-              paddingTop: 0.5,
-              backgroundColor: "primary.main",
-              overflow: "scroll",
-              "&::-webkit-scrollbar": {
-                display: "none",
-              },
-            }}
-          >
-            {selected === "2" &&
-              typeList?.map((type, index) => (
-                <Chip
-                  key={index}
-                  color={type.isSelected ? "selectedWhite" : "lightPrimary"}
-                  label={type.name}
-                  size="small"
-                  onClick={() => {
-                    handleSelect(index);
-                  }}
-                  {...(type.isSelected && {
-                    onDelete: () => {
-                      handleRemove(index);
-                    },
-                  })}
-                  sx={{
-                    mr: 1,
-                    fontSize: "0.75rem",
-                    fontWeight: "medium",
-                    "&.MuiChip-root:hover": {
-                      backgroundColor: type.isSelected
-                        ? "selectedWhite.main"
-                        : "lightPrimary.main",
-                    },
-                    "& .MuiChip-deleteIcon": {
-                      color: "primary.main",
-                    },
-                  }}
-                />
-              ))}
-          </Toolbar>
-        </AppBar>
-      )}
+            ))}
+        </Toolbar>
+      </AppBar>
       {fullProject !== null && (
         <Fab
           color="primary"
@@ -301,7 +291,7 @@ const MobileProjectsBar = () => {
           onClick={() => {
             setFullProject(null);
           }}
-          sx={{ position: "absolute", right: 16, bottom: 80 }}
+          sx={{ position: "fixed", right: 16, bottom: 80 }}
         >
           <ArrowBackIosRoundedIcon />
         </Fab>

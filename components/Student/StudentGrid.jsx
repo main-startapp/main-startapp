@@ -1,4 +1,5 @@
-import { Box, Grid } from "@mui/material";
+import { Box, Grid, Paper } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { useContext, useMemo, useEffect } from "react";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
 import StudentGridCard from "./StudentGridCard";
@@ -7,6 +8,7 @@ const StudentGrid = () => {
   // context
   const { users, winWidth, winHeight, onMedia } = useContext(GlobalContext);
   const { searchTerm, setStudent } = useContext(StudentContext);
+  const theme = useTheme();
 
   // local vars
   const filteredStudents = useMemo(
@@ -33,33 +35,40 @@ const StudentGrid = () => {
   }, [onMedia.onDesktop, setStudent, users]);
 
   return (
-    <Box
+    <Paper
+      elevation={onMedia.onDesktop ? 2 : 0}
       sx={{
-        height: `calc(${winHeight}px - 64px - 64px - 1.5px)`,
-        overflowX: "hidden",
-        overflowY: "scroll",
+        // mt: onMedia.onDesktop ? 4 : 2,
+        // ml: onMedia.onDesktop ? 4 : 2,
+        // mr: onMedia.onDesktop ? 2 : 0,
+        backgroundColor: "background.paper",
+        borderTop: onMedia.onDesktop ? 1 : 0,
+        borderColor: "divider",
+        borderRadius: onMedia.onDesktop
+          ? "32px 32px 0px 0px"
+          : "32px 0px 0px 0px",
+        paddingTop: "32px",
       }}
     >
-      <Grid container spacing={1.5} padding={1.5}>
-        {filteredStudents?.map((user, index) => (
-          <Grid
-            key={index}
-            item
-            xs={
-              winWidth < 1333
-                ? 4
-                : winWidth < 1770
-                ? 3
-                : winWidth < 2207
-                ? 2.4
-                : 2
-            }
-          >
-            <StudentGridCard key={user.uid} student={user} />
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
+      <Box
+        id="studentgrid-grid-box"
+        sx={{
+          height: `calc(${winHeight}px - 65px - ${theme.spacing(
+            4
+          )} - 1px - 32px)`,
+          overflowX: "hidden",
+          overflowY: "scroll",
+        }}
+      >
+        <Grid container>
+          {filteredStudents?.map((user, index) => (
+            <Grid key={index} item xs={3}>
+              <StudentGridCard key={user.uid} student={user} />
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    </Paper>
   );
 };
 

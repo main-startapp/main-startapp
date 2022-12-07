@@ -87,7 +87,7 @@ const UserCreate = () => {
     delete userRef?.uid;
 
     let userModRef;
-    if (userRef.create_timestamp) {
+    if (userRef?.create_timestamp) {
       // update
       // can't update partially
       userModRef = updateDoc(docRef, userRef).catch((error) => {

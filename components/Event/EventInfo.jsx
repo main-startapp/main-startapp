@@ -52,44 +52,51 @@ const EventInfo = () => {
 
   return (
     <Paper
-      elevation={2}
+      elevation={onMedia.onDesktop ? 2 : 0}
       sx={{
         // mt: onMedia.onDesktop ? 4 : 2,
         // ml: onMedia.onDesktop ? 2 : 2,
         // mr: onMedia.onDesktop ? 4 : 0,
+        display: "flex",
+        flexDirection: "column",
+        height: onMedia.onDesktop
+          ? `calc(100dvh - 65px - ${theme.spacing(4)})`
+          : "auto", // onDesktop: fixed height, onMobile: auto to enable hiding address bar
+        minHeight: onMedia.onDesktop
+          ? `calc(100dvh - 65px - ${theme.spacing(4)})`
+          : `calc(100dvh - 160px - ${theme.spacing(2)} - 64px)`,
+        mt: onMedia.onDesktop ? 0 : "160px",
+        mb: onMedia.onDesktop ? 0 : "64px", // onDesktop: on margin, onMobile: top & bottom navbars
+        paddingTop: onMedia.onDesktop ? "32px" : 0,
         backgroundColor: "background.paper",
         borderTop: onMedia.onDesktop ? 1 : 0,
         borderColor: "divider",
         borderRadius: onMedia.onDesktop
           ? "32px 32px 0px 0px"
           : "32px 0px 0px 0px",
-        paddingTop: "32px",
-        minHeight: "100%",
       }}
     >
-      <motion.div
-        key={event?.title}
-        initial={{ opacity: 0, y: "1%" }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+      <Box
+        id="eventinfo-box"
+        ref={boxRef}
+        sx={{
+          // height: onMedia.onDesktop
+          //   ? `calc(${winHeight}px - 65px - ${theme.spacing(4)} - 1px - 32px)` // navbar; spacing; paper t-border; paper t-padding
+          //   : `calc(${winHeight}px - ${theme.spacing(2)} - 32px - 65px)`, // mobile bar; spacing; paper t-padding; bottom navbar
+          overflowY: "scroll",
+          paddingTop: onMedia.onDesktop ? 2 : 2, // align with project list
+          paddingBottom: onMedia.onDesktop ? 6 : 2, // enough space to not covered by messages
+          paddingLeft: onMedia.onDesktop ? 4 : 2,
+          paddingRight: onMedia.onDesktop
+            ? `calc(${theme.spacing(4)} - 0.4rem)`
+            : 2, // considering scrollbar
+        }}
       >
-        <Box
-          id="eventinfo-box"
-          ref={boxRef}
-          sx={{
-            height: onMedia.onDesktop
-              ? `calc(${winHeight}px - 65px - ${theme.spacing(4)} - 1px - 32px)` // navbar; spacing; paper t-border; paper t-padding
-              : `calc(${winHeight}px - ${theme.spacing(2)} - 32px - 65px)`, // mobile bar; spacing; paper t-padding; bottom navbar
-            overflowY: "scroll",
-            paddingTop: onMedia.onDesktop ? 2 : 0, // align with project list
-            paddingBottom: onMedia.onDesktop ? 6 : 4, // enough space to not covered by messages
-            paddingLeft: onMedia.onDesktop ? 4 : 2,
-            paddingRight: onMedia.onDesktop
-              ? `calc(${theme.spacing(4)} - 0.4rem)`
-              : 2, // considering scrollbar
-            display: "flex",
-            flexDirection: "column",
-          }}
+        <motion.div
+          key={event?.title}
+          initial={{ opacity: 0, y: "1%" }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
         >
           <Box
             id="eventinfo-header-box"
@@ -120,6 +127,7 @@ const EventInfo = () => {
               {event?.title}
             </Typography>
           </Box>
+
           <Divider
             sx={{
               mt: 2,
@@ -127,6 +135,7 @@ const EventInfo = () => {
               borderColor: "divider",
             }}
           />
+
           <Typography
             color="text.primary"
             variant="h3"
@@ -171,15 +180,16 @@ const EventInfo = () => {
 
           <Button
             disableElevation
-            sx={{
-              mt: 4,
-              borderRadius: 8,
-            }}
+            fullWidth
             variant="contained"
             component={Link}
             target="_blank"
             href={event?.registration_form_url}
             rel="noreferrer"
+            sx={{
+              mt: 4,
+              borderRadius: 8,
+            }}
           >
             {"Attend"}
           </Button>
@@ -189,19 +199,18 @@ const EventInfo = () => {
               <Typography
                 color="text.primary"
                 variant="h3"
-                sx={{ mt: 4, fontSize: "1.25rem", fontWeight: "bold" }}
+                sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
               >
                 {"Details: "}
               </Typography>
-
               {eventAllTags?.map((tag, index) => (
                 <Chip
                   key={index}
                   color={"lightPrimary"}
                   label={tag}
                   sx={{
-                    mt: 1,
                     mr: 1,
+                    mb: 1,
                     fontSize: "0.875rem",
                     fontWeight: "medium",
                   }}
@@ -212,7 +221,7 @@ const EventInfo = () => {
 
           <Box
             sx={{
-              mt: isLoaded ? 4 : 0,
+              mt: isLoaded ? 3 : 0,
               display: "flex",
               justifyContent: "center",
               visibility: isLoaded ? "visible" : "collapse",
@@ -227,8 +236,8 @@ const EventInfo = () => {
               sx={{ maxWidth: "100%" }}
             />
           </Box>
-        </Box>
-      </motion.div>
+        </motion.div>
+      </Box>
     </Paper>
   );
 };
@@ -621,7 +630,7 @@ export default EventInfo;
             }}
           >
             <ExportedImage
-              src="/images/EDIUMLogo.png"
+              src="/images/edium_text_1024.png"
               alt=""
               width={256}
               height={256}

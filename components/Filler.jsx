@@ -6,7 +6,7 @@ const Filler = () => {
   return (
     <Container>
       <ExportedImage
-        src="/images/EDIUMLogo.png"
+        src="/images/edium_text_1024.png"
         alt=""
         width={512}
         height={512}

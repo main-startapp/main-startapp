@@ -10,10 +10,10 @@ import ProjectInfo from "../components/Project/ProjectInfo";
 import { motion } from "framer-motion";
 
 // this page is also project homepage. Is this a good practice?
-// RoT: Reduce as many redundant local calculations (i.e., find project creator from Users). Don't put any calculation in the comp in ?.map()
-// perfer more centerized, easy-to-review/modify structure, especially for relatively heavy calculation
+// RoT: Reduce redundant local calculations (i.e., find project creator from Users). Don't put any calculation in the comp in map()
+// Perfer more centerized, easy-to-review/modify structure, especially for heavy calculation
 const Home = () => {
-  // global context
+  // context
   const {
     setChat,
     setChatPartner,
@@ -61,7 +61,11 @@ const Home = () => {
 
       <Box
         id="projects-main-box"
-        sx={{ display: "flex", justifyContent: "center", overflow: "hidden" }}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          overflow: "hidden",
+        }}
       >
         {onMedia.onDesktop ? (
           <>

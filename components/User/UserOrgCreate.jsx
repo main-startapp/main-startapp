@@ -36,7 +36,6 @@ const UserOrgCreate = (props) => {
 
   const [newOrgUser, setNewOrgUser] = useState({
     name: "",
-    create_timestamp: "",
     role: "org_admin",
     org_title: "",
     org_department: "N/A",

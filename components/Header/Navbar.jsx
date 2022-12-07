@@ -47,8 +47,9 @@ const Navbar = () => {
             maxWidth: "1392px",
           }}
         >
+          {/* https://stackoverflow.com/questions/46973910/accessing-files-from-firebase-storage-vs-firebase-hosting */}
           <ExportedImage
-            src="/images/EDIUMPlatformLogo256.png"
+            src="/images/edium_notext_128.png"
             alt=""
             height={40}
             width={40}
@@ -109,7 +110,6 @@ const Navbar = () => {
               </LinkIconBox>
             </NextLink>
           </Stack>
-
           <UserIconMenu iconHeight="40px" avatarHeight="40px" />
         </Box>
       </Toolbar>

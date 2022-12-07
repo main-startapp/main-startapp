@@ -18,7 +18,7 @@ const BetaLogin = ({ type, color }) => {
   return (
     <Container>
       <ExportedImage
-        src="/images/EDIUMLogo.png"
+        src="/images/edium_text_1024.png"
         alt=""
         width="512px"
         height="512px"

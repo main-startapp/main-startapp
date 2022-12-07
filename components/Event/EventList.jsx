@@ -104,13 +104,23 @@ const EventList = () => {
         // mt: onMedia.onDesktop ? 4 : 2,
         // ml: onMedia.onDesktop ? 4 : 2,
         // mr: onMedia.onDesktop ? 2 : 0,
+        display: "flex",
+        flexDirection: "column",
+        height: onMedia.onDesktop
+          ? `calc(100dvh - 65px - ${theme.spacing(4)})`
+          : "auto", // onDesktop: fixed height, onMobile: auto to enable hiding address bar
+        minHeight: onMedia.onDesktop
+          ? `calc(100dvh - 65px - ${theme.spacing(4)})`
+          : `calc(100dvh - 160px - ${theme.spacing(2)} - 64px)`,
+        mt: onMedia.onDesktop ? 0 : "160px",
+        mb: onMedia.onDesktop ? 0 : "64px", // onDesktop: on margin, onMobile: top & bottom navbars
+        paddingTop: onMedia.onDesktop ? "32px" : 0,
         backgroundColor: "background.paper",
         borderTop: onMedia.onDesktop ? 1 : 0,
         borderColor: "divider",
         borderRadius: onMedia.onDesktop
           ? "32px 32px 0px 0px"
           : "32px 0px 0px 0px",
-        paddingTop: "32px",
       }}
     >
       {onMedia.onDesktop && <EventListHeader />}
@@ -118,13 +128,14 @@ const EventList = () => {
       <Box
         id="eventlist-eventlistitem-box"
         sx={{
-          height: onMedia.onDesktop
-            ? `calc(${winHeight}px - 65px - ${theme.spacing(
-                4
-              )} - 1px - 32px - 112px - 29px - 96px)` // navbar; spacing; paper t-border; paper t-padding; header; button box
-            : `calc(${winHeight}px - 160px - ${theme.spacing(
-                2
-              )} - 32px + 1px - 65px)`, // mobile bar; spacing margin; inner t-padding; last entry border; bottom navbar
+          flexGrow: 1,
+          // height: onMedia.onDesktop
+          //   ? `calc(${winHeight}px - 65px - ${theme.spacing(
+          //       4
+          //     )} - 1px - 32px - 112px - 29px - 96px)` // navbar; spacing; paper t-border; paper t-padding; header; button box
+          //   : `calc(${winHeight}px - 160px - ${theme.spacing(
+          //       2
+          //     )} - 32px + 1px - 65px)`, // mobile bar; spacing margin; inner t-padding; last entry border; bottom navbar
           overflowY: "scroll",
         }}
       >
@@ -150,7 +161,7 @@ const EventList = () => {
         >
           <Tooltip
             title={ediumUser?.uid ? "" : "Edit your profile first"}
-            style={{ width: "100%" }}
+            style={{ width: "100%" }} // !important: make create button fullwidth
           >
             <span>
               <NextLink

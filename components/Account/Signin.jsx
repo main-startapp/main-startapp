@@ -257,9 +257,9 @@ const Signin = () => {
           }}
         >
           <ExportedImage
-            src="/images/EDIUMLogo.png"
+            src="/images/edium_text_1024.png"
             alt=""
-            layout="fill"
+            fill
             priority
           />
         </Box>

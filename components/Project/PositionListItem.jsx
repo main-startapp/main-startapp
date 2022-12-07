@@ -195,18 +195,18 @@ const PositionListItem = (props) => {
   // components
   const appFormButton = (
     <Button
+      color="primary"
       disabled={!ediumUser?.uid}
       disableElevation
+      size="small"
       variant="contained"
       component={Link}
       target="_blank"
       href={appFormURL}
       rel="noreferrer"
       onClick={(e) => e.stopPropagation()}
-      size="small"
       sx={{
         borderRadius: 8,
-        backgroundColor: "primary",
         paddingX: 2,
         paddingY: 0,
         fontSize: "0.75rem",
@@ -218,6 +218,7 @@ const PositionListItem = (props) => {
 
   const joinRequestButton = (
     <Button
+      color="primary"
       disabled={
         !ediumUser?.uid ||
         ediumUserExt?.join_requests?.some(
@@ -225,15 +226,14 @@ const PositionListItem = (props) => {
         )
       }
       disableElevation
+      size="small"
       variant="contained"
       onClick={(e) => {
         e.stopPropagation();
         handleJoinRequest();
       }}
-      size="small"
       sx={{
         borderRadius: 8,
-        backgroundColor: "primary",
         paddingX: 2,
         paddingY: 0,
         fontSize: "0.75rem",

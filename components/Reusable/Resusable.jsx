@@ -204,6 +204,7 @@ export const findItemFromList = (list, key, itemID) => {
 // change google url photo resolution
 //============================================================
 export const getGooglePhotoURLwithRes = (photo_url, res) => {
+  if (!photo_url) return null;
   const newRes = "=s" + res + "-c";
   return photo_url.replace("=s96-c", newRes);
 };

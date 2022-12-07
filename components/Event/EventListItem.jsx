@@ -66,7 +66,6 @@ const EventListItem = (props) => {
         alignItems: "flex-start",
         borderBottom: 1,
         borderColor: "divider",
-        backgroundColor: "background.paper",
         "&:hover": {
           backgroundColor: "hoverGray.main",
           cursor: "default",

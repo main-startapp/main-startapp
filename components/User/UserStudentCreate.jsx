@@ -36,7 +36,6 @@ const UserStudentCreate = (props) => {
     year_of_ed: 0,
     skill_level: 0,
     desired_position: "",
-    create_timestamp: "",
     field_of_interest: "",
     social_media: [""],
     //past_exp: [""],
