@@ -1,12 +1,19 @@
-import { Box, Grid, Paper } from "@mui/material";
+import { Box, Chip, Grid } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useContext, useMemo, useEffect } from "react";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
-import StudentGridCard from "./StudentGridCard";
+import {
+  FixedHeightPaper,
+  SearchBox,
+  SearchIconWrapper,
+  StyledInputBase,
+} from "../Reusable/Resusable";
+import StudentCard from "./StudentCard";
+import SearchIcon from "@mui/icons-material/Search";
 
 const StudentGrid = () => {
   // context
-  const { users, winWidth, winHeight, onMedia } = useContext(GlobalContext);
+  const { users, winHeight, onMedia } = useContext(GlobalContext);
   const { searchTerm, setStudent } = useContext(StudentContext);
   const theme = useTheme();
 
@@ -35,22 +42,55 @@ const StudentGrid = () => {
   }, [onMedia.onDesktop, setStudent, users]);
 
   return (
-    <Paper
+    <FixedHeightPaper
       elevation={onMedia.onDesktop ? 2 : 0}
+      isdesktop={onMedia.onDesktop ? 1 : 0}
+      islist={1}
       sx={{
-        // mt: onMedia.onDesktop ? 4 : 2,
-        // ml: onMedia.onDesktop ? 4 : 2,
-        // mr: onMedia.onDesktop ? 2 : 0,
-        backgroundColor: "background.paper",
-        borderTop: onMedia.onDesktop ? 1 : 0,
-        borderColor: "divider",
-        borderRadius: onMedia.onDesktop
-          ? "32px 32px 0px 0px"
-          : "32px 0px 0px 0px",
         paddingTop: "32px",
       }}
     >
+      <SearchBox sx={{ mt: 2, mx: 4, mb: 4 }}>
+        <SearchIconWrapper>
+          <SearchIcon />
+        </SearchIconWrapper>
+        <StyledInputBase
+          placeholder="Search for name or experise"
+          inputProps={{ "aria-label": "search" }}
+          // onChange={(e) => {
+          //   if (e.target.value.length !== 0) return;
+          //   setSearchTerm("");
+          // }}
+          // onKeyPress={(e) => {
+          //   if (e.key === "Enter") {
+          //     setSearchTerm(e.target.value);
+          //   }
+          // }}
+        />
+      </SearchBox>
+
       <Box
+        id="studentgrid-items-box"
+        sx={{
+          flexGrow: 1,
+          overflowY: "scroll",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          {filteredStudents?.map((user, index) => {
+            return <StudentCard key={user.uid} student={user} />;
+          })}
+        </Box>
+      </Box>
+
+      {/* <Box
         id="studentgrid-grid-box"
         sx={{
           height: `calc(${winHeight}px - 65px - ${theme.spacing(
@@ -63,12 +103,12 @@ const StudentGrid = () => {
         <Grid container>
           {filteredStudents?.map((user, index) => (
             <Grid key={index} item xs={3}>
-              <StudentGridCard key={user.uid} student={user} />
+              <StudentCard key={user.uid} student={user} />
             </Grid>
           ))}
         </Grid>
-      </Box>
-    </Paper>
+      </Box> */}
+    </FixedHeightPaper>
   );
 };
 

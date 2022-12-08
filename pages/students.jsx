@@ -55,7 +55,14 @@ const Students = () => {
 
       <Box
         id="students-main-box"
-        sx={{ display: "flex", justifyContent: "center", overflow: "hidden" }}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          overflow: "hidden",
+          ":hover": {
+            cursor: "default",
+          },
+        }}
       >
         {onMedia.onDesktop ? (
           <>

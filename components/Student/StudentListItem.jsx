@@ -49,7 +49,6 @@ const StudentListItem = (props) => {
           backgroundColor: "#ffffff",
           "&:hover": {
             backgroundColor: "#f6f6f6",
-            cursor: "default",
           },
           // height: "180px",
           overflow: "hidden",

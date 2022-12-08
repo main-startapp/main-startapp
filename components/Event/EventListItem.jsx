@@ -68,7 +68,6 @@ const EventListItem = (props) => {
         borderColor: "divider",
         "&:hover": {
           backgroundColor: "hoverGray.main",
-          cursor: "default",
         },
         overflow: "hidden",
         paddingY: 2,

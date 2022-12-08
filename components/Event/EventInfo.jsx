@@ -5,6 +5,7 @@ import {
   Button,
   Chip,
   Divider,
+  Fab,
   Link,
   Paper,
   Typography,
@@ -12,15 +13,17 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { EventContext, GlobalContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
+import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 import moment from "moment";
 import { Interweave } from "interweave";
 import { UrlMatcher } from "interweave-autolink";
 import { motion } from "framer-motion";
+import { FixedHeightPaper } from "../Reusable/Resusable";
 
 const EventInfo = () => {
   // context
   const { winHeight, onMedia } = useContext(GlobalContext);
-  const { fullEvent } = useContext(EventContext);
+  const { fullEvent, setFullEvent } = useContext(EventContext);
   const theme = useTheme();
 
   // local vars
@@ -45,44 +48,24 @@ const EventInfo = () => {
   const isSameTime = startMoment.format("LLL") === endMoment.format("LLL");
 
   // useEffect to reset box scrollbar position
-  const boxRef = useRef();
+  // useEffect to reset box scrollbar position
   useEffect(() => {
-    if (boxRef?.current?.scrollTop) boxRef.current.scrollTop = 0;
-  }, [fullEvent]);
+    window.scrollTo({ top: 0 });
+  }, [fullEvent]); // every time project changes, this forces each accordion to collapse
 
   return (
-    <Paper
+    <FixedHeightPaper
       elevation={onMedia.onDesktop ? 2 : 0}
+      isdesktop={onMedia.onDesktop ? 1 : 0}
+      islist={0}
       sx={{
-        // mt: onMedia.onDesktop ? 4 : 2,
-        // ml: onMedia.onDesktop ? 2 : 2,
-        // mr: onMedia.onDesktop ? 4 : 0,
-        display: "flex",
-        flexDirection: "column",
-        height: onMedia.onDesktop
-          ? `calc(100dvh - 65px - ${theme.spacing(4)})`
-          : "auto", // onDesktop: fixed height, onMobile: auto to enable hiding address bar
-        minHeight: onMedia.onDesktop
-          ? `calc(100dvh - 65px - ${theme.spacing(4)})`
-          : `calc(100dvh - 160px - ${theme.spacing(2)} - 64px)`,
-        mt: onMedia.onDesktop ? 0 : "160px",
-        mb: onMedia.onDesktop ? 0 : "64px", // onDesktop: on margin, onMobile: top & bottom navbars
         paddingTop: onMedia.onDesktop ? "32px" : 0,
-        backgroundColor: "background.paper",
-        borderTop: onMedia.onDesktop ? 1 : 0,
-        borderColor: "divider",
-        borderRadius: onMedia.onDesktop
-          ? "32px 32px 0px 0px"
-          : "32px 0px 0px 0px",
       }}
     >
       <Box
         id="eventinfo-box"
-        ref={boxRef}
         sx={{
-          // height: onMedia.onDesktop
-          //   ? `calc(${winHeight}px - 65px - ${theme.spacing(4)} - 1px - 32px)` // navbar; spacing; paper t-border; paper t-padding
-          //   : `calc(${winHeight}px - ${theme.spacing(2)} - 32px - 65px)`, // mobile bar; spacing; paper t-padding; bottom navbar
+          flexGrow: 1,
           overflowY: "scroll",
           paddingTop: onMedia.onDesktop ? 2 : 2, // align with project list
           paddingBottom: onMedia.onDesktop ? 6 : 2, // enough space to not covered by messages
@@ -199,7 +182,7 @@ const EventInfo = () => {
               <Typography
                 color="text.primary"
                 variant="h3"
-                sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
+                sx={{ mt: 4, fontSize: "1.25rem", fontWeight: "bold" }}
               >
                 {"Details: "}
               </Typography>
@@ -210,7 +193,7 @@ const EventInfo = () => {
                   label={tag}
                   sx={{
                     mr: 1,
-                    mb: 1,
+                    mt: 1,
                     fontSize: "0.875rem",
                     fontWeight: "medium",
                   }}
@@ -238,7 +221,19 @@ const EventInfo = () => {
           </Box>
         </motion.div>
       </Box>
-    </Paper>
+      {!onMedia.onDesktop && fullEvent !== null && (
+        <Fab
+          color="primary"
+          size="small"
+          onClick={() => {
+            setFullEvent(null);
+          }}
+          sx={{ position: "fixed", right: 16, bottom: 80 }}
+        >
+          <ArrowBackIosRoundedIcon />
+        </Fab>
+      )}
+    </FixedHeightPaper>
   );
 };
 

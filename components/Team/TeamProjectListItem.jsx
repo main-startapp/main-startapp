@@ -51,7 +51,6 @@ const TeamProjectListItem = (props) => {
           borderColor: "text.secondary",
           "&:hover": {
             backgroundColor: "#f6f6f6",
-            cursor: "default",
           },
           overflow: "hidden",
           opacity: project?.is_visible ? "100%" : "50%",

@@ -477,8 +477,8 @@ const ChatMsg = (props) => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        overflow: "auto",
         flexGrow: 1,
+        overflow: "auto",
         borderColor: "divider",
       }}
     >

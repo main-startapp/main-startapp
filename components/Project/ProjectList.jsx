@@ -7,6 +7,7 @@ import ProjectListItem from "./ProjectListItem";
 import ProjectListHeader from "./ProjectListHeader";
 import {
   findItemFromList,
+  FixedHeightPaper,
   isStrInObjList,
   isStrInStr,
   isStrInStrList,
@@ -104,44 +105,20 @@ const ProjectList = () => {
   // https://stackoverflow.com/questions/45767405/the-difference-between-flex1-and-flex-grow1
   // https://stackoverflow.com/questions/43520932/make-flex-grow-expand-items-based-on-their-original-size
   return (
-    <Paper
+    <FixedHeightPaper
       elevation={onMedia.onDesktop ? 2 : 0}
+      isdesktop={onMedia.onDesktop ? 1 : 0}
+      islist={1}
       sx={{
-        // mt: onMedia.onDesktop ? 4 : 2,
-        // ml: onMedia.onDesktop ? 4 : 2,
-        // mr: onMedia.onDesktop ? 2 : 0,
-        display: "flex",
-        flexDirection: "column",
-        height: onMedia.onDesktop
-          ? `calc(100dvh - 65px - ${theme.spacing(4)})`
-          : "auto", // onDesktop: fixed height, onMobile: auto to enable hiding address bar
-        minHeight: onMedia.onDesktop
-          ? `calc(100dvh - 65px - ${theme.spacing(4)})`
-          : `calc(100dvh - 160px - ${theme.spacing(2)} - 64px)`,
-        mt: onMedia.onDesktop ? 0 : "160px",
-        mb: onMedia.onDesktop ? 0 : "64px", // onDesktop: on margin, onMobile: top & bottom navbars
         paddingTop: onMedia.onDesktop ? "32px" : 0,
-        backgroundColor: "background.paper",
-        borderTop: onMedia.onDesktop ? 1 : 0,
-        borderColor: "divider",
-        borderRadius: onMedia.onDesktop
-          ? "32px 32px 0px 0px"
-          : "32px 0px 0px 0px",
       }}
     >
       {onMedia.onDesktop && <ProjectListHeader />}
 
       <Box
-        id="projectlist-projectlistitem-box"
+        id="projectlist-items-box"
         sx={{
           flexGrow: 1,
-          // height: onMedia.onDesktop
-          //   ? `calc(${winHeight}px - 65px - ${theme.spacing(
-          //       4
-          //     )} - 1px - 32px - 112px - 29px - 96px)` // navbar; spacing; paper t-border; paper t-padding; header; button box
-          //   : `calc(${winHeight}px - 160px - ${theme.spacing(
-          //       2
-          //     )} - 32px + 1px - 65px)`, // mobile bar; spacing margin; inner t-padding; last entry border; bottom navbar
           overflowY: "scroll",
         }}
       >
@@ -197,7 +174,7 @@ const ProjectList = () => {
           </Tooltip>
         </Box>
       )}
-    </Paper>
+    </FixedHeightPaper>
   );
 };
 

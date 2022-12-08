@@ -449,7 +449,4 @@ const LinkWrapper = styled(Box)(({ theme }) => ({
   flexDirection: "row",
   alignItems: "center",
   height: "4em",
-  "&:hover": {
-    cursor: "default",
-  },
 }));

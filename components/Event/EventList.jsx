@@ -8,14 +8,14 @@ import moment from "moment";
 import EventListHeader from "./EventListHeader";
 import {
   findItemFromList,
+  FixedHeightPaper,
   isStrInStr,
   isStrInStrList,
 } from "../Reusable/Resusable";
 
 const EventList = () => {
   // context
-  const { events, users, ediumUser, winHeight, onMedia } =
-    useContext(GlobalContext);
+  const { events, users, ediumUser, onMedia } = useContext(GlobalContext);
   const { setFullEvent, searchTerm, searchTypeList } = useContext(EventContext);
   const theme = useTheme();
 
@@ -98,44 +98,20 @@ const EventList = () => {
   }, [filteredFullEvents, onMedia.onDesktop, setFullEvent]);
 
   return (
-    <Paper
+    <FixedHeightPaper
       elevation={onMedia.onDesktop ? 2 : 0}
+      isdesktop={onMedia.onDesktop ? 1 : 0}
+      islist={1}
       sx={{
-        // mt: onMedia.onDesktop ? 4 : 2,
-        // ml: onMedia.onDesktop ? 4 : 2,
-        // mr: onMedia.onDesktop ? 2 : 0,
-        display: "flex",
-        flexDirection: "column",
-        height: onMedia.onDesktop
-          ? `calc(100dvh - 65px - ${theme.spacing(4)})`
-          : "auto", // onDesktop: fixed height, onMobile: auto to enable hiding address bar
-        minHeight: onMedia.onDesktop
-          ? `calc(100dvh - 65px - ${theme.spacing(4)})`
-          : `calc(100dvh - 160px - ${theme.spacing(2)} - 64px)`,
-        mt: onMedia.onDesktop ? 0 : "160px",
-        mb: onMedia.onDesktop ? 0 : "64px", // onDesktop: on margin, onMobile: top & bottom navbars
         paddingTop: onMedia.onDesktop ? "32px" : 0,
-        backgroundColor: "background.paper",
-        borderTop: onMedia.onDesktop ? 1 : 0,
-        borderColor: "divider",
-        borderRadius: onMedia.onDesktop
-          ? "32px 32px 0px 0px"
-          : "32px 0px 0px 0px",
       }}
     >
       {onMedia.onDesktop && <EventListHeader />}
 
       <Box
-        id="eventlist-eventlistitem-box"
+        id="eventlist-items-box"
         sx={{
           flexGrow: 1,
-          // height: onMedia.onDesktop
-          //   ? `calc(${winHeight}px - 65px - ${theme.spacing(
-          //       4
-          //     )} - 1px - 32px - 112px - 29px - 96px)` // navbar; spacing; paper t-border; paper t-padding; header; button box
-          //   : `calc(${winHeight}px - 160px - ${theme.spacing(
-          //       2
-          //     )} - 32px + 1px - 65px)`, // mobile bar; spacing margin; inner t-padding; last entry border; bottom navbar
           overflowY: "scroll",
         }}
       >
@@ -191,7 +167,7 @@ const EventList = () => {
           </Tooltip>
         </Box>
       )}
-    </Paper>
+    </FixedHeightPaper>
   );
 };
 

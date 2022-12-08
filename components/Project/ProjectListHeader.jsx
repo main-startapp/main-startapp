@@ -197,8 +197,8 @@ const ProjectListHeader = () => {
         </TabContext>
         {searchTypeList.length > 0 && (
           <Chip
-            label={searchTypeList.length + " selected"}
             color="primary"
+            label={searchTypeList.length + " selected"}
             size="small"
             onDelete={() => {
               const newTypeList = [...typeList];

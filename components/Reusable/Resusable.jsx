@@ -12,7 +12,13 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { styled } from "@mui/material/styles";
-import { Box, InputBase, TextField, Link as MuiLink } from "@mui/material";
+import {
+  Box,
+  InputBase,
+  TextField,
+  Link as MuiLink,
+  Paper,
+} from "@mui/material";
 
 //============================================================
 // handle connect/message: if chat found, return; if not, create a chat with "request to connect" auto msg.
@@ -267,7 +273,9 @@ export const DefaultTextField = styled(TextField)(({ theme }) => ({
 }));
 
 export const SearchBox = styled(Box)(({ theme }) => ({
+  minHeight: "36px",
   height: "36px",
+  maxHeight: "36px",
   border: 0,
   borderRadius: theme.shape.borderRadius * 2,
   backgroundColor: theme.palette.searchGary.main,
@@ -302,6 +310,24 @@ export const MenuItemLink = styled(MuiLink)(({ theme }) => ({
   color: theme.palette.text.primary,
   textDecoration: "none",
 }));
+
+export const FixedHeightPaper = styled(Paper)(
+  ({ theme, isdesktop, islist }) => ({
+    display: "flex",
+    flexDirection: "column",
+    height: isdesktop ? `calc(100dvh - 65px - ${theme.spacing(4)})` : "auto", // onDesktop: fixed height, onMobile: auto to enable hiding address bar
+    minHeight: isdesktop
+      ? `calc(100dvh - 65px - ${theme.spacing(4)})`
+      : islist
+      ? `calc(100dvh - 160px - ${theme.spacing(2)} - 64px)`
+      : `calc(100dvh - ${theme.spacing(2)} - 64px)`,
+    marginTop: isdesktop ? 0 : islist ? "160px" : 0, // mobile search bar
+    marginBottom: isdesktop ? 0 : "64px", // mobile bottom navbar
+    backgroundColor: theme.palette.background.paper,
+    borderTop: isdesktop ? `1px solid ${theme.palette.divider}` : 0,
+    borderRadius: isdesktop ? "32px 32px 0px 0px" : "32px 0px 0px 0px",
+  })
+);
 //============================================================
 // ADMIN: Duplicate Collections With New Name
 //============================================================

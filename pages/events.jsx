@@ -54,11 +54,18 @@ const Events = () => {
         setSearchTypeList,
       }}
     >
-      {!onMedia.onDesktop && <MobileEventsBar />}
+      {!onMedia.onDesktop && fullEvent === null && <MobileEventsBar />}
 
       <Box
         id="events-main-box"
-        sx={{ display: "flex", justifyContent: "center", overflow: "hidden" }}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          overflow: "hidden",
+          ":hover": {
+            cursor: "default",
+          },
+        }}
       >
         {onMedia.onDesktop ? (
           <>

@@ -2,33 +2,31 @@ import {
   Avatar,
   Box,
   Button,
-  IconButton,
+  Chip,
   Link,
-  Paper,
   Tooltip,
   Typography,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import ParkIcon from "@mui/icons-material/Park";
 import LinkIcon from "@mui/icons-material/Link";
-import { getGooglePhotoURLwithRes, handleConnect } from "../Reusable/Resusable";
+import {
+  FixedHeightPaper,
+  getGooglePhotoURLwithRes,
+  handleConnect,
+} from "../Reusable/Resusable";
 import ExportedImage from "next-image-export-optimizer";
-import FaceRetouchingNaturalOutlinedIcon from "@mui/icons-material/FaceRetouchingNaturalOutlined";
 
 const StudentProfile = () => {
   // context
-  const {
-    chats,
-    ediumUser,
-    setForceChatExpand,
-    setChatPartner,
-    winHeight,
-    onMedia,
-  } = useContext(GlobalContext);
+  const { chats, ediumUser, setForceChatExpand, setChatPartner, onMedia } =
+    useContext(GlobalContext);
   const { student } = useContext(StudentContext);
   const theme = useTheme();
 
@@ -55,27 +53,29 @@ const StudentProfile = () => {
   }, [student]); // every time project changes, this forces each accordion to collapse
 
   return (
-    <Paper
+    <FixedHeightPaper
       elevation={onMedia.onDesktop ? 2 : 0}
+      isdesktop={onMedia.onDesktop ? 1 : 0}
+      islist={0}
       sx={{
         position: "relative",
-        // mt: onMedia.onDesktop ? 4 : 2,
-        // ml: onMedia.onDesktop ? 4 : 2,
-        // mr: onMedia.onDesktop ? 2 : 0,
-        backgroundColor: "background.paper",
-        borderTop: onMedia.onDesktop ? 1 : 0,
-        borderColor: "divider",
-        borderRadius: onMedia.onDesktop
-          ? "32px 32px 0px 0px"
-          : "32px 0px 0px 0px",
-        //paddingTop: "32px",
       }}
     >
       <Tooltip
         title="Credit: https://www.freepik.com/author/skyandglass"
         followCursor
       >
-        <Box id="studentprofile-banner-box" sx={{ height: "216px" }}>
+        <Box
+          id="studentprofile-banner-box"
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            height: "216px",
+            width: "100%",
+            borderRadius: "32px 32px 0px 0px",
+            overflow: "hidden",
+          }}
+        >
           <ExportedImage
             src="/images/student_profile_banner2.png"
             alt=""
@@ -83,6 +83,15 @@ const StudentProfile = () => {
             width={512}
             style={{ borderRadius: "32px 32px 0px 0px" }}
           />
+          {!onMedia.onDesktop && (
+            <ExportedImage
+              src="/images/student_profile_banner2.png"
+              alt=""
+              height={216}
+              width={512}
+              style={{ borderRadius: "32px 32px 0px 0px" }}
+            />
+          )}
         </Box>
       </Tooltip>
       <Avatar
@@ -138,21 +147,22 @@ const StudentProfile = () => {
         id="studentprofile-info-box"
         ref={boxRef}
         sx={{
-          height: onMedia.onDesktop
-            ? `calc(${winHeight}px - 65px - ${theme.spacing(
-                4
-              )} - 1px - 216px - 80px - ${theme.spacing(2)})`
-            : `calc(${winHeight}px - 48px - 48px - 1px - 60px)`,
+          flexGrow: 1,
           overflowY: "scroll",
-          marginTop: 2,
           paddingX: 4,
         }}
       >
         {/* name + icon */}
         <Box
-          sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            mt: 2,
+          }}
         >
           <Typography
+            variant="h2"
             sx={{
               mr: 2,
               fontWeight: "medium",
@@ -169,34 +179,243 @@ const StudentProfile = () => {
             width={17}
           />
         </Box>
-        {/* education year */}
-        {student?.year_of_ed && (
-          <Typography>
-            {ordinal_suffix_of(student.year_of_ed) + " year"}
-          </Typography>
-        )}
 
-        {/* position */}
-        <Typography sx={{ fontSize: onMedia.onDesktop ? "1.1em" : "1em" }}>
-          {student?.desired_position}
-        </Typography>
-
-        {/* field of interest */}
-        <Typography sx={{ fontSize: onMedia.onDesktop ? "1.1em" : "1em" }}>
-          {student?.field_of_interest}
-        </Typography>
-
-        {/* 2nd box; start; student details */}
+        {/* education year + major*/}
         <Box
           sx={{
             display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-start",
-            m: onMedia.onDesktop ? 3 : 1.5,
+            flexDirection: "row",
+            alignItems: "center",
           }}
         >
-          {/* awards */}
-          {student?.awards?.length > 0 && (
+          <Typography variant="h3" sx={{ fontSize: "1rem" }}>
+            {student?.year_of_ed !== (null || undefined) &&
+              ordinal_suffix_of(student.year_of_ed) + " year"}
+            {student?.major !== (null || undefined) && " " + student.major}
+          </Typography>
+        </Box>
+
+        {/* desired position */}
+        {/* <Typography
+          variant="h3"
+          sx={{ mt: 2, fontSize: "1.25rem", fontWeight: "medium" }}
+        >
+          {student?.desired_position}
+        </Typography> */}
+        <Typography sx={{ mt: 2, fontSize: "1rem", fontWeight: "light" }}>
+          {student?.introduction}
+        </Typography>
+
+        {/* social media links */}
+        {student?.social_media?.length > 0 && (
+          <Box
+            sx={{
+              mt: 2,
+              display: "flex",
+              flexDirection: "row",
+              height: "48px",
+            }}
+          >
+            {student.social_media.map((link, index) => {
+              if (link.toLowerCase().includes("linkedin")) {
+                return (
+                  <Link
+                    key={index}
+                    target="_blank"
+                    href={link}
+                    rel="noreferrer"
+                  >
+                    <LinkedInIcon
+                      sx={{
+                        height: "100%",
+                        width: "100%",
+                        color: "#0077b5",
+                      }}
+                    />
+                  </Link>
+                );
+              } else if (link.toLowerCase().includes("facebook")) {
+                return (
+                  <Link
+                    key={index}
+                    target="_blank"
+                    href={link}
+                    rel="noreferrer"
+                  >
+                    <FacebookIcon
+                      sx={{
+                        height: "100%",
+                        width: "100%",
+                        color: "#4267B2",
+                      }}
+                    />
+                  </Link>
+                );
+              } else if (link.toLowerCase().includes("instagram")) {
+                return (
+                  <Link
+                    key={index}
+                    target="_blank"
+                    href={link}
+                    rel="noreferrer"
+                  >
+                    <InstagramIcon
+                      sx={{ height: "100%", width: "100%", color: "#E1306C" }}
+                    />
+                  </Link>
+                );
+              } else if (link.toLowerCase().includes("github")) {
+                return (
+                  <Link
+                    key={index}
+                    target="_blank"
+                    href={link}
+                    rel="noreferrer"
+                  >
+                    <GitHubIcon
+                      sx={{ height: "91.57%", width: "91.57%", color: "#333" }}
+                    />
+                  </Link>
+                );
+              } else if (link.toLowerCase().includes("linktr")) {
+                return (
+                  <Link
+                    key={index}
+                    target="_blank"
+                    href={link}
+                    rel="noreferrer"
+                  >
+                    <ParkIcon
+                      sx={{
+                        height: "94.88%",
+                        width: "94.88%",
+                        color: "#41e760",
+                      }}
+                    />
+                  </Link>
+                );
+              } else {
+                return (
+                  <Link
+                    key={index}
+                    target="_blank"
+                    href={link}
+                    rel="noreferrer"
+                  >
+                    <LinkIcon
+                      sx={{ height: "100%", width: "100%", color: "#EF5432" }}
+                    />
+                  </Link>
+                );
+              }
+            })}
+          </Box>
+        )}
+
+        {/* About section */}
+        {/* positions */}
+        {student?.desired_position && (
+          <>
+            <Typography
+              variant="h3"
+              sx={{ mt: 4, fontSize: "1.25rem", fontWeight: "medium" }}
+            >
+              Desired Positions
+            </Typography>
+            <Chip
+              color="primary"
+              label={student.desired_position}
+              size="medium"
+              sx={{
+                mr: 1,
+                mt: 1,
+                fontSize: "0.875rem",
+                fontWeight: "medium",
+              }}
+            />
+          </>
+        )}
+        {student?.other_positions?.map((position, index) => {
+          return (
+            <Chip
+              key={index}
+              color="lightPrimary"
+              label={position}
+              size="medium"
+              sx={{
+                mr: 1,
+                mt: 1,
+                fontSize: "0.875rem",
+                fontWeight: "medium",
+              }}
+            />
+          );
+        })}
+
+        {/* interests */}
+        {student?.field_of_interest && (
+          <>
+            <Typography
+              variant="h3"
+              sx={{ mt: 4, fontSize: "1.25rem", fontWeight: "medium" }}
+            >
+              Interests
+            </Typography>
+            <Chip
+              color="lightPrimary"
+              label={student.field_of_interest}
+              size="medium"
+              sx={{
+                mr: 1,
+                mt: 1,
+                fontSize: "0.875rem",
+                fontWeight: "medium",
+              }}
+            />
+          </>
+        )}
+        {student?.interests?.map((interest, index) => {
+          return (
+            <Chip
+              key={index}
+              color="lightPrimary"
+              label={interest}
+              size="medium"
+              sx={{
+                mr: 1,
+                mt: 1,
+                fontSize: "0.875rem",
+                fontWeight: "medium",
+              }}
+            />
+          );
+        })}
+        {/* testing filler */}
+        {/* <Typography>
+          There are many variations of passages of Lorem Ipsum available, but
+          the majority have suffered alteration in some form, by injected
+          humour, or randomised words which dont look even slightly believable.
+          If you are going to use a passage of Lorem Ipsum, you need to be sure
+          there isnt anything embarrassing hidden in the middle of text. All the
+          Lorem Ipsum generators on the Internet tend to repeat predefined
+          chunks as necessary, making this the first true generator on the
+          Internet. It uses a dictionary of over 200 Latin words, combined with
+          a handful of model sentence structures, to generate Lorem Ipsum which
+          looks reasonable. The generated Lorem Ipsum is therefore always free
+          from repetition, injected humour, or non-characteristic words etc.
+        </Typography> */}
+      </Box>
+    </FixedHeightPaper>
+  );
+};
+
+export default StudentProfile;
+
+{
+  /* awards */
+}
+{
+  /* {student?.awards?.length > 0 && (
             <Typography
               sx={{
                 fontWeight: "bold",
@@ -220,95 +439,14 @@ const StudentProfile = () => {
                   />
                 </Tooltip>
               )}
-          </Box>
-          {/* social media links */}
-          {student?.social_media?.length > 0 && (
-            <Typography
-              sx={{
-                fontWeight: "bold",
-                fontSize: onMedia.onDesktop ? "1.5em" : "1.25em",
-                mt: 1,
-              }}
-            >
-              {"Social media"}
-            </Typography>
-          )}
-          <Box sx={{ display: "flex", flexDirection: "row", width: "100%" }}>
-            {student?.social_media?.length > 0 &&
-              student.social_media?.map((link, index) => {
-                if (link.toLowerCase().includes("linkedin")) {
-                  return (
-                    <Link
-                      key={index}
-                      target="_blank"
-                      href={link}
-                      rel="noreferrer"
-                    >
-                      <LinkedInIcon
-                        sx={{
-                          fontSize: onMedia.onDesktop ? "3em" : "2.5em",
-                          mr: 1,
-                          color: "black",
-                        }}
-                      />
-                    </Link>
-                  );
-                } else if (link.toLowerCase().includes("facebook")) {
-                  return (
-                    <Link
-                      key={index}
-                      target="_blank"
-                      href={link}
-                      rel="noreferrer"
-                    >
-                      <FacebookIcon
-                        sx={{
-                          fontSize: onMedia.onDesktop ? "3em" : "2.5em",
-                          mr: 1,
-                          color: "black",
-                        }}
-                      />
-                    </Link>
-                  );
-                } else if (link.toLowerCase().includes("instagram")) {
-                  return (
-                    <Link
-                      key={index}
-                      target="_blank"
-                      href={link}
-                      rel="noreferrer"
-                    >
-                      <InstagramIcon
-                        sx={{
-                          fontSize: onMedia.onDesktop ? "3em" : "2.5em",
-                          mr: 1,
-                          color: "black",
-                        }}
-                      />
-                    </Link>
-                  );
-                } else {
-                  return (
-                    <Link
-                      key={index}
-                      target="_blank"
-                      href={link}
-                      rel="noreferrer"
-                    >
-                      <LinkIcon
-                        sx={{
-                          fontSize: onMedia.onDesktop ? "3em" : "2.5em",
-                          mr: 1,
-                          color: "black",
-                        }}
-                      />
-                    </Link>
-                  );
-                }
-              })}
-          </Box>
-          {/* past experience */}
-          {/* {student?.past_exp?.length > 0 && (
+          </Box> */
+}
+
+{
+  /* past experience */
+}
+{
+  /* {student?.past_exp?.length > 0 && (
           <Typography
             sx={{
               fontWeight: "bold",
@@ -334,11 +472,5 @@ const StudentProfile = () => {
                 &bull; &nbsp; {exp}
               </Typography>
             ))}
-        </Box> */}
-        </Box>
-      </Box>
-    </Paper>
-  );
-};
-
-export default StudentProfile;
+        </Box> */
+}

@@ -1,6 +1,5 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { AppBar, Box, Chip, Fab, Toolbar, Typography } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { AppBar, Box, Chip, Toolbar, Typography } from "@mui/material";
 import { ProjectContext } from "../Context/ShareContexts";
 import {
   removeValueFromArray,
@@ -8,7 +7,6 @@ import {
   SearchIconWrapper,
   StyledInputBase,
 } from "../Reusable/Resusable";
-import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 import SearchIcon from "@mui/icons-material/Search";
 import UserIconMenu from "./UserIconMenu";
 import TuneIcon from "@mui/icons-material/Tune";
@@ -17,8 +15,6 @@ import { projectStrList } from "../Reusable/MenuStringList";
 const MobileProjectsBar = () => {
   // context
   const {
-    fullProject,
-    setFullProject,
     setSearchTerm,
     searchCategory,
     setSearchCategory,
@@ -188,13 +184,15 @@ const MobileProjectsBar = () => {
         >
           <TuneIcon sx={{ mr: 2 }} />
           <Typography
-            sx={{
-              mr: 2,
-              fontSize: selected === "1" ? "1rem" : "0.75rem",
-              fontWeight: selected === "1" ? "medium" : "regular",
-            }}
             onClick={() => {
               setSelected("1");
+            }}
+            sx={{
+              mr: 2,
+              fontSize: "1rem",
+              fontWeight: "regular",
+              borderBottom: 1,
+              borderColor: selected === "1" ? "white" : "primary.main",
             }}
           >
             Category
@@ -202,8 +200,9 @@ const MobileProjectsBar = () => {
           <Typography
             sx={{
               mr: 2,
-              fontSize: selected === "2" ? "1rem" : "0.75rem",
-              fontWeight: selected === "2" ? "medium" : "regular",
+              fontSize: "1rem",
+              borderBottom: 1,
+              borderColor: selected === "2" ? "white" : "primary.main",
             }}
             onClick={() => {
               setSelected("2");
@@ -284,18 +283,6 @@ const MobileProjectsBar = () => {
             ))}
         </Toolbar>
       </AppBar>
-      {fullProject !== null && (
-        <Fab
-          color="primary"
-          size="small"
-          onClick={() => {
-            setFullProject(null);
-          }}
-          sx={{ position: "fixed", right: 16, bottom: 80 }}
-        >
-          <ArrowBackIosRoundedIcon />
-        </Fab>
-      )}
     </>
   );
 };

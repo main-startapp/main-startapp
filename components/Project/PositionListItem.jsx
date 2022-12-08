@@ -256,10 +256,6 @@ const PositionListItem = (props) => {
         sx={{
           boxShadow: "none",
           borderRadius: 2,
-          // "&:hover": {
-          //   backgroundColor: "hoverGray.main",
-          //   cursor: "default",
-          // },
         }}
       >
         <StyledAccordionSummary

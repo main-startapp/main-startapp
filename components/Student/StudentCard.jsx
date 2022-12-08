@@ -1,9 +1,10 @@
 import { Avatar, Box, Button, Card, Tooltip, Typography } from "@mui/material";
+import ExportedImage from "next-image-export-optimizer";
 import { useContext } from "react";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
 import { handleConnect } from "../Reusable/Resusable";
 
-const StudentGridCard = (props) => {
+const StudentCard = (props) => {
   const student = props.student;
 
   // context
@@ -11,37 +12,58 @@ const StudentGridCard = (props) => {
     useContext(GlobalContext);
   const { setStudent } = useContext(StudentContext);
 
+  function ordinal_suffix_of(i) {
+    let j = i % 10;
+    if (j == 1) {
+      return i + "st";
+    }
+    if (j == 2) {
+      return i + "nd";
+    }
+    if (j == 3) {
+      return i + "rd";
+    }
+    return i + "th";
+  }
+
   // local vars
   return (
     <Card
-      variant="outlined"
+      elevation={4}
       onClick={() => setStudent(student)}
       sx={{
-        backgroundColor: "#ffffff",
-        border: 1.5,
-        borderRadius: 8,
-        borderColor: "#dbdbdb",
-        height: "100%",
+        m: 2,
+        borderTop: 1,
+        borderColor: "divider",
+        borderRadius: "16px 16px 16px 16px",
+        height: "216px",
+        width: "160px",
       }}
     >
       <Box
         sx={{
+          position: "relative",
           display: "flex",
           flexDirection: "column",
+          justifyContent: "center",
           alignItems: "center",
           height: "100%",
           // justifyContent: "center",
         }}
       >
+        <ExportedImage
+          src="/images/u_logo.png"
+          alt=""
+          placeholder="empty"
+          height={24}
+          width={17}
+          style={{ position: "absolute", left: 16, top: 16 }}
+        />
         <Avatar
           sx={{
-            m: 2,
-            width: "96px",
-            height: "96px",
-            // color: "#dbdbdb",
-            // backgroundColor: "#ffffff",
-            // border: 1,
-            // borderColor: "#dbdbdb",
+            mb: 1,
+            width: "64px",
+            height: "64px",
           }}
           src={student?.photo_url}
           referrerPolicy="no-referrer"
@@ -54,41 +76,36 @@ const StudentGridCard = (props) => {
             backgroundColor: "green",
           }}
         > */}
-        <Typography sx={{ fontWeight: "bold", fontSize: "1.1em" }}>
-          {student.name}
+        <Typography
+          variant="h2"
+          sx={{ fontSize: "1rem", fontWeight: "regular" }}
+        >
+          {student?.name}
         </Typography>
-        <Typography sx={{ fontSize: "0.9em" }}>
-          {student.desired_position}
+        <Typography
+          variant="h3"
+          sx={{ fontSize: "0.625rem", fontWeight: "regular" }}
+        >
+          {student?.year_of_ed !== (null || undefined) &&
+            ordinal_suffix_of(student.year_of_ed) + " year"}
+          {student?.major !== (null || undefined) && " " + student.major}
         </Typography>
-        <Typography sx={{ fontSize: "0.9em" }}>
-          {student.field_of_interest}
+        <Typography
+          variant="h3"
+          sx={{ mt: 2, fontSize: "0.875rem", fontWeight: "bold" }}
+        >
+          {student?.desired_position}
         </Typography>
-        <Typography sx={{ fontSize: "0.9em" }}>
-          {"Education year: "}
-          {student.year_of_ed}
-        </Typography>
-
-        <Box sx={{ flexGrow: 1 }} />
 
         <Tooltip title={ediumUser?.uid ? "" : "Please edit your profile first"}>
           <span>
             <Button
+              color="primary"
               disabled={!ediumUser?.uid || ediumUser?.uid === student.uid}
               disableElevation
               size="small"
-              sx={{
-                my: 2,
-                border: 1.5,
-                borderColor: "#dbdbdb",
-                borderRadius: 8,
-                color: "#ffffff",
-                backgroundColor: "#3e95c2",
-                fontSize: "0.8em",
-                paddingY: 0.1,
-                paddingX: 3,
-                textTransform: "none",
-              }}
-              variant="contained"
+              variant="outlined"
+              sx={{ mt: 2, border: 1, borderRadius: 8, paddingY: 0 }}
               onClick={(e) => {
                 e.stopPropagation();
                 setStudent(student);
@@ -101,7 +118,7 @@ const StudentGridCard = (props) => {
                 );
               }}
             >
-              {"Connect"}
+              {"+ Connect"}
             </Button>
           </span>
         </Tooltip>
@@ -111,4 +128,4 @@ const StudentGridCard = (props) => {
   );
 };
 
-export default StudentGridCard;
+export default StudentCard;

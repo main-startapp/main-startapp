@@ -57,7 +57,7 @@ const Home = () => {
         setSearchTypeList,
       }}
     >
-      {!onMedia.onDesktop && <MobileProjectsBar />}
+      {!onMedia.onDesktop && fullProject === null && <MobileProjectsBar />}
 
       <Box
         id="projects-main-box"
@@ -65,6 +65,9 @@ const Home = () => {
           display: "flex",
           justifyContent: "center",
           overflow: "hidden",
+          ":hover": {
+            cursor: "default",
+          },
         }}
       >
         {onMedia.onDesktop ? (

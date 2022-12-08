@@ -63,7 +63,6 @@ const ProjectListItem = (props) => {
         borderColor: "divider",
         "&:hover": {
           backgroundColor: "hoverGray.main",
-          cursor: "default",
         },
         overflow: "hidden",
         paddingY: 2,
@@ -223,7 +222,11 @@ const ProjectListItem = (props) => {
           <ListItemText
             key={index}
             secondary={
-              <Typography variant="body2" sx={{ fontWeight: "medium" }}>
+              <Typography
+                color="text.secondary"
+                variant="body2"
+                sx={{ fontWeight: "medium" }}
+              >
                 {position.title}
               </Typography>
             }
@@ -233,7 +236,11 @@ const ProjectListItem = (props) => {
         {project.position_list.length > 3 && (
           <ListItemText
             secondary={
-              <Typography variant="body2" sx={{ fontWeight: "medium" }}>
+              <Typography
+                color="text.secondary"
+                variant="body2"
+                sx={{ fontWeight: "medium" }}
+              >
                 {"and more..."}
               </Typography>
             }
