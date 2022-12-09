@@ -185,6 +185,7 @@ function MyApp({ Component, pageProps }) {
   const [isAnimated, setIsAnimated] = useState({
     projects: false,
     events: false,
+    students: false,
   });
   // theme
   const [mode, setMode] = useState("light");

@@ -31,7 +31,7 @@ const Students = () => {
 
   // turn off introduction animation after initialization
   useEffect(() => {
-    setIsAnimated({ ...isAnimated, projects: true });
+    setIsAnimated({ ...isAnimated, students: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -77,8 +77,8 @@ const Students = () => {
               }}
             >
               <motion.div
-                initial={isAnimated.projects ? false : { y: 200, opacity: 0 }}
-                animate={isAnimated.projects ? false : { y: 0, opacity: 1 }}
+                initial={isAnimated.students ? false : { y: 200, opacity: 0 }}
+                animate={isAnimated.students ? false : { y: 0, opacity: 1 }}
                 transition={{ delay: 1 }}
               >
                 <StudentGrid />
@@ -95,8 +95,8 @@ const Students = () => {
               }}
             >
               <motion.div
-                initial={isAnimated.projects ? false : { x: 200, opacity: 0 }}
-                animate={isAnimated.projects ? false : { x: 0, opacity: 1 }}
+                initial={isAnimated.students ? false : { x: 200, opacity: 0 }}
+                animate={isAnimated.students ? false : { x: 0, opacity: 1 }}
                 transition={{ delay: 1 }}
               >
                 <StudentProfile />

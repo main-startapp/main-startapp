@@ -1,4 +1,4 @@
-import { Box, Chip, Grid } from "@mui/material";
+import { Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useContext, useMemo, useEffect } from "react";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
@@ -13,9 +13,8 @@ import SearchIcon from "@mui/icons-material/Search";
 
 const StudentGrid = () => {
   // context
-  const { users, winHeight, onMedia } = useContext(GlobalContext);
+  const { users, onMedia } = useContext(GlobalContext);
   const { searchTerm, setStudent } = useContext(StudentContext);
-  const theme = useTheme();
 
   // local vars
   const filteredStudents = useMemo(
