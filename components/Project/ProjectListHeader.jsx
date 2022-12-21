@@ -11,7 +11,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useContext, useEffect, useRef, useState } from "react";
 import { ProjectContext } from "../Context/ShareContexts";
 import { projectStrList } from "../Reusable/MenuStringList";
-import { useTheme } from "@mui/material/styles";
 
 const ProjectListHeader = () => {
   const { setSearchTerm, searchTypeList, setSearchTypeList } =

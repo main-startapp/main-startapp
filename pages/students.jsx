@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Box, Grid } from "@mui/material";
+import { Box } from "@mui/material";
 import {
   GlobalContext,
   StudentContext,
@@ -7,7 +7,7 @@ import {
 import { motion } from "framer-motion";
 import StudentProfile from "../components/Student/StudentProfile";
 import StudentGrid from "../components/Student/StudentGrid";
-import StudentList from "../components/Student/StudentList";
+import MobileStudentsBar from "../components/Header/MobileStudentsBar";
 
 const Students = () => {
   // context
@@ -51,7 +51,7 @@ const Students = () => {
         setSearchCategory,
       }}
     >
-      {/* <StudentsPageBar /> */}
+      {!onMedia.onDesktop && student === null && <MobileStudentsBar />}
 
       <Box
         id="students-main-box"
@@ -72,8 +72,8 @@ const Students = () => {
                 paddingTop: 4,
                 paddingLeft: 4,
                 paddingRight: 2,
-                width: "61.54%",
-                maxWidth: "896px",
+                width: "61.11111%",
+                maxWidth: "880px",
               }}
             >
               <motion.div
@@ -90,7 +90,7 @@ const Students = () => {
                 paddingTop: 4,
                 paddingLeft: 2,
                 paddingRight: 4,
-                width: "38.46%",
+                width: "38.88889%",
                 maxWidth: "560px",
               }}
             >
@@ -113,7 +113,7 @@ const Students = () => {
               backgroundColor: "hoverGray.main",
             }}
           >
-            <StudentList />
+            <StudentGrid />
           </Box>
         ) : (
           <Box
@@ -155,7 +155,7 @@ export default Students;
     </>
   ) : student === null ? (
     <Grid item xs={12}>
-      <StudentList />
+
     </Grid>
   ) : (
     <Grid item xs={12}>

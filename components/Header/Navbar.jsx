@@ -43,7 +43,7 @@ const Navbar = () => {
             alignItems: "center",
             //height: "100%",
             width: "100%",
-            maxWidth: "1392px",
+            maxWidth: "1376px",
           }}
         >
           {/* https://stackoverflow.com/questions/46973910/accessing-files-from-firebase-storage-vs-firebase-hosting */}

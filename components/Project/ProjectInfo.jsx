@@ -27,21 +27,24 @@ const ProjectInfo = () => {
   }, [fullProject]);
 
   // useEffect to reset box scrollbar position
+  const boxRef = useRef();
   useEffect(() => {
     window.scrollTo({ top: 0 });
+    if (boxRef?.current?.scrollTop) boxRef.current.scrollTop = 0;
   }, [fullProject]); // every time project changes, this forces each accordion to collapse
 
   return (
     <FixedHeightPaper
       elevation={onMedia.onDesktop ? 2 : 0}
       isdesktop={onMedia.onDesktop ? 1 : 0}
-      islist={0}
+      mobileheight={0}
       sx={{
         paddingTop: onMedia.onDesktop ? "32px" : 0,
       }}
     >
       <Box
         id="projectinfo-box"
+        ref={boxRef}
         sx={{
           flexGrow: 1,
           overflowY: "scroll",

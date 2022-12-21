@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useContext, useMemo, useEffect } from "react";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
@@ -10,11 +10,13 @@ import {
 } from "../Reusable/Resusable";
 import StudentCard from "./StudentCard";
 import SearchIcon from "@mui/icons-material/Search";
+import StudentListItem from "./StudentListItem";
 
 const StudentGrid = () => {
   // context
-  const { users, onMedia } = useContext(GlobalContext);
+  const { users, winWidth, onMedia } = useContext(GlobalContext);
   const { searchTerm, setStudent } = useContext(StudentContext);
+  const theme = useTheme();
 
   // local vars
   const filteredStudents = useMemo(
@@ -44,31 +46,33 @@ const StudentGrid = () => {
     <FixedHeightPaper
       elevation={onMedia.onDesktop ? 2 : 0}
       isdesktop={onMedia.onDesktop ? 1 : 0}
-      islist={1}
+      mobileheight={80}
       sx={{
-        paddingTop: "32px",
+        paddingTop: onMedia.onDesktop ? "32px" : 0,
       }}
     >
-      <SearchBox sx={{ mt: 2, mx: 4, mb: 4 }}>
-        <SearchIconWrapper>
-          <SearchIcon />
-        </SearchIconWrapper>
-        <StyledInputBase
-          placeholder="Search for name or experise"
-          inputProps={{ "aria-label": "search" }}
-          // onChange={(e) => {
-          //   if (e.target.value.length !== 0) return;
-          //   setSearchTerm("");
-          // }}
-          // onKeyPress={(e) => {
-          //   if (e.key === "Enter") {
-          //     setSearchTerm(e.target.value);
-          //   }
-          // }}
-        />
-      </SearchBox>
+      {onMedia.onDesktop ? (
+        <>
+          <SearchBox sx={{ mt: 2, mx: 4, mb: 4 }}>
+            <SearchIconWrapper>
+              <SearchIcon />
+            </SearchIconWrapper>
+            <StyledInputBase
+              placeholder="Search for name or experise"
+              inputProps={{ "aria-label": "search" }}
+              // onChange={(e) => {
+              //   if (e.target.value.length !== 0) return;
+              //   setSearchTerm("");
+              // }}
+              // onKeyPress={(e) => {
+              //   if (e.key === "Enter") {
+              //     setSearchTerm(e.target.value);
+              //   }
+              // }}
+            />
+          </SearchBox>
 
-      <Box
+          {/* <Box
         id="studentgrid-items-box"
         sx={{
           flexGrow: 1,
@@ -87,26 +91,53 @@ const StudentGrid = () => {
             return <StudentCard key={user.uid} student={user} />;
           })}
         </Box>
-      </Box>
-
-      {/* <Box
-        id="studentgrid-grid-box"
-        sx={{
-          height: `calc(${winHeight}px - 65px - ${theme.spacing(
-            4
-          )} - 1px - 32px)`,
-          overflowX: "hidden",
-          overflowY: "scroll",
-        }}
-      >
-        <Grid container>
-          {filteredStudents?.map((user, index) => (
-            <Grid key={index} item xs={3}>
-              <StudentCard key={user.uid} student={user} />
-            </Grid>
-          ))}
-        </Grid>
       </Box> */}
+
+          <Box
+            id="studentgrid-grid-box"
+            sx={{
+              flexGrow: 1,
+              overflowY: "scroll",
+              paddingLeft: 4,
+              paddingRight: onMedia.onDesktop
+                ? `calc(${theme.spacing(4)} - 0.4rem)`
+                : 4, // considering scrollbar
+              paddingTop: 1,
+              paddingBottom: 4,
+            }}
+          >
+            <Grid container spacing={4}>
+              {filteredStudents?.map((user, index) => (
+                <Grid
+                  key={index}
+                  item
+                  xs={winWidth < 1440 ? (winWidth < 1113 ? 6 : 4) : 3}
+                  sx={{ display: "flex", justifyContent: "center" }}
+                >
+                  <StudentCard key={user.uid} student={user} />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        </>
+      ) : (
+        <Box
+          id="studentgrid-listitems-box"
+          sx={{
+            flexGrow: 1,
+            overflowY: "scroll",
+          }}
+        >
+          {filteredStudents?.map((student, index) => (
+            <StudentListItem
+              key={student.uid}
+              index={index}
+              student={student}
+              last={filteredStudents.length - 1}
+            />
+          ))}
+        </Box>
+      )}
     </FixedHeightPaper>
   );
 };

@@ -75,7 +75,7 @@ const Events = () => {
                 paddingTop: 4,
                 paddingLeft: 4,
                 paddingRight: 2,
-                width: "38.46%",
+                width: "38.88889%",
                 maxWidth: "560px",
               }}
             >
@@ -93,8 +93,8 @@ const Events = () => {
                 paddingTop: 4,
                 paddingLeft: 2,
                 paddingRight: 4,
-                width: "61.54%",
-                maxWidth: "896px",
+                width: "61.11111%",
+                maxWidth: "880px",
               }}
             >
               <motion.div

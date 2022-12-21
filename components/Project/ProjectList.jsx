@@ -108,7 +108,7 @@ const ProjectList = () => {
     <FixedHeightPaper
       elevation={onMedia.onDesktop ? 2 : 0}
       isdesktop={onMedia.onDesktop ? 1 : 0}
-      islist={1}
+      mobileheight={160}
       sx={{
         paddingTop: onMedia.onDesktop ? "32px" : 0,
       }}

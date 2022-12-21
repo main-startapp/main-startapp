@@ -3,7 +3,6 @@ import { useContext, useState } from "react";
 import { auth } from "../../firebase";
 import { useAuth } from "../Context/AuthContext";
 import { GlobalContext } from "../Context/ShareContexts";
-import { MenuItemLink } from "../Reusable/Resusable";
 import NextLink from "next/link";
 
 const UserIconMenu = (props) => {
@@ -42,12 +41,12 @@ const UserIconMenu = (props) => {
         aria-controls={open ? "navbar-menu" : undefined}
         aria-haspopup="true"
         aria-expanded={open ? "true" : undefined}
+        onClick={(e) => handleMenu(e)}
         sx={{
           height: iconHeight,
           width: iconHeight,
           padding: 0,
         }}
-        onClick={(e) => handleMenu(e)}
       >
         <Avatar
           sx={{ height: avatarHeight, width: avatarHeight }}

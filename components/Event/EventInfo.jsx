@@ -7,7 +7,6 @@ import {
   Divider,
   Fab,
   Link,
-  Paper,
   Typography,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -22,7 +21,7 @@ import { FixedHeightPaper } from "../Reusable/Resusable";
 
 const EventInfo = () => {
   // context
-  const { winHeight, onMedia } = useContext(GlobalContext);
+  const { onMedia } = useContext(GlobalContext);
   const { fullEvent, setFullEvent } = useContext(EventContext);
   const theme = useTheme();
 
@@ -48,22 +47,24 @@ const EventInfo = () => {
   const isSameTime = startMoment.format("LLL") === endMoment.format("LLL");
 
   // useEffect to reset box scrollbar position
-  // useEffect to reset box scrollbar position
+  const boxRef = useRef();
   useEffect(() => {
     window.scrollTo({ top: 0 });
+    if (boxRef?.current?.scrollTop) boxRef.current.scrollTop = 0;
   }, [fullEvent]); // every time project changes, this forces each accordion to collapse
 
   return (
     <FixedHeightPaper
       elevation={onMedia.onDesktop ? 2 : 0}
       isdesktop={onMedia.onDesktop ? 1 : 0}
-      islist={0}
+      mobileheight={0}
       sx={{
         paddingTop: onMedia.onDesktop ? "32px" : 0,
       }}
     >
       <Box
         id="eventinfo-box"
+        ref={boxRef}
         sx={{
           flexGrow: 1,
           overflowY: "scroll",

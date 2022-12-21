@@ -218,7 +218,7 @@ const ProjectListItem = (props) => {
           }
           sx={{ mb: 2 }}
         />
-        {project.position_list.slice(0, 3)?.map((position, index) => (
+        {project?.position_list?.slice(0, 3)?.map((position, index) => (
           <ListItemText
             key={index}
             secondary={
@@ -233,7 +233,7 @@ const ProjectListItem = (props) => {
             sx={{ margin: 0, ml: "5%" }}
           />
         ))}
-        {project.position_list.length > 3 && (
+        {project?.position_list?.length > 3 && (
           <ListItemText
             secondary={
               <Typography

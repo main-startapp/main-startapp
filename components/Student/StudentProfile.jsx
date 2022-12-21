@@ -3,11 +3,11 @@ import {
   Box,
   Button,
   Chip,
+  Fab,
   Link,
   Tooltip,
   Typography,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 import { useContext, useEffect, useRef } from "react";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
@@ -16,39 +16,36 @@ import InstagramIcon from "@mui/icons-material/Instagram";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import ParkIcon from "@mui/icons-material/Park";
 import LinkIcon from "@mui/icons-material/Link";
+import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 import {
   FixedHeightPaper,
   getGooglePhotoURLwithRes,
   handleConnect,
+  ordinal_suffix_of,
 } from "../Reusable/Resusable";
 import ExportedImage from "next-image-export-optimizer";
+import { motion } from "framer-motion";
+import { useRouter } from "next/router";
 
 const StudentProfile = () => {
   // context
-  const { chats, ediumUser, setForceChatExpand, setChatPartner, onMedia } =
-    useContext(GlobalContext);
-  const { student } = useContext(StudentContext);
-  const theme = useTheme();
+  const {
+    chats,
+    ediumUser,
+    setForceChatExpand,
+    setChatPartner,
+    winWidth,
+    onMedia,
+  } = useContext(GlobalContext);
+  const { student, setStudent } = useContext(StudentContext);
 
-  // prefix help func
-  // https://stackoverflow.com/questions/13627308/add-st-nd-rd-and-th-ordinal-suffix-to-a-number
-  function ordinal_suffix_of(i) {
-    let j = i % 10;
-    if (j == 1) {
-      return i + "st";
-    }
-    if (j == 2) {
-      return i + "nd";
-    }
-    if (j == 3) {
-      return i + "rd";
-    }
-    return i + "th";
-  }
+  // local
+  const router = useRouter();
 
   // useEffect to reset box scrollbar position
   const boxRef = useRef();
   useEffect(() => {
+    window.scrollTo({ top: 0 });
     if (boxRef?.current?.scrollTop) boxRef.current.scrollTop = 0;
   }, [student]); // every time project changes, this forces each accordion to collapse
 
@@ -56,7 +53,7 @@ const StudentProfile = () => {
     <FixedHeightPaper
       elevation={onMedia.onDesktop ? 2 : 0}
       isdesktop={onMedia.onDesktop ? 1 : 0}
-      islist={0}
+      mobileheight={0}
       sx={{
         position: "relative",
       }}
@@ -70,7 +67,9 @@ const StudentProfile = () => {
           sx={{
             display: "flex",
             flexDirection: "row",
+            minHeight: "216px",
             height: "216px",
+            maxHeight: "216px",
             width: "100%",
             borderRadius: "32px 32px 0px 0px",
             overflow: "hidden",
@@ -96,7 +95,7 @@ const StudentProfile = () => {
       </Tooltip>
       <Avatar
         sx={{
-          ml: 6,
+          ml: onMedia.onDesktop ? 6 : 2,
           width: "160px",
           height: "160px",
           position: "absolute",
@@ -109,11 +108,12 @@ const StudentProfile = () => {
       <Box
         id="studentprofile-connect-box"
         sx={{
+          minHeight: "80px",
           height: "80px",
           display: "flex",
           justifyContent: "flex-end",
           alignItems: "center",
-          paddingRight: 4,
+          paddingRight: onMedia.onDesktop ? 4 : 2,
         }}
       >
         <Tooltip title={ediumUser?.uid ? "" : "Edit your profile first"}>
@@ -132,10 +132,11 @@ const StudentProfile = () => {
                   setChatPartner,
                   setForceChatExpand
                 );
+                if (!onMedia.onDesktop) router.push("/chats");
               }}
               sx={{
                 borderRadius: 8,
-                width: "128px",
+                width: winWidth < 375 ? "96px" : "128px",
               }}
             >
               {"Connect"}
@@ -143,13 +144,20 @@ const StudentProfile = () => {
           </span>
         </Tooltip>
       </Box>
+      {/* <motion.div
+        key={student?.name}
+        initial={{ opacity: 0, y: "1%" }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      > */}
       <Box
         id="studentprofile-info-box"
         ref={boxRef}
         sx={{
           flexGrow: 1,
           overflowY: "scroll",
-          paddingX: 4,
+          paddingX: onMedia.onDesktop ? 4 : 2,
+          paddingBottom: onMedia.onDesktop ? 4 : 2,
         }}
       >
         {/* name + icon */}
@@ -158,7 +166,7 @@ const StudentProfile = () => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            mt: 2,
+            mt: onMedia.onDesktop ? 4 : 2,
           }}
         >
           <Typography
@@ -186,6 +194,7 @@ const StudentProfile = () => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
+            mt: 1,
           }}
         >
           <Typography variant="h3" sx={{ fontSize: "1rem" }}>
@@ -273,7 +282,11 @@ const StudentProfile = () => {
                     rel="noreferrer"
                   >
                     <GitHubIcon
-                      sx={{ height: "91.57%", width: "91.57%", color: "#333" }}
+                      sx={{
+                        height: "91.57%",
+                        width: "91.57%",
+                        color: "#333",
+                      }}
                     />
                   </Link>
                 );
@@ -405,6 +418,19 @@ const StudentProfile = () => {
           from repetition, injected humour, or non-characteristic words etc.
         </Typography> */}
       </Box>
+      {/* </motion.div> */}
+      {!onMedia.onDesktop && student !== null && (
+        <Fab
+          color="primary"
+          size="small"
+          onClick={() => {
+            setStudent(null);
+          }}
+          sx={{ position: "fixed", right: 16, bottom: 80 }}
+        >
+          <ArrowBackIosRoundedIcon />
+        </Fab>
+      )}
     </FixedHeightPaper>
   );
 };

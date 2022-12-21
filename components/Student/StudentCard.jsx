@@ -2,7 +2,7 @@ import { Avatar, Box, Button, Card, Tooltip, Typography } from "@mui/material";
 import ExportedImage from "next-image-export-optimizer";
 import { useContext } from "react";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
-import { handleConnect } from "../Reusable/Resusable";
+import { handleConnect, ordinal_suffix_of } from "../Reusable/Resusable";
 
 const StudentCard = (props) => {
   const student = props.student;
@@ -12,32 +12,17 @@ const StudentCard = (props) => {
     useContext(GlobalContext);
   const { setStudent } = useContext(StudentContext);
 
-  function ordinal_suffix_of(i) {
-    let j = i % 10;
-    if (j == 1) {
-      return i + "st";
-    }
-    if (j == 2) {
-      return i + "nd";
-    }
-    if (j == 3) {
-      return i + "rd";
-    }
-    return i + "th";
-  }
-
   // local vars
   return (
     <Card
       elevation={4}
       onClick={() => setStudent(student)}
       sx={{
-        m: 2,
         borderTop: 1,
         borderColor: "divider",
         borderRadius: "16px 16px 16px 16px",
-        height: "216px",
-        width: "160px",
+        height: "232px",
+        width: "168px",
       }}
     >
       <Box
@@ -101,7 +86,7 @@ const StudentCard = (props) => {
           <span>
             <Button
               color="primary"
-              disabled={!ediumUser?.uid || ediumUser?.uid === student.uid}
+              disabled={!ediumUser?.uid || ediumUser?.uid === student?.uid}
               disableElevation
               size="small"
               variant="outlined"

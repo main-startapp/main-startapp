@@ -110,8 +110,8 @@ const ChatAccordion = () => {
       >
         <Typography
           sx={{
-            fontSize: "1.25rem",
-            fontWeight: "bold",
+            fontSize: "1.125rem",
+            fontWeight: "medium",
           }}
         >
           {"Messages"}

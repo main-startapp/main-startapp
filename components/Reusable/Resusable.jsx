@@ -247,6 +247,24 @@ export const isStrInObjList = (objList, key, subStr, isExact) => {
 };
 
 //============================================================
+// utility function: get ordinal suffix
+// https://stackoverflow.com/questions/13627308/add-st-nd-rd-and-th-ordinal-suffix-to-a-number
+//============================================================
+export function ordinal_suffix_of(i) {
+  let j = i % 10;
+  if (j == 1) {
+    return i + "st";
+  }
+  if (j == 2) {
+    return i + "nd";
+  }
+  if (j == 3) {
+    return i + "rd";
+  }
+  return i + "th";
+}
+
+//============================================================
 // styled components
 //============================================================
 export const DefaultTextField = styled(TextField)(({ theme }) => ({
@@ -312,16 +330,14 @@ export const MenuItemLink = styled(MuiLink)(({ theme }) => ({
 }));
 
 export const FixedHeightPaper = styled(Paper)(
-  ({ theme, isdesktop, islist }) => ({
+  ({ theme, isdesktop, mobileheight }) => ({
     display: "flex",
     flexDirection: "column",
     height: isdesktop ? `calc(100dvh - 65px - ${theme.spacing(4)})` : "auto", // onDesktop: fixed height, onMobile: auto to enable hiding address bar
     minHeight: isdesktop
       ? `calc(100dvh - 65px - ${theme.spacing(4)})`
-      : islist
-      ? `calc(100dvh - 160px - ${theme.spacing(2)} - 64px)`
-      : `calc(100dvh - ${theme.spacing(2)} - 64px)`,
-    marginTop: isdesktop ? 0 : islist ? "160px" : 0, // mobile search bar
+      : `calc(100dvh - ${mobileheight}px - ${theme.spacing(2)} - 64px)`,
+    marginTop: isdesktop ? 0 : `${mobileheight}px`, // mobile top bar
     marginBottom: isdesktop ? 0 : "64px", // mobile bottom navbar
     backgroundColor: theme.palette.background.paper,
     borderTop: isdesktop ? `1px solid ${theme.palette.divider}` : 0,
