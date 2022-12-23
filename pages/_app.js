@@ -89,7 +89,6 @@ function MyApp({ Component, pageProps }) {
   }, [])
 
   return (
-    <>
       <ThemeProvider theme={globalTheme}>
         <AuthProvider>
           <LocalizationProvider dateAdapter={AdapterMoment}>
@@ -143,7 +142,6 @@ function MyApp({ Component, pageProps }) {
           </LocalizationProvider>
         </AuthProvider>
       </ThemeProvider>
-    </>
   );
 }
 export default MyApp;
