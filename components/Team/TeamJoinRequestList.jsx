@@ -3,9 +3,6 @@ import { styled } from "@mui/material/styles";
 import { useContext, useEffect, useState } from "react";
 import { TeamContext } from "../Context/ShareContexts";
 import TeamJoinRequestListItem from "./TeamJoinRequestListItem";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 
 const TeamJoinRequestList = () => {
   // context
@@ -22,36 +19,36 @@ const TeamJoinRequestList = () => {
     return filteredJRs;
   }, [joinRequests, project]);
 
-  const sliderSettings = {
-    //  arrows: false,
-    slidesToShow: 4,
-    slidesToScroll: 1,
-    infinite: false,
-    dots: true,
-    draggable: false,
-  };
+  // const sliderSettings = {
+  //   //  arrows: false,
+  //   slidesToShow: 4,
+  //   slidesToScroll: 1,
+  //   infinite: false,
+  //   dots: true,
+  //   draggable: false,
+  // };
 
-  const StyledSlider = styled(Slider)`
-    .slick-prev {
-      left: -50px;
-    }
+  // const StyledSlider = styled(Slider)`
+  //   .slick-prev {
+  //     left: -50px;
+  //   }
 
-    .slick-next {
-      right: -50px;
-    }
+  //   .slick-next {
+  //     right: -50px;
+  //   }
 
-    .slick-prev,
-    .slick-next {
-      width: 50px;
-      height: 50px;
-    }
+  //   .slick-prev,
+  //   .slick-next {
+  //     width: 50px;
+  //     height: 50px;
+  //   }
 
-    .slick-prev:before,
-    .slick-next:before {
-      font-size: 50px;
-      color: SteelBlue;
-    }
-  `;
+  //   .slick-prev:before,
+  //   .slick-next:before {
+  //     font-size: 50px;
+  //     color: blue;
+  //   }
+  // `;
 
   return projectJoinRequests?.length > 0 ? (
     <Box
@@ -96,14 +93,14 @@ const TeamJoinRequestList = () => {
             paddingBottom: 1.5,
           }}
         >
-          <StyledSlider {...sliderSettings}>
-            {projectJoinRequests.map((request) => (
+          {/* <StyledSlider {...sliderSettings}>
+            {projectJoinRequests?.map((request) => (
               <TeamJoinRequestListItem
                 key={request.project_id}
                 request={request}
               />
             ))}
-          </StyledSlider>
+          </StyledSlider> */}
         </Box>
       </Box>
     </Box>

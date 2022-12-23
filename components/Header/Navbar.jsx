@@ -1,200 +1,115 @@
-import { useContext, useState } from "react";
 import {
   AppBar,
   Toolbar,
-  Typography,
   Box,
-  IconButton,
-  Avatar,
-  Divider,
   Link as MuiLink,
-  Menu,
-  MenuItem,
+  Stack,
+  Typography,
 } from "@mui/material";
-import NextLink from "next/link";
-import { auth } from "../../firebase";
-import { useAuth } from "../Context/AuthContext";
 import { styled } from "@mui/material/styles";
+import NextLink from "next/link";
 import ExportedImage from "next-image-export-optimizer";
-import { GlobalContext } from "../Context/ShareContexts";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import DateRangeIcon from "@mui/icons-material/DateRange";
+import PeopleIcon from "@mui/icons-material/People";
+import UserIconMenu from "./UserIconMenu";
 
 const Navbar = () => {
-  // context
-  const { currentUser } = useAuth();
-  const { ediumUser, onMedia } = useContext(GlobalContext);
-
-  // menu
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-  const handleUserMenu = (e) => {
-    setAnchorEl(e.currentTarget);
-  };
-  const handleUserMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleUserMenuLogout = () => {
-    // signout user -> close menu
-    auth.signOut();
-    setAnchorEl(null);
-    // window.location.reload();
-  };
+  // url
+  const url = new URL(window.location.href);
 
   return (
-    // https://www.color-hex.com/color/3e95c2
-    <AppBar
-      position="static"
-      sx={{
-        backgroundColor: "#3e95c2",
-        "&:hover": {
-          cursor: "default",
-        },
-      }}
-      elevation={0}
-    >
+    <AppBar color="background" elevation={0} position="static">
       <Toolbar
         sx={{
           display: "flex",
-          // flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          minHeight: 0,
-          "@media (min-width: 600px)": {
-            minHeight: 0,
-          },
-          height: onMedia.onDesktop ? "64px" : "48px",
-          paddingX: onMedia.onDesktop ? 3 : 1.5,
+          justifyContent: "center",
+          // minHeight: 0,
+          // "@media (min-width: 600px)": {
+          //   minHeight: 0,
+          // },
+          height: "65px", // 64+border
+          borderBottom: 1,
+          borderColor: "divider",
         }}
         disableGutters
       >
-        {/* icon */}
         <Box
           sx={{
+            mx: 4,
             display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
             alignItems: "center",
-            flexGrow: 1,
-            flexBasis: 0,
-            justifyContent: "flex-start",
+            //height: "100%",
+            width: "100%",
+            maxWidth: "1376px",
           }}
         >
+          {/* https://stackoverflow.com/questions/46973910/accessing-files-from-firebase-storage-vs-firebase-hosting */}
           <ExportedImage
-            src="/images/EDIUMPlatformLogo256.png"
-            placeholder=""
-            width={onMedia.onDesktop ? 48 : 36}
-            height={onMedia.onDesktop ? 48 : 36}
+            src="/images/edium_notext_128.png"
+            alt=""
+            height={40}
+            width={40}
           />
-          {/* <Typography variant="edium" sx={{ fontSize: "2em", ml: 1 }}>
-            Edium
-          </Typography> */}
-        </Box>
-        {/* tabs */}
-        {/* https://stackoverflow.com/questions/32378953/keep-the-middle-item-centered-when-side-items-have-different-widths */}
-        {onMedia.onDesktop && (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+          {/* tabs */}
+          {/* https://stackoverflow.com/questions/32378953/keep-the-middle-item-centered-when-side-items-have-different-widths */}
+          <Stack direction="row" spacing={8}>
             <NextLink href="/">
-              <PageLink>Projects</PageLink>
-            </NextLink>
-            <Divider
-              sx={{
-                ml: 3,
-                mr: 3,
-                borderRightWidth: 1.5,
-                borderColor: "black",
-              }}
-              orientation="vertical"
-              flexItem
-            />
-            <NextLink href="/events">
-              <PageLink>Events</PageLink>
-            </NextLink>
-            <Divider
-              sx={{
-                ml: 3,
-                mr: 3,
-                borderRightWidth: 1.5,
-                borderColor: "black",
-              }}
-              orientation="vertical"
-              flexItem
-            />
-            <NextLink href="/students">
-              <PageLink>Students</PageLink>
-            </NextLink>
-          </Box>
-        )}
-        {/* user */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            flexGrow: 1,
-            flexBasis: 0,
-            justifyContent: "end",
-          }}
-        >
-          <IconButton
-            id="navbar-menu-button"
-            disabled={!currentUser}
-            aria-controls={open ? "navbar-menu" : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? "true" : undefined}
-            sx={
-              onMedia.onDesktop
-                ? {
-                    width: "64px",
-                    height: "64px",
+              <LinkIconBox url={url} pathname="/">
+                <DashboardIcon
+                  color={
+                    url.pathname === "/" ? "text.primary" : "unselectedIcon"
                   }
-                : {
-                    width: "48px",
-                    height: "48px",
+                  sx={{
+                    height: "40px",
+                    fontSize: "28px",
+                  }}
+                />
+                <LinkTypography url={url} pathname="/">
+                  {"Projects"}
+                </LinkTypography>
+              </LinkIconBox>
+            </NextLink>
+            <NextLink href="/events/">
+              <LinkIconBox url={url} pathname="/events/">
+                <DateRangeIcon
+                  color={
+                    url.pathname === "/events/"
+                      ? "text.primary"
+                      : "unselectedIcon"
                   }
-            }
-            onClick={(e) => handleUserMenu(e)}
-          >
-            <Avatar
-              sx={
-                onMedia.onDesktop
-                  ? {
-                      width: "48px",
-                      height: "48px",
-                    }
-                  : {
-                      width: "36px",
-                      height: "36px",
-                    }
-              }
-              src={ediumUser?.photo_url}
-              referrerPolicy="no-referrer"
-            />
-          </IconButton>
-          <Menu
-            id="navbar-menu"
-            anchorEl={anchorEl}
-            // anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-            open={open}
-            onClose={handleUserMenuClose}
-            MenuListProps={{
-              "aria-labelledby": "navbar-menu-button",
-            }}
-          >
-            <MenuItem onClick={handleUserMenuClose}>
-              <NextLink href="/students/create" passHref>
-                <MenuItemLink>Edit Profile</MenuItemLink>
-              </NextLink>
-            </MenuItem>
-            {/* <MenuItem onClick={handleUserMenuClose}>
-              <NextLink href="/team/management" passHref>
-                <MenuItemLink>Team Management</MenuItemLink>
-              </NextLink>
-            </MenuItem> */}
-            <MenuItem onClick={handleUserMenuLogout}>Log Out</MenuItem>
-          </Menu>
+                  sx={{
+                    height: "40px",
+                    fontSize: "28px",
+                  }}
+                />
+                <LinkTypography url={url} pathname="/events/">
+                  {"Events"}
+                </LinkTypography>
+              </LinkIconBox>
+            </NextLink>
+            <NextLink href="/students/">
+              <LinkIconBox url={url} pathname="/students/">
+                <PeopleIcon
+                  color={
+                    url.pathname === "/students/"
+                      ? "text.primary"
+                      : "unselectedIcon"
+                  }
+                  sx={{
+                    height: "40px",
+                    fontSize: "28px",
+                  }}
+                />
+                <LinkTypography url={url} pathname="/students/">
+                  {"Students"}
+                </LinkTypography>
+              </LinkIconBox>
+            </NextLink>
+          </Stack>
+          <UserIconMenu iconHeight="40px" avatarHeight="40px" />
         </Box>
       </Toolbar>
     </AppBar>
@@ -203,16 +118,22 @@ const Navbar = () => {
 
 export default Navbar;
 
-const PageLink = styled(MuiLink)(({ theme }) => ({
-  color: "#ffffff",
-  textDecoration: "none",
-  fontSize: "1.1em",
-  ":hover": {
-    cursor: "pointer",
-  },
+const LinkIconBox = styled(Box)(({ theme, url, pathname }) => ({
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "flex-start",
+  alignItems: "center",
+  borderBottomWidth: url.pathname === pathname ? 2 : 0,
+  borderBottomColor: theme.palette.text.primary,
+  borderBottomStyle: "solid",
 }));
 
-const MenuItemLink = styled(MuiLink)(({ theme }) => ({
-  color: "#000000",
-  textDecoration: "none",
+const LinkTypography = styled(Typography)(({ theme, url, pathname }) => ({
+  height: "24px",
+  fontSize: "16px",
+  fontWeight: theme.typography.fontWeightMedium,
+  color:
+    url.pathname === pathname
+      ? theme.palette.text.primary
+      : theme.palette.unselectedIcon.main,
 }));

@@ -21,15 +21,15 @@ const UserCreate = () => {
   const { showAlert } = useContext(StudentContext);
 
   // local vars
-  const [isStudentMode, setIsStudentMode] = useState(true);
   const [isCreate, setIsCreate] = useState(true);
+  const [isStudentMode, setIsStudentMode] = useState(true);
+
   useEffect(() => {
     if (!ediumUser) return;
 
-    setIsCreate(false);
-    if (ediumUser?.role !== "student") {
-      setIsStudentMode(false);
-    }
+    // found user data
+    setIsCreate(false); // update profile
+    setIsStudentMode(ediumUser?.role === "student"); // prev mode
   }, [ediumUser]);
 
   const [userCreatedFoI, setUserCreatedFoI] = useState([]);
@@ -87,7 +87,7 @@ const UserCreate = () => {
     delete userRef?.uid;
 
     let userModRef;
-    if (userRef.create_timestamp) {
+    if (userRef?.create_timestamp) {
       // update
       // can't update partially
       userModRef = updateDoc(docRef, userRef).catch((error) => {
@@ -184,7 +184,7 @@ const UserCreate = () => {
             sx={{
               height: "3em",
               width: "300px",
-              borderRadius: "30px",
+              borderRadius: 8,
               border: 1.5,
               borderColor: "#dbdbdb",
               backgroundColor: isCreate ? "#3e95c2" : "#e0e0e0",
@@ -214,7 +214,7 @@ const UserCreate = () => {
                 height: "80%",
                 width: "50%",
                 mx: "2%",
-                borderRadius: "30px",
+                borderRadius: 8,
                 border: 1.5,
                 borderColor: "#dbdbdb",
                 backgroundColor: "white",

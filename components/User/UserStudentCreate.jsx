@@ -26,6 +26,7 @@ const UserStudentCreate = (props) => {
   // context & hooks
   const { currentUser } = useAuth();
   const { ediumUser, onMedia } = useContext(GlobalContext);
+  const formRef = useRef();
 
   // local vars
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
@@ -35,7 +36,6 @@ const UserStudentCreate = (props) => {
     year_of_ed: 0,
     skill_level: 0,
     desired_position: "",
-    create_timestamp: "",
     field_of_interest: "",
     social_media: [""],
     //past_exp: [""],
@@ -66,8 +66,6 @@ const UserStudentCreate = (props) => {
     // }
     setNewStudent(ediumUserRef);
   }, [ediumUser]);
-
-  const formRef = useRef();
 
   // helper func
   const handleRemoveSocialMedia = (index) => {
@@ -184,7 +182,7 @@ const UserStudentCreate = (props) => {
   //       width: onMedia.onDesktop ? "50%" : "100%",
 
   //       "& .MuiOutlinedInput-root": {
-  //         borderRadius: "10px",
+  //         borderRadius: 2,
   //         backgroundColor: "#f0f0f0",
   //       },
   //       "& .MuiOutlinedInput-notchedOutline": {
@@ -223,7 +221,7 @@ const UserStudentCreate = (props) => {
   //       <MenuItem value={"Other"}>Other</MenuItem>
   //     </Select>
   //     <FormHelperText
-  //       id="sc-category-helper-text"
+  //       id="userstudentcreate-category-helper-text"
   //       sx={{ color: "lightgray", fontSize: "12px" }}
   //     >
   //       {"Doesn't have to be related to your major"}
@@ -302,7 +300,7 @@ const UserStudentCreate = (props) => {
       <Divider sx={{ my: 5 }}>
         <Typography sx={{ color: "gray" }}>Optional</Typography>
       </Divider>
-      {newStudent.social_media.map((link, index) => {
+      {newStudent.social_media?.map((link, index) => {
         return (
           <Box
             key={index}
@@ -356,7 +354,7 @@ const UserStudentCreate = (props) => {
       })}
 
       {/* past experience list */}
-      {/*newStudent.past_exp.map((exp_desc, index) => {
+      {/*newStudent.past_exp?.map((exp_desc, index) => {
         return (
           <Box
             key={index}
@@ -423,7 +421,7 @@ const UserStudentCreate = (props) => {
             mb: 5,
             border: 1.5,
             borderColor: "#dbdbdb",
-            borderRadius: "30px",
+            borderRadius: 8,
             backgroundColor: "#3e95c2",
             textTransform: "none",
             paddingX: 5,

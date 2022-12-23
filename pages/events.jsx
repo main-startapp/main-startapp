@@ -1,17 +1,27 @@
 import { useContext, useEffect, useState } from "react";
-import { Grid } from "@mui/material";
+import { Box } from "@mui/material";
 import {
   GlobalContext,
   EventContext,
 } from "../components/Context/ShareContexts";
 import EventList from "../components/Event/EventList";
-import EventsPageBar from "../components/Header/EventsPageBar";
 import EventInfo from "../components/Event/EventInfo";
+import { motion } from "framer-motion";
+import MobileEventsBar from "../components/Header/MobileEventsBar";
 
 const Events = () => {
   // global context
-  const { setChat, setChatPartner, setShowChat, setShowMsg, onMedia } =
-    useContext(GlobalContext);
+  const {
+    setChat,
+    setChatPartner,
+    setShowChat,
+    setShowMsg,
+    onMedia,
+    isAnimated,
+    setIsAnimated,
+  } = useContext(GlobalContext);
+
+  // page setup
   useEffect(() => {
     setShowChat(true);
     setShowMsg(false);
@@ -19,57 +29,109 @@ const Events = () => {
     setChatPartner(null);
   }, [setChat, setChatPartner, setShowChat, setShowMsg]);
 
+  // turn off introduction animation after initialization
+  useEffect(() => {
+    setIsAnimated({ ...isAnimated, events: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // event state init
-  const [event, setEvent] = useState(null); // thec selected project
+  const [fullEvent, setFullEvent] = useState(null); // the selected event with extra data
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
+  const [searchTypeList, setSearchTypeList] = useState([]);
 
   return (
     <EventContext.Provider
       value={{
-        event,
-        setEvent,
+        fullEvent,
+        setFullEvent,
         searchTerm,
         setSearchTerm,
         searchCategory,
         setSearchCategory,
+        searchTypeList,
+        setSearchTypeList,
       }}
     >
-      {/* Toolbar for searching keywords, category and filter */}
-      <EventsPageBar />
+      {!onMedia.onDesktop && fullEvent === null && <MobileEventsBar />}
 
-      <Grid
-        container
-        spaceing={0}
-        direction="row"
-        alignItems="start"
-        justifyContent="center"
+      <Box
+        id="events-main-box"
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          overflow: "hidden",
+          ":hover": {
+            cursor: "default",
+          },
+        }}
       >
-        {/* left part: list */}
         {onMedia.onDesktop ? (
-          <Grid item xs={4}>
+          <>
+            <Box
+              id="events-desktop-list-box"
+              sx={{
+                paddingTop: 4,
+                paddingLeft: 4,
+                paddingRight: 2,
+                width: "38.88889%",
+                maxWidth: "560px",
+              }}
+            >
+              <motion.div
+                initial={isAnimated.events ? false : { x: -200, opacity: 0 }}
+                animate={isAnimated.events ? false : { x: 0, opacity: 1 }}
+                transition={{ delay: 1 }}
+              >
+                <EventList />
+              </motion.div>
+            </Box>
+            <Box
+              id="events-desktop-info-box"
+              sx={{
+                paddingTop: 4,
+                paddingLeft: 2,
+                paddingRight: 4,
+                width: "61.11111%",
+                maxWidth: "880px",
+              }}
+            >
+              <motion.div
+                initial={isAnimated.events ? false : { y: 200, opacity: 0 }}
+                animate={isAnimated.events ? false : { y: 0, opacity: 1 }}
+                transition={{ delay: 1 }}
+              >
+                <EventInfo />
+              </motion.div>
+            </Box>
+          </>
+        ) : fullEvent === null ? (
+          <Box
+            id="events-mobile-list-box"
+            sx={{
+              paddingTop: 2,
+              paddingLeft: 2,
+              width: "100%",
+              backgroundColor: "hoverGray.main",
+            }}
+          >
             <EventList />
-          </Grid>
+          </Box>
         ) : (
-          event === null && (
-            <Grid item xs={12}>
-              <EventList />
-            </Grid>
-          )
-        )}
-        {/* right part: info */}
-        {onMedia.onDesktop ? (
-          <Grid item xs={8}>
+          <Box
+            id="events-mobile-info-box"
+            sx={{
+              paddingTop: 2,
+              paddingLeft: 2,
+              width: "100%",
+              backgroundColor: "hoverGray.main",
+            }}
+          >
             <EventInfo />
-          </Grid>
-        ) : (
-          event !== null && (
-            <Grid item xs={12}>
-              <EventInfo />
-            </Grid>
-          )
+          </Box>
         )}
-      </Grid>
+      </Box>
     </EventContext.Provider>
   );
 };

@@ -325,26 +325,3 @@ export const sendUnreadEmails = functions.pubsub
 
     return null;
   });
-
-// export const testSendEmail = functions.pubsub
-//   .schedule("0 15 * * *")
-//   .onRun((context) => {
-//     const emailArray = ["main.startapp@gmail.com"];
-//     for (let email of emailArray) {
-//       const mailOptions = {
-//         from: "Edium <contact@edium.ca>",
-//         to: email,
-//         subject: "Unread messages on Edium",
-//         html: ``,
-//       };
-
-//       transporter.sendMail(mailOptions, (error, data) => {
-//         if (error) {
-//           console.log(error);
-//           return;
-//         }
-//         console.log("Sent!");
-//       });
-//     }
-//     return null;
-//   });

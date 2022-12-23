@@ -4,7 +4,7 @@ import {
   AccordionSummary,
   Box,
   Button,
-  Divider,
+  Chip,
   Link,
   Tooltip,
   Typography,
@@ -21,9 +21,19 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import { findItemFromList } from "../Reusable/Resusable";
+import { Interweave } from "interweave";
 
+// prefer not doing any dynamic calculation in this leaf component
 const PositionListItem = (props) => {
+  const index = props.index;
+  const posID = props.posID;
+  const posTitle = props.posTitle;
+  const posResp = props.posResp;
+  const posWeeklyHour = props.posWeeklyHour;
+  const posLevel = props.posLevel;
+  const creator = props.creator; // creator's user data
+  const appFormURL = props.appFormURL;
+
   // context
   const {
     chats,
@@ -34,23 +44,16 @@ const PositionListItem = (props) => {
     setForceChatExpand,
     onMedia,
   } = useContext(GlobalContext);
-  const { project } = useContext(ProjectContext);
+  const { fullProject } = useContext(ProjectContext);
 
-  // args
-  const posID = props.posID;
-  const posTitle = props.posTitle;
-  const posResp = props.posResp;
-  const posWeeklyHour = props.posWeeklyHour;
-  const isCreator = props.isCreator; // whether ediumUser is the creator
-  const creator = props.creator; // creator's user data
-  const appFormURL = props.appFormURL;
+  // local var
+  const project = fullProject?.project;
 
-  // local vars
   // useEffect to reset accordion expansion
   const [expandState, setExpandState] = useState("collapseIt");
   useEffect(() => {
     setExpandState("collpaseIt");
-  }, [project]); // every time project changes, this sets each accordion to collapse
+  }, [fullProject]); // every time project changes, this sets each accordion to collapse
 
   const handleExpand = (e) => {
     expandState === "expandIt"
@@ -152,12 +155,11 @@ const PositionListItem = (props) => {
       const collectionRef = collection(db, "chats");
       const my_name_key = ediumUser?.uid + "_name";
       const creator_name_key = project?.creator_uid + "_name";
-      const creatorUser = findItemFromList(users, "uid", project?.creator_uid);
       const chatRef = {
         // new
         chat_user_ids: [ediumUser?.uid, project.creator_uid],
         [my_name_key]: ediumUser?.name,
-        [creator_name_key]: creatorUser?.name,
+        [creator_name_key]: creator?.name,
         [my_unread_key]: 0,
         [creator_unread_key]: 1,
         has_unread: true,
@@ -193,31 +195,30 @@ const PositionListItem = (props) => {
   // components
   const appFormButton = (
     <Button
+      color="primary"
       disabled={!ediumUser?.uid}
       disableElevation
       size="small"
-      sx={{
-        border: 1.5,
-        borderColor: "#dbdbdb",
-        borderRadius: "30px",
-        backgroundColor: "#3e95c2",
-        textTransform: "none",
-        paddingX: 3,
-        paddingY: 0,
-      }}
-      onClick={(e) => e.stopPropagation()}
       variant="contained"
       component={Link}
       target="_blank"
       href={appFormURL}
       rel="noreferrer"
+      onClick={(e) => e.stopPropagation()}
+      sx={{
+        borderRadius: 8,
+        paddingX: 2,
+        paddingY: 0,
+        fontSize: "0.75rem",
+      }}
     >
-      {"Application Link"}
+      {"Apply"}
     </Button>
   );
 
   const joinRequestButton = (
     <Button
+      color="primary"
       disabled={
         !ediumUser?.uid ||
         ediumUserExt?.join_requests?.some(
@@ -226,88 +227,105 @@ const PositionListItem = (props) => {
       }
       disableElevation
       size="small"
-      sx={{
-        border: 1.5,
-        borderColor: "#dbdbdb",
-        borderRadius: "30px",
-        backgroundColor: "#3e95c2",
-        textTransform: "none",
-        paddingX: 3,
-        paddingY: 0,
-      }}
       variant="contained"
       onClick={(e) => {
         e.stopPropagation();
         handleJoinRequest();
       }}
+      sx={{
+        borderRadius: 8,
+        paddingX: 2,
+        paddingY: 0,
+        fontSize: "0.75rem",
+      }}
     >
-      {"Join Request"}
+      {"Apply"}
     </Button>
   );
 
   return (
-    <Box sx={onMedia.onDesktop ? { m: 3 } : { m: 1.5 }}>
+    <Box
+      id="positionlistitem-box"
+      sx={onMedia.onDesktop ? { my: 2 } : { my: 1 }}
+    >
       <Accordion
+        //disableGutters
         square
+        elevation={2}
         expanded={expandState === "expandIt"}
         sx={{
-          border: 1.5,
-          borderRadius: "10px",
-          borderColor: "#dbdbdb",
-          "&:hover": {
-            backgroundColor: "#f6f6f6",
-          },
+          boxShadow: "none",
+          borderRadius: 2,
         }}
-        elevation={0}
       >
         <StyledAccordionSummary
+          id={"accordion-" + index + "-header"}
+          aria-controls={"accordion-" + index + "-content"}
           expandIcon={<ExpandMoreIcon />}
           onClick={(e) => handleExpand(e)}
+          sx={{ borderRadius: 2, boxShadow: 2 }}
         >
           <Box
             sx={{
-              mr: 3,
+              mr: 2,
               width: "100%",
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
             }}
           >
-            <Typography color="text.primary">{posTitle}</Typography>
+            <Typography
+              variant="h4"
+              color="text.primary"
+              sx={{ fontSize: "1rem", fontWeight: "medium" }}
+            >
+              {posTitle}
+            </Typography>
+            {posLevel !== "" && (
+              <Chip
+                color={posLevel === "Beginner" ? "beginnerGreen" : "error"}
+                label={posLevel}
+                size="small"
+                sx={{
+                  ml: 1,
+                  height: "16px",
+                  borderRadius: 1.5,
+                  fontSize: "0.625rem",
+                }}
+              />
+            )}
             <Box sx={{ flexGrow: 1 }} />
-            {onMedia.onDesktop && !isCreator && (
+            {onMedia.onDesktop && ediumUser?.uid !== creator?.uid && (
               <Tooltip title={ediumUser?.uid ? "" : "Edit your profile first"}>
                 <span>{appFormURL ? appFormButton : joinRequestButton}</span>
               </Tooltip>
             )}
           </Box>
         </StyledAccordionSummary>
-        <AccordionDetails>
-          <Divider
+        <AccordionDetails sx={{ padding: 4 }}>
+          {/* <Divider
             sx={{ mb: 1.5, borderBottomWidth: 1.5, borderColor: "#dbdbdb" }}
-          />
+          /> */}
 
-          <Box sx={{ width: "100%", display: "flex", flexDirection: "column" }}>
-            <Box
-              sx={{
-                width: "100%",
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-              }}
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Typography
+              color="text.primary"
+              sx={{ mb: 1, fontSize: "1rem", fontWeight: "medium" }}
             >
-              <Typography
-                color="text.primary"
-                sx={{ fontSize: "1em", fontWeight: "bold" }}
-              >
-                {"Responsibilities: "}
-              </Typography>
-              <Typography sx={{ fontSize: "1em", fontWeight: "bold" }}>
-                {"Weekly Hours: "}
-                {posWeeklyHour}
-              </Typography>
-            </Box>
-            <Typography component="span" color="text.secondary">
+              {"Role Description: "}
+            </Typography>
+            <Typography
+              color="text.secondary"
+              component="span"
+              variant="body1"
+              sx={{ fontSize: "0.875rem" }}
+            >
               <pre
                 style={{
                   fontFamily: "inherit",
@@ -316,10 +334,10 @@ const PositionListItem = (props) => {
                   display: "inline",
                 }}
               >
-                {posResp}
+                <Interweave content={posResp} />
               </pre>
             </Typography>
-            {!onMedia.onDesktop && !isCreator && (
+            {!onMedia.onDesktop && ediumUser?.uid !== creator?.uid && (
               <Box sx={{ mt: 1.5, display: "flex", justifyContent: "end" }}>
                 <Tooltip
                   title={ediumUser?.uid ? "" : "Edit your profile first"}

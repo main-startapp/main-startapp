@@ -23,12 +23,12 @@ const ChatMsgItem = (props) => {
           }}
         >
           <Typography
-            sx={{ display: "inline", fontWeight: "bold", fontSize: "1em" }}
+            sx={{ display: "inline", fontWeight: "medium", fontSize: "1rem" }}
           >
             {chatPartner?.name}
           </Typography>
           <Typography
-            sx={{ display: "inline", color: "lightgray", fontSize: "0.9em" }}
+            sx={{ display: "inline", color: "lightgray", fontSize: "0.875em" }}
           >
             {" · "}
             {moment(message?.sent_at?.toDate().getTime()).format("M/D LT")}
@@ -43,11 +43,13 @@ const ChatMsgItem = (props) => {
             position: "relative",
           }}
         >
-          <Typography sx={{ display: "inline", fontWeight: "bold" }}>
+          <Typography
+            sx={{ display: "inline", fontWeight: "medium", fontSize: "1rem" }}
+          >
             Me
           </Typography>
           <Typography
-            sx={{ display: "inline", color: "lightgray", fontSize: "0.9em" }}
+            sx={{ display: "inline", color: "lightgray", fontSize: "0.875rem" }}
           >
             {" · "}
             {moment(message?.sent_at?.toDate().getTime()).format("M/D LT")}
@@ -63,7 +65,7 @@ const ChatMsgItem = (props) => {
           mb: isLastMsg ? "18px" : 0,
         }}
       >
-        <Typography sx={{ fontSize: "0.9em", mx: "18px" }}>
+        <Typography sx={{ fontSize: "0.875rem", mx: "18px" }}>
           {message.text}
         </Typography>
       </Box>

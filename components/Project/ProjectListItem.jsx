@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import {
   Avatar,
   Box,
+  Chip,
   IconButton,
   ListItem,
   ListItemText,
@@ -13,193 +14,259 @@ import moment from "moment";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { handleDeleteEntry, handleVisibility } from "../Reusable/Resusable";
+import {
+  handleDeleteEntry,
+  handleVisibility,
+  isStrInStrList,
+} from "../Reusable/Resusable";
+import { convert } from "html-to-text";
+import NextLink from "next/link";
 
 // the project list item component in the project list: has full project data but only shows some brief information
+// prefer not doing any dynamic calculation in this leaf component
 const ProjectListItem = (props) => {
   const index = props.index;
-  const project = props.project;
+  const fullProject = props.fullProject;
   const last = props.last;
 
   // context
-
   const { ediumUser, onMedia } = useContext(GlobalContext);
-  const { setProject } = useContext(ProjectContext);
+  const { setFullProject, searchTypeList } = useContext(ProjectContext);
+
+  // local vars
+  const project = fullProject.project;
+  const projectCreator = fullProject.creator_uid;
+  const projectAllTags = fullProject.allTags;
 
   // menu
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleMenuClick = (e) => {
+    e.stopPropagation();
     setAnchorEl(e.currentTarget);
   };
-  const handleMenuClose = () => {
+  const handleMenuClose = (e) => {
+    e.stopPropagation();
     setAnchorEl(null);
   };
 
-  // functions
-  const editDescString = (text) => {
-    if (text) return text.replace(/<img .*>/, "");
-    else return "";
-  };
-
   return (
-    <Box
+    <ListItem
+      onClick={() => {
+        setFullProject(fullProject);
+      }}
       sx={{
-        mx: onMedia.onDesktop ? 3 : 1.5,
-        mt: onMedia.onDesktop ? (index === 0 ? 3 : 1.5) : 1.5,
-        mb: index === last ? (onMedia.onDesktop ? 3 : 1.5) : 0,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        borderBottom: 1,
+        borderColor: "divider",
+        "&:hover": {
+          backgroundColor: "hoverGray.main",
+        },
+        overflow: "hidden",
+        paddingY: 2,
+        paddingX: 2,
       }}
     >
-      <ListItem
-        onClick={() => setProject(project)}
+      <Box
+        id="projectlistitem-upper-box"
         sx={{
           display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          border: 1.5,
-          borderRadius: "30px",
-          borderColor: "#dbdbdb",
-          backgroundColor: "#ffffff",
-          "&:hover": {
-            backgroundColor: "#f6f6f6",
-            cursor: "default",
-          },
-          // height: "180px",
-          overflow: "hidden",
+          flexDirection: "row",
+          alignItems: "center",
+          width: "100%",
         }}
       >
-        <Box
+        {/* project icon uploaded by users*/}
+        <Avatar
           sx={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            width: "100%",
+            mr: 2,
+            height: "48px",
+            width: "48px",
           }}
+          src={project?.icon_url}
         >
-          {/* project icon uploaded by users*/}
-          <Avatar
-            sx={{
-              mr: 2,
-              height: "48px",
-              width: "48px",
-            }}
-            src={project?.icon_url}
-          >
-            <UploadFileIcon />
-          </Avatar>
-          <ListItemText
-            primary={project.title}
-            primaryTypographyProps={{ fontWeight: "bold" }}
-            secondary={
-              <>
-                {project.max_member_count && "Team size: "}
-                {project.max_member_count && project.max_member_count}
-                <br />
-              </>
-            }
-          />
-          <IconButton
-            id="PLI-menu-button"
-            aria-controls={open ? "PLI-menu" : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? "true" : undefined}
-            onClick={(e) => {
-              if (ediumUser?.uid !== project?.creator_uid) return; // !todo: will be removed after there's at least one menu for regular user
-              handleMenuClick(e);
-            }}
-          >
-            <MoreVertIcon />
-          </IconButton>
-          <Menu
-            id="PLI-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleMenuClose}
-            MenuListProps={{
-              "aria-labelledby": "PLI-menu-button",
-            }}
-          >
-            {ediumUser?.uid === project?.creator_uid && (
-              <MenuItem
-                onClick={() => {
-                  handleVisibility("projects", project);
-                  handleMenuClose();
-                }}
-              >
-                {project?.is_visible ? "Hide" : "Display"}
-              </MenuItem>
-            )}
-            {ediumUser?.uid === project?.creator_uid && (
-              <MenuItem
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteEntry(
-                    "projects",
-                    "projects_ext",
-                    "my_project_ids",
-                    project?.id,
-                    ediumUser?.uid
-                  );
-                  setProject(null);
-                  handleMenuClose();
-                }}
-              >
-                Delete
-              </MenuItem>
-            )}
-          </Menu>
-        </Box>
+          <UploadFileIcon />
+        </Avatar>
         <Box sx={{ width: "100%" }}>
           <ListItemText
-            secondary={
+            disableTypography
+            primary={
               <Typography
-                component="span" // this fixed eror saying div cannot appear as descendant of p
-                sx={{
-                  display: "-webkit-box",
-                  overflow: "hidden",
-                  WebkitBoxOrient: "vertical",
-                  WebkitLineClamp: 2,
-                  // is there a better way to directly ref to ListItemText Secondary style?
-                  fontSize: "0.875rem",
-                  lineHeight: 1.43,
-                  letterSpacing: "0.01071em",
-                  color: "rgba(0, 0, 0, 0.6)",
-                }}
+                variant="h2"
+                sx={{ fontSize: "1rem", fontWeight: "bold" }}
               >
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: editDescString(project.description),
-                  }}
-                />
+                {project?.title}
               </Typography>
             }
           />
-          {project.position_list.slice(0, 3).map((position, index) => (
-            <ListItemText
-              sx={{ ml: "5%" }}
-              key={index}
-              secondary={<span>&bull; &nbsp; {position.title}</span>}
-            />
-          ))}
-          {project.position_list.length > 3 && (
-            <ListItemText
-              sx={{ ml: "5%" }}
-              secondary={<span>&bull; &nbsp; {"and more..."}</span>}
-            />
-          )}
-          {onMedia.onDesktop && (
-            <ListItemText
-              secondary={
-                <>
-                  {"Last Update: "}
-                  {moment(project.last_timestamp).format("MMMM Do, YYYY")}
-                </>
-              }
-            />
+          {projectAllTags?.length > 0 && (
+            <Box sx={{ mt: 1, height: "1.75rem", overflow: "hidden" }}>
+              {projectAllTags?.map((tag, index) => (
+                <Chip
+                  key={index}
+                  color={
+                    isStrInStrList(searchTypeList, tag, true)
+                      ? "primary"
+                      : "lightPrimary"
+                  }
+                  label={tag}
+                  sx={{
+                    mr: 1,
+                    mb: 1,
+                    fontSize: "0.75rem",
+                    fontWeight: "medium",
+                    height: "1.5rem",
+                  }}
+                />
+              ))}
+            </Box>
           )}
         </Box>
-      </ListItem>
-    </Box>
+        {ediumUser?.uid === project?.creator_uid && (
+          <IconButton
+            id="projectlistitem-menu-button"
+            aria-controls={open ? "projectlistitem-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
+            onClick={(e) => {
+              handleMenuClick(e);
+            }}
+            sx={{ padding: 0 }}
+          >
+            <MoreVertIcon />
+          </IconButton>
+        )}
+        <Menu
+          id="projectlistitem-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={(e) => {
+            handleMenuClose(e);
+          }}
+          MenuListProps={{
+            "aria-labelledby": "projectlistitem-menu-button",
+          }}
+        >
+          {ediumUser?.uid === project?.creator_uid && (
+            <MenuItem
+              onClick={(e) => {
+                handleMenuClose(e);
+              }}
+            >
+              <NextLink
+                href={{
+                  pathname: "/projects/create",
+                  query: { projectID: project?.id },
+                }}
+                as="/projects/create"
+                passHref
+              >
+                Modify
+              </NextLink>
+            </MenuItem>
+          )}
+          {ediumUser?.uid === project?.creator_uid && (
+            <MenuItem
+              onClick={(e) => {
+                handleVisibility("projects", project);
+                handleMenuClose(e);
+              }}
+            >
+              {project?.is_visible ? "Hide" : "Display"}
+            </MenuItem>
+          )}
+          {ediumUser?.uid === project?.creator_uid && (
+            <MenuItem
+              onClick={(e) => {
+                handleDeleteEntry(
+                  "projects",
+                  "projects_ext",
+                  "my_project_ids",
+                  project?.id,
+                  ediumUser?.uid
+                );
+                setFullProject(null);
+                handleMenuClose(e);
+              }}
+            >
+              Delete
+            </MenuItem>
+          )}
+        </Menu>
+      </Box>
+      <Box
+        id="projectlistitem-lower-box"
+        // padding right to align with more icon
+        sx={{ mt: 2, paddingRight: "10px", width: "100%" }}
+      >
+        <ListItemText
+          secondary={
+            <Typography
+              color="text.secondary"
+              variant="body2"
+              sx={{
+                display: "-webkit-box",
+                overflow: "hidden",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: 1,
+              }}
+            >
+              {convert(project?.description)}
+            </Typography>
+          }
+          sx={{ mb: 2 }}
+        />
+        {project?.position_list?.slice(0, 3)?.map((position, index) => (
+          <ListItemText
+            key={index}
+            secondary={
+              <Typography
+                color="text.secondary"
+                variant="body2"
+                sx={{ fontWeight: "medium" }}
+              >
+                {position.title}
+              </Typography>
+            }
+            sx={{ margin: 0, ml: "5%" }}
+          />
+        ))}
+        {project?.position_list?.length > 3 && (
+          <ListItemText
+            secondary={
+              <Typography
+                color="text.secondary"
+                variant="body2"
+                sx={{ fontWeight: "medium" }}
+              >
+                {"and more..."}
+              </Typography>
+            }
+            sx={{ margin: 0, ml: "5%" }}
+          />
+        )}
+        {onMedia.onDesktop && (
+          <ListItemText
+            secondary={
+              <Typography
+                color="text.secondary"
+                variant="body2"
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  fontWeight: "light",
+                }}
+              >
+                {moment(project.last_timestamp).format("MMM Do, YYYY")}
+              </Typography>
+            }
+            sx={{ mt: 2 }}
+          />
+        )}
+      </Box>
+    </ListItem>
   );
 };
 

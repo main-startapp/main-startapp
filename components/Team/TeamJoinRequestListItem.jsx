@@ -27,7 +27,6 @@ import { useContext, useEffect, useState, useRef, useMemo } from "react";
 import { db } from "../../firebase";
 import { GlobalContext } from "../Context/ShareContexts";
 import { handleConnect } from "../Reusable/Resusable";
-import ReactCardFlip from "react-card-flip";
 import FaceRetouchingNaturalOutlinedIcon from "@mui/icons-material/FaceRetouchingNaturalOutlined";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import FacebookIcon from "@mui/icons-material/Facebook";
@@ -140,7 +139,7 @@ const TeamJoinRequestListItem = (props) => {
   };
 
   return (
-    <ReactCardFlip isFlipped={isFlipped}>
+    <>
       <Card
         variant="outlined"
         sx={{
@@ -337,7 +336,7 @@ const TeamJoinRequestListItem = (props) => {
                   </Typography>
                 )}
                 {requestingStudent?.awards?.length > 0 &&
-                  requestingStudent.awards.map((awardStr, index) => {
+                  requestingStudent.awards?.map((awardStr, index) => {
                     if (awardStr.toLowerCase() === "betauser") {
                       return (
                         <Tooltip key={index} title="Beta User">
@@ -357,7 +356,7 @@ const TeamJoinRequestListItem = (props) => {
                   </Typography>
                 )}
                 {requestingStudent?.social_media?.length > 0 &&
-                  requestingStudent.social_media.map((link, index) => {
+                  requestingStudent.social_media?.map((link, index) => {
                     if (link.toLowerCase().includes("linkedin")) {
                       return (
                         <Link
@@ -421,7 +420,7 @@ const TeamJoinRequestListItem = (props) => {
                   </Typography>
                 )}
                 {requestingStudent?.past_exp?.length > 0 &&
-                  requestingStudent.past_exp.map((exp, index) => (
+                  requestingStudent.past_exp?.map((exp, index) => (
                     <Typography
                       key={index}
                       sx={{
@@ -443,7 +442,7 @@ const TeamJoinRequestListItem = (props) => {
             </Typography>
           )}
           {requestingStudent?.awards?.length > 0 &&
-            requestingStudent.awards.map((awardStr, index) => {
+            requestingStudent.awards?.map((awardStr, index) => {
               if (awardStr.toLowerCase() === "betauser") {
                 return (
                   <Tooltip key={index} title="Beta User">
@@ -461,7 +460,7 @@ const TeamJoinRequestListItem = (props) => {
             </Typography>
           )}
           {requestingStudent?.social_media?.length > 0 &&
-            requestingStudent.social_media.map((link, index) => {
+            requestingStudent.social_media?.map((link, index) => {
               // todo!: too hacky, is there any library can do this properly?
               if (link.toLowerCase().includes("linkedin")) {
                 return (
@@ -522,7 +521,7 @@ const TeamJoinRequestListItem = (props) => {
             </Typography>
           )}
           {requestingStudent?.past_exp?.length > 0 &&
-            requestingStudent.past_exp.map((exp, index) => (
+            requestingStudent.past_exp?.map((exp, index) => (
               <Typography
                 key={index}
                 sx={{
@@ -550,7 +549,7 @@ const TeamJoinRequestListItem = (props) => {
           </Typography>
         )}
       </Card>
-    </ReactCardFlip>
+    </>
   );
 };
 

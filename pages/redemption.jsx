@@ -249,7 +249,7 @@ const Redemption = () => {
   // reusable comp
   const codeList = (codesArray, setCodesArray, name, isLeft) => (
     <>
-      {codesArray.map((code, index) => (
+      {codesArray?.map((code, index) => (
         <Box key={index} sx={{ mt: 3, width: "100%" }}>
           <Typography
             sx={{

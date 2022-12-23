@@ -52,7 +52,7 @@ const Create = () => {
           {alertMessage}
         </Alert>
       </Snackbar>
-      <ProjectCreate isCreateStr={query.isCreateStr} />
+      <ProjectCreate projectID={query?.projectID} />
     </ProjectContext.Provider>
   );
 };

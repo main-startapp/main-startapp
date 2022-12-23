@@ -52,7 +52,7 @@ const Create = () => {
           {alertMessage}
         </Alert>
       </Snackbar>
-      <EventCreate isCreateStr={query.isCreateStr} />
+      <EventCreate eventID={query?.eventID} />
     </EventContext.Provider>
   );
 };

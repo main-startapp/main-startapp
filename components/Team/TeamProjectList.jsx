@@ -51,7 +51,7 @@ const TeamProjectList = () => {
           : 0
       )
         .fill("filler")
-        .map((filler, index) => {
+        ?.map((filler, index) => {
           return <TeamProjectListItemEmpty key={index} />;
         })}
       {/* divider: !! to transfer number to boolean; willl not show if no joined projects */}

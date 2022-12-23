@@ -1,90 +1,247 @@
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
   Avatar,
   Box,
   Button,
+  Chip,
   Divider,
-  Grid,
-  IconButton,
+  Fab,
   Link,
-  Tooltip,
   Typography,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { EventContext, GlobalContext } from "../Context/ShareContexts";
-import ExportedImage from "next-image-export-optimizer";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
-import NextLink from "next/link";
-import {
-  findItemFromList,
-  getDocFromDB,
-  handleConnect,
-} from "../Reusable/Resusable";
+import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 import moment from "moment";
-import { useAuth } from "../Context/AuthContext";
-import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
-import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import { useRouter } from "next/router";
+import { Interweave } from "interweave";
+import { UrlMatcher } from "interweave-autolink";
+import { motion } from "framer-motion";
+import { FixedHeightPaper } from "../Reusable/Resusable";
 
 const EventInfo = () => {
   // context
-  const { currentUser } = useAuth();
-  const {
-    setOldEvent,
-    chats,
-    ediumUser,
-    ediumUserExt,
-    users,
-    setChatPartner,
-    setForceChatExpand,
-    winHeight,
-    onMedia,
-  } = useContext(GlobalContext);
-  const { event } = useContext(EventContext);
+  const { onMedia } = useContext(GlobalContext);
+  const { fullEvent, setFullEvent } = useContext(EventContext);
+  const theme = useTheme();
 
   // local vars
-  const router = useRouter();
+  const event = fullEvent?.event;
+  const eventCreator = fullEvent?.creator_uid;
+  const eventAllTags = fullEvent?.allTags;
+
   const [tCode, setTCode] = useState("");
   useEffect(() => {
     setTCode("");
-  }, [event]);
+  }, [fullEvent]);
+
+  const [isLoaded, setIsLoaded] = useState(false);
+  useEffect(() => {
+    setIsLoaded(false);
+  }, [fullEvent]);
 
   // moment
-  const startMoment = useMemo(() => {
-    return moment(event?.start_date);
-  }, [event?.start_date]);
-
-  const endMoment = useMemo(() => {
-    return moment(event?.end_date);
-  }, [event?.end_date]);
-
-  const isSameDay = useMemo(() => {
-    return startMoment.format("L") === endMoment.format("L");
-  }, [startMoment, endMoment]);
-
-  const isSameTime = useMemo(() => {
-    return startMoment.format("LLL") === endMoment.format("LLL");
-  }, [startMoment, endMoment]);
-
-  // hook to find is the ediumUser the event creator
-  const isCreator = useMemo(() => {
-    return ediumUser?.uid === event?.creator_uid ? true : false;
-  }, [ediumUser?.uid, event?.creator_uid]);
-
-  // hook to get event creator data
-  const creatorUser = useMemo(() => {
-    return findItemFromList(users, "uid", event?.creator_uid);
-  }, [users, event?.creator_uid]);
-
-  // box ref to used by useEffect
-  const boxRef = useRef();
+  const startMoment = moment(event?.start_date);
+  const endMoment = moment(event?.end_date);
+  const isSameDay = startMoment.format("L") === endMoment.format("L");
+  const isSameTime = startMoment.format("LLL") === endMoment.format("LLL");
 
   // useEffect to reset box scrollbar position
+  const boxRef = useRef();
   useEffect(() => {
-    boxRef.current.scrollTop = 0;
-  }, [event]);
+    window.scrollTo({ top: 0 });
+    if (boxRef?.current?.scrollTop) boxRef.current.scrollTop = 0;
+  }, [fullEvent]); // every time project changes, this forces each accordion to collapse
 
   return (
-    <Box
+    <FixedHeightPaper
+      elevation={onMedia.onDesktop ? 2 : 0}
+      isdesktop={onMedia.onDesktop ? 1 : 0}
+      mobileheight={0}
+      sx={{
+        paddingTop: onMedia.onDesktop ? "32px" : 0,
+      }}
+    >
+      <Box
+        id="eventinfo-box"
+        ref={boxRef}
+        sx={{
+          flexGrow: 1,
+          overflowY: "scroll",
+          paddingTop: onMedia.onDesktop ? 2 : 2, // align with project list
+          paddingBottom: onMedia.onDesktop ? 6 : 2, // enough space to not covered by messages
+          paddingLeft: onMedia.onDesktop ? 4 : 2,
+          paddingRight: onMedia.onDesktop
+            ? `calc(${theme.spacing(4)} - 0.4rem)`
+            : 2, // considering scrollbar
+        }}
+      >
+        <motion.div
+          key={event?.title}
+          initial={{ opacity: 0, y: "1%" }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Box
+            id="eventinfo-header-box"
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Avatar
+              sx={{
+                mr: onMedia.onDesktop ? 4 : 2,
+                height: "96px",
+                width: "96px",
+              }}
+              src={event?.icon_url}
+            >
+              <UploadFileIcon />
+            </Avatar>
+            <Typography
+              color="text.primary"
+              variant="h2"
+              sx={{
+                fontSize: onMedia.onDesktop ? "1.875rem" : "1.25rem",
+                fontWeight: "bold",
+              }}
+            >
+              {event?.title}
+            </Typography>
+          </Box>
+
+          <Divider
+            sx={{
+              mt: 2,
+              borderBottomWidth: 1,
+              borderColor: "divider",
+            }}
+          />
+
+          <Typography
+            color="text.primary"
+            variant="h3"
+            sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
+          >
+            {"Time & Location: "}
+          </Typography>
+          <Typography color="text.secondary" variant="body1">
+            {isSameDay
+              ? startMoment.format("MMMM Do YYYY, h:mm a") +
+                (isSameTime ? "" : " - " + endMoment.format("h:mm a"))
+              : startMoment.format("MMMM Do YYYY, h:mm a") +
+                " - " +
+                endMoment.format("MMMM Do YYYY, h:mm a")}
+          </Typography>
+          <Typography color="text.secondary" variant="body1">
+            {event?.location}
+          </Typography>
+
+          <Typography
+            color="text.primary"
+            variant="h3"
+            sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
+          >
+            {"Description:"}
+          </Typography>
+          <Typography color="text.secondary" component="span" variant="body1">
+            <pre
+              style={{
+                fontFamily: "inherit",
+                whiteSpace: "pre-wrap",
+                wordWrap: "break-word",
+                display: "inline",
+              }}
+            >
+              <Interweave
+                content={event?.description}
+                matchers={[new UrlMatcher("url")]}
+              />
+            </pre>
+          </Typography>
+
+          <Button
+            disableElevation
+            fullWidth
+            variant="contained"
+            component={Link}
+            target="_blank"
+            href={event?.registration_form_url}
+            rel="noreferrer"
+            sx={{
+              mt: 4,
+              borderRadius: 8,
+            }}
+          >
+            {"Attend"}
+          </Button>
+
+          {eventAllTags?.length > 0 && (
+            <Box id="eventinfo-details-box">
+              <Typography
+                color="text.primary"
+                variant="h3"
+                sx={{ mt: 4, fontSize: "1.25rem", fontWeight: "bold" }}
+              >
+                {"Details: "}
+              </Typography>
+              {eventAllTags?.map((tag, index) => (
+                <Chip
+                  key={index}
+                  color={"lightPrimary"}
+                  label={tag}
+                  sx={{
+                    mr: 1,
+                    mt: 1,
+                    fontSize: "0.875rem",
+                    fontWeight: "medium",
+                  }}
+                />
+              ))}
+            </Box>
+          )}
+
+          <Box
+            sx={{
+              mt: isLoaded ? 3 : 0,
+              display: "flex",
+              justifyContent: "center",
+              visibility: isLoaded ? "visible" : "collapse",
+            }}
+          >
+            <Box
+              component="img"
+              onLoad={() => {
+                setIsLoaded(true);
+              }}
+              src={event?.banner_url}
+              sx={{ maxWidth: "100%" }}
+            />
+          </Box>
+        </motion.div>
+      </Box>
+      {!onMedia.onDesktop && fullEvent !== null && (
+        <Fab
+          color="primary"
+          size="small"
+          onClick={() => {
+            setFullEvent(null);
+          }}
+          sx={{ position: "fixed", right: 16, bottom: 80 }}
+        >
+          <ArrowBackIosRoundedIcon />
+        </Fab>
+      )}
+    </FixedHeightPaper>
+  );
+};
+
+export default EventInfo;
+
+{
+  /* <Box
       ref={boxRef}
       sx={{
         height: onMedia.onDesktop
@@ -96,7 +253,7 @@ const EventInfo = () => {
     >
       {!!event && (
         <Grid container>
-          {/* Top left info box */}
+
           <Grid item xs={onMedia.onDesktop ? 9 : 12}>
             <Box
               sx={
@@ -112,7 +269,7 @@ const EventInfo = () => {
                   alignItems: "center",
                 }}
               >
-                {/* default unit is px */}
+
                 <Avatar
                   sx={{
                     mr: onMedia.onDesktop ? 3 : 1.5,
@@ -140,12 +297,12 @@ const EventInfo = () => {
                   borderColor: "#dbdbdb",
                 }}
               />
-              {/* details */}
+
               <Typography sx={{ fontWeight: "bold" }} color="text.primary">
                 {"Details: "}
               </Typography>
               <Typography color="text.secondary">{event?.details}</Typography>
-              {/* time */}
+
               <Typography
                 sx={{ mt: onMedia.onDesktop ? 3 : 1.5, fontWeight: "bold" }}
                 color="text.primary"
@@ -160,7 +317,7 @@ const EventInfo = () => {
                     " - " +
                     endMoment.format("MMMM Do YYYY, h:mm a")}
               </Typography>
-              {/* location */}
+
               <Typography
                 sx={{ mt: onMedia.onDesktop ? 3 : 1.5, fontWeight: "bold" }}
                 color="text.primary"
@@ -171,7 +328,7 @@ const EventInfo = () => {
             </Box>
           </Grid>
 
-          {/* Top right founder box */}
+
           {onMedia.onDesktop &&
             (event?.creator_uid !== "T5q6FqwJFcRTKxm11lu0zmaXl8x2" ||
               ediumUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2") && (
@@ -226,7 +383,7 @@ const EventInfo = () => {
                             mt: 1,
                             border: 1.5,
                             borderColor: "#dbdbdb",
-                            borderRadius: "30px",
+                            borderRadius: 8,
                             color: "text.primary",
                             backgroundColor: "#ffffff",
                             fontWeight: "bold",
@@ -257,19 +414,18 @@ const EventInfo = () => {
                     <NextLink
                       href={{
                         pathname: "/events/create",
-                        query: { isCreateStr: "false" },
                       }}
                       as="/events/create"
                       passHref
                     >
                       <Button
-                        onClick={() => setOldEvent(event)}
+
                         variant="contained"
                         sx={{
                           mt: 1,
                           border: 1.5,
                           borderColor: "#dbdbdb",
-                          borderRadius: "30px",
+                          borderRadius: 8,
                           color: "text.primary",
                           backgroundColor: "#ffffff",
                           fontWeight: "bold",
@@ -289,7 +445,7 @@ const EventInfo = () => {
               </Grid>
             )}
 
-          {/* Bottom description and button */}
+
           <Grid item xs={12}>
             <Box
               sx={onMedia.onDesktop ? { mt: 3, mx: 3 } : { mt: 1.5, mx: 1.5 }}
@@ -316,7 +472,7 @@ const EventInfo = () => {
                   mt: onMedia.onDesktop ? 3 : 1.5,
                   border: 1.5,
                   borderColor: "#dbdbdb",
-                  borderRadius: "30px",
+                  borderRadius: 8,
                   color: "white",
                   backgroundColor: "#3e95c2",
                   fontWeight: "bold",
@@ -370,7 +526,7 @@ const EventInfo = () => {
                   <Button
                     variant="contained"
                     disableElevation
-                    color="AdminOrange"
+                    color="adminOrange"
                     sx={{
                       borderRadius: "0px",
                       color: "white",
@@ -429,7 +585,7 @@ const EventInfo = () => {
                     <Button
                       variant="contained"
                       disableElevation
-                      color="AdminOrange"
+                      color="adminOrange"
                       sx={{
                         borderRadius: "0px",
                         color: "white",
@@ -453,7 +609,7 @@ const EventInfo = () => {
       )}
       {!event && (
         <Box
-          id="logo placeholder container"
+          id="eventinfo-logo-placeholder-box"
           sx={{
             width: "100%",
             height: "100%",
@@ -463,15 +619,15 @@ const EventInfo = () => {
           }}
         >
           <Box
-            id="logo placeholder wrapper"
+            id="eventinfo-logo-placeholder-wrapper-box"
             sx={{
               display: "flex",
               justifyContent: "center",
             }}
           >
             <ExportedImage
-              src="/images/EDIUMLogo.png"
-              placeholder=""
+              src="/images/edium_text_1024.png"
+              alt=""
               width={256}
               height={256}
               priority
@@ -479,8 +635,5 @@ const EventInfo = () => {
           </Box>
         </Box>
       )}
-    </Box>
-  );
-};
-
-export default EventInfo;
+    </Box> */
+}
