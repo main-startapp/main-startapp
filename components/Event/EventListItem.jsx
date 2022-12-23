@@ -1,112 +1,260 @@
-import { useContext, useMemo, useState } from "react";
+import { useContext, useState } from "react";
 import {
   Avatar,
   Box,
+  Chip,
   IconButton,
   ListItem,
   ListItemText,
   Menu,
   MenuItem,
+  Typography,
 } from "@mui/material";
 import moment from "moment";
 import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useAuth } from "../Context/AuthContext";
-import { handleDeleteEntry } from "../Reusable/Resusable";
+import {
+  handleDeleteEntry,
+  handleVisibility,
+  isStrInStrList,
+} from "../Reusable/Resusable";
+import NextLink from "next/link";
 
+// prefer not doing any dynamic calculation in this leaf component
 const EventListItem = (props) => {
   const index = props.index;
-  const event = props.event;
+  const fullEvent = props.fullEvent;
   const last = props.last;
 
   // context
   const { ediumUser, onMedia } = useContext(GlobalContext);
-  const { setEvent } = useContext(EventContext);
+  const { setFullEvent, searchTypeList } = useContext(EventContext);
 
-  // local
-  const startMoment = useMemo(() => {
-    return moment(event?.start_date);
-  }, [event?.start_date]);
+  // local vars
+  const event = fullEvent.event;
+  const eventCreator = fullEvent.creator_uid;
+  const eventAllTags = fullEvent.allTags;
 
-  const endMoment = useMemo(() => {
-    return moment(event?.end_date);
-  }, [event?.end_date]);
-
-  const isExpired = useMemo(() => {
-    return moment({ hour: 23, minute: 59 }).isAfter(endMoment);
-  }, [endMoment]);
-
-  const isSameDay = useMemo(() => {
-    return startMoment.format("L") === endMoment.format("L");
-  }, [startMoment, endMoment]);
-
-  const isSameTime = useMemo(() => {
-    return startMoment.format("LLL") === endMoment.format("LLL");
-  }, [startMoment, endMoment]);
+  // time related
+  const startMoment = moment(event?.start_date);
+  const endMoment = moment(event?.end_date);
+  const isExpired = moment({ hour: 23, minute: 59 }).isAfter(endMoment);
+  const isSameDay = startMoment.format("L") === endMoment.format("L");
+  const isSameTime = startMoment.format("LLL") === endMoment.format("LLL");
 
   // menu
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleMenuClick = (e) => {
+    e.stopPropagation();
     setAnchorEl(e.currentTarget);
   };
-  const handleMenuClose = () => {
+  const handleMenuClose = (e) => {
+    e.stopPropagation();
     setAnchorEl(null);
   };
 
   return (
-    <Box
+    <ListItem
+      onClick={() => {
+        setFullEvent(fullEvent);
+      }}
       sx={{
-        mx: onMedia.onDesktop ? 3 : 1.5,
-        mt: onMedia.onDesktop ? (index === 0 ? 3 : 1.5) : 1.5,
-        mb: index === last ? (onMedia.onDesktop ? 3 : 1.5) : 0,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        borderBottom: 1,
+        borderColor: "divider",
+        "&:hover": {
+          backgroundColor: "hoverGray.main",
+        },
+        overflow: "hidden",
+        paddingY: 2,
+        paddingX: 2,
+        opacity: isExpired ? "50%" : "100%",
       }}
     >
-      <ListItem
-        onClick={() => setEvent(event)}
+      <Box
+        id="eventlistitem-upper-box"
         sx={{
           display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          border: 1.5,
-          borderRadius: "30px",
-          borderColor: "#dbdbdb",
-          backgroundColor: "#ffffff",
-          "&:hover": {
-            backgroundColor: "#f6f6f6",
-            cursor: "default",
-          },
-          // height: "180px",
-          overflow: "hidden",
-          opacity: isExpired ? "50%" : "100%",
+          flexDirection: "row",
+          alignItems: "center",
+          width: "100%",
         }}
       >
-        <Box
+        {/* event icon uploaded by users*/}
+        <Avatar
           sx={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            width: "100%",
+            mr: 2,
+            height: "48px",
+            width: "48px",
           }}
-          // onClick={(e) => {
-          //   e.stopPropagation();
-          // }}
+          src={event?.icon_url}
         >
-          {/* event icon uploaded by users*/}
-          <Avatar
-            sx={{
-              my: 1,
-              ml: 1,
-              mr: 3,
-              height: "80px",
-              width: "80px",
-            }}
-            src={event?.icon_url}
-          >
-            <UploadFileIcon />
-          </Avatar>
+          <UploadFileIcon />
+        </Avatar>
+        <Box sx={{ width: "100%" }}>
           <ListItemText
+            primary={
+              <Typography
+                variant="h2"
+                sx={{ fontSize: "1rem", fontWeight: "bold" }}
+              >
+                {event?.title}
+              </Typography>
+            }
+          />
+          {eventAllTags?.length > 0 && (
+            <Box sx={{ mt: 1, height: "1.75rem", overflow: "hidden" }}>
+              {eventAllTags?.map((tag, index) => (
+                <Chip
+                  key={index}
+                  color={
+                    isStrInStrList(searchTypeList, tag, true)
+                      ? "primary"
+                      : "lightPrimary"
+                  }
+                  label={tag}
+                  sx={{
+                    mr: 1,
+                    mb: 1,
+                    fontSize: "0.75rem",
+                    fontWeight: "medium",
+                    height: "1.5rem",
+                  }}
+                />
+              ))}
+            </Box>
+          )}
+        </Box>
+        {ediumUser?.uid === event?.creator_uid && (
+          <IconButton
+            id="eventlistitem-menu-button"
+            aria-controls={open ? "eventlistitem-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
+            onClick={(e) => {
+              handleMenuClick(e);
+            }}
+            sx={{ padding: 0 }}
+          >
+            <MoreVertIcon />
+          </IconButton>
+        )}
+        <Menu
+          id="eventlistitem-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={(e) => {
+            handleMenuClose(e);
+          }}
+          MenuListProps={{
+            "aria-labelledby": "eventlistitem-menu-button",
+          }}
+        >
+          {ediumUser?.uid === event?.creator_uid && (
+            <MenuItem
+              onClick={(e) => {
+                handleMenuClose(e);
+              }}
+            >
+              <NextLink
+                href={{
+                  pathname: "/events/create",
+                  query: { eventID: event?.id },
+                }}
+                as="/events/create"
+                passHref
+              >
+                Modify
+              </NextLink>
+            </MenuItem>
+          )}
+          {ediumUser?.uid === event?.creator_uid && (
+            <MenuItem
+              onClick={(e) => {
+                handleVisibility("events", event);
+                handleMenuClose(e);
+              }}
+            >
+              {event?.is_visible ? "Hide" : "Display"}
+            </MenuItem>
+          )}
+          {ediumUser?.uid === event?.creator_uid && (
+            <MenuItem
+              onClick={(e) => {
+                handleDeleteEntry(
+                  "events",
+                  "evets_ext",
+                  "my_event_ids",
+                  event?.id,
+                  ediumUser?.uid
+                );
+                setFullEvent(null);
+                handleMenuClose(e);
+              }}
+            >
+              Delete
+            </MenuItem>
+          )}
+        </Menu>
+      </Box>
+      <Box
+        id="eventlistitem-lower-box"
+        // padding right to align with more icon
+        sx={{ mt: 2, paddingRight: "10px", width: "100%" }}
+      >
+        <ListItemText
+          secondary={
+            <Typography
+              color="text.secondary"
+              variant="body2"
+              // sx={{
+              //   display: "-webkit-box",
+              //   overflow: "hidden",
+              //   WebkitBoxOrient: "vertical",
+              //   WebkitLineClamp: 1,
+              // }}
+            >
+              {event.category}
+              <br />
+              {isSameDay
+                ? startMoment.format("MMM Do h:mm a") +
+                  (isSameTime ? "" : " - " + endMoment.format("h:mm a"))
+                : startMoment.format("MMM Do h:mm a") +
+                  " - " +
+                  endMoment.format("MMM Do h:mm a")}
+            </Typography>
+          }
+        />
+        {onMedia.onDesktop && (
+          <ListItemText
+            secondary={
+              <Typography
+                color="text.secondary"
+                variant="body2"
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  fontWeight: "light",
+                }}
+              >
+                {moment(event.last_timestamp).format("MMM Do, YYYY")}
+              </Typography>
+            }
+            sx={{ mt: 2 }}
+          />
+        )}
+      </Box>
+    </ListItem>
+  );
+};
+
+export default EventListItem;
+{
+  /* <ListItemText
             primary={event.title}
             primaryTypographyProps={{ fontWeight: "bold" }}
             secondary={
@@ -121,64 +269,5 @@ const EventListItem = (props) => {
                     endMoment.format("MMM Do h:mm a")}
               </>
             }
-          />
-          <Box
-            sx={{ height: "96px", display: "flex", alignItems: "flex-start" }}
-          >
-            <IconButton
-              id="PLI-menu-button"
-              aria-controls={open ? "PLI-menu" : undefined}
-              aria-haspopup="true"
-              aria-expanded={open ? "true" : undefined}
-              onClick={(e) => {
-                if (ediumUser?.uid !== event?.creator_uid) return; // !todo: will be removed after there's at least one menu for regular user
-                handleMenuClick(e);
-              }}
-            >
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              id="PLI-menu"
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleMenuClose}
-              MenuListProps={{
-                "aria-labelledby": "PLI-menu-button",
-              }}
-            >
-              {ediumUser?.uid === event?.creator_uid && (
-                <MenuItem
-                  onClick={() => {
-                    handleMenuClose();
-                  }}
-                >
-                  {event?.is_visible ? "Hide" : "Display"}
-                </MenuItem>
-              )}
-              {ediumUser?.uid === event?.creator_uid && (
-                <MenuItem
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteEntry(
-                      "events",
-                      "evets_ext",
-                      "my_event_ids",
-                      event?.id,
-                      ediumUser?.uid
-                    );
-                    setEvent(null);
-                    handleMenuClose();
-                  }}
-                >
-                  Delete
-                </MenuItem>
-              )}
-            </Menu>
-          </Box>
-        </Box>
-      </ListItem>
-    </Box>
-  );
-};
-
-export default EventListItem;
+          /> */
+}

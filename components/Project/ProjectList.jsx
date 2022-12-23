@@ -1,110 +1,177 @@
 import { useContext, useMemo, useEffect } from "react";
 import NextLink from "next/link";
-import { Box, Button, Tooltip } from "@mui/material";
+import { Box, Button, Paper, Tooltip, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import ProjectListItem from "./ProjectListItem";
+import ProjectListHeader from "./ProjectListHeader";
+import {
+  findItemFromList,
+  FixedHeightPaper,
+  isStrInObjList,
+  isStrInStr,
+  isStrInStrList,
+} from "../Reusable/Resusable";
 
 // link/router https://stackoverflow.com/questions/65086108/next-js-link-vs-router-push-vs-a-tag
 // description: a list of projects (project list items); a button to create new project (router.push)
 // behavior: filters projects based on the search term and/or search category
 const ProjectList = () => {
   // context
-  const { projects, ediumUser, winHeight, onMedia } = useContext(GlobalContext);
-  const { searchTerm, searchCategory, setProject } = useContext(ProjectContext);
+  const { projects, users, ediumUser, onMedia } = useContext(GlobalContext);
+  const { setFullProject, searchTerm, searchTypeList } =
+    useContext(ProjectContext);
+  const theme = useTheme();
 
-  // local vars
-  const filteredProjects = useMemo(
-    () =>
-      projects.filter((project) => {
-        if (!project.is_visible) return;
-        if (searchTerm === "" && searchCategory === "") return project;
+  // projects with extra info from other dataset (creator, merged tags)
+  const fullProjects = useMemo(() => {
+    return projects?.map((project) => {
+      // creator
+      const projectCreator = findItemFromList(
+        users,
+        "uid",
+        project?.creator_uid
+      );
+      // allTags
+      let projectTags = [];
+      if (project?.tags?.length > 0) {
+        projectTags = projectTags.concat(project.tags); // project tags
+      }
+      if (
+        projectCreator?.role === "org_admin" &&
+        projectCreator?.org_tags?.length > 0
+      ) {
+        projectTags = projectTags.concat(projectCreator.org_tags); // org tags
+      }
+      // category
+      projectTags.push(project?.category?.toLowerCase()); // type
+      return {
+        project: project,
+        creator: projectCreator,
+        allTags: projectTags,
+      };
+    });
+  }, [projects, users]);
 
-        // !todo: is this optimized?
-        // lazy evaluation
-        const isInTitles =
-          searchTerm !== "" &&
-          (project.title.toLowerCase().includes(searchTerm.toLowerCase()) || // project title
-            project.position_list.some(
-              (position) =>
-                position.title.toLowerCase().includes(searchTerm.toLowerCase()) // position title
-            ));
-        const isInCategory =
-          searchCategory !== "" && // lazy evaluation to avoid unnecessary expensive includes()
-          project.category.toLowerCase().includes(searchCategory.toLowerCase());
+  // project list with filtering
+  const filteredFullProjects = useMemo(() => {
+    return fullProjects?.filter((fullProject) => {
+      if (!fullProject.project.is_visible) return false;
 
-        if (isInTitles || isInCategory) return project;
-      }),
-    [projects, searchTerm, searchCategory]
-  );
+      if (searchTerm === "" && searchTypeList.length === 0) {
+        return true; // no search
+      } else if (searchTerm !== "" && searchTypeList.length === 0) {
+        return (
+          isStrInStr(fullProject.project.title, searchTerm, false) ||
+          isStrInObjList(
+            fullProject.project.position_list,
+            "title",
+            searchTerm,
+            false
+          )
+        ); // only term: in project title || position title
+      } else if (searchTerm === "" && searchTypeList.length > 0) {
+        return searchTypeList.some((type) => {
+          return isStrInStrList(fullProject.allTags, type, true);
+        }); // only tags
+      } else {
+        return (
+          searchTypeList.some((type) => {
+            return isStrInStrList(fullProject.allTags, type, true);
+          }) &&
+          (isStrInStr(fullProject.project.title, searchTerm, false) ||
+            isStrInObjList(
+              fullProject.project.position_list,
+              "title",
+              searchTerm,
+              false
+            ))
+        ); // term && tags
+      }
+    });
+  }, [fullProjects, searchTerm, searchTypeList]);
 
-  // set initial project to be first in list to render out immediately
+  // set initial project to be the first in list to render out immediately
   useEffect(() => {
-    if (onMedia.onDesktop) setProject(projects.length > 0 ? projects[0] : null);
-  }, [setProject, projects, onMedia.onDesktop]);
+    if (onMedia.onDesktop)
+      setFullProject(
+        filteredFullProjects.length > 0 ? filteredFullProjects[0] : null
+      );
+  }, [filteredFullProjects, onMedia.onDesktop, setFullProject]);
 
+  // https://stackoverflow.com/questions/45767405/the-difference-between-flex1-and-flex-grow1
+  // https://stackoverflow.com/questions/43520932/make-flex-grow-expand-items-based-on-their-original-size
   return (
-    <Box sx={{ backgroundColor: "#fafafa" }}>
+    <FixedHeightPaper
+      elevation={onMedia.onDesktop ? 2 : 0}
+      isdesktop={onMedia.onDesktop ? 1 : 0}
+      mobileheight={160}
+      sx={{
+        paddingTop: onMedia.onDesktop ? "32px" : 0,
+      }}
+    >
+      {onMedia.onDesktop && <ProjectListHeader />}
+
       <Box
+        id="projectlist-items-box"
         sx={{
-          height: onMedia.onDesktop
-            ? `calc(${winHeight}px - 64px - 64px - 1.5px - 36px - 24px)`
-            : `calc(${winHeight}px - 48px - 48px - 1.5px - 60px)`, // navbar; projectbar; border; button; y-margins
-          overflow: "auto",
+          flexGrow: 1,
+          overflowY: "scroll",
         }}
       >
-        {filteredProjects.map((project, index) => (
+        {filteredFullProjects?.map((fullProject, index) => (
           <ProjectListItem
-            key={project.id}
-            project={project}
+            key={fullProject?.project?.id}
+            fullProject={fullProject}
             index={index}
-            last={filteredProjects.length - 1}
+            last={filteredFullProjects.length - 1}
           />
         ))}
       </Box>
 
       {onMedia.onDesktop && (
         <Box
+          id="projectlist-button-box"
           sx={{
             display: "flex",
             justifyContent: "center",
-            mt: "12px",
+            paddingY: 3,
+            paddingX: 2,
           }}
         >
-          <Tooltip title={ediumUser?.uid ? "" : "Edit your profile first"}>
+          <Tooltip
+            title={ediumUser?.uid ? "" : "Edit your profile first"}
+            style={{ width: "100%" }} // !important: make create button fullwidth
+          >
             <span>
               <NextLink
                 href={{
                   pathname: "/projects/create",
-                  query: { isCreateStr: "true" },
                 }}
                 as="/projects/create"
                 passHref
               >
                 <Button
+                  color="secondary"
                   disabled={!ediumUser?.uid}
                   disableElevation
-                  sx={{
-                    border: 1.5,
-                    borderColor: "#dbdbdb",
-                    borderRadius: "30px",
-                    color: "text.primary",
-                    backgroundColor: "#ffffff",
-                    fontWeight: "bold",
-                    "&:hover": {
-                      backgroundColor: "#f6f6f6",
-                    },
-                    textTransform: "none",
-                  }}
+                  fullWidth
                   variant="contained"
+                  sx={{
+                    height: "48px",
+                    borderRadius: 8,
+                  }}
                 >
-                  {"Create Project"}
+                  <Typography variant="button" sx={{ fontSize: "1.125rem" }}>
+                    {"Create Project"}
+                  </Typography>
                 </Button>
               </NextLink>
             </span>
           </Tooltip>
         </Box>
       )}
-    </Box>
+    </FixedHeightPaper>
   );
 };
 

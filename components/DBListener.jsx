@@ -29,10 +29,6 @@ const DBListener = () => {
     setChats,
   } = useContext(GlobalContext);
 
-  {
-    /* db listeners */
-  }
-
   // listen to realtime projects collection, public
   // https://stackoverflow.com/questions/59841800/react-useeffect-in-depth-use-of-useeffect
   useEffect(() => {
@@ -49,7 +45,7 @@ const DBListener = () => {
       q,
       (querySnapshot) => {
         setProjects(
-          querySnapshot.docs.map((doc) => ({
+          querySnapshot.docs?.map((doc) => ({
             ...doc.data(),
             id: doc.id,
             completion_date: doc.data()?.completion_date
@@ -61,7 +57,7 @@ const DBListener = () => {
         );
       },
       (error) => {
-        console.log(error?.message);
+        console.log("projects", error?.message);
       }
     );
 
@@ -83,7 +79,7 @@ const DBListener = () => {
       q,
       (querySnapshot) => {
         setProjectsExt(
-          querySnapshot.docs.map((doc) => {
+          querySnapshot.docs?.map((doc) => {
             const projectExt = {
               ...doc.data(),
               id: doc.id,
@@ -92,8 +88,8 @@ const DBListener = () => {
             if (!projectExt?.schedules) return projectExt; // return if there's no schedules
             projectExt.schedules.forEach(
               (schedule) =>
-                (schedule.availability = schedule.availability.map((dateTime) =>
-                  dateTime.toDate()
+                (schedule.availability = schedule.availability?.map(
+                  (dateTime) => dateTime.toDate()
                 ))
             );
             return projectExt;
@@ -101,7 +97,7 @@ const DBListener = () => {
         );
       },
       (error) => {
-        console.log(error?.message);
+        console.log("projects ext", error?.message);
       }
     );
 
@@ -124,7 +120,7 @@ const DBListener = () => {
       q,
       (querySnapshot) => {
         setEvents(
-          querySnapshot.docs.map((doc) => ({
+          querySnapshot.docs?.map((doc) => ({
             ...doc.data(),
             id: doc.id,
             create_timestamp: doc.data().create_timestamp?.toDate(),
@@ -135,7 +131,7 @@ const DBListener = () => {
         );
       },
       (error) => {
-        console.log(error?.message);
+        console.log("events", error?.message);
       }
     );
 
@@ -157,7 +153,7 @@ const DBListener = () => {
       q,
       (querySnapshot) => {
         setEventsExt(
-          querySnapshot.docs.map((doc) => {
+          querySnapshot.docs?.map((doc) => {
             const eventExt = {
               ...doc.data(),
               id: doc.id,
@@ -168,7 +164,7 @@ const DBListener = () => {
         );
       },
       (error) => {
-        console.log(error?.message);
+        console.log("events ext", error?.message);
       }
     );
 
@@ -186,14 +182,14 @@ const DBListener = () => {
       q,
       (querySnapshot) => {
         setUsers(
-          querySnapshot.docs.map((doc) => ({
+          querySnapshot.docs?.map((doc) => ({
             ...doc.data(),
             uid: doc.id,
           }))
         );
       },
       (error) => {
-        console.log(error?.message);
+        console.log("users", error?.message);
       }
     );
 
@@ -213,7 +209,7 @@ const DBListener = () => {
         }
       },
       (error) => {
-        console.log(error?.message);
+        console.log("edium user", error?.message);
       }
     );
 
@@ -233,7 +229,7 @@ const DBListener = () => {
         }
       },
       (error) => {
-        console.log(error?.message);
+        console.log("edium user ext", error?.message);
       }
     );
 
@@ -255,11 +251,11 @@ const DBListener = () => {
       q,
       (querySnapshot) => {
         setChats(
-          querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+          querySnapshot.docs?.map((doc) => ({ ...doc.data(), id: doc.id }))
         );
       },
       (error) => {
-        console.log(error?.message);
+        console.log("chats", error?.message);
       }
     );
 

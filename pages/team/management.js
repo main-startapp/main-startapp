@@ -56,7 +56,7 @@ const TeamManagement = () => {
     // >
     //   <Grid
     //     container
-    //     spaceing={0}
+    //     spacing={0}
     //     mt={1}
     //     direction="row"
     //     alignItems="start"

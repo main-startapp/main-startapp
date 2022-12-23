@@ -31,14 +31,14 @@ export const AuthProvider = ({ children }) => {
     return <Loading type="spokes" color="#3e95c2" />;
   }
   const url = new URL(window.location.href);
-  if (!currentUser && url.pathname !== "/") {
-    return <Signin />;
-  } else {
+  if (currentUser || url.pathname === "/" || url.pathname === "/events/") {
     return (
       <AuthContext.Provider value={{ currentUser }}>
         {children}
       </AuthContext.Provider>
     );
+  } else {
+    return <Signin />;
   }
 };
 

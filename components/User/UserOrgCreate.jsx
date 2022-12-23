@@ -26,16 +26,16 @@ const UserOrgCreate = (props) => {
   const redirectTo = props.redirectTo;
   const userCreatedTags = props.userCreatedTags;
 
-  // context & hooks
+  // context & ref
   const { currentUser } = useAuth();
   const { ediumUser, onMedia } = useContext(GlobalContext);
+  const formRef = useRef();
 
   // local vars
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
 
   const [newOrgUser, setNewOrgUser] = useState({
     name: "",
-    create_timestamp: "",
     role: "org_admin",
     org_title: "",
     org_department: "N/A",
@@ -57,8 +57,6 @@ const UserOrgCreate = (props) => {
     const ediumUserRef = cloneDeep(ediumUser);
     setNewOrgUser(ediumUserRef);
   }, [ediumUser]);
-
-  const formRef = useRef();
 
   // helper func
   const handleRemoveSocialMedia = (index) => {
@@ -207,7 +205,7 @@ const UserOrgCreate = (props) => {
       <Divider sx={{ my: 5 }}>
         <Typography sx={{ color: "gray" }}>Optional</Typography>
       </Divider>
-      {newOrgUser.org_social_media.map((link, index) => {
+      {newOrgUser.org_social_media?.map((link, index) => {
         return (
           <Box
             key={index}
@@ -284,7 +282,7 @@ const UserOrgCreate = (props) => {
             mb: 5,
             border: 1.5,
             borderColor: "#dbdbdb",
-            borderRadius: "30px",
+            borderRadius: 8,
             backgroundColor: "#3e95c2",
             textTransform: "none",
             paddingX: 5,

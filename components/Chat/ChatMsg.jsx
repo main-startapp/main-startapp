@@ -63,7 +63,7 @@ const ChatMsg = (props) => {
     const q = query(collectionRef, orderBy("sent_at", "asc"));
 
     const unsub = onSnapshot(q, (querySnapshot) => {
-      setMessages(querySnapshot.docs.map((doc) => ({ ...doc.data() })));
+      setMessages(querySnapshot.docs?.map((doc) => ({ ...doc.data() })));
     });
 
     return () => {
@@ -309,9 +309,8 @@ const ChatMsg = (props) => {
     setChatPartner(null);
   };
 
-  // box ref to used by useEffect
-  const scrollRef = useRef();
   // useEffect to reset box scrollbar position
+  const scrollRef = useRef();
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behaviour: "smooth" });
@@ -327,8 +326,8 @@ const ChatMsg = (props) => {
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        borderBottom: joinRequests?.length > 0 ? 1.5 : 2.5,
-        borderColor: "#dbdbdb",
+        borderBottom: 1,
+        borderColor: "divider",
         zIndex: 1,
       }}
     >
@@ -345,7 +344,7 @@ const ChatMsg = (props) => {
         src={chatPartner?.photo_url}
         referrerPolicy="no-referrer"
       />
-      <Typography sx={{ fontWeight: "bold", fontSize: "1em" }}>
+      <Typography sx={{ fontWeight: "medium", fontSize: "1rem" }}>
         {chatPartner?.name}
       </Typography>
       <Box sx={{ flexGrow: 1 }} />
@@ -354,7 +353,6 @@ const ChatMsg = (props) => {
           {isMaximized ? (
             <IconButton
               onClick={(e) => {
-                e.stopPropagation();
                 handleMaximize();
               }}
             >
@@ -363,7 +361,6 @@ const ChatMsg = (props) => {
           ) : (
             <IconButton
               onClick={(e) => {
-                e.stopPropagation();
                 handleMaximize();
               }}
             >
@@ -372,7 +369,6 @@ const ChatMsg = (props) => {
           )}
           <IconButton
             onClick={(e) => {
-              e.stopPropagation();
               handleClose();
             }}
           >
@@ -389,9 +385,9 @@ const ChatMsg = (props) => {
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        borderBottom: 2.5,
-        borderColor: "#dbdbdb",
-        backgroundColor: "#fafafa",
+        borderBottom: 1,
+        borderColor: "divider",
+        //backgroundColor: "searchGary.main",
         paddingRight: "3px",
       }}
     >
@@ -403,12 +399,13 @@ const ChatMsg = (props) => {
           flexDirection: "column",
         }}
       >
-        <Typography sx={{ fontSize: "0.8em", color: "#3e95c2" }}>
+        <Typography color="text.secondary" sx={{ fontSize: "0.75em" }}>
           Join Request
         </Typography>
         <Typography
+          color="text.secondary"
           sx={{
-            fontSize: "0.8em",
+            fontSize: "0.75em",
             display: "-webkit-box",
             overflow: "hidden",
             WebkitBoxOrient: "vertical",
@@ -421,7 +418,6 @@ const ChatMsg = (props) => {
       <Box sx={{ flexGrow: 1 }} />
       <IconButton
         onClick={(e) => {
-          e.stopPropagation();
           handleAccept(joinRequests[0], "title", "title");
         }}
       >
@@ -434,7 +430,6 @@ const ChatMsg = (props) => {
       </IconButton>
       <IconButton
         onClick={(e) => {
-          e.stopPropagation();
           handleDialogOpen();
         }}
       >
@@ -456,7 +451,7 @@ const ChatMsg = (props) => {
             multiline
             minRows={5}
             margin="dense"
-            id="declineMsg"
+            id="chatmsg-decline-msg-textfield"
             // label="Message"
             value={declineMsg}
             fullWidth
@@ -482,12 +477,12 @@ const ChatMsg = (props) => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        overflow: "auto",
         flexGrow: 1,
-        borderColor: "#dbdbdb",
+        overflow: "auto",
+        borderColor: "divider",
       }}
     >
-      {messages.map((message, index) => {
+      {messages?.map((message, index) => {
         const isSameAuthor =
           index > 0 && messages[index - 1].sent_by === message.sent_by;
         const isLastMsg = messages.length - 1 === index;
@@ -516,7 +511,7 @@ const ChatMsg = (props) => {
       <Box
         sx={{
           borderTop: 2.5,
-          borderColor: focused ? "#3e95c2" : "#dbdbdb",
+          borderColor: focused ? "secondary.main" : "divider",
         }}
       >
         <TextField
@@ -526,7 +521,7 @@ const ChatMsg = (props) => {
             mx: "12px",
             "& .MuiInputBase-root": {
               padding: 0,
-              fontSize: "0.9em",
+              fontSize: "0.875rem",
             },
           }}
           variant="standard"
@@ -555,8 +550,8 @@ const ChatMsg = (props) => {
           display: "flex",
           flexDirection: "row",
           justifyContent: "flex-end",
-          borderTop: 1.5,
-          borderColor: "#dbdbdb",
+          borderTop: 1,
+          borderColor: "divider",
           paddingY: "6px",
           paddingX: "12px",
         }}
@@ -566,14 +561,11 @@ const ChatMsg = (props) => {
           disabled={!message.text || !isClickable}
           disableElevation
           sx={{
-            backgroundColor: "#3e95c2",
-            border: 1.5,
-            borderColor: "#dbdbdb",
-            borderRadius: "30px",
+            backgroundColor: "secondary",
+            borderRadius: 8,
             paddingX: 0,
             paddingY: 0,
-            textTransform: "none",
-            fontSize: "0.7em",
+            fontSize: "0.75rem",
             position: "relative",
           }}
           onClick={(e) => handleSubmit(e)}

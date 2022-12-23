@@ -44,7 +44,7 @@ const ChatsPageBar = () => {
                 sx={{
                   backgroundColor: "#f0f0f0",
                   color: "gray",
-                  borderRadius: "10px",
+                  borderRadius: 2,
                 }}
                 onClick={() => {
                   setChat(null);

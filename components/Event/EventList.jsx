@@ -1,122 +1,170 @@
 import { useContext, useMemo, useEffect } from "react";
 import NextLink from "next/link";
-import { Box, Button, Tooltip } from "@mui/material";
+import { Box, Button, Paper, Tooltip, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import EventListItem from "./EventListItem";
 import moment from "moment";
-import cloneDeep from "lodash/cloneDeep";
+import EventListHeader from "./EventListHeader";
+import {
+  findItemFromList,
+  FixedHeightPaper,
+  isStrInStr,
+  isStrInStrList,
+} from "../Reusable/Resusable";
 
 const EventList = () => {
   // context
-  const { events, ediumUser, winHeight, onMedia } = useContext(GlobalContext);
-  const { searchTerm, searchCategory, setEvent } = useContext(EventContext);
+  const { events, users, ediumUser, onMedia } = useContext(GlobalContext);
+  const { setFullEvent, searchTerm, searchTypeList } = useContext(EventContext);
+  const theme = useTheme();
 
-  // local vars
-  const sortedEvents = useMemo(() => {
-    const tempEvents = cloneDeep(events);
-    const eventsLength = tempEvents.length;
+  // events with extra info from other dataset (creator, merged tags)
+  const fullEvents = useMemo(() => {
+    return events?.map((event) => {
+      // creator
+      const eventCreator = findItemFromList(users, "uid", event?.creator_uid);
+      // allTags
+      let eventTags = [];
+      if (event?.tags?.length > 0) {
+        eventTags = eventTags.concat(event.tags); // event tags
+      }
+      if (
+        eventCreator?.role === "org_admin" &&
+        eventCreator?.org_tags?.length > 0
+      ) {
+        eventTags = eventTags.concat(eventCreator.org_tags); // org tags
+      }
+      // category
+      eventTags.push(event?.category?.toLowerCase()); // type
+      return {
+        event: event,
+        creator: eventCreator,
+        allTags: eventTags,
+      };
+    });
+  }, [events, users]);
+
+  // event list with sorting
+  const sortedFullEvents = useMemo(() => {
+    const eventsLength = fullEvents.length;
     for (let i = eventsLength - 1; i > -1; i--) {
       if (
-        moment({ hour: 23, minute: 59 }).isAfter(moment(tempEvents[i].end_date))
+        moment({ hour: 23, minute: 59 }).isAfter(
+          moment(fullEvents[i].event.end_date)
+        )
       ) {
-        let temp = tempEvents[i];
-        tempEvents.splice(i, 1);
-        tempEvents.push(temp);
+        let temp = fullEvents[i];
+        fullEvents.splice(i, 1);
+        fullEvents.push(temp);
       }
     }
-    return tempEvents;
-  }, [events]);
+    return fullEvents;
+  }, [fullEvents]);
 
-  const filteredEvents = useMemo(
+  const filteredFullEvents = useMemo(
     () =>
-      sortedEvents.filter((event) => {
-        if (!event.is_visible) return;
-        if (searchTerm === "" && searchCategory === "") return event;
+      sortedFullEvents?.filter((fullEvent) => {
+        if (!fullEvent.event.is_visible) return;
 
-        // !todo: is this optimized?
-        // lazy evaluation to avoid unnecessary expensive includes()
-        const isInTitles =
-          searchTerm !== "" &&
-          event.title.toLowerCase().includes(searchTerm.toLowerCase());
-
-        const isInCategory =
-          searchCategory !== "" &&
-          event.category.toLowerCase().includes(searchCategory.toLowerCase());
-
-        if (isInTitles || isInCategory) return event;
+        if (searchTerm === "" && searchTypeList.length === 0) {
+          return true; // no search
+        } else if (searchTerm !== "" && searchTypeList.length === 0) {
+          return isStrInStr(fullEvent.event.title, searchTerm, false); // only term: in event title
+        } else if (searchTerm === "" && searchTypeList.length > 0) {
+          return searchTypeList.some((type) => {
+            return isStrInStrList(fullEvent.allTags, type, true);
+          }); // only tags
+        } else {
+          return (
+            searchTypeList.some((type) => {
+              return isStrInStrList(fullEvent.allTags, type, true);
+            }) && isStrInStr(fullEvent.event.title, searchTerm, false)
+          ); // term && tags
+        }
       }),
-    [sortedEvents, searchTerm, searchCategory]
+    [searchTerm, searchTypeList, sortedFullEvents]
   );
 
-  // set initial event to be first in list to render out immediately
+  // set initial event to be the first in list to render out immediately
   useEffect(() => {
     if (onMedia.onDesktop)
-      setEvent(filteredEvents.length > 0 ? filteredEvents[0] : null);
-  }, [setEvent, filteredEvents, onMedia.onDesktop]);
+      setFullEvent(
+        filteredFullEvents.length > 0 ? filteredFullEvents[0] : null
+      );
+  }, [filteredFullEvents, onMedia.onDesktop, setFullEvent]);
 
   return (
-    <Box sx={{ backgroundColor: "#fafafa" }}>
+    <FixedHeightPaper
+      elevation={onMedia.onDesktop ? 2 : 0}
+      isdesktop={onMedia.onDesktop ? 1 : 0}
+      mobileheight={160}
+      sx={{
+        paddingTop: onMedia.onDesktop ? "32px" : 0,
+      }}
+    >
+      {onMedia.onDesktop && <EventListHeader />}
+
       <Box
+        id="eventlist-items-box"
         sx={{
-          height: onMedia.onDesktop
-            ? `calc(${winHeight}px - 64px - 64px - 1.5px - 36px - 24px)`
-            : `calc(${winHeight}px - 48px - 48px - 1.5px - 60px)`, // navbar; appbar; border; button; y-margins
-          overflow: "auto",
+          flexGrow: 1,
+          overflowY: "scroll",
         }}
       >
-        {filteredEvents.map((event, index) => (
+        {filteredFullEvents?.map((fullEvent, index) => (
           <EventListItem
-            key={event.id}
-            event={event}
+            key={fullEvent?.event?.id}
+            fullEvent={fullEvent}
             index={index}
-            last={filteredEvents.length - 1}
+            last={filteredFullEvents.length - 1}
           />
         ))}
       </Box>
 
       {onMedia.onDesktop && (
         <Box
+          id="eventlist-button-box"
           sx={{
             display: "flex",
             justifyContent: "center",
-            mt: "12px",
+            paddingY: 3,
+            paddingX: 2,
           }}
         >
-          <Tooltip title={ediumUser?.uid ? "" : "Edit your profile first"}>
+          <Tooltip
+            title={ediumUser?.uid ? "" : "Edit your profile first"}
+            style={{ width: "100%" }} // !important: make create button fullwidth
+          >
             <span>
               <NextLink
                 href={{
                   pathname: "/events/create",
-                  query: { isCreateStr: "true" },
                 }}
                 as="/events/create"
                 passHref
               >
                 <Button
+                  color="secondary"
                   disabled={!ediumUser?.uid}
                   disableElevation
-                  sx={{
-                    border: 1.5,
-                    borderColor: "#dbdbdb",
-                    borderRadius: "30px",
-                    color: "text.primary",
-                    backgroundColor: "#ffffff",
-                    fontWeight: "bold",
-                    "&:hover": {
-                      backgroundColor: "#f6f6f6",
-                    },
-                    textTransform: "none",
-                  }}
+                  fullWidth
                   variant="contained"
+                  sx={{
+                    height: "48px",
+                    borderRadius: 8,
+                  }}
                 >
-                  {"Create Event"}
+                  <Typography variant="button" sx={{ fontSize: "1.125rem" }}>
+                    {"Create Event"}
+                  </Typography>
                 </Button>
               </NextLink>
             </span>
           </Tooltip>
         </Box>
       )}
-    </Box>
+    </FixedHeightPaper>
   );
 };
 

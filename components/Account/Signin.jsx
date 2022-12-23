@@ -19,9 +19,6 @@ import AppleIcon from "@mui/icons-material/Apple";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import Signup from "./Signup";
 
-import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
-import { GoogleAuthProvider, EmailAuthProvider } from "firebase/auth";
-
 // sign in, sign up, log in
 // https://ux.stackexchange.com/questions/1080/using-sign-in-vs-using-log-in
 
@@ -191,7 +188,7 @@ const Signin = () => {
             mt: "1vh",
             border: 1.5,
             borderColor: "#dbdbdb",
-            borderRadius: "30px",
+            borderRadius: 8,
             color: "white",
             backgroundColor: "#3e95c2",
             fontSize: "0.8em",
@@ -260,9 +257,9 @@ const Signin = () => {
           }}
         >
           <ExportedImage
-            src="/images/EDIUMLogo.png"
-            placeholder=""
-            layout="fill"
+            src="/images/edium_text_1024.png"
+            alt=""
+            fill
             priority
           />
         </Box>
@@ -292,7 +289,7 @@ export default Signin;
 const StyledButton = styled(Button)(({ theme }) => ({
   color: "black",
   backgroundColor: "white",
-  borderRadius: "30px",
+  borderRadius: 8,
   textTransform: "none",
   display: "flex",
   justifyContent: "center",
@@ -306,7 +303,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   "& .MuiFormLabel-root.Mui-focused": { top: "0" }, // to counter root adjustment
 
   "& .MuiOutlinedInput-root": {
-    borderRadius: "10px",
+    borderRadius: 2,
     backgroundColor: "white",
   },
   "& .MuiOutlinedInput-notchedOutline": {

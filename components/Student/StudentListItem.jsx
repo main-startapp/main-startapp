@@ -1,10 +1,19 @@
 import { useContext, useState } from "react";
-import { Avatar, Box, IconButton, ListItem, ListItemText } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Chip,
+  IconButton,
+  ListItem,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
-import ForumIcon from "@mui/icons-material/Forum";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
+import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import { useRouter } from "next/router";
-import { handleConnect } from "../Reusable/Resusable";
+import { handleConnect, ordinal_suffix_of } from "../Reusable/Resusable";
+import ExportedImage from "next-image-export-optimizer";
 
 const StudentListItem = (props) => {
   const index = props.index;
@@ -19,99 +28,165 @@ const StudentListItem = (props) => {
   // local
   const router = useRouter();
 
-  // menu
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-  const handleMenuClick = (e) => {
-    setAnchorEl(e.currentTarget);
-  };
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
+  const positionList = student?.desired_position
+    ? student?.other_positions
+      ? [student.desired_position, ...student.other_positions]
+      : [student.desired_position]
+    : [];
+
+  const interestList = student?.field_of_interest
+    ? student?.interests
+      ? [student.field_of_interest, ...student.interests]
+      : [student.field_of_interest]
+    : [];
 
   return (
-    <Box
+    <ListItem
+      onClick={() => {
+        setStudent(student);
+      }}
       sx={{
-        mx: 1.5,
-        mt: 1.5,
-        mb: index === last ? 1.5 : 0,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        borderBottom: 1,
+        borderColor: "divider",
+        "&:hover": {
+          backgroundColor: "hoverGray.main",
+        },
+        overflow: "hidden",
+        paddingY: 2,
+        paddingX: 2,
       }}
     >
-      <ListItem
-        onClick={() => setStudent(student)}
+      <Box
+        id="studentlistitem-upper-box"
         sx={{
           display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          border: 1.5,
-          borderRadius: "30px",
-          borderColor: "#dbdbdb",
-          backgroundColor: "#ffffff",
-          "&:hover": {
-            backgroundColor: "#f6f6f6",
-            cursor: "default",
-          },
-          // height: "180px",
-          overflow: "hidden",
+          flexDirection: "row",
+          alignItems: "center",
+          width: "100%",
         }}
       >
-        <Box
+        {/* project icon uploaded by users*/}
+        <Avatar
           sx={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            width: "100%",
+            mr: 2,
+            height: "48px",
+            width: "48px",
           }}
-          // onClick={(e) => {
-          //   e.stopPropagation();
-          // }}
+          src={student?.photo_url}
         >
-          <Avatar
+          <UploadFileIcon />
+        </Avatar>
+        <Box sx={{ width: "100%" }}>
+          <Box
             sx={{
-              my: 1,
-              ml: 1,
-              mr: 3,
-              height: "80px",
-              width: "80px",
+              display: "flex",
+              flexDirection: "row",
+
+              alignItems: "center",
             }}
-            src={student?.photo_url}
-          />
-          <ListItemText
-            primary={student?.name}
-            primaryTypographyProps={{ fontWeight: "bold", fontSize: "1em" }}
-            secondary={
-              <>
-                {student?.desired_position}
-                <br />
-                {student?.field_of_interest}
-                <br />
-                {"Education year: "}
-                {student?.year_of_ed}
-              </>
-            }
-            secondaryTypographyProps={{ fontSize: "0.8em" }}
-          />
-          {student?.uid !== ediumUser?.uid && (
-            <IconButton
-              sx={{ mr: 1, backgroundColor: "lightgray" }}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleConnect(
-                  chats,
-                  student,
-                  ediumUser,
-                  setChatPartner,
-                  setForceChatExpand
-                );
-                router.push("/chats");
-              }}
+          >
+            <Typography
+              variant="h2"
+              sx={{ mr: 2, fontSize: "1rem", fontWeight: "bold" }}
             >
-              <ForumIcon sx={{ color: "white" }} />
-            </IconButton>
+              {student?.name}
+            </Typography>
+            <ExportedImage
+              src="/images/u_logo.png"
+              alt=""
+              placeholder="empty"
+              height={24}
+              width={17}
+            />
+          </Box>
+          {positionList.length > 0 && (
+            <Box sx={{ mt: 1, height: "1.75rem", overflow: "hidden" }}>
+              {positionList.map((position, index) => (
+                <Chip
+                  key={index}
+                  color={index === 0 ? "primary" : "lightPrimary"}
+                  label={position}
+                  sx={{
+                    mr: 1,
+                    mb: 1,
+                    fontSize: "0.75rem",
+                    fontWeight: "medium",
+                    height: "1.5rem",
+                  }}
+                />
+              ))}
+            </Box>
           )}
         </Box>
-      </ListItem>
-    </Box>
+        <IconButton
+          color="primary"
+          disabled={student?.uid === ediumUser?.uid}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleConnect(
+              chats,
+              student,
+              ediumUser,
+              setChatPartner,
+              setForceChatExpand
+            );
+            router.push("/chats");
+          }}
+          sx={{
+            padding: 0,
+            mr: 1,
+            height: "32px",
+            width: "32px",
+          }}
+        >
+          <PersonAddAlt1Icon sx={{ height: "32px", width: "32px" }} />
+        </IconButton>
+      </Box>
+
+      <ListItemText
+        secondary={
+          <Typography
+            color="text.secondary"
+            variant="body2"
+            sx={{
+              display: "-webkit-box",
+              overflow: "hidden",
+              WebkitBoxOrient: "vertical",
+              WebkitLineClamp: 1,
+            }}
+          >
+            {student?.year_of_ed !== (null || undefined) &&
+              ordinal_suffix_of(student.year_of_ed) + " year"}
+            {student?.major !== (null || undefined) && " " + student.major}
+          </Typography>
+        }
+        sx={{ mt: 2, mb: 2 }}
+      />
+
+      {interestList.length > 0 && (
+        <Box sx={{ height: "1.75rem", overflow: "hidden" }}>
+          {interestList.map((interest, index) => {
+            return (
+              <Chip
+                key={index}
+                color="lightPrimary"
+                label={interest}
+                sx={{
+                  mr: 1,
+                  mb: 1,
+                  fontSize: "0.75rem",
+                  fontWeight: "medium",
+                  height: "1.5rem",
+                }}
+              />
+            );
+          })}
+        </Box>
+      )}
+    </ListItem>
   );
 };
 

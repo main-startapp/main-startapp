@@ -3,7 +3,7 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
-  Button,
+  Stack,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -28,8 +28,16 @@ const ChatAccordion = () => {
     onMedia,
   } = useContext(GlobalContext);
 
-  // local
+  // accordion expansion
   const [expandState, setExpandState] = useState("collapseIt");
+  const handleExpand = (e) => {
+    expandState === "expandIt"
+      ? setExpandState("collapseIt")
+      : setExpandState("expandIt");
+    setShowMsg(false);
+    setChat(null);
+    setChatPartner(null);
+  };
 
   // handle chat expansion called by handleConnect/handleJoinRequest
   // connect or join request might create a new chat, this new chat will be found by this hook
@@ -54,19 +62,15 @@ const ChatAccordion = () => {
     setTimeout(() => {
       setShowMsg(true);
     }, timeout); // delayed msg window
-
-    return () => {
-      foundChat;
-    };
   }, [
-    forceChatExpand,
-    expandState,
-    setForceChatExpand,
-    chats,
     chatPartner,
-    setChat,
-    setShowMsg,
+    chats,
     ediumUser,
+    expandState,
+    forceChatExpand,
+    setChat,
+    setForceChatExpand,
+    setShowMsg,
   ]);
 
   // unread signal
@@ -75,92 +79,75 @@ const ChatAccordion = () => {
     return chats.some((chat) => chat[my_unread_key] > 0) ? true : false;
   }, [ediumUser?.uid, chats]);
 
-  // helper func
-  const handleExpand = (e) => {
-    expandState === "expandIt"
-      ? setExpandState("collapseIt")
-      : setExpandState("expandIt");
-    setShowMsg(false);
-    setChat(null);
-    setChatPartner(null);
-  };
-
   return onMedia.onDesktop ? (
-    // box is essential for wrapping the accrodion to get rid of ugly top line
-    <Box>
-      <Accordion
-        expanded={expandState === "expandIt"}
-        square
+    <Accordion
+      expanded={expandState === "expandIt"}
+      square
+      elevation={3}
+      sx={{
+        width: "320px",
+        position: "fixed",
+        right: 0,
+        bottom: 0,
+        borderTop: 1,
+        borderRadius: "8px 8px 0px 0px",
+        borderColor: "divider",
+        "&.MuiAccordion-root::before": {
+          opacity: 0,
+        },
+      }}
+      disableGutters
+    >
+      <StyledAccordionSummary
         sx={{
-          width: "320px",
-          position: "fixed",
-          right: 0,
-          bottom: -1,
-          border: 1.5,
-          borderRadius: "10px 10px 0px 0px",
-          borderColor: "#dbdbdb",
+          height: "48px",
+          borderBottom: 1,
+          borderColor: "divider",
+          paddingX: 4,
         }}
-        disableGutters
-        elevation={3}
+        expandIcon={<ExpandLessIcon />}
+        onClick={(e) => handleExpand(e)}
       >
-        <StyledAccordionSummary
+        <Typography
           sx={{
-            borderBottom: 1.5,
-            borderColor: "#dbdbdb",
+            fontSize: "1.125rem",
+            fontWeight: "medium",
           }}
-          expandIcon={<ExpandLessIcon />}
-          onClick={(e) => handleExpand(e)}
         >
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Typography
-              sx={{
-                fontSize: "1em",
-                fontWeight: "bold",
-              }}
-            >
-              Messenger
-            </Typography>
-            {hasUnread && (
-              <CircleIcon
-                sx={{
-                  color: "#3e95c2",
-                  fontSize: "0.8em",
-                  position: "absolute",
-                  right: "30%",
-                }}
-              />
-            )}
-          </Box>
-        </StyledAccordionSummary>
-        <AccordionDetails
-          sx={{ overflow: "auto", maxHeight: "75vh", padding: 0 }}
-        >
-          <ChatList>
-            {chats.map((chat) => (
-              <ChatAccordionContact key={chat.id} chat={chat} />
-            ))}
-          </ChatList>
-        </AccordionDetails>
-      </Accordion>
-    </Box>
+          {"Messages"}
+        </Typography>
+        {hasUnread && (
+          <CircleIcon
+            color="secondary"
+            sx={{
+              fontSize: "1rem",
+              position: "absolute",
+              left: `calc(126px + 8px)`,
+            }}
+          />
+        )}
+      </StyledAccordionSummary>
+      <AccordionDetails
+        sx={{ overflow: "auto", maxHeight: "75vh", padding: 0 }}
+      >
+        {chats?.map((chat) => (
+          <ChatAccordionContact key={chat.id} chat={chat} />
+        ))}
+      </AccordionDetails>
+    </Accordion>
   ) : null;
 };
 
 export default ChatAccordion;
 
-const ChatList = styled(Box)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  width: "100%",
-}));
-
 const StyledAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
   "& .MuiAccordionSummary-content": {
-    justifyContent: "center",
+    justifyContent: "flex-start",
+    alignItems: "center",
   },
 
   "& .MuiAccordionSummary-expandIconWrapper": {
     position: "absolute",
-    left: "5%",
+    right: "32px",
   },
 }));
