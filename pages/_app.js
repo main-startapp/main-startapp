@@ -4,7 +4,7 @@ import { CssBaseline } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { AuthProvider } from "../components/Context/AuthContext";
 import Navbar from "../components/Header/Navbar";
@@ -14,7 +14,7 @@ import ChatMsgBox from "../components/Chat/ChatMsgBox";
 import DBListener from "../components/DBListener";
 import BottomNav from "../components/Header/BottomNav";
 import useWindowDimensions from "../components/Reusable/WindowDimensions";
-
+import Script from "next/script";
 // makeStyles, useStyles, createStyles, withStyles, styled
 // https://smartdevpreneur.com/material-ui-makestyles-usestyles-createstyles-and-withstyles-explained/
 // https://smartdevpreneur.com/material-ui-styled-components/
@@ -76,60 +76,75 @@ function MyApp({ Component, pageProps }) {
   onMedia.onTablet = useMediaQuery("(min-width:768px) and (max-width:1023px)");
   onMedia.onMobile = useMediaQuery("(max-width:767px)");
 
+  useEffect(() => {
+    (function (w, d, s, l, i) {
+      w[l] = w[l] || [];
+      w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+      var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s),
+        dl = l != "dataLayer" ? "&l=" + l : "";
+      j.async = true;
+      j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+      f.parentNode.insertBefore(j, f);
+    })(window, document, "script", "dataLayer", "GTM-5LXCG97");
+  }, [])
+
   return (
-    <ThemeProvider theme={globalTheme}>
-      <AuthProvider>
-        <LocalizationProvider dateAdapter={AdapterMoment}>
-          <GlobalContext.Provider
-            value={{
-              projects,
-              setProjects,
-              oldProject,
-              setOldProject,
-              projectsExt,
-              setProjectsExt,
-              events,
-              setEvents,
-              oldEvent,
-              setOldEvent,
-              eventsExt,
-              setEventsExt,
-              users,
-              setUsers,
-              ediumUser,
-              setEdiumUser,
-              ediumUserExt,
-              setEdiumUserExt,
-              chats,
-              setChats,
-              chat,
-              setChat,
-              chatPartner,
-              setChatPartner,
-              showMsg,
-              setShowMsg,
-              showChat,
-              setShowChat,
-              forceChatExpand,
-              setForceChatExpand,
-              winWidth,
-              winHeight,
-              onMedia,
-            }}
-          >
-            <CssBaseline />
-            <DBListener />
-            <Navbar />
-            <Component {...pageProps} />
-            {onMedia.onDesktop && ediumUser?.uid && showMsg && <ChatMsgBox />}
-            {onMedia.onDesktop && ediumUser?.uid && showChat && (
-              <ChatAccordion />
-            )}
-            {!onMedia.onDesktop && <BottomNav />}
-          </GlobalContext.Provider>
-        </LocalizationProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <>
+      <ThemeProvider theme={globalTheme}>
+        <AuthProvider>
+          <LocalizationProvider dateAdapter={AdapterMoment}>
+            <GlobalContext.Provider
+              value={{
+                projects,
+                setProjects,
+                oldProject,
+                setOldProject,
+                projectsExt,
+                setProjectsExt,
+                events,
+                setEvents,
+                oldEvent,
+                setOldEvent,
+                eventsExt,
+                setEventsExt,
+                users,
+                setUsers,
+                ediumUser,
+                setEdiumUser,
+                ediumUserExt,
+                setEdiumUserExt,
+                chats,
+                setChats,
+                chat,
+                setChat,
+                chatPartner,
+                setChatPartner,
+                showMsg,
+                setShowMsg,
+                showChat,
+                setShowChat,
+                forceChatExpand,
+                setForceChatExpand,
+                winWidth,
+                winHeight,
+                onMedia,
+              }}
+            >
+              <CssBaseline />
+              <DBListener />
+              <Navbar />
+              <Component {...pageProps} />
+              {onMedia.onDesktop && ediumUser?.uid && showMsg && <ChatMsgBox />}
+              {onMedia.onDesktop && ediumUser?.uid && showChat && (
+                <ChatAccordion />
+              )}
+              {!onMedia.onDesktop && <BottomNav />}
+            </GlobalContext.Provider>
+          </LocalizationProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </>
   );
 }
 export default MyApp;

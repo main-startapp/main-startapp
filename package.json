@@ -24,6 +24,8 @@
     "firebaseui": "^0.600.0",
     "jquery": "3.6.1",
     "lodash.clonedeep": "^4.5.0",
+    "logrocket": "^3.0.1",
+    "logrocket-react": "5",
     "moment": "^2.29.1",
     "next": "12.0.10",
     "next-image-export-optimizer": "^0.10.0",

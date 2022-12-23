@@ -24,6 +24,7 @@ const Home = () => {
   const [project, setProject] = useState(null); // thec selected project
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
+
   return (
     <ProjectContext.Provider
       value={{
