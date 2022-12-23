@@ -15,16 +15,19 @@ import StudentListItem from "./StudentListItem";
 const StudentGrid = () => {
   // context
   const { users, winWidth, onMedia } = useContext(GlobalContext);
-  const { searchTerm, setStudent } = useContext(StudentContext);
+  const { searchTerm, setSearchTerm, setStudent } = useContext(StudentContext);
   const theme = useTheme();
 
   // local vars
   const filteredStudents = useMemo(
     () =>
       users.filter((user) => {
-        if (user?.role !== "student") return;
-        if (searchTerm === "") return user;
+        if (user?.role !== "student") return false;
+        if (searchTerm === "") return true;
 
+        const isInName = user.name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
         const isInPosition = user.desired_position
           .toLowerCase()
           .includes(searchTerm.toLowerCase());
@@ -32,15 +35,16 @@ const StudentGrid = () => {
           .toLowerCase()
           .includes(searchTerm.toLowerCase());
 
-        if (isInPosition || isInFoI) return user;
+        if (isInName || isInPosition || isInFoI) return true;
       }),
     [users, searchTerm]
   );
 
   // set initial student to be first in list to render out immediately
   useEffect(() => {
-    if (onMedia.onDesktop) setStudent(users.length > 0 ? users[0] : null);
-  }, [onMedia.onDesktop, setStudent, users]);
+    if (onMedia.onDesktop)
+      setStudent(filteredStudents.length > 0 ? filteredStudents[0] : null);
+  }, [filteredStudents, onMedia.onDesktop, setStudent]);
 
   return (
     <FixedHeightPaper
@@ -60,15 +64,15 @@ const StudentGrid = () => {
             <StyledInputBase
               placeholder="Search for name or experise"
               inputProps={{ "aria-label": "search" }}
-              // onChange={(e) => {
-              //   if (e.target.value.length !== 0) return;
-              //   setSearchTerm("");
-              // }}
-              // onKeyPress={(e) => {
-              //   if (e.key === "Enter") {
-              //     setSearchTerm(e.target.value);
-              //   }
-              // }}
+              onChange={(e) => {
+                if (e.target.value.length !== 0) return;
+                setSearchTerm("");
+              }}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  setSearchTerm(e.target.value);
+                }
+              }}
             />
           </SearchBox>
 

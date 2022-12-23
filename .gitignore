@@ -36,4 +36,5 @@ yarn-error.log*
 # firebase
 /.firebase/
 firebase.js
+credentials.json
 *-debug.log

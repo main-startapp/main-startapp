@@ -29,10 +29,6 @@ const DBListener = () => {
     setChats,
   } = useContext(GlobalContext);
 
-  {
-    /* db listeners */
-  }
-
   // listen to realtime projects collection, public
   // https://stackoverflow.com/questions/59841800/react-useeffect-in-depth-use-of-useeffect
   useEffect(() => {

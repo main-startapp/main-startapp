@@ -88,13 +88,10 @@ const EventList = () => {
 
   // set initial event to be the first in list to render out immediately
   useEffect(() => {
-    if (!onMedia.onDesktop) return;
-
-    if (filteredFullEvents?.length > 0) {
-      setFullEvent(filteredFullEvents[0]);
-    } else {
-      setFullEvent(null);
-    }
+    if (onMedia.onDesktop)
+      setFullEvent(
+        filteredFullEvents.length > 0 ? filteredFullEvents[0] : null
+      );
   }, [filteredFullEvents, onMedia.onDesktop, setFullEvent]);
 
   return (

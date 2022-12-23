@@ -93,13 +93,10 @@ const ProjectList = () => {
 
   // set initial project to be the first in list to render out immediately
   useEffect(() => {
-    if (!onMedia.onDesktop) return;
-
-    if (filteredFullProjects?.length > 0) {
-      setFullProject(filteredFullProjects[0]);
-    } else {
-      setFullProject(null);
-    }
+    if (onMedia.onDesktop)
+      setFullProject(
+        filteredFullProjects.length > 0 ? filteredFullProjects[0] : null
+      );
   }, [filteredFullProjects, onMedia.onDesktop, setFullProject]);
 
   // https://stackoverflow.com/questions/45767405/the-difference-between-flex1-and-flex-grow1
