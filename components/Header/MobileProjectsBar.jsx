@@ -183,7 +183,7 @@ const MobileProjectsBar = () => {
           }}
         >
           <TuneIcon sx={{ mr: 2 }} />
-          <Typography
+          {/* <Typography
             onClick={() => {
               setSelected("1");
             }}
@@ -196,7 +196,7 @@ const MobileProjectsBar = () => {
             }}
           >
             Category
-          </Typography>
+          </Typography> */}
           <Typography
             sx={{
               mr: 2,

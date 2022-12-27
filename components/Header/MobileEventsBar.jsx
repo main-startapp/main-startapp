@@ -214,7 +214,7 @@ const MobileEventsBar = () => {
           }}
         >
           <TuneIcon sx={{ mr: 2 }} />
-          <Typography
+          {/* <Typography
             sx={{
               mr: 2,
               fontSize: "1rem",
@@ -227,7 +227,7 @@ const MobileEventsBar = () => {
             }}
           >
             Category
-          </Typography>
+          </Typography> */}
           <Typography
             sx={{
               mr: 2,
