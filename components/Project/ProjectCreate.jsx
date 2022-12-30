@@ -48,17 +48,20 @@ import { useAuth } from "../Context/AuthContext";
 import { projectTags, projectStrList } from "../Reusable/MenuStringList";
 import TextEditor from "../TextEditor";
 import moment from "moment/moment";
+import { useTheme } from "@mui/material/styles";
 
 const ProjectCreate = (props) => {
   // context
   const { currentUser } = useAuth();
-  const { projects, projectsExt, ediumUser, ediumUserExt, winHeight, onMedia } =
+  const { projects, projectsExt, ediumUser, ediumUserExt, winHeight, winWidth, onMedia } =
     useContext(GlobalContext);
   const { showAlert } = useContext(ProjectContext);
   const router = useRouter();
   const formRef = useRef();
   const dateRef = useRef();
   const teamSizeRef = useRef();
+  const theme = useTheme();
+
 
   // click spam
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
@@ -463,6 +466,12 @@ const ProjectCreate = (props) => {
   };
 
   // debugging console logs if there's any
+   
+  const styles = {
+    root: {
+      border: "none"
+    }
+  }
 
   return (
     <Grid
@@ -481,12 +490,15 @@ const ProjectCreate = (props) => {
     >
       <Grid
         item
-        xs={onMedia.onDesktop ? 8 : 10}
+        xs={onMedia.onDesktop ? 6 : 8}
         sx={{
+          borderRadius: "30px",
+          border: "none !important",
+          boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
+          margin: "30px 0",
           backgroundColor: "#ffffff",
           borderLeft: 1.5,
           borderRight: 1.5,
-          borderColor: "#dbdbdb",
           paddingX: 3,
           minHeight: "100%",
         }}
@@ -534,21 +546,22 @@ const ProjectCreate = (props) => {
             <Button
               sx={{
                 backgroundColor: "#f0f0f0",
-                border: 1.5,
                 borderRadius: 2,
-                borderColor: "#dbdbdb",
                 color: "rgba(0, 0, 0, 0.6)",
                 height: "56px",
                 textTransform: "none",
                 width: "15%",
                 paddingLeft: "30px",
+                border: "none",
               }}
               // variant="contained"
               disableElevation
               onClick={handleDialogOpen}
             >
               <UploadFileIcon sx={{ position: "absolute", left: "5%" }} />
-              <Typography>{"Logo"}</Typography>
+              <Typography sx={{
+                color: "red"
+              }}>{"Logo"}</Typography>
             </Button>
             <Dialog
               open={isDialogOpen}
@@ -618,18 +631,18 @@ const ProjectCreate = (props) => {
                   backgroundColor: "#f0f0f0",
                 },
                 "& .MuiOutlinedInput-notchedOutline": {
-                  border: 1.5,
-                  borderColor: "#dbdbdb",
+                  border: "none",
                 },
                 "&:hover .MuiOutlinedInput-notchedOutline": {
-                  border: 1.5,
-                  borderColor: "#dbdbdb",
+                  border: "none",
                 },
                 ".MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                   {
-                    border: 1.5,
-                    borderColor: "#3e95c2",
+                    border: "none",
                   },
+                "& .MuiFormLabel-root": {
+                  color: "red",
+                },
               }}
             >
               <InputLabel>Category</InputLabel>
