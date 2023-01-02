@@ -287,7 +287,9 @@ export const DefaultTextField = styled(TextField)(({ theme }) => ({
     fontSize: "12px",
   },
   "& .MuiFormLabel-root": {
-    color: theme.palette.adminOrange, // theme.palette.{} not working
+    fontWeight: theme.typography.fontWeightMedium,
+    color: theme.palette.unselectedIcon.main,
+    fontSize: "18px"
   },
 }));
 

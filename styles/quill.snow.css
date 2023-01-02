@@ -3,6 +3,7 @@
     border-bottom-right-radius: 10px;
     background-color: #f0f0f0;
     border: none;
+    height: 100px;
 }
 
 .ql-toolbar.ql-snow {
@@ -20,4 +21,20 @@
 
 .ql-toolbar.ql-snow {
     border: none !important;
+    padding-top: 10px;
+}
+
+
+.text-label {
+    color: #757575;
+    font-weight: 500;
+    font-size: 15px;
+    position: absolute;
+    top: -12px;
+    left: 15px;
+}
+
+
+.text-container {
+    position: relative;
 }

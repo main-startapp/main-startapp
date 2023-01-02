@@ -22,7 +22,7 @@ import {
 } from "@mui/material";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
 import {
   collection,
   doc,
@@ -49,6 +49,7 @@ import { projectTags, projectStrList } from "../Reusable/MenuStringList";
 import TextEditor from "../TextEditor";
 import moment from "moment/moment";
 import { useTheme } from "@mui/material/styles";
+import { AttachFile } from "@mui/icons-material";
 
 const ProjectCreate = (props) => {
   // context
@@ -78,10 +79,12 @@ const ProjectCreate = (props) => {
   const emptyProject = {
     title: "",
     category: "",
+    type: "",
     completion_date: "",
     max_member_count: 0, 
     tags: [],
     description: "",
+    short_description: "",
     is_visible: true,
     icon_url: "",
     application_form_url: "",
@@ -99,6 +102,7 @@ const ProjectCreate = (props) => {
     weekly_hour: 1,
     count: 1,
     url: "",
+    application_deadline: "",
   };
   const [positionFields, setPositionFields] = useState(() =>
     oldProject?.position_list?.length > 0
@@ -121,6 +125,7 @@ const ProjectCreate = (props) => {
   const [isCheckedAppForm, setIsCheckedAppForm] = useState(false);
   const [isCheckedCompDate, setIsCheckedCompDate] = useState(newProject.completion_date != "");
   const [isCheckedTeamSize, setIsCheckedTeamSize] = useState(false);
+  const [showDescOverlay, setShowDescOverlay] = useState(true);
   useEffect(() => {
     if (!oldProject) {
       // create: defalut to check the positions
@@ -466,12 +471,6 @@ const ProjectCreate = (props) => {
   };
 
   // debugging console logs if there's any
-   
-  const styles = {
-    root: {
-      border: "none"
-    }
-  }
 
   return (
     <Grid
@@ -532,17 +531,49 @@ const ProjectCreate = (props) => {
         <form ref={formRef}>
           {/* Title textfield & Upload logo button */}
           <Box display="flex" justifyContent="space-between" alignItems="start">
-            <DefaultTextField
-              sx={{ mr: 5 }}
+            <FormControl
               required
               fullWidth
-              label="Project Title"
-              margin="none"
-              value={newProject.title}
-              onChange={(e) =>
-                setNewProject({ ...newProject, title: e.target.value })
-              }
-            />
+              sx={{
+                mr: 2.5,
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  backgroundColor: "#f0f0f0",
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+                ".MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                  {
+                    border: "none",
+                  },
+                "& .MuiFormLabel-root": {
+                  fontWeight: theme.typography.fontWeightMedium,
+                  color: theme.palette.unselectedIcon.main,
+                  fontSize: "18px",
+                },
+              }}
+            >
+              <DefaultTextField
+                required
+                fullWidth
+                label="Project Title"
+                margin="none"
+                value={newProject.title}
+                onChange={(e) =>
+                  setNewProject({ ...newProject, title: e.target.value })
+                }
+              />
+              <FormHelperText
+                id="projectcreate-title-helper-text"
+                sx={{ color: "lightgray", fontSize: "12px" }}
+              >
+                {"Name of your project/club/organization"}
+              </FormHelperText>
+            </FormControl>
             <Button
               sx={{
                 backgroundColor: "#f0f0f0",
@@ -550,18 +581,24 @@ const ProjectCreate = (props) => {
                 color: "rgba(0, 0, 0, 0.6)",
                 height: "56px",
                 textTransform: "none",
-                width: "15%",
-                paddingLeft: "30px",
+                width: "25%",
                 border: "none",
+                display: "flex",
               }}
               // variant="contained"
               disableElevation
               onClick={handleDialogOpen}
             >
-              <UploadFileIcon sx={{ position: "absolute", left: "5%" }} />
-              <Typography sx={{
-                color: "red"
-              }}>{"Logo"}</Typography>
+              <Typography
+                sx={{
+                  fontWeight: theme.typography.fontWeightMedium,
+                  color: theme.palette.unselectedIcon.main,
+                  fontSize: "18px",
+                }}
+              >
+                {"Logo"}
+              </Typography>
+              <AttachFileIcon sx={{ ml: "8%", fontSize: "large" }} />
             </Button>
             <Dialog
               open={isDialogOpen}
@@ -614,18 +651,19 @@ const ProjectCreate = (props) => {
             </Dialog>
           </Box>
 
-          {/* Category select & completion date*/}
+          {/* Category select & type select*/}
           <Box
             display="flex"
             justifyContent="space-between"
             alignItems="start"
-            sx={{ mt: 5 }}
+            sx={{ mt: 2.5 }}
           >
+            {/* Category Container */}
             <FormControl
               required
               fullWidth
               sx={{
-                mr: 5,
+                mr: 2.5,
                 "& .MuiOutlinedInput-root": {
                   borderRadius: 2,
                   backgroundColor: "#f0f0f0",
@@ -641,7 +679,9 @@ const ProjectCreate = (props) => {
                     border: "none",
                   },
                 "& .MuiFormLabel-root": {
-                  color: "red",
+                  fontWeight: theme.typography.fontWeightMedium,
+                  color: theme.palette.unselectedIcon.main,
+                  fontSize: "18px",
                 },
               }}
             >
@@ -665,64 +705,68 @@ const ProjectCreate = (props) => {
                 id="projectcreate-category-helper-text"
                 sx={{ color: "lightgray", fontSize: "12px" }}
               >
-                {"A general category of your project"}
+                {"General category of your project"}
               </FormHelperText>
             </FormControl>
 
-            {/* completion date container */}
-            <Box display="flex" flexDirection="column">
-              {/* date and checkbox */}
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignContent="center"
-                gap="10%"
+            {/* Type Container */}
+            <FormControl
+              required
+              fullWidth
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  backgroundColor: "#f0f0f0",
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+                ".MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                  {
+                    border: "none",
+                  },
+                "& .MuiFormLabel-root": {
+                  fontWeight: theme.typography.fontWeightMedium,
+                  color: theme.palette.unselectedIcon.main,
+                  fontSize: "18px",
+                },
+              }}
+            >
+              <InputLabel>Type</InputLabel>
+              <Select
+                label="Type"
+                value={newProject.type}
+                onChange={(e) =>
+                  setNewProject({ ...newProject, type: e.target.value })
+                }
               >
-                <LocalizationProvider dateAdapter={AdapterMoment}>
-                  <DesktopDatePicker
-                    ref={dateRef}
-                    renderInput={(props) => {
-                      return (
-                        <DefaultTextField
-                          sx={{
-                            width: onMedia.onDesktop ? "175px" : "100px",
-                          }}
-                          {...props}
-                          required={true}
-                          disabled={!isCheckedCompDate}
-                        />
-                      );
-                    }}
-                    // label="Completion Date"
-                    disabled={!isCheckedCompDate}
-                    border="none"
-                    value={newProject.completion_date}
-                    onChange={(e) => {
-                      handleDateTimeChange(e);
-                    }}
-                  />
-                </LocalizationProvider>
-                <Checkbox
-                  sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
-                  checked={isCheckedCompDate}
-                  onChange={handleCompDateChange}
-                />
-              </Box>
+                {projectStrList?.map((projectStr, index) => {
+                  return (
+                    <MenuItem key={index} value={projectStr}>
+                      {projectStr}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
               <FormHelperText
-                sx={{ color: "lightgray", fontSize: "12px", ml: 1 }}
+                id="projectcreate-type-helper-text"
+                sx={{ color: "lightgray", fontSize: "12px" }}
               >
-                {"Completion Date"}
+                {"General type of your project"}
               </FormHelperText>
-            </Box>
+            </FormControl>
           </Box>
 
-          {/* tags and total team size */}
+          {/* tags */}
           <Box
             display="flex"
             alignItems="start"
             sx={{
-              mt: 5,
-              mb: 5,
+              mt: 2.5,
+              mb: 2.5,
             }}
           >
             {/* <DefaultTextField
@@ -737,7 +781,6 @@ const ProjectCreate = (props) => {
               }
             /> */}
             <Autocomplete
-              sx={{ mr: 5 }}
               fullWidth
               freeSolo
               clearOnBlur
@@ -763,8 +806,8 @@ const ProjectCreate = (props) => {
             />
 
             {/* Team Size container */}
-            <Box display="flex" flexDirection="column">
-              {/* Size and checkbox */}
+            {/* Size and checkbox */}
+            {/* <Box display="flex" flexDirection="column">
               <Box
                 display="flex"
                 justifyContent="center"
@@ -808,10 +851,61 @@ const ProjectCreate = (props) => {
               >
                 {"Team Size"}
               </FormHelperText>
-            </Box>
+            </Box> */}
           </Box>
 
-          <TextEditor update={setNewProject} project={newProject} />
+          {/* short description */}
+
+          <FormControl
+            required
+            fullWidth
+            sx={{
+              mr: 2.5,
+              mb: 2.5,
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 2,
+                backgroundColor: "#f0f0f0",
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                border: "none",
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                border: "none",
+              },
+              ".MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                {
+                  border: "none",
+                },
+              "& .MuiFormLabel-root": {
+                fontWeight: theme.typography.fontWeightMedium,
+                color: theme.palette.unselectedIcon.main,
+                fontSize: "18px",
+              },
+            }}
+          >
+            <DefaultTextField
+              fullWidth
+              label="Short Description"
+              margin="none"
+              value={newProject.short_description}
+              onChange={(e) =>
+                setNewProject({
+                  ...newProject,
+                  short_description: e.target.value,
+                })
+              }
+            />
+            <FormHelperText
+              id="projectcreate-sd-helper-text"
+              sx={{ color: "lightgray", fontSize: "12px" }}
+            >
+              {"One sentence description of your project"}
+            </FormHelperText>
+          </FormControl>
+
+          {/* Description */}
+          <TextEditor update={setNewProject} project={newProject} overlay={showDescOverlay} showOverlay={setShowDescOverlay}/>
+
           <FormHelperText sx={{ color: "lightgray", fontSize: "12px", ml: 1 }}>
             {
               "A brief description of the new project (e.g. scope, mission, work format, timeline) *"
@@ -886,6 +980,7 @@ const ProjectCreate = (props) => {
                         handlePosInputChange(index, e);
                       }}
                     />
+
                     {/* Number of people */}
                     <DefaultTextField
                       required
@@ -936,6 +1031,7 @@ const ProjectCreate = (props) => {
                       }}
                     />
                   </Box>
+
                   <Box
                     display="flex"
                     justifyContent="space-between"
@@ -949,7 +1045,62 @@ const ProjectCreate = (props) => {
                       label="Application Form Link"
                       defaultValue={getAppLink(index)}
                       onChange={(e) => handlePosInputChange(index, e)}
+                      sx={{
+                        mr: 2.5,
+                      }}
                     />
+
+                    {/* Application deadline container */}
+                    <Box display="flex" justifyContent="space-between">
+                      {/* date */}
+                      <Box
+                        display="flex"
+                        justifyContent="center"
+                        alignContent="center"
+                      >
+                        <LocalizationProvider dateAdapter={AdapterMoment}>
+                          <DesktopDatePicker
+                            ref={dateRef}
+                            renderInput={(props) => {
+                              return (
+                                <DefaultTextField
+                                  sx={{
+                                    width: onMedia.onDesktop
+                                      ? "225px"
+                                      : "150px",
+                                    // overflow: "none",
+                                    mr: 2.5,
+                                  }}
+                                  {...props}
+                                  // required={true}
+                                  disabled={!isCheckedCompDate}
+                                  label="Application Deadline"
+                                  InputLabelProps={{
+                                    shrink: true,
+                                  }}
+                                />
+                              );
+                            }}
+                            disabled={!isCheckedCompDate}
+                            border="none"
+                            value={newProject.completion_date}
+                            onChange={(e) => {
+                              handleDateTimeChange(e);
+                            }}
+                          />
+                        </LocalizationProvider>
+                        <Checkbox
+                          sx={{ color: "#dbdbdb", padding: 0 }}
+                          checked={isCheckedCompDate}
+                          onChange={handleCompDateChange}
+                        />
+                      </Box>
+                      {/* <FormHelperText
+                        sx={{ color: "lightgray", fontSize: "12px", ml: 1 }}
+                      >
+                        {"Completion Date"}
+                      </FormHelperText> */}
+                    </Box>
                   </Box>
                 </div>
               );
