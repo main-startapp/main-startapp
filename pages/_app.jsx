@@ -19,6 +19,7 @@ import ChatMsgPaper from "../components/Chat/ChatMsgPaper";
 import DBListener from "../components/DBListener";
 import MobileBottomNav from "../components/Header/MobileBottomNav";
 import useWindowDimensions from "../components/Reusable/WindowDimensions";
+import Head from "next/head";
 
 // makeStyles, useStyles, createStyles, withStyles, styled
 // https://smartdevpreneur.com/material-ui-makestyles-usestyles-createstyles-and-withstyles-explained/
@@ -253,6 +254,9 @@ function MyApp({ Component, pageProps }) {
               setIsAnimated,
             }}
           >
+            <Head>
+              <link rel="icon" href="/images/favicon.ico" />
+            </Head>
             <CssBaseline enableColorScheme />
             <DBListener />
             {onMedia.onDesktop && <Navbar />}

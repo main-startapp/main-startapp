@@ -77,17 +77,10 @@ export const studentDepartmentStrList = [
 ];
 
 // organization - tags
-export const organizationTags = [
-  "computer science",
-  "game dev",
-  "unity",
-  "software",
-];
+export const organizationTags = ["computer science"];
 
 // project - tags
-export const projectTags = [
-  "computer science",
-  "game dev",
-  "unity",
-  "software",
-];
+export const projectTags = ["computer science"];
+
+// event - tags
+export const eventTags = ["computer science"];
