@@ -2,11 +2,9 @@ import { Button } from "@mui/material";
 import { useState } from "react";
 import useDrivePicker from "react-google-drive-picker";
 import useGoogleSheets from "use-google-sheets";
+import { API_KEY, CLIENT_ID } from "../localenv";
 
 const Form = () => {
-  const API_KEY = "AIzaSyB-Si9BOXFbX9W50sNPsDZqMfyAd_qCh7g";
-  const CLIENT_ID =
-    "373522521624-rhjmlkv7d4llpqihl50u2j9hejeltbvo.apps.googleusercontent.com";
   const [openPicker, authResponse] = useDrivePicker();
   const [sheet, setSheet] = useState(null);
   // const customViewsArray = [new google.picker.DocsView()]; // custom view
