@@ -75,12 +75,10 @@ const ProjectCreate = (props) => {
   // init new project
   // Project State Initialization.
   // https://stackoverflow.com/questions/68945060/react-make-usestate-initial-value-conditional
-  const currentTime = new Date();
   const emptyProject = {
     title: "",
     category: "",
     type: "",
-    completion_date: "",
     max_member_count: 0, 
     tags: [],
     description: "",
@@ -89,6 +87,7 @@ const ProjectCreate = (props) => {
     icon_url: "",
     application_form_url: "",
     is_deleted: false,
+    completion_date: "", // not used anymore in new design
   };
   const [newProject, setNewProject] = useState(() =>
     oldProject ? oldProject : emptyProject
@@ -105,9 +104,11 @@ const ProjectCreate = (props) => {
     application_deadline: "",
   };
   const [positionFields, setPositionFields] = useState(() =>
-    oldProject?.position_list?.length > 0
-      ? oldProject.position_list
-      : [emptyPositionField]
+  oldProject?.position_list?.length > 0
+  ? oldProject.position_list.map((pos) => {
+    return { ...pos, application_deadline: pos.application_deadline !== "" ? pos.application_deadline.toDate() : "" }
+  })
+  : [emptyPositionField]
   );
 
   // upload-icon dialog modal
@@ -123,9 +124,11 @@ const ProjectCreate = (props) => {
   const [isCheckedTransferable, setIsCheckedTransferable] = useState(false);
   const [isCheckedPosition, setIsCheckedPosition] = useState(false);
   const [isCheckedAppForm, setIsCheckedAppForm] = useState(false);
-  const [isCheckedCompDate, setIsCheckedCompDate] = useState(newProject.completion_date != "");
-  const [isCheckedTeamSize, setIsCheckedTeamSize] = useState(false);
+  const [isCheckedPositionDates, setIsCheckedPositionDates] = useState(positionFields?.map((position) => {
+    return position.application_deadline !== "" ? true : false;
+  }));
   const [showDescOverlay, setShowDescOverlay] = useState(true);
+
   useEffect(() => {
     if (!oldProject) {
       // create: defalut to check the positions
@@ -176,7 +179,13 @@ const ProjectCreate = (props) => {
         ...newProject,
         // update max num of members
         max_member_count: maxMemberCount,
-        position_list: isCheckedPosition ? positionFields : [],
+        position_list: isCheckedPosition
+          ? positionFields?.map((pos, index) => {
+              return isCheckedPositionDates[index]
+                ? pos
+                : { ...pos, application_deadline: "" };
+            })
+          : [],
         creator_uid: ediumUser?.uid,
         create_timestamp: serverTimestamp(),
         last_timestamp: serverTimestamp(),
@@ -192,7 +201,13 @@ const ProjectCreate = (props) => {
         ...newProject,
         // update max num of members
         max_member_count: maxMemberCount,
-        position_list: isCheckedPosition ? positionFields : [],
+        position_list: isCheckedPosition
+          ? positionFields?.map((pos, index) => {
+              return isCheckedPositionDates[index]
+                ? pos
+                : { ...pos, application_deadline: "" };
+            })
+          : [],
         application_form_url: isCheckedAppForm
           ? newProject.application_form_url
           : "",
@@ -273,7 +288,13 @@ const ProjectCreate = (props) => {
         ...newProject,
         // update max num of members
         max_member_count: maxMemberCount,
-        position_list: isCheckedPosition ? positionFields : [],
+        position_list: isCheckedPosition
+          ? positionFields?.map((pos, index) => {
+              return isCheckedPositionDates[index]
+                ? pos
+                : { ...pos, application_deadline: "" };
+            })
+          : [],
         creator_uid: ediumUser?.uid,
         create_timestamp: serverTimestamp(),
         last_timestamp: serverTimestamp(),
@@ -289,7 +310,9 @@ const ProjectCreate = (props) => {
         ...newProject,
         // update max num of members
         max_member_count: maxMemberCount,
-        position_list: isCheckedPosition ? positionFields : [],
+        position_list: isCheckedPosition ? positionFields?.map((pos, index) => {
+          return isCheckedPositionDates[index] ? pos : { ...pos, application_deadline: ""}
+        }) : [],
         application_form_url: isCheckedAppForm
           ? newProject.application_form_url
           : "",
@@ -426,36 +449,6 @@ const ProjectCreate = (props) => {
     setPositionFields(pFields);
   };
 
-  const handleDateTimeChange = (e) => {
-    setNewProject({
-      ...newProject,
-      completion_date: e?._d,
-    });
-  };
-
-  const handleCompDateChange = (e) => {
-    setIsCheckedCompDate(!isCheckedCompDate);
-    if (isCheckedCompDate) {
-       setNewProject({
-         ...newProject,
-         completion_date: "",
-       });
-    } else {
-       setNewProject({
-         ...newProject,
-         completion_date: new Date(),
-       });
-    }
-  };
-
-  const handleTeamSizeChange = (e) => {
-    setIsCheckedTeamSize(!isCheckedTeamSize);
-    setNewProject({
-      ...newProject,
-      max_member_count: teamSizeRef.current.children[0].firstChild.value
-    });
-  };
-
   // new projects will get link from the project.url attribute,
   // old projects will get from project.application_form_url link
   const getAppLink = (index) => {
@@ -468,6 +461,22 @@ const ProjectCreate = (props) => {
     else {
       return positionFields[index - 1].url;
     }
+  };
+
+  const handlePositionDatesCheckboxChange = (indexToChange) => {
+    setIsCheckedPositionDates(isCheckedPositionDates?.map((position, index) => {
+      return index == indexToChange ? !position : position;
+    }))
+  }
+
+  const handlePositionDatesChange = (e, indexToChange) => {
+    setPositionFields(
+      positionFields?.map((pos, index) => {
+        if (index === indexToChange)
+          return { ...pos, application_deadline: e?._d };
+        else return pos;
+      })
+    );
   };
 
   // debugging console logs if there's any
@@ -743,7 +752,7 @@ const ProjectCreate = (props) => {
                   setNewProject({ ...newProject, type: e.target.value })
                 }
               >
-                {projectStrList?.map((projectStr, index) => {
+                {projectStrList?.map((projectStr, index) => { // need to change projectStrList to typeStrList
                   return (
                     <MenuItem key={index} value={projectStr}>
                       {projectStr}
@@ -1073,7 +1082,7 @@ const ProjectCreate = (props) => {
                                   }}
                                   {...props}
                                   // required={true}
-                                  disabled={!isCheckedCompDate}
+                                  // disabled={!isCheckedPositionDates[index]}
                                   label="Application Deadline"
                                   InputLabelProps={{
                                     shrink: true,
@@ -1081,18 +1090,28 @@ const ProjectCreate = (props) => {
                                 />
                               );
                             }}
-                            disabled={!isCheckedCompDate}
+                            disabled={
+                              isCheckedPositionDates[index] == null
+                                ? true
+                                : !isCheckedPositionDates[index]
+                            }
                             border="none"
-                            value={newProject.completion_date}
+                            value={positionFields[index].application_deadline}
                             onChange={(e) => {
-                              handleDateTimeChange(e);
+                              handlePositionDatesChange(e, index);
                             }}
                           />
                         </LocalizationProvider>
                         <Checkbox
                           sx={{ color: "#dbdbdb", padding: 0 }}
-                          checked={isCheckedCompDate}
-                          onChange={handleCompDateChange}
+                          checked={
+                            isCheckedPositionDates[index] == null
+                              ? false
+                              : isCheckedPositionDates[index]
+                          }
+                          onChange={() => 
+                            handlePositionDatesCheckboxChange(index)
+                          }
                         />
                       </Box>
                       {/* <FormHelperText

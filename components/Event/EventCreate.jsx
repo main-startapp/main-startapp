@@ -320,6 +320,7 @@ const EventCreate = (props) => {
   };
 
   const handleDateTimeChange = (e, isStart) => {
+    console.log(newEvent)
     isStart
       ? setNewEvent({ ...newEvent, start_date: e?._d })
       : setNewEvent({ ...newEvent, end_date: e?._d });
