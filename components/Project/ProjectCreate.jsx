@@ -45,7 +45,11 @@ import {
   handleDeleteEntry,
 } from "../Reusable/Resusable";
 import { useAuth } from "../Context/AuthContext";
-import { projectTags, projectStrList } from "../Reusable/MenuStringList";
+import {
+  projectTags,
+  typeStrList,
+  categoryStrList,
+} from "../Reusable/MenuStringList";
 import TextEditor from "../TextEditor";
 import moment from "moment/moment";
 import { useTheme } from "@mui/material/styles";
@@ -508,7 +512,7 @@ const ProjectCreate = (props) => {
           borderLeft: 1.5,
           borderRight: 1.5,
           paddingX: 3,
-          minHeight: "100%",
+          // minHeight: "100%",
         }}
       >
         <Typography
@@ -702,7 +706,7 @@ const ProjectCreate = (props) => {
                   setNewProject({ ...newProject, category: e.target.value })
                 }
               >
-                {projectStrList?.map((projectStr, index) => {
+                {categoryStrList?.map((projectStr, index) => {
                   return (
                     <MenuItem key={index} value={projectStr}>
                       {projectStr}
@@ -752,7 +756,8 @@ const ProjectCreate = (props) => {
                   setNewProject({ ...newProject, type: e.target.value })
                 }
               >
-                {projectStrList?.map((projectStr, index) => { // need to change projectStrList to typeStrList
+                {typeStrList?.map((projectStr, index) => {
+                  // need to change typeStrList to typeStrList
                   return (
                     <MenuItem key={index} value={projectStr}>
                       {projectStr}
@@ -913,7 +918,12 @@ const ProjectCreate = (props) => {
           </FormControl>
 
           {/* Description */}
-          <TextEditor update={setNewProject} project={newProject} overlay={showDescOverlay} showOverlay={setShowDescOverlay}/>
+          <TextEditor
+            update={setNewProject}
+            project={newProject}
+            overlay={showDescOverlay}
+            showOverlay={setShowDescOverlay}
+          />
 
           <FormHelperText sx={{ color: "lightgray", fontSize: "12px", ml: 1 }}>
             {
@@ -1109,7 +1119,7 @@ const ProjectCreate = (props) => {
                               ? false
                               : isCheckedPositionDates[index]
                           }
-                          onChange={() => 
+                          onChange={() =>
                             handlePositionDatesCheckboxChange(index)
                           }
                         />

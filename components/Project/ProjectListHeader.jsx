@@ -10,7 +10,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import { useContext, useEffect, useRef, useState } from "react";
 import { ProjectContext } from "../Context/ShareContexts";
-import { projectStrList } from "../Reusable/MenuStringList";
+import { typeStrList } from "../Reusable/MenuStringList";
 
 const ProjectListHeader = () => {
   const { setSearchTerm, searchTypeList, setSearchTypeList } =
@@ -44,7 +44,7 @@ const ProjectListHeader = () => {
   const [typeList, setTypeList] = useState([]);
   useEffect(() => {
     const retList = [];
-    projectStrList.forEach((typeStr) => {
+    typeStrList.forEach((typeStr) => {
       retList.push({ name: typeStr, isSelected: false });
     });
     setTypeList(retList);
