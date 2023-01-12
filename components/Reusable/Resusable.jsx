@@ -19,6 +19,7 @@ import {
   Link as MuiLink,
   Paper,
 } from "@mui/material";
+import Router from "next/router";
 
 //============================================================
 // handle connect/message: if chat found, return; if not, create a chat with "request to connect" auto msg.
@@ -263,6 +264,20 @@ export function ordinal_suffix_of(i) {
   }
   return i + "th";
 }
+
+//============================================================
+// utility function: whether substring is in a list of obj / string
+//============================================================
+export const shallowUpdateURLQuery = (pathName, queryKey, queryValue) => {
+  Router.push(
+    {
+      pathname: pathName,
+      query: queryKey ? { [queryKey]: queryValue } : null,
+    },
+    undefined,
+    { shallow: true }
+  );
+};
 
 //============================================================
 // styled components
