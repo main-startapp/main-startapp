@@ -155,7 +155,7 @@ const ProjectCreate = (props) => {
 
     let projectModRef; // ref to addDoc() or updateDoc()
     if (!oldProject) {
-      // create a new newProject
+      // create a new project
       const collectionRef = collection(db, "projects");
       let projectRef = {
         ...newProject,
@@ -170,7 +170,7 @@ const ProjectCreate = (props) => {
         console.log(error?.message);
       });
     } else {
-      // update an existing newProject
+      // update an existing project
       // since all changes are in newProject, can't just update partially
       const docRef = doc(db, "projects", newProject.id);
       const projectRef = {
@@ -691,17 +691,7 @@ const ProjectCreate = (props) => {
               mb: 5,
             }}
           >
-            {/* <DefaultTextField
-              sx={{ mr: 5 }}
-              fullWidth
-              label="Details"
-              margin="none"
-              helperText="Keywords to shortly describe the new project seperated by commas (e.g. tags)"
-              value={newProject.details}
-              onChange={(e) =>
-                setNewProject({ ...newProject, details: e.target.value })
-              }
-            /> */}
+            {/* Details */}
             <Autocomplete
               sx={{ mr: 5 }}
               fullWidth
