@@ -40,6 +40,7 @@ const Home = () => {
 
   // project state init
   const [fullProject, setFullProject] = useState(null); // the selected project with extra data (creator, tags)
+  const [isMobileBackClicked, setIsMobileBackClicked] = useState(false); // initialize show list on mobile
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
   const [searchTypeList, setSearchTypeList] = useState([]);
@@ -49,6 +50,8 @@ const Home = () => {
       value={{
         fullProject,
         setFullProject,
+        isMobileBackClicked,
+        setIsMobileBackClicked,
         searchTerm,
         setSearchTerm,
         searchCategory,
@@ -109,30 +112,33 @@ const Home = () => {
               </motion.div>
             </Box>
           </>
-        ) : fullProject === null ? (
-          <Box
-            id="projects-mobile-list-box"
-            sx={{
-              paddingTop: 2,
-              paddingLeft: 2,
-              width: "100%",
-              backgroundColor: "hoverGray.main",
-            }}
-          >
-            <ProjectList />
-          </Box>
         ) : (
-          <Box
-            id="projects-mobile-info-box"
-            sx={{
-              paddingTop: 2,
-              paddingLeft: 2,
-              width: "100%",
-              backgroundColor: "hoverGray.main",
-            }}
-          >
-            <ProjectInfo />
-          </Box>
+          <>
+            <Box
+              id="projects-mobile-list-box"
+              sx={{
+                display: fullProject === null ? "block" : "none",
+                paddingTop: 2,
+                paddingLeft: 2,
+                width: "100%",
+                backgroundColor: "hoverGray.main",
+              }}
+            >
+              <ProjectList />
+            </Box>
+            <Box
+              id="projects-mobile-info-box"
+              sx={{
+                display: fullProject === null ? "none" : "block",
+                paddingTop: 2,
+                paddingLeft: 2,
+                width: "100%",
+                backgroundColor: "hoverGray.main",
+              }}
+            >
+              <ProjectInfo />
+            </Box>
+          </>
         )}
       </Box>
     </ProjectContext.Provider>
