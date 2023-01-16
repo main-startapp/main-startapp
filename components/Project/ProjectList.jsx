@@ -100,12 +100,11 @@ const ProjectList = () => {
   }, [fullProjects, searchTerm, searchTypeList]);
 
   // project query & auto set initial project
-  // project query & auto set initial project
   useEffect(() => {
     const queryPID = Router.query?.pid;
     const currentPID = fullProject?.project?.id;
     // case 1 (desktop & mobile): user click a new entry => current entry, update url
-    // case 1.1 (desktop & mobile): if they exist and are equal, do nothing
+    // case 1.1 (desktop & mobile): if query and current entry exist and are equal, do nothing
     // case 2 (desktop & mobile): user directly input a url with a valid query => query && !current entry, set it to user's
     // case 2.1 (mobile): mobile app can't distinguish between user input a query or user clicked back button (since both are query && !current entry), thus isMobileBackClicked flag was introduced
     // case 3 (desktop): the query is invalid or no query => !query && !current entry, set it to the 1st entry then update url
