@@ -177,24 +177,19 @@ const ProjectInfo = () => {
               >
                 {"Details: "}
               </Typography>
-              <Typography color="text.secondary">
-                {project?.tags}
-              </Typography>
-              {project.max_member_count && (
-                <div>
-                  <Typography
-                    sx={{ mt: onMedia.onDesktop ? 3 : 1.5, fontWeight: "bold" }}
-                    color="text.primary"
-                  >
-                    {"Team size: "}
-                  </Typography>
-                  <Typography color="text.secondary">
-                    {/* {project?.cur_member_count}
-                {"/"} */}
-                    {project?.max_member_count}
-                  </Typography>
-                </div>
-              )}
+              {projectAllTags?.map((tag, index) => (
+                <Chip
+                  key={index}
+                  color={"lightPrimary"}
+                  label={tag}
+                  sx={{
+                    mr: 1,
+                    mt: 1,
+                    fontSize: "0.875rem",
+                    fontWeight: "medium",
+                  }}
+                />
+              ))}
             </Box>
           )}
         </motion.div>
