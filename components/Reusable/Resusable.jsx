@@ -19,6 +19,7 @@ import {
   Link as MuiLink,
   Paper,
 } from "@mui/material";
+import { NoEncryption } from "@mui/icons-material";
 
 //============================================================
 // handle connect/message: if chat found, return; if not, create a chat with "request to connect" auto msg.
@@ -273,20 +274,22 @@ export const DefaultTextField = styled(TextField)(({ theme }) => ({
     backgroundColor: "#f0f0f0",
   },
   "& .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1,
-    borderColor: "#dbdbdb",
+    border: "none",
   },
   "&:hover .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1,
-    borderColor: "#dbdbdb !important",
+    border: "none",
   },
   "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1,
-    borderColor: "#3e95c2 !important",
+    border: "none",
   },
   "& .MuiFormHelperText-root": {
     color: "lightgray",
     fontSize: "12px",
+  },
+  "& .MuiFormLabel-root": {
+    fontWeight: theme.typography.fontWeightMedium,
+    color: theme.palette.unselectedIcon.main,
+    fontSize: "18px"
   },
 }));
 

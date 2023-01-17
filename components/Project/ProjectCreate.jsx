@@ -22,7 +22,7 @@ import {
 } from "@mui/material";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
 import {
   collection,
   doc,
@@ -45,17 +45,28 @@ import {
   handleDeleteEntry,
 } from "../Reusable/Resusable";
 import { useAuth } from "../Context/AuthContext";
-import { projectTags, projectStrList } from "../Reusable/MenuStringList";
+import {
+  projectTags,
+  typeStrList,
+  categoryStrList,
+} from "../Reusable/MenuStringList";
 import TextEditor from "../TextEditor";
+import moment from "moment/moment";
+import { useTheme } from "@mui/material/styles";
+import { AttachFile } from "@mui/icons-material";
 
 const ProjectCreate = (props) => {
   // context
   const { currentUser } = useAuth();
-  const { projects, projectsExt, ediumUser, ediumUserExt, winHeight, onMedia } =
+  const { projects, projectsExt, ediumUser, ediumUserExt, winHeight, winWidth, onMedia } =
     useContext(GlobalContext);
   const { showAlert } = useContext(ProjectContext);
   const router = useRouter();
   const formRef = useRef();
+  const dateRef = useRef();
+  const teamSizeRef = useRef();
+  const theme = useTheme();
+
 
   // click spam
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
@@ -66,17 +77,21 @@ const ProjectCreate = (props) => {
     : null;
 
   // init new project
+  // Project State Initialization.
+  // https://stackoverflow.com/questions/68945060/react-make-usestate-initial-value-conditional
   const emptyProject = {
     title: "",
     category: "",
-    completion_date: "",
-    max_member_count: 0,
+    type: "",
+    max_member_count: 0, 
     tags: [],
     description: "",
+    short_description: "",
     is_visible: true,
     icon_url: "",
     application_form_url: "",
     is_deleted: false,
+    completion_date: "", // not used anymore in new design
   };
   const [newProject, setNewProject] = useState(() =>
     oldProject ? oldProject : emptyProject
@@ -90,11 +105,14 @@ const ProjectCreate = (props) => {
     weekly_hour: 1,
     count: 1,
     url: "",
+    application_deadline: "",
   };
   const [positionFields, setPositionFields] = useState(() =>
-    oldProject?.position_list?.length > 0
-      ? oldProject.position_list
-      : [emptyPositionField]
+  oldProject?.position_list?.length > 0
+  ? oldProject.position_list.map((pos) => {
+    return { ...pos, application_deadline: pos.application_deadline !== "" ? pos.application_deadline.toDate() : "" }
+  })
+  : [emptyPositionField]
   );
 
   // upload-icon dialog modal
@@ -110,8 +128,11 @@ const ProjectCreate = (props) => {
   const [isCheckedTransferable, setIsCheckedTransferable] = useState(false);
   const [isCheckedPosition, setIsCheckedPosition] = useState(false);
   const [isCheckedAppForm, setIsCheckedAppForm] = useState(false);
-  const [isCheckedCompDate, setIsCheckedCompDate] = useState(false);
-  const [isCheckedTeamSize, setIsCheckedTeamSize] = useState(false);
+  const [isCheckedPositionDates, setIsCheckedPositionDates] = useState(positionFields?.map((position) => {
+    return position.application_deadline !== "" ? true : false;
+  }));
+  const [showDescOverlay, setShowDescOverlay] = useState(true);
+
   useEffect(() => {
     if (!oldProject) {
       // create: defalut to check the positions
@@ -136,6 +157,7 @@ const ProjectCreate = (props) => {
 
   // helper functions
   const handleSubmit = async (e) => {
+  
     if (!isClickable) return;
     if (!formRef.current.reportValidity()) return;
 
@@ -161,7 +183,13 @@ const ProjectCreate = (props) => {
         ...newProject,
         // update max num of members
         max_member_count: maxMemberCount,
-        position_list: isCheckedPosition ? positionFields : [],
+        position_list: isCheckedPosition
+          ? positionFields?.map((pos, index) => {
+              return isCheckedPositionDates[index]
+                ? pos
+                : { ...pos, application_deadline: "" };
+            })
+          : [],
         creator_uid: ediumUser?.uid,
         create_timestamp: serverTimestamp(),
         last_timestamp: serverTimestamp(),
@@ -177,7 +205,13 @@ const ProjectCreate = (props) => {
         ...newProject,
         // update max num of members
         max_member_count: maxMemberCount,
-        position_list: isCheckedPosition ? positionFields : [],
+        position_list: isCheckedPosition
+          ? positionFields?.map((pos, index) => {
+              return isCheckedPositionDates[index]
+                ? pos
+                : { ...pos, application_deadline: "" };
+            })
+          : [],
         application_form_url: isCheckedAppForm
           ? newProject.application_form_url
           : "",
@@ -258,7 +292,13 @@ const ProjectCreate = (props) => {
         ...newProject,
         // update max num of members
         max_member_count: maxMemberCount,
-        position_list: isCheckedPosition ? positionFields : [],
+        position_list: isCheckedPosition
+          ? positionFields?.map((pos, index) => {
+              return isCheckedPositionDates[index]
+                ? pos
+                : { ...pos, application_deadline: "" };
+            })
+          : [],
         creator_uid: ediumUser?.uid,
         create_timestamp: serverTimestamp(),
         last_timestamp: serverTimestamp(),
@@ -274,7 +314,9 @@ const ProjectCreate = (props) => {
         ...newProject,
         // update max num of members
         max_member_count: maxMemberCount,
-        position_list: isCheckedPosition ? positionFields : [],
+        position_list: isCheckedPosition ? positionFields?.map((pos, index) => {
+          return isCheckedPositionDates[index] ? pos : { ...pos, application_deadline: ""}
+        }) : [],
         application_form_url: isCheckedAppForm
           ? newProject.application_form_url
           : "",
@@ -411,26 +453,6 @@ const ProjectCreate = (props) => {
     setPositionFields(pFields);
   };
 
-  const handleDateTimeChange = (e) => {
-    setNewProject({ ...newProject, completion_date: e?._d });
-  };
-
-  const handleCompDateChange = (e) => {
-    setIsCheckedCompDate(!isCheckedCompDate);
-    setNewProject({
-      ...newProject,
-      completion_date: isCheckedCompDate ? e.target.value : "",
-    });
-  };
-
-  const handleTeamSizeChange = (e) => {
-    setIsCheckedTeamSize(!isCheckedTeamSize);
-    setNewProject({
-      ...newProject,
-      max_member_count: isCheckedTeamSize ? e.target.value : 0,
-    });
-  };
-
   // new projects will get link from the project.url attribute,
   // old projects will get from project.application_form_url link
   const getAppLink = (index) => {
@@ -443,6 +465,22 @@ const ProjectCreate = (props) => {
     else {
       return positionFields[index - 1].url;
     }
+  };
+
+  const handlePositionDatesCheckboxChange = (indexToChange) => {
+    setIsCheckedPositionDates(isCheckedPositionDates?.map((position, index) => {
+      return index == indexToChange ? !position : position;
+    }))
+  }
+
+  const handlePositionDatesChange = (e, indexToChange) => {
+    setPositionFields(
+      positionFields?.map((pos, index) => {
+        if (index === indexToChange)
+          return { ...pos, application_deadline: e?._d };
+        else return pos;
+      })
+    );
   };
 
   // debugging console logs if there's any
@@ -464,14 +502,17 @@ const ProjectCreate = (props) => {
     >
       <Grid
         item
-        xs={onMedia.onDesktop ? 8 : 10}
+        xs={onMedia.onDesktop ? 6 : 8}
         sx={{
+          borderRadius: "30px",
+          border: "none !important",
+          boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
+          margin: "30px 0",
           backgroundColor: "#ffffff",
           borderLeft: 1.5,
           borderRight: 1.5,
-          borderColor: "#dbdbdb",
           paddingX: 3,
-          minHeight: "100%",
+          // minHeight: "100%",
         }}
       >
         <Typography
@@ -503,35 +544,74 @@ const ProjectCreate = (props) => {
         <form ref={formRef}>
           {/* Title textfield & Upload logo button */}
           <Box display="flex" justifyContent="space-between" alignItems="start">
-            <DefaultTextField
-              sx={{ mr: 5 }}
+            <FormControl
               required
               fullWidth
-              label="Project Title"
-              margin="none"
-              value={newProject.title}
-              onChange={(e) =>
-                setNewProject({ ...newProject, title: e.target.value })
-              }
-            />
+              sx={{
+                mr: 2.5,
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  backgroundColor: "#f0f0f0",
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+                ".MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                  {
+                    border: "none",
+                  },
+                "& .MuiFormLabel-root": {
+                  fontWeight: theme.typography.fontWeightMedium,
+                  color: theme.palette.unselectedIcon.main,
+                  fontSize: "18px",
+                },
+              }}
+            >
+              <DefaultTextField
+                required
+                fullWidth
+                label="Project Title"
+                margin="none"
+                value={newProject.title}
+                onChange={(e) =>
+                  setNewProject({ ...newProject, title: e.target.value })
+                }
+              />
+              <FormHelperText
+                id="projectcreate-title-helper-text"
+                sx={{ color: "lightgray", fontSize: "12px" }}
+              >
+                {"Name of your project/club/organization"}
+              </FormHelperText>
+            </FormControl>
             <Button
               sx={{
                 backgroundColor: "#f0f0f0",
-                border: 1.5,
                 borderRadius: 2,
-                borderColor: "#dbdbdb",
                 color: "rgba(0, 0, 0, 0.6)",
                 height: "56px",
                 textTransform: "none",
-                width: "15%",
-                paddingLeft: "30px",
+                width: "25%",
+                border: "none",
+                display: "flex",
               }}
               // variant="contained"
               disableElevation
               onClick={handleDialogOpen}
             >
-              <UploadFileIcon sx={{ position: "absolute", left: "5%" }} />
-              <Typography>{"Logo"}</Typography>
+              <Typography
+                sx={{
+                  fontWeight: theme.typography.fontWeightMedium,
+                  color: theme.palette.unselectedIcon.main,
+                  fontSize: "18px",
+                }}
+              >
+                {"Logo"}
+              </Typography>
+              <AttachFileIcon sx={{ ml: "8%", fontSize: "large" }} />
             </Button>
             <Dialog
               open={isDialogOpen}
@@ -584,35 +664,38 @@ const ProjectCreate = (props) => {
             </Dialog>
           </Box>
 
-          {/* Category select & completion date*/}
+          {/* Category select & type select*/}
           <Box
             display="flex"
             justifyContent="space-between"
             alignItems="start"
-            sx={{ mt: 5 }}
+            sx={{ mt: 2.5 }}
           >
+            {/* Category Container */}
             <FormControl
               required
               fullWidth
               sx={{
-                mr: 5,
+                mr: 2.5,
                 "& .MuiOutlinedInput-root": {
                   borderRadius: 2,
                   backgroundColor: "#f0f0f0",
                 },
                 "& .MuiOutlinedInput-notchedOutline": {
-                  border: 1.5,
-                  borderColor: "#dbdbdb",
+                  border: "none",
                 },
                 "&:hover .MuiOutlinedInput-notchedOutline": {
-                  border: 1.5,
-                  borderColor: "#dbdbdb",
+                  border: "none",
                 },
                 ".MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                   {
-                    border: 1.5,
-                    borderColor: "#3e95c2",
+                    border: "none",
                   },
+                "& .MuiFormLabel-root": {
+                  fontWeight: theme.typography.fontWeightMedium,
+                  color: theme.palette.unselectedIcon.main,
+                  fontSize: "18px",
+                },
               }}
             >
               <InputLabel>Category</InputLabel>
@@ -623,7 +706,7 @@ const ProjectCreate = (props) => {
                   setNewProject({ ...newProject, category: e.target.value })
                 }
               >
-                {projectStrList?.map((projectStr, index) => {
+                {categoryStrList?.map((projectStr, index) => {
                   return (
                     <MenuItem key={index} value={projectStr}>
                       {projectStr}
@@ -635,65 +718,73 @@ const ProjectCreate = (props) => {
                 id="projectcreate-category-helper-text"
                 sx={{ color: "lightgray", fontSize: "12px" }}
               >
-                {"A general category of your project"}
+                {"General category of your project"}
               </FormHelperText>
             </FormControl>
 
-            {/* completion date container */}
-            <Box display="flex" flexDirection="column" width="40%">
-              {/* date and checkbox */}
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignContent="center"
-                gap="10%"
+            {/* Type Container */}
+            <FormControl
+              required
+              fullWidth
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  backgroundColor: "#f0f0f0",
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+                ".MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                  {
+                    border: "none",
+                  },
+                "& .MuiFormLabel-root": {
+                  fontWeight: theme.typography.fontWeightMedium,
+                  color: theme.palette.unselectedIcon.main,
+                  fontSize: "18px",
+                },
+              }}
+            >
+              <InputLabel>Type</InputLabel>
+              <Select
+                label="Type"
+                value={newProject.type}
+                onChange={(e) =>
+                  setNewProject({ ...newProject, type: e.target.value })
+                }
               >
-                <LocalizationProvider dateAdapter={AdapterMoment}>
-                  <DesktopDatePicker
-                    renderInput={(props) => {
-                      return (
-                        <DefaultTextField
-                          {...props}
-                          disabled={!isCheckedCompDate}
-                        />
-                      );
-                    }}
-                    // label="Completion Date"
-                    disabled={!isCheckedCompDate}
-                    border="none"
-                    value={newProject.completion_date}
-                    onChange={(e) => {
-                      handleDateTimeChange(e);
-                    }}
-                  />
-                </LocalizationProvider>
-                <Checkbox
-                  sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
-                  checked={isCheckedCompDate}
-                  onChange={handleCompDateChange}
-                />
-              </Box>
+                {typeStrList?.map((projectStr, index) => {
+                  // need to change typeStrList to typeStrList
+                  return (
+                    <MenuItem key={index} value={projectStr}>
+                      {projectStr}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
               <FormHelperText
-                sx={{ color: "lightgray", fontSize: "12px", ml: 1 }}
+                id="projectcreate-type-helper-text"
+                sx={{ color: "lightgray", fontSize: "12px" }}
               >
-                {"Completion Date"}
+                {"General type of your project"}
               </FormHelperText>
-            </Box>
+            </FormControl>
           </Box>
 
-          {/* tags and total team size */}
+          {/* tags */}
           <Box
             display="flex"
-            justifyContent="space-between"
             alignItems="start"
             sx={{
-              mt: 5,
-              mb: 5,
+              mt: 2.5,
+              mb: 2.5,
             }}
           >
             {/* Details */}
             <Autocomplete
-              sx={{ mr: 5 }}
               fullWidth
               freeSolo
               clearOnBlur
@@ -719,21 +810,33 @@ const ProjectCreate = (props) => {
             />
 
             {/* Team Size container */}
-            <Box display="flex" flexDirection="column" width="40%">
-              {/* Size and checkbox */}
+            {/* Size and checkbox */}
+            {/* <Box display="flex" flexDirection="column">
               <Box
                 display="flex"
                 justifyContent="center"
                 alignContent="center"
                 gap="10%"
+                // sx={{
+                //   ml: 8,
+                //   border: "solid red 2px"
+                // }}
               >
                 <DefaultTextField
+                  sx={{
+                    width: onMedia.onDesktop ? "175px" : "100px",
+                  }}
+                  ref={teamSizeRef}
                   fullWidth
                   // label="Team Size"
                   type="number"
                   margin="none"
                   disabled={!isCheckedTeamSize}
-                  value={newProject.max_member_count}
+                  value={
+                    newProject.max_member_count
+                      ? newProject.max_member_count
+                      : ""
+                  }
                   onChange={(e) =>
                     setNewProject({
                       ...newProject,
@@ -752,13 +855,69 @@ const ProjectCreate = (props) => {
               >
                 {"Team Size"}
               </FormHelperText>
-            </Box>
+            </Box> */}
           </Box>
 
-          <TextEditor update={setNewProject} project={newProject} />
+          {/* short description */}
+
+          <FormControl
+            required
+            fullWidth
+            sx={{
+              mr: 2.5,
+              mb: 2.5,
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 2,
+                backgroundColor: "#f0f0f0",
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                border: "none",
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                border: "none",
+              },
+              ".MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                {
+                  border: "none",
+                },
+              "& .MuiFormLabel-root": {
+                fontWeight: theme.typography.fontWeightMedium,
+                color: theme.palette.unselectedIcon.main,
+                fontSize: "18px",
+              },
+            }}
+          >
+            <DefaultTextField
+              fullWidth
+              label="Short Description"
+              margin="none"
+              value={newProject.short_description}
+              onChange={(e) =>
+                setNewProject({
+                  ...newProject,
+                  short_description: e.target.value,
+                })
+              }
+            />
+            <FormHelperText
+              id="projectcreate-sd-helper-text"
+              sx={{ color: "lightgray", fontSize: "12px" }}
+            >
+              {"One sentence description of your project"}
+            </FormHelperText>
+          </FormControl>
+
+          {/* Description */}
+          <TextEditor
+            update={setNewProject}
+            project={newProject}
+            overlay={showDescOverlay}
+            showOverlay={setShowDescOverlay}
+          />
+
           <FormHelperText sx={{ color: "lightgray", fontSize: "12px", ml: 1 }}>
             {
-              "A brief description of the new project (e.g. scope, mission, work format, timeline)"
+              "A brief description of the new project (e.g. scope, mission, work format, timeline) *"
             }
           </FormHelperText>
           <Box
@@ -830,6 +989,7 @@ const ProjectCreate = (props) => {
                         handlePosInputChange(index, e);
                       }}
                     />
+
                     {/* Number of people */}
                     <DefaultTextField
                       required
@@ -880,6 +1040,7 @@ const ProjectCreate = (props) => {
                       }}
                     />
                   </Box>
+
                   <Box
                     display="flex"
                     justifyContent="space-between"
@@ -893,7 +1054,72 @@ const ProjectCreate = (props) => {
                       label="Application Form Link"
                       defaultValue={getAppLink(index)}
                       onChange={(e) => handlePosInputChange(index, e)}
+                      sx={{
+                        mr: 2.5,
+                      }}
                     />
+
+                    {/* Application deadline container */}
+                    <Box display="flex" justifyContent="space-between">
+                      {/* date */}
+                      <Box
+                        display="flex"
+                        justifyContent="center"
+                        alignContent="center"
+                      >
+                        <LocalizationProvider dateAdapter={AdapterMoment}>
+                          <DesktopDatePicker
+                            ref={dateRef}
+                            renderInput={(props) => {
+                              return (
+                                <DefaultTextField
+                                  sx={{
+                                    width: onMedia.onDesktop
+                                      ? "225px"
+                                      : "150px",
+                                    // overflow: "none",
+                                    mr: 2.5,
+                                  }}
+                                  {...props}
+                                  // required={true}
+                                  // disabled={!isCheckedPositionDates[index]}
+                                  label="Application Deadline"
+                                  InputLabelProps={{
+                                    shrink: true,
+                                  }}
+                                />
+                              );
+                            }}
+                            disabled={
+                              isCheckedPositionDates[index] == null
+                                ? true
+                                : !isCheckedPositionDates[index]
+                            }
+                            border="none"
+                            value={positionFields[index].application_deadline}
+                            onChange={(e) => {
+                              handlePositionDatesChange(e, index);
+                            }}
+                          />
+                        </LocalizationProvider>
+                        <Checkbox
+                          sx={{ color: "#dbdbdb", padding: 0 }}
+                          checked={
+                            isCheckedPositionDates[index] == null
+                              ? false
+                              : isCheckedPositionDates[index]
+                          }
+                          onChange={() =>
+                            handlePositionDatesCheckboxChange(index)
+                          }
+                        />
+                      </Box>
+                      {/* <FormHelperText
+                        sx={{ color: "lightgray", fontSize: "12px", ml: 1 }}
+                      >
+                        {"Completion Date"}
+                      </FormHelperText> */}
+                    </Box>
                   </Box>
                 </div>
               );

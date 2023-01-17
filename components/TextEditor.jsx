@@ -1,8 +1,8 @@
-// import Quill from "quill";
-// import ImageResize from "quill-image-resize-module-react";
 import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
-// Quill.register("modules/imageResize", ImageResize);
+import { DefaultTextField } from "./Reusable/Resusable";
+import { FormControl, TextField } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 const QuillNoSSRWrapper = dynamic(import("react-quill"), {
   ssr: false,
@@ -23,20 +23,32 @@ const modules = {
   // },
 };
 
-const TextEditor = ({ update, project }) => {
+const TextEditor = ({ update, project, overlay, showOverlay }) => {
   const handleTextOnChange = (e) => {
     update({
       ...project,
       description: e,
     });
   };
+  const theme = useTheme();
+
+  const removeOverlay = () => {
+    if (overlay) {
+      showOverlay(false);
+    }
+  }
+
+
   return (
-    <QuillNoSSRWrapper
-      modules={modules}
-      value={project?.description}
-      onChange={(e) => handleTextOnChange(e)}
-      theme="snow"
-    />
+    <div className="text-container">
+      {/* <div className="text-label">Description</div> */}
+      <QuillNoSSRWrapper
+        modules={modules}
+        value={project?.description}
+        onChange={(e) => handleTextOnChange(e)}
+        theme="snow"
+      />
+    </div>
   );
 };
 

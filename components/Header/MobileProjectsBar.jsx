@@ -10,7 +10,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import UserIconMenu from "./UserIconMenu";
 import TuneIcon from "@mui/icons-material/Tune";
-import { projectStrList } from "../Reusable/MenuStringList";
+import { typeStrList } from "../Reusable/MenuStringList";
 
 const MobileProjectsBar = () => {
   // context
@@ -32,7 +32,7 @@ const MobileProjectsBar = () => {
   const [typeList, setTypeList] = useState([]);
   useEffect(() => {
     const retList = [];
-    projectStrList.forEach((typeStr) => {
+    typeStrList.forEach((typeStr) => {
       retList.push({ name: typeStr, isSelected: false });
     });
     setTypeList(retList);
@@ -107,7 +107,7 @@ const MobileProjectsBar = () => {
   //       }}
   //     >
   //       <MenuItem value={""}>None</MenuItem>
-  //       {projectStrList?.map((projectStr, index) => {
+  //       {typeStrList?.map((projectStr, index) => {
   //         return (
   //           <MenuItem key={index} value={projectStr}>
   //             {projectStr}
