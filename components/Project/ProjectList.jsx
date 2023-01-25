@@ -43,8 +43,8 @@ const ProjectList = () => {
       ) {
         projectTags = projectTags.concat(projectCreator.org_tags); // org tags
       }
-      // category
-      projectTags.push(project?.category?.toLowerCase()); // type
+      // type
+      projectTags.push(project?.type?.toLowerCase());
       return {
         project: project,
         creator: projectCreator,

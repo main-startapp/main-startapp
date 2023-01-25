@@ -21,10 +21,11 @@ const ProjectInfo = () => {
   const projectCreator = fullProject?.creator_uid;
   const projectAllTags = fullProject?.allTags;
 
-  const [tCode, setTCode] = useState("");
-  useEffect(() => {
-    setTCode("");
-  }, [fullProject]);
+  // transfer code
+  // const [tCode, setTCode] = useState("");
+  // useEffect(() => {
+  //   setTCode("");
+  // }, [fullProject]);
 
   // useEffect to reset box scrollbar position
   const boxRef = useRef();

@@ -18,8 +18,8 @@ import {
   TextField,
   Link as MuiLink,
   Paper,
+  FormControl,
 } from "@mui/material";
-import { NoEncryption } from "@mui/icons-material";
 
 //============================================================
 // handle connect/message: if chat found, return; if not, create a chat with "request to connect" auto msg.
@@ -268,6 +268,27 @@ export function ordinal_suffix_of(i) {
 //============================================================
 // styled components
 //============================================================
+export const DefaultFormControl = styled(FormControl)(({ theme }) => ({
+  "& .MuiOutlinedInput-root": {
+    borderRadius: theme.shape.borderRadius * 2,
+    backgroundColor: "#f0f0f0",
+  },
+  "& .MuiOutlinedInput-notchedOutline": {
+    border: "none",
+  },
+  "&:hover .MuiOutlinedInput-notchedOutline": {
+    border: "none",
+  },
+  ".MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    border: "none",
+  },
+  "& .MuiFormLabel-root": {
+    fontWeight: theme.typography.fontWeightMedium,
+    color: theme.palette.textfieldPlaceholder.main,
+    fontSize: "16px",
+  },
+}));
+
 export const DefaultTextField = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
     borderRadius: theme.shape.borderRadius * 2,
@@ -288,8 +309,8 @@ export const DefaultTextField = styled(TextField)(({ theme }) => ({
   },
   "& .MuiFormLabel-root": {
     fontWeight: theme.typography.fontWeightMedium,
-    color: theme.palette.unselectedIcon.main,
-    fontSize: "18px"
+    color: theme.palette.textfieldPlaceholder.main,
+    fontSize: "16px",
   },
 }));
 

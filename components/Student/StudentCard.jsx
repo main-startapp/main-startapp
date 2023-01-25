@@ -90,7 +90,7 @@ const StudentCard = (props) => {
               disableElevation
               size="small"
               variant="outlined"
-              sx={{ mt: 2, border: 1, borderRadius: 8, paddingY: 0 }}
+              sx={{ mt: 2, borderRadius: 8, paddingY: 0 }}
               onClick={(e) => {
                 e.stopPropagation();
                 setStudent(student);

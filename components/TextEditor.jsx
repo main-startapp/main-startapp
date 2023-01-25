@@ -1,13 +1,7 @@
 import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
-import { DefaultTextField } from "./Reusable/Resusable";
-import { FormControl, TextField } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 
-const QuillNoSSRWrapper = dynamic(import("react-quill"), {
-  ssr: false,
-  loading: () => <p>Loading ...</p>,
-});
+const QuillNoSSRWrapper = dynamic(import("react-quill"), { ssr: false });
 
 const modules = {
   toolbar: [
@@ -23,30 +17,23 @@ const modules = {
   // },
 };
 
-const TextEditor = ({ update, project, overlay, showOverlay }) => {
+const TextEditor = ({ update, project }) => {
   const handleTextOnChange = (e) => {
     update({
       ...project,
       description: e,
     });
   };
-  const theme = useTheme();
-
-  const removeOverlay = () => {
-    if (overlay) {
-      showOverlay(false);
-    }
-  }
-
 
   return (
     <div className="text-container">
       {/* <div className="text-label">Description</div> */}
       <QuillNoSSRWrapper
         modules={modules}
+        placeholder="Description"
+        theme="snow"
         value={project?.description}
         onChange={(e) => handleTextOnChange(e)}
-        theme="snow"
       />
     </div>
   );
