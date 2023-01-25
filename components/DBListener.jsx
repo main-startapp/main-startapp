@@ -41,6 +41,8 @@ const DBListener = () => {
     );
 
     // https://firebase.google.com/docs/firestore/query-data/listen
+    // https://stackoverflow.com/questions/52247445/how-do-i-convert-a-firestore-date-timestamp-to-a-js-date
+    // toDate() method converts firestore timestamp to js date obj
     const unsub = onSnapshot(
       q,
       (querySnapshot) => {
@@ -48,11 +50,17 @@ const DBListener = () => {
           querySnapshot.docs?.map((doc) => ({
             ...doc.data(),
             id: doc.id,
-            completion_date: doc.data()?.completion_date
-              ? doc.data().completion_date.toDate()
-              : "",
             create_timestamp: doc.data().create_timestamp?.toDate(),
             last_timestamp: doc.data().last_timestamp?.toDate(),
+            position_list:
+              doc.data()?.position_list?.length > 0
+                ? doc.data().position_list.map((position) => ({
+                    ...position,
+                    application_deadline: position?.application_deadline
+                      ? position.application_deadline.toDate()
+                      : "",
+                  }))
+                : [],
           }))
         );
       },

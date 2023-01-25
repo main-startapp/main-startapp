@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   Avatar,
   Box,
@@ -18,6 +18,7 @@ import { Interweave } from "interweave";
 import { UrlMatcher } from "interweave-autolink";
 import { motion } from "framer-motion";
 import { FixedHeightPaper } from "../Reusable/Resusable";
+import { InstagramEmbed } from "react-social-media-embed";
 
 const EventInfo = () => {
   // context
@@ -30,15 +31,25 @@ const EventInfo = () => {
   const eventCreator = fullEvent?.creator_uid;
   const eventAllTags = fullEvent?.allTags;
 
-  const [tCode, setTCode] = useState("");
-  useEffect(() => {
-    setTCode("");
-  }, [fullEvent]);
+  // transfer code
+  // const [tCode, setTCode] = useState("");
+  // useEffect(() => {
+  //   setTCode("");
+  // }, [fullEvent]);
 
   const [isLoaded, setIsLoaded] = useState(false);
   useEffect(() => {
     setIsLoaded(false);
   }, [fullEvent]);
+
+  const isInstagram = useMemo(() => {
+    try {
+      const url = new URL(event?.banner_url);
+      return url.hostname === "www.instagram.com";
+    } catch (err) {
+      return false;
+    }
+  }, [event?.banner_url]);
 
   // moment
   const startMoment = moment(event?.start_date);
@@ -111,7 +122,6 @@ const EventInfo = () => {
               {event?.title}
             </Typography>
           </Box>
-
           <Divider
             sx={{
               mt: 2,
@@ -119,7 +129,6 @@ const EventInfo = () => {
               borderColor: "divider",
             }}
           />
-
           <Typography
             color="text.primary"
             variant="h3"
@@ -138,7 +147,6 @@ const EventInfo = () => {
           <Typography color="text.secondary" variant="body1">
             {event?.location}
           </Typography>
-
           <Typography
             color="text.primary"
             variant="h3"
@@ -161,7 +169,6 @@ const EventInfo = () => {
               />
             </pre>
           </Typography>
-
           <Button
             disableElevation
             fullWidth
@@ -177,7 +184,6 @@ const EventInfo = () => {
           >
             {"Attend"}
           </Button>
-
           {eventAllTags?.length > 0 && (
             <Box id="eventinfo-details-box">
               <Typography
@@ -202,26 +208,40 @@ const EventInfo = () => {
               ))}
             </Box>
           )}
-
-          <Box
-            sx={{
-              mt: isLoaded ? 3 : 0,
-              display: "flex",
-              justifyContent: "center",
-              visibility: isLoaded ? "visible" : "collapse",
-            }}
-          >
+          {/* !todo: desirably using only 1 container */}
+          {isInstagram ? (
             <Box
-              component="img"
-              onLoad={() => {
-                setIsLoaded(true);
+              sx={{
+                mt: 4,
+                display: "flex",
+                justifyContent: "center",
               }}
-              src={event?.banner_url}
-              sx={{ maxWidth: "100%" }}
-            />
-          </Box>
+            >
+              <InstagramEmbed captioned url={event?.banner_url} width="100%" />
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                mt: isLoaded ? 4 : 0,
+                display: "flex",
+                justifyContent: "center",
+                visibility: isLoaded ? "visible" : "collapse",
+              }}
+            >
+              <Box
+                component="img"
+                onLoad={() => {
+                  setIsLoaded(true);
+                }}
+                src={event?.banner_url}
+                sx={{ maxWidth: "100%" }}
+              />
+            </Box>
+          )}
         </motion.div>
       </Box>
+
+      {/* Mobile back button */}
       {!onMedia.onDesktop && fullEvent !== null && (
         <Fab
           color="primary"

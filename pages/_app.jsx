@@ -47,6 +47,7 @@ const getDesignTokens = (mode, onMedia) => ({
             contrastText: "rgba(0, 0, 0, 1)",
           },
           unselectedIcon: { main: grey[600] },
+          textfieldPlaceholder: { main: grey[500] },
           searchGary: { main: grey[300], contrastText: "rgba(0, 0, 0, 0.87)" },
           hoverGray: { main: grey[100] },
 
@@ -67,6 +68,7 @@ const getDesignTokens = (mode, onMedia) => ({
             contrastText: "rgba(0, 0, 0, 1)",
           },
           unselectedIcon: { main: grey[600] },
+          textfieldPlaceholder: { main: grey[500] },
           searchGary: { main: grey[600], contrastText: "#fff" },
           hoverGray: { main: grey[800] },
 

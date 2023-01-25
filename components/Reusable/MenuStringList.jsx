@@ -17,7 +17,6 @@ export const categoryStrList = [
   "Sports",
 ];
 
-
 // event
 export const eventStrList = [
   "Case Competition",
@@ -88,10 +87,10 @@ export const studentDepartmentStrList = [
 ];
 
 // organization - tags
-export const organizationTags = ["computer science"];
+export const organizationTags = ["business", "engineering", "computer science"];
 
 // project - tags
-export const projectTags = ["computer science"];
+export const projectTags = ["business", "engineering", "computer science"];
 
 // event - tags
-export const eventTags = ["computer science"];
+export const eventTags = ["business", "engineering", "computer science"];

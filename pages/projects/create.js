@@ -1,4 +1,4 @@
-import { Alert, Snackbar } from "@mui/material";
+import { Alert, Box, Snackbar } from "@mui/material";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import {
@@ -52,7 +52,28 @@ const Create = () => {
           {alertMessage}
         </Alert>
       </Snackbar>
-      <ProjectCreate projectID={query?.projectID} />
+      <Box
+        id="projects-create-main-box"
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          overflow: "hidden",
+          ":hover": {
+            cursor: "default",
+          },
+        }}
+      >
+        <Box
+          id="projects-create-box"
+          sx={{
+            paddingTop: 4,
+            width: "100%",
+            maxWidth: "1024px",
+          }}
+        >
+          <ProjectCreate projectID={query?.projectID} />
+        </Box>
+      </Box>
     </ProjectContext.Provider>
   );
 };
