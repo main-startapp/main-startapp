@@ -143,6 +143,9 @@ const EventList = () => {
                 }}
                 as="/events/create"
                 passHref
+                style={{
+                  color: "inherit",
+                }}
               >
                 <Button
                   color="secondary"

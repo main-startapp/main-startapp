@@ -256,12 +256,7 @@ const Signin = () => {
             width: isMobile ? "60vmin" : "40vmin",
           }}
         >
-          <ExportedImage
-            src="/images/edium_text_1024.png"
-            alt=""
-            fill
-            priority
-          />
+          <ExportedImage src="/images/edium_v4_256.png" alt="" fill priority />
         </Box>
 
         <Typography

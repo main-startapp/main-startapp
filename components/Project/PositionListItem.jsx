@@ -37,7 +37,6 @@ const PositionListItem = (props) => {
   // context
   const {
     chats,
-    users,
     ediumUser,
     ediumUserExt,
     setChatPartner,
@@ -239,7 +238,7 @@ const PositionListItem = (props) => {
         fontSize: "0.75rem",
       }}
     >
-      {"Apply"}
+      {"Join"}
     </Button>
   );
 

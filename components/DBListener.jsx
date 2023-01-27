@@ -56,8 +56,8 @@ const DBListener = () => {
               doc.data()?.position_list?.length > 0
                 ? doc.data().position_list.map((position) => ({
                     ...position,
-                    application_deadline: position?.application_deadline
-                      ? position.application_deadline.toDate()
+                    deadline: position?.deadline
+                      ? position.deadline.toDate()
                       : "",
                   }))
                 : [],

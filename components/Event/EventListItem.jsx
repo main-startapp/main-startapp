@@ -167,6 +167,9 @@ const EventListItem = (props) => {
                 }}
                 as="/events/create"
                 passHref
+                style={{
+                  color: "inherit",
+                }}
               >
                 Modify
               </NextLink>

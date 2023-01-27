@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
   Avatar,
   Box,
@@ -18,7 +18,6 @@ import { Interweave } from "interweave";
 import { UrlMatcher } from "interweave-autolink";
 import { motion } from "framer-motion";
 import { FixedHeightPaper } from "../Reusable/Resusable";
-import { InstagramEmbed } from "react-social-media-embed";
 
 const EventInfo = () => {
   // context
@@ -41,15 +40,6 @@ const EventInfo = () => {
   useEffect(() => {
     setIsLoaded(false);
   }, [fullEvent]);
-
-  const isInstagram = useMemo(() => {
-    try {
-      const url = new URL(event?.banner_url);
-      return url.hostname === "www.instagram.com";
-    } catch (err) {
-      return false;
-    }
-  }, [event?.banner_url]);
 
   // moment
   const startMoment = moment(event?.start_date);
@@ -208,36 +198,23 @@ const EventInfo = () => {
               ))}
             </Box>
           )}
-          {/* !todo: desirably using only 1 container */}
-          {isInstagram ? (
+          <Box
+            sx={{
+              mt: isLoaded ? 4 : 0,
+              display: "flex",
+              justifyContent: "center",
+              visibility: isLoaded ? "visible" : "collapse",
+            }}
+          >
             <Box
-              sx={{
-                mt: 4,
-                display: "flex",
-                justifyContent: "center",
+              component="img"
+              onLoad={() => {
+                setIsLoaded(true);
               }}
-            >
-              <InstagramEmbed captioned url={event?.banner_url} width="100%" />
-            </Box>
-          ) : (
-            <Box
-              sx={{
-                mt: isLoaded ? 4 : 0,
-                display: "flex",
-                justifyContent: "center",
-                visibility: isLoaded ? "visible" : "collapse",
-              }}
-            >
-              <Box
-                component="img"
-                onLoad={() => {
-                  setIsLoaded(true);
-                }}
-                src={event?.banner_url}
-                sx={{ maxWidth: "100%" }}
-              />
-            </Box>
-          )}
+              src={event?.banner_url}
+              sx={{ maxWidth: "100%" }}
+            />
+          </Box>
         </motion.div>
       </Box>
 
@@ -646,7 +623,7 @@ export default EventInfo;
             }}
           >
             <ExportedImage
-              src="/images/edium_text_1024.png"
+              src="/images/edium_v4_256.png"
               alt=""
               width={256}
               height={256}

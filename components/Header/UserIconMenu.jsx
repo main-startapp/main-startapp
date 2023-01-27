@@ -81,6 +81,9 @@ const UserIconMenu = (props) => {
               pathname: "/students/create",
             }}
             passHref
+            style={{
+              color: "inherit",
+            }}
           >
             Edit Profile
           </NextLink>
