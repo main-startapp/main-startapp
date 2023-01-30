@@ -30,10 +30,11 @@ const EventInfo = () => {
   const eventCreator = fullEvent?.creator_uid;
   const eventAllTags = fullEvent?.allTags;
 
-  const [tCode, setTCode] = useState("");
-  useEffect(() => {
-    setTCode("");
-  }, [fullEvent]);
+  // transfer code
+  // const [tCode, setTCode] = useState("");
+  // useEffect(() => {
+  //   setTCode("");
+  // }, [fullEvent]);
 
   const [isLoaded, setIsLoaded] = useState(false);
   useEffect(() => {
@@ -111,7 +112,6 @@ const EventInfo = () => {
               {event?.title}
             </Typography>
           </Box>
-
           <Divider
             sx={{
               mt: 2,
@@ -119,7 +119,6 @@ const EventInfo = () => {
               borderColor: "divider",
             }}
           />
-
           <Typography
             color="text.primary"
             variant="h3"
@@ -138,7 +137,6 @@ const EventInfo = () => {
           <Typography color="text.secondary" variant="body1">
             {event?.location}
           </Typography>
-
           <Typography
             color="text.primary"
             variant="h3"
@@ -161,7 +159,6 @@ const EventInfo = () => {
               />
             </pre>
           </Typography>
-
           <Button
             disableElevation
             fullWidth
@@ -177,7 +174,6 @@ const EventInfo = () => {
           >
             {"Attend"}
           </Button>
-
           {eventAllTags?.length > 0 && (
             <Box id="eventinfo-details-box">
               <Typography
@@ -202,10 +198,9 @@ const EventInfo = () => {
               ))}
             </Box>
           )}
-
           <Box
             sx={{
-              mt: isLoaded ? 3 : 0,
+              mt: isLoaded ? 4 : 0,
               display: "flex",
               justifyContent: "center",
               visibility: isLoaded ? "visible" : "collapse",
@@ -222,6 +217,8 @@ const EventInfo = () => {
           </Box>
         </motion.div>
       </Box>
+
+      {/* Mobile back button */}
       {!onMedia.onDesktop && fullEvent !== null && (
         <Fab
           color="primary"
@@ -626,7 +623,7 @@ export default EventInfo;
             }}
           >
             <ExportedImage
-              src="/images/edium_text_1024.png"
+              src="/images/edium_v4_256.png"
               alt=""
               width={256}
               height={256}

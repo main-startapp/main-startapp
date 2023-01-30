@@ -18,8 +18,10 @@ import {
   TextField,
   Link as MuiLink,
   Paper,
+  FormControl,
 } from "@mui/material";
 import Router from "next/router";
+import NextLink from "next/link";
 
 //============================================================
 // handle connect/message: if chat found, return; if not, create a chat with "request to connect" auto msg.
@@ -282,26 +284,49 @@ export const shallowUpdateURLQuery = (pathName, queryKey, queryValue) => {
 //============================================================
 // styled components
 //============================================================
+export const DefaultFormControl = styled(FormControl)(({ theme }) => ({
+  "& .MuiOutlinedInput-root": {
+    borderRadius: theme.shape.borderRadius * 2,
+    backgroundColor: "#f0f0f0",
+  },
+  "& .MuiOutlinedInput-notchedOutline": {
+    border: "none",
+  },
+  "&:hover .MuiOutlinedInput-notchedOutline": {
+    border: "none",
+  },
+  ".MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    border: "none",
+  },
+  "& .MuiFormLabel-root": {
+    fontWeight: theme.typography.fontWeightMedium,
+    color: theme.palette.textfieldPlaceholder.main,
+    fontSize: "16px",
+  },
+}));
+
 export const DefaultTextField = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
     borderRadius: theme.shape.borderRadius * 2,
     backgroundColor: "#f0f0f0",
   },
   "& .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1,
-    borderColor: "#dbdbdb",
+    border: "none",
   },
   "&:hover .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1,
-    borderColor: "#dbdbdb !important",
+    border: "none",
   },
   "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1,
-    borderColor: "#3e95c2 !important",
+    border: "none",
   },
   "& .MuiFormHelperText-root": {
     color: "lightgray",
     fontSize: "12px",
+  },
+  "& .MuiFormLabel-root": {
+    fontWeight: theme.typography.fontWeightMedium,
+    color: theme.palette.textfieldPlaceholder.main,
+    fontSize: "16px",
   },
 }));
 
@@ -339,11 +364,6 @@ export const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export const MenuItemLink = styled(MuiLink)(({ theme }) => ({
-  color: theme.palette.text.primary,
-  textDecoration: "none",
-}));
-
 export const FixedHeightPaper = styled(Paper)(
   ({ theme, isdesktop, mobileheight }) => ({
     display: "flex",
@@ -359,6 +379,11 @@ export const FixedHeightPaper = styled(Paper)(
     borderRadius: isdesktop ? "32px 32px 0px 0px" : "32px 0px 0px 0px",
   })
 );
+
+export const StyledMuiLink = styled(MuiLink)(({ theme }) => ({
+  color: theme.palette.text.primary,
+  textDecoration: "none",
+}));
 //============================================================
 // ADMIN: Duplicate Collections With New Name
 //============================================================

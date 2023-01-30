@@ -1,10 +1,20 @@
 // project
-export const projectStrList = [
+export const typeStrList = [
   "Charity Initiative",
   "Club",
   "Fun Project",
   "Learning Project",
   "Startup",
+];
+
+export const categoryStrList = [
+  "Engineering & Tech",
+  "Sustainability",
+  "Business",
+  "Life Sciences",
+  "Media & Fine Arts",
+  "Education",
+  "Sports",
 ];
 
 // event
@@ -77,17 +87,10 @@ export const studentDepartmentStrList = [
 ];
 
 // organization - tags
-export const organizationTags = [
-  "computer science",
-  "game dev",
-  "unity",
-  "software",
-];
+export const organizationTags = ["business", "engineering", "computer science"];
 
 // project - tags
-export const projectTags = [
-  "computer science",
-  "game dev",
-  "unity",
-  "software",
-];
+export const projectTags = ["business", "engineering", "computer science"];
+
+// event - tags
+export const eventTags = ["business", "engineering", "computer science"];

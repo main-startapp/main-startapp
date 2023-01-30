@@ -51,8 +51,8 @@ const ProjectList = () => {
       ) {
         projectTags = projectTags.concat(projectCreator.org_tags); // org tags
       }
-      // category
-      projectTags.push(project?.category?.toLowerCase()); // type
+      // type
+      projectTags.push(project?.type?.toLowerCase());
       return {
         project: project,
         creator: projectCreator,
@@ -76,16 +76,17 @@ const ProjectList = () => {
             "title",
             searchTerm,
             false
-          )
-        ); // only term: in project title || position title
+          ) ||
+          isStrInStrList(fullProject.allTags, searchTerm, true)
+        ); // only term: in project title || in position title || in tags exactly
       } else if (searchTerm === "" && searchTypeList.length > 0) {
         return searchTypeList.some((type) => {
-          return isStrInStrList(fullProject.allTags, type, true);
-        }); // only tags
+          return fullProject.project.type === type;
+        }); // only type
       } else {
         return (
           searchTypeList.some((type) => {
-            return isStrInStrList(fullProject.allTags, type, true);
+            return fullProject.project.type === type;
           }) &&
           (isStrInStr(fullProject.project.title, searchTerm, false) ||
             isStrInObjList(
@@ -93,8 +94,9 @@ const ProjectList = () => {
               "title",
               searchTerm,
               false
-            ))
-        ); // term && tags
+            ) ||
+            isStrInStrList(fullProject.allTags, searchTerm, true))
+        ); // term && type
       }
     });
   }, [fullProjects, searchTerm, searchTypeList]);
@@ -213,6 +215,9 @@ const ProjectList = () => {
                 }}
                 as="/projects/create"
                 passHref
+                style={{
+                  color: "inherit",
+                }}
               >
                 <Button
                   color="secondary"

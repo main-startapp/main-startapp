@@ -1,13 +1,7 @@
-// import Quill from "quill";
-// import ImageResize from "quill-image-resize-module-react";
 import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
-// Quill.register("modules/imageResize", ImageResize);
 
-const QuillNoSSRWrapper = dynamic(import("react-quill"), {
-  ssr: false,
-  loading: () => <p>Loading ...</p>,
-});
+const QuillNoSSRWrapper = dynamic(import("react-quill"), { ssr: false });
 
 const modules = {
   toolbar: [
@@ -30,13 +24,18 @@ const TextEditor = ({ update, project }) => {
       description: e,
     });
   };
+
   return (
-    <QuillNoSSRWrapper
-      modules={modules}
-      value={project?.description}
-      onChange={(e) => handleTextOnChange(e)}
-      theme="snow"
-    />
+    <div className="text-container">
+      {/* <div className="text-label">Description</div> */}
+      <QuillNoSSRWrapper
+        modules={modules}
+        placeholder="Description"
+        theme="snow"
+        value={project?.description}
+        onChange={(e) => handleTextOnChange(e)}
+      />
+    </div>
   );
 };
 

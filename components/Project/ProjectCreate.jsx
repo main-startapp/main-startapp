@@ -9,9 +9,7 @@ import {
   DialogContentText,
   DialogTitle,
   Divider,
-  FormControl,
   FormHelperText,
-  Grid,
   IconButton,
   InputLabel,
   Link,
@@ -22,7 +20,7 @@ import {
 } from "@mui/material";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
+import AddLinkIcon from "@mui/icons-material/AddLink";
 import {
   collection,
   doc,
@@ -33,29 +31,38 @@ import {
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { db } from "../../firebase";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
-import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { useRouter } from "next/router";
 import {
+  DefaultFormControl,
   DefaultTextField,
   findItemFromList,
+  FixedHeightPaper,
   handleDeleteEntry,
 } from "../Reusable/Resusable";
 import { useAuth } from "../Context/AuthContext";
-import { projectTags, projectStrList } from "../Reusable/MenuStringList";
+import {
+  projectTags,
+  typeStrList,
+  categoryStrList,
+} from "../Reusable/MenuStringList";
 import TextEditor from "../TextEditor";
+import { useTheme } from "@mui/material/styles";
 
 const ProjectCreate = (props) => {
   // context
   const { currentUser } = useAuth();
-  const { projects, projectsExt, ediumUser, ediumUserExt, winHeight, onMedia } =
+  const { projects, projectsExt, ediumUser, ediumUserExt, onMedia } =
     useContext(GlobalContext);
   const { showAlert } = useContext(ProjectContext);
   const router = useRouter();
   const formRef = useRef();
+  const theme = useTheme();
 
   // click spam
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
@@ -66,16 +73,17 @@ const ProjectCreate = (props) => {
     : null;
 
   // init new project
+  // Project State Initialization.
+  // https://stackoverflow.com/questions/68945060/react-make-usestate-initial-value-conditional
   const emptyProject = {
     title: "",
+    icon_url: "",
     category: "",
-    completion_date: "",
-    max_member_count: 0,
+    type: "",
     tags: [],
+    short_description: "",
     description: "",
     is_visible: true,
-    icon_url: "",
-    application_form_url: "",
     is_deleted: false,
   };
   const [newProject, setNewProject] = useState(() =>
@@ -86,10 +94,11 @@ const ProjectCreate = (props) => {
   const emptyPositionField = {
     id: Math.random().toString(16).slice(2),
     title: "",
+    weekly_hour: "",
+    count: "",
     responsibility: "",
-    weekly_hour: 1,
-    count: 1,
     url: "",
+    deadline: "",
   };
   const [positionFields, setPositionFields] = useState(() =>
     oldProject?.position_list?.length > 0
@@ -109,20 +118,19 @@ const ProjectCreate = (props) => {
   // check box
   const [isCheckedTransferable, setIsCheckedTransferable] = useState(false);
   const [isCheckedPosition, setIsCheckedPosition] = useState(false);
-  const [isCheckedAppForm, setIsCheckedAppForm] = useState(false);
-  const [isCheckedCompDate, setIsCheckedCompDate] = useState(false);
-  const [isCheckedTeamSize, setIsCheckedTeamSize] = useState(false);
+  const [showDescOverlay, setShowDescOverlay] = useState(true);
+
   useEffect(() => {
     if (!oldProject) {
       // create: defalut to check the positions
       setIsCheckedPosition(true);
+      // if admin, check transfer project by default
+      if (currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2")
+        setIsCheckedTransferable(true);
     } else {
       // update: checked value depends on oldProject
       if (oldProject?.position_list?.length > 0) {
         setIsCheckedPosition(true);
-      }
-      if (oldProject?.application_form_url?.length > 0) {
-        setIsCheckedAppForm(true);
       }
       // if creator is admin, check if updating transferable project
       if (
@@ -142,25 +150,12 @@ const ProjectCreate = (props) => {
     // button is clickable & form is valid
     setIsClickable(false);
 
-    // change field value into an int if not null
-    let maxMemberCount = newProject.max_member_count
-      ? parseInt(newProject.max_member_count)
-      : null;
-
-    // !yichen: don't auto calculate the team size, use this num as is.
-    // if checked position, add number of positions to count
-    // if (maxMemberCount && isCheckedPosition) {
-    //   positionFields.forEach((position) => (maxMemberCount += position.count));
-    // }
-
     let projectModRef; // ref to addDoc() or updateDoc()
     if (!oldProject) {
-      // create a new newProject
+      // create a new project
       const collectionRef = collection(db, "projects");
       let projectRef = {
         ...newProject,
-        // update max num of members
-        max_member_count: maxMemberCount,
         position_list: isCheckedPosition ? positionFields : [],
         creator_uid: ediumUser?.uid,
         create_timestamp: serverTimestamp(),
@@ -170,17 +165,12 @@ const ProjectCreate = (props) => {
         console.log(error?.message);
       });
     } else {
-      // update an existing newProject
+      // update an existing project
       // since all changes are in newProject, can't just update partially
       const docRef = doc(db, "projects", newProject.id);
       const projectRef = {
         ...newProject,
-        // update max num of members
-        max_member_count: maxMemberCount,
         position_list: isCheckedPosition ? positionFields : [],
-        application_form_url: isCheckedAppForm
-          ? newProject.application_form_url
-          : "",
         last_timestamp: serverTimestamp(),
       };
       delete projectRef.id;
@@ -245,19 +235,12 @@ const ProjectCreate = (props) => {
     // button is clickable & form is valid
     setIsClickable(false);
 
-    // change field value into an int if not null
-    let maxMemberCount = newProject.max_member_count
-      ? parseInt(newProject.max_member_count)
-      : null;
-
     let projectModRef; // ref to addDoc() or updateDoc()
     if (!oldProject) {
       // create a new newProject
       const collectionRef = collection(db, "projects");
       let projectRef = {
         ...newProject,
-        // update max num of members
-        max_member_count: maxMemberCount,
         position_list: isCheckedPosition ? positionFields : [],
         creator_uid: ediumUser?.uid,
         create_timestamp: serverTimestamp(),
@@ -272,12 +255,7 @@ const ProjectCreate = (props) => {
       const docRef = doc(db, "projects", newProject.id);
       const projectRef = {
         ...newProject,
-        // update max num of members
-        max_member_count: maxMemberCount,
         position_list: isCheckedPosition ? positionFields : [],
-        application_form_url: isCheckedAppForm
-          ? newProject.application_form_url
-          : "",
         last_timestamp: serverTimestamp(),
       };
       delete projectRef.id;
@@ -387,10 +365,15 @@ const ProjectCreate = (props) => {
 
   const handlePosInputChange = (index, e) => {
     let pFields = [...positionFields];
-    let fieldValue =
-      e.target.name === "weekly_hour" || e.target.name === "count"
-        ? Number(e.target.value)
-        : e.target.value;
+    let fieldValue;
+    switch (e.target.name) {
+      case "weekly_hour":
+      case "count":
+        fieldValue = Number(e.target.value);
+        break;
+      default:
+        fieldValue = e.target.value;
+    }
     pFields[index][e.target.name] = fieldValue;
     setPositionFields(pFields);
   };
@@ -400,7 +383,6 @@ const ProjectCreate = (props) => {
       ...positionFields,
       {
         ...emptyPositionField,
-        url: index >= 0 ? positionFields[index].url : "",
       },
     ]);
   };
@@ -411,127 +393,98 @@ const ProjectCreate = (props) => {
     setPositionFields(pFields);
   };
 
-  const handleDateTimeChange = (e) => {
-    setNewProject({ ...newProject, completion_date: e?._d });
-  };
-
-  const handleCompDateChange = (e) => {
-    setIsCheckedCompDate(!isCheckedCompDate);
-    setNewProject({
-      ...newProject,
-      completion_date: isCheckedCompDate ? e.target.value : "",
-    });
-  };
-
-  const handleTeamSizeChange = (e) => {
-    setIsCheckedTeamSize(!isCheckedTeamSize);
-    setNewProject({
-      ...newProject,
-      max_member_count: isCheckedTeamSize ? e.target.value : 0,
-    });
-  };
-
-  // new projects will get link from the project.url attribute,
-  // old projects will get from project.application_form_url link
-  const getAppLink = (index) => {
-    // old project versions will have this attribute set to a url
-    if (newProject.application_form_url !== "")
-      return newProject.application_form_url;
-
-    // get app link of previous position if possible
-    if (index === 0) return positionFields[index].url;
-    else {
-      return positionFields[index - 1].url;
-    }
-  };
-
-  // debugging console logs if there's any
-
   return (
-    <Grid
-      container
-      spacing={0}
-      direction="row"
-      alignItems="center"
-      justifyContent="center"
+    <FixedHeightPaper
+      elevation={onMedia.onDesktop ? 2 : 0}
+      isdesktop={onMedia.onDesktop ? 1 : 0}
+      mobileheight={0}
       sx={{
-        backgroundColor: "#fafafa",
-        height: onMedia.onDesktop
-          ? `calc(${winHeight}px - 64px)`
-          : `calc(${winHeight}px - 48px - 60px)`,
-        overflow: "auto",
+        paddingTop: onMedia.onDesktop ? "32px" : 0,
       }}
     >
-      <Grid
-        item
-        xs={onMedia.onDesktop ? 8 : 10}
+      <Box
+        id="projectcreate-box"
         sx={{
-          backgroundColor: "#ffffff",
-          borderLeft: 1.5,
-          borderRight: 1.5,
-          borderColor: "#dbdbdb",
-          paddingX: 3,
-          minHeight: "100%",
+          flexGrow: 1,
+          //overflowX: "hidden",
+          overflowY: "scroll",
+          //paddingTop: onMedia.onDesktop ? 2 : 2, // align with project list
+          paddingBottom: onMedia.onDesktop ? 8 : 4, // enough space for messages
+          paddingLeft: onMedia.onDesktop ? 4 : 2,
+          paddingRight: onMedia.onDesktop
+            ? `calc(${theme.spacing(4)} - 0.4rem)`
+            : 2, // onDesktop: scrollbar
         }}
       >
         <Typography
           sx={{
             display: "flex",
             justifyContent: "center",
-            fontSize: "2em",
+            fontSize: "2rem",
             fontWeight: "bold",
-            mt: 5,
-            mb: 5,
+            mt: 4,
+            mb: 8,
           }}
         >
           {oldProject ? "Update Project" : "Create New Project"}
         </Typography>
-        {ediumUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" && (
-          <Box sx={{ mb: 5, display: "flex" }}>
+        {currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" && (
+          <Box sx={{ mb: 4, display: "flex" }}>
+            <Typography sx={{ color: "#f4511e", fontWeight: "bold" }}>
+              {"This is a transferable project"}
+            </Typography>
             <Checkbox
-              sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
               checked={isCheckedTransferable}
               onChange={() => {
                 setIsCheckedTransferable(!isCheckedTransferable);
               }}
+              sx={{ ml: 2, color: "textfieldPlaceholder.main", padding: 0 }}
             />
-            <Typography sx={{ color: "#f4511e", fontWeight: "bold" }}>
-              {"ADMIN This is a transferable project"}
-            </Typography>
           </Box>
         )}
         <form ref={formRef}>
           {/* Title textfield & Upload logo button */}
           <Box display="flex" justifyContent="space-between" alignItems="start">
             <DefaultTextField
-              sx={{ mr: 5 }}
               required
               fullWidth
               label="Project Title"
-              margin="none"
+              helperText="Name of your project/club/organization"
               value={newProject.title}
               onChange={(e) =>
                 setNewProject({ ...newProject, title: e.target.value })
               }
             />
+
             <Button
               sx={{
+                ml: 4,
                 backgroundColor: "#f0f0f0",
-                border: 1.5,
                 borderRadius: 2,
-                borderColor: "#dbdbdb",
-                color: "rgba(0, 0, 0, 0.6)",
+                color: "#9e9e9e",
                 height: "56px",
                 textTransform: "none",
-                width: "15%",
-                paddingLeft: "30px",
+                width: "50%",
+                maxWidth: "112px",
+                border: "none",
+                padding: "16.5px 14px",
+                display: "flex",
+                justifyContent: "space-between",
               }}
               // variant="contained"
               disableElevation
               onClick={handleDialogOpen}
             >
-              <UploadFileIcon sx={{ position: "absolute", left: "5%" }} />
-              <Typography>{"Logo"}</Typography>
+              <Typography
+                sx={{
+                  fontWeight: "medium",
+                  color: theme.palette.textfieldPlaceholder.main,
+                  fontSize: "16px",
+                }}
+              >
+                {"Logo"}
+              </Typography>
+              <AddLinkIcon sx={{ fontSize: "24px", fontWeight: "medium" }} />
             </Button>
             <Dialog
               open={isDialogOpen}
@@ -584,37 +537,15 @@ const ProjectCreate = (props) => {
             </Dialog>
           </Box>
 
-          {/* Category select & completion date*/}
+          {/* Category select & type select*/}
           <Box
             display="flex"
             justifyContent="space-between"
             alignItems="start"
-            sx={{ mt: 5 }}
+            sx={{ mt: 4 }}
           >
-            <FormControl
-              required
-              fullWidth
-              sx={{
-                mr: 5,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                  backgroundColor: "#f0f0f0",
-                },
-                "& .MuiOutlinedInput-notchedOutline": {
-                  border: 1.5,
-                  borderColor: "#dbdbdb",
-                },
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  border: 1.5,
-                  borderColor: "#dbdbdb",
-                },
-                ".MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                  {
-                    border: 1.5,
-                    borderColor: "#3e95c2",
-                  },
-              }}
-            >
+            {/* Category Container */}
+            <DefaultFormControl required fullWidth>
               <InputLabel>Category</InputLabel>
               <Select
                 label="Category"
@@ -623,7 +554,7 @@ const ProjectCreate = (props) => {
                   setNewProject({ ...newProject, category: e.target.value })
                 }
               >
-                {projectStrList?.map((projectStr, index) => {
+                {categoryStrList?.map((projectStr, index) => {
                   return (
                     <MenuItem key={index} value={projectStr}>
                       {projectStr}
@@ -635,75 +566,54 @@ const ProjectCreate = (props) => {
                 id="projectcreate-category-helper-text"
                 sx={{ color: "lightgray", fontSize: "12px" }}
               >
-                {"A general category of your project"}
+                {"General category of your project"}
               </FormHelperText>
-            </FormControl>
+            </DefaultFormControl>
 
-            {/* completion date container */}
-            <Box display="flex" flexDirection="column" width="40%">
-              {/* date and checkbox */}
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignContent="center"
-                gap="10%"
+            {/* Type Container */}
+            <DefaultFormControl
+              required
+              fullWidth
+              sx={{
+                ml: 4,
+              }}
+            >
+              <InputLabel>Type</InputLabel>
+              <Select
+                label="Type"
+                value={newProject.type}
+                onChange={(e) =>
+                  setNewProject({ ...newProject, type: e.target.value })
+                }
               >
-                <LocalizationProvider dateAdapter={AdapterMoment}>
-                  <DesktopDatePicker
-                    renderInput={(props) => {
-                      return (
-                        <DefaultTextField
-                          {...props}
-                          disabled={!isCheckedCompDate}
-                        />
-                      );
-                    }}
-                    // label="Completion Date"
-                    disabled={!isCheckedCompDate}
-                    border="none"
-                    value={newProject.completion_date}
-                    onChange={(e) => {
-                      handleDateTimeChange(e);
-                    }}
-                  />
-                </LocalizationProvider>
-                <Checkbox
-                  sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
-                  checked={isCheckedCompDate}
-                  onChange={handleCompDateChange}
-                />
-              </Box>
+                {typeStrList?.map((projectStr, index) => {
+                  // need to change typeStrList to typeStrList
+                  return (
+                    <MenuItem key={index} value={projectStr}>
+                      {projectStr}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
               <FormHelperText
-                sx={{ color: "lightgray", fontSize: "12px", ml: 1 }}
+                id="projectcreate-type-helper-text"
+                sx={{ color: "lightgray", fontSize: "12px" }}
               >
-                {"Completion Date"}
+                {"General type of your project"}
               </FormHelperText>
-            </Box>
+            </DefaultFormControl>
           </Box>
 
-          {/* tags and total team size */}
+          {/* tags */}
           <Box
             display="flex"
-            justifyContent="space-between"
             alignItems="start"
             sx={{
-              mt: 5,
-              mb: 5,
+              mt: 4,
             }}
           >
-            {/* <DefaultTextField
-              sx={{ mr: 5 }}
-              fullWidth
-              label="Details"
-              margin="none"
-              helperText="Keywords to shortly describe the new project seperated by commas (e.g. tags)"
-              value={newProject.details}
-              onChange={(e) =>
-                setNewProject({ ...newProject, details: e.target.value })
-              }
-            /> */}
+            {/* Details */}
             <Autocomplete
-              sx={{ mr: 5 }}
               fullWidth
               freeSolo
               clearOnBlur
@@ -717,103 +627,91 @@ const ProjectCreate = (props) => {
               renderInput={(params) => (
                 <DefaultTextField
                   {...params}
-                  label="Details"
-                  helperText="Keywords to shortly describe the new project (e.g. tags)"
                   required
                   inputProps={{
                     ...params.inputProps,
                     required: newProject?.tags?.length === 0,
                   }}
+                  label="Details"
+                  helperText="Keywords to shortly describe the new project (e.g. tags)"
                 />
               )}
             />
-
-            {/* Team Size container */}
-            <Box display="flex" flexDirection="column" width="40%">
-              {/* Size and checkbox */}
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignContent="center"
-                gap="10%"
-              >
-                <DefaultTextField
-                  fullWidth
-                  // label="Team Size"
-                  type="number"
-                  margin="none"
-                  disabled={!isCheckedTeamSize}
-                  value={newProject.max_member_count}
-                  onChange={(e) =>
-                    setNewProject({
-                      ...newProject,
-                      max_member_count: e.target.value,
-                    })
-                  }
-                />
-                <Checkbox
-                  sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
-                  checked={isCheckedTeamSize}
-                  onChange={handleTeamSizeChange}
-                />
-              </Box>
-              <FormHelperText
-                sx={{ color: "lightgray", fontSize: "12px", ml: 1 }}
-              >
-                {"Team Size"}
-              </FormHelperText>
-            </Box>
           </Box>
 
-          <TextEditor update={setNewProject} project={newProject} />
-          <FormHelperText sx={{ color: "lightgray", fontSize: "12px", ml: 1 }}>
+          {/* Short description */}
+          <DefaultTextField
+            required
+            fullWidth
+            label="Short Description"
+            helperText="One sentence description of your project"
+            value={newProject.short_description}
+            onChange={(e) =>
+              setNewProject({
+                ...newProject,
+                short_description: e.target.value,
+              })
+            }
+            sx={{ mt: 4, mb: 4 }}
+          />
+
+          {/* Description */}
+          <TextEditor
+            update={setNewProject}
+            project={newProject}
+            overlay={showDescOverlay}
+            showOverlay={setShowDescOverlay}
+          />
+          <FormHelperText
+            sx={{ color: "lightgray", fontSize: "12px", mx: "14px", mt: "3px" }}
+          >
             {
-              "A brief description of the new project (e.g. scope, mission, work format, timeline)"
+              "A brief description of the new project (e.g. scope, mission, work format, timeline) *"
             }
           </FormHelperText>
+
+          {/* Positions */}
           <Box
             sx={{
-              mt: 5,
+              mt: 4,
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
             }}
           >
+            <Typography sx={{ color: "textfieldPlaceholder.main" }}>
+              {"I want to add positions"}
+            </Typography>
             <Checkbox
-              sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
               checked={isCheckedPosition}
               onChange={() => {
                 setIsCheckedPosition(!isCheckedPosition);
               }}
+              sx={{ ml: 2, color: "textfieldPlaceholder.main", padding: 0 }}
             />
-            <Typography sx={{ color: "rgba(0,0,0,0.6)" }}>
-              {"I want to add positions"}
-            </Typography>
           </Box>
           {/* firebase dynamic array: http://y2u.be/zgKH12s_95A */}
           {isCheckedPosition &&
             positionFields?.map((positionField, index) => {
               return (
-                <div key={index}>
+                <Box key={index}>
                   <Divider
                     sx={{
-                      mt: 2.5,
-                      borderBottomWidth: 1.5,
-                      borderColor: "#dbdbdb",
+                      mt: 4,
+                      mb: 4,
+                      borderBottomWidth: 1,
+                      borderColor: "divider",
                     }}
                   />
                   <Box
                     display="flex"
                     justifyContent="space-between"
                     alignItems="center"
-                    mt={2.5}
                   >
                     {/* Title */}
                     <DefaultTextField
                       required
-                      sx={{ mr: 2.5 }}
                       fullWidth
-                      margin="none"
                       name="title" // has to be the same as key
                       label="Position Title"
                       value={positionField.title}
@@ -824,8 +722,6 @@ const ProjectCreate = (props) => {
                     {/* Weekly hour */}
                     <DefaultTextField
                       required
-                      sx={{ mr: 2.5 }}
-                      margin="none"
                       type="number"
                       name="weekly_hour" // has to be the same as key
                       label="Weekly Hour"
@@ -839,14 +735,15 @@ const ProjectCreate = (props) => {
                           : (e.target.value = 1);
                         handlePosInputChange(index, e);
                       }}
+                      sx={{ ml: 2, minWidth: "20%" }}
                     />
+
                     {/* Number of people */}
                     <DefaultTextField
                       required
-                      margin="none"
                       type="number"
                       name="count" // has to be the same as key
-                      label="NO. of People"
+                      label="Pos. Count"
                       inputProps={{
                         min: 1,
                       }}
@@ -857,11 +754,16 @@ const ProjectCreate = (props) => {
                           : (e.target.value = 1);
                         handlePosInputChange(index, e);
                       }}
+                      sx={{ ml: 2, minWidth: "20%" }}
                     />
                     {/* Add / Remove position button */}
                     {index > 0 && (
                       <IconButton
-                        sx={{ ml: 2.5, backgroundColor: "#f0f0f0" }}
+                        sx={{
+                          ml: 2,
+                          backgroundColor: "secondary.main",
+                          ":hover": { backgroundColor: "secondary.dark" },
+                        }}
                         onClick={() => handleRemovePosField(index)}
                       >
                         <RemoveRoundedIcon />
@@ -872,16 +774,15 @@ const ProjectCreate = (props) => {
                     display="flex"
                     justifyContent="space-between"
                     alignItems="center"
-                    mt={2.5}
+                    sx={{ mt: 2 }}
                   >
                     {/* Responsibilities */}
                     <DefaultTextField
-                      fullWidth
                       required
+                      fullWidth
                       multiline
                       minRows={2}
                       maxRows={8}
-                      margin="none"
                       name="responsibility"
                       label="Role Description"
                       value={positionField.responsibility}
@@ -894,114 +795,121 @@ const ProjectCreate = (props) => {
                     display="flex"
                     justifyContent="space-between"
                     alignItems="center"
-                    mt={2.5}
+                    sx={{ mt: 2 }}
                   >
                     <DefaultTextField
                       fullWidth
-                      margin="none"
+                      type="url"
                       name="url"
-                      label="Application Form Link"
-                      defaultValue={getAppLink(index)}
-                      onChange={(e) => handlePosInputChange(index, e)}
+                      label="Application Form URL"
+                      value={positionField.url}
+                      onChange={(e) => {
+                        handlePosInputChange(index, e);
+                      }}
                     />
+                    {/* Application deadline container */}
+                    {/* https://stackoverflow.com/questions/63870164/material-ui-pickers-trigger-validation-on-blur-not-on-change */}
+                    <LocalizationProvider dateAdapter={AdapterMoment}>
+                      <DatePicker
+                        name="deadline"
+                        label="Application Deadline"
+                        value={positionField.deadline}
+                        onChange={(e) => {
+                          let pFields = [...positionFields];
+                          pFields[index]["deadline"] = e?._isValid ? e?._d : "";
+                          setPositionFields(pFields);
+                        }}
+                        renderInput={(params) => {
+                          return (
+                            <DefaultTextField
+                              {...params}
+                              sx={{
+                                minWidth: "25%",
+                                ml: 2,
+                              }}
+                            />
+                          );
+                        }}
+                      />
+                    </LocalizationProvider>
                   </Box>
-                </div>
+                </Box>
               );
             })}
           {/* add button */}
           {isCheckedPosition && (
-            <Box
-              sx={{
-                mt: 5,
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <IconButton
+            <>
+              <Box
                 sx={{
-                  width: "12%",
-                  borderRadius: 8,
-                  border: 1.5,
-                  borderColor: "#dbdbdb",
-                  backgroundColor: "#fafafa",
-                  color: "black",
+                  mt: 4,
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
-                onClick={() => handleAddPosField(positionFields?.length - 1)}
               >
-                <AddRoundedIcon />
-              </IconButton>
-            </Box>
+                <IconButton
+                  sx={{
+                    width: "128px",
+                    borderRadius: 8,
+                    backgroundColor: "secondary.main",
+                    ":hover": { backgroundColor: "secondary.dark" },
+                  }}
+                  onClick={() => handleAddPosField(positionFields?.length - 1)}
+                >
+                  <AddRoundedIcon />
+                </IconButton>
+              </Box>
+              <Divider
+                sx={{
+                  mt: 4,
+                  borderBottomWidth: 1,
+                  borderColor: "divider",
+                }}
+              />
+            </>
           )}
 
           {/* Buttons */}
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Box sx={{ mt: 8, display: "flex", justifyContent: "space-between" }}>
             {oldProject && (
               <Button
-                sx={{
-                  mt: 5,
-                  mb: 5,
-                  border: 1.5,
-                  borderColor: "#dbdbdb",
-                  borderRadius: 8,
-                  backgroundColor: "#3e95c2",
-                  textTransform: "none",
-                  paddingX: 5,
-                }}
-                variant="contained"
-                disableElevation
+                color="primary"
                 disabled={!isClickable || !ediumUser?.uid}
+                disableElevation
+                variant="contained"
                 onClick={() => handleDelete(newProject.id)}
+                sx={{
+                  width: "128px",
+                  height: "32px",
+                  borderRadius: 8,
+                }}
               >
                 {"Delete"}
               </Button>
             )}
             <Box sx={{ flexGrow: 1 }} />
-            {/* <Button
-              sx={{ mt: 5, mb: 5, backgroundColor: "#3e95c2" }}
-              variant="contained"
-              disableElevation
-              onClick={(e) => handleGoBack(e)}
-            >
-              {"Go Back"}
-            </Button> */}
             <Button
-              sx={{
-                mt: 5,
-                ml: 2.5,
-                mb: 5,
-                border: 1.5,
-                borderColor: "#dbdbdb",
-                borderRadius: 8,
-                backgroundColor: "#fafafa",
-                color: "black",
-                textTransform: "none",
-                paddingX: 5,
-              }}
-              variant="contained"
-              disableElevation
+              color="primary"
               disabled={!isClickable || !ediumUser?.uid}
+              disableElevation
+              variant="outlined"
               onClick={(e) => handleDiscard(e)}
+              sx={{
+                ml: onMedia.onDesktop ? 4 : 2,
+                width: "128px",
+                height: "32px",
+                borderRadius: 8,
+              }}
             >
               {"Discard"}
             </Button>
 
             <Button
-              sx={{
-                mt: 5,
-                ml: 2.5,
-                mb: 5,
-                border: 1.5,
-                borderColor: "#dbdbdb",
-                borderRadius: 8,
-                backgroundColor: "#3e95c2",
-                textTransform: "none",
-                paddingX: 5,
-              }}
-              variant="contained"
-              disableElevation
+              color="primary"
               disabled={!isClickable || !ediumUser?.uid}
+              disableElevation
+              variant="contained"
               onClick={(e) => {
                 if (
                   currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
@@ -1012,13 +920,19 @@ const ProjectCreate = (props) => {
                   handleSubmit(e);
                 }
               }}
+              sx={{
+                ml: onMedia.onDesktop ? 4 : 2,
+                width: "128px",
+                height: "32px",
+                borderRadius: 8,
+              }}
             >
               {"Confirm"}
             </Button>
           </Box>
         </form>
-      </Grid>
-    </Grid>
+      </Box>
+    </FixedHeightPaper>
   );
 };
 

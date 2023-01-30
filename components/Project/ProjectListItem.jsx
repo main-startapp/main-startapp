@@ -31,6 +31,7 @@ const ProjectListItem = (props) => {
 
   // context
   const { ediumUser, onMedia } = useContext(GlobalContext);
+
   const { setFullProject, setIsMobileBackClicked, searchTypeList } =
     useContext(ProjectContext);
 
@@ -109,7 +110,8 @@ const ProjectListItem = (props) => {
                 <Chip
                   key={index}
                   color={
-                    isStrInStrList(searchTypeList, tag, true)
+                    isStrInStrList(searchTypeList, tag, true) ||
+                    searchTerm === tag
                       ? "primary"
                       : "lightPrimary"
                   }
@@ -164,6 +166,9 @@ const ProjectListItem = (props) => {
                 }}
                 as="/projects/create"
                 passHref
+                style={{
+                  color: "inherit",
+                }}
               >
                 Modify
               </NextLink>
@@ -215,7 +220,9 @@ const ProjectListItem = (props) => {
                 WebkitLineClamp: 1,
               }}
             >
-              {convert(project?.description)}
+              {project?.short_description
+                ? project.short_description
+                : convert(project?.description)}
             </Typography>
           }
           sx={{ mb: 2 }}

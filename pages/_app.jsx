@@ -19,6 +19,7 @@ import ChatMsgPaper from "../components/Chat/ChatMsgPaper";
 import DBListener from "../components/DBListener";
 import MobileBottomNav from "../components/Header/MobileBottomNav";
 import useWindowDimensions from "../components/Reusable/WindowDimensions";
+import Head from "next/head";
 
 // makeStyles, useStyles, createStyles, withStyles, styled
 // https://smartdevpreneur.com/material-ui-makestyles-usestyles-createstyles-and-withstyles-explained/
@@ -43,14 +44,20 @@ const getDesignTokens = (mode, onMedia) => ({
           },
           selectedWhite: {
             main: "#fff",
-            contrastText: "rgba(0, 0, 0, 1)",
+            contrastText: "rgba(0, 0, 0, 0.87)",
           },
-          unselectedIcon: { main: grey[600] },
+          unselectedIcon: {
+            main: grey[700],
+            contrastText: "rgba(0, 0, 0, 0.87)",
+          },
+          textfieldPlaceholder: {
+            main: grey[500],
+            contrastText: "rgba(0, 0, 0, 0.87)",
+          },
           searchGary: { main: grey[300], contrastText: "rgba(0, 0, 0, 0.87)" },
-          hoverGray: { main: grey[100] },
+          hoverGray: { main: grey[100], contrastText: "rgba(0, 0, 0, 0.87)" },
 
           adminOrange: { main: "#f4511e", contrastText: "#fff" },
-          beginnerGreen: { main: "#59B113", contrastText: "#fff" },
         }
       : {
           // palette values for dark mode
@@ -63,14 +70,14 @@ const getDesignTokens = (mode, onMedia) => ({
           },
           selectedWhite: {
             main: "#fff",
-            contrastText: "rgba(0, 0, 0, 1)",
+            contrastText: "rgba(0, 0, 0, 0.87)",
           },
-          unselectedIcon: { main: grey[600] },
+          unselectedIcon: { main: grey[700], contrastText: "#fff" },
+          textfieldPlaceholder: { main: grey[500], contrastText: "#fff" },
           searchGary: { main: grey[600], contrastText: "#fff" },
-          hoverGray: { main: grey[800] },
+          hoverGray: { main: grey[800], contrastText: "#fff" },
 
           adminOrange: { main: "#f4511e", contrastText: "#fff" },
-          beginnerGreen: { main: "#59B113", contrastText: "#fff" },
         }),
   },
 
@@ -253,6 +260,9 @@ function MyApp({ Component, pageProps }) {
               setIsAnimated,
             }}
           >
+            <Head>
+              <link rel="icon" href="/images/favicon.ico" />
+            </Head>
             <CssBaseline enableColorScheme />
             <DBListener />
             {onMedia.onDesktop && <Navbar />}

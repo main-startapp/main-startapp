@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Box,
   Button,
   Checkbox,
@@ -30,7 +31,7 @@ import {
   arrayRemove,
   arrayUnion,
 } from "firebase/firestore";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { db } from "../../firebase";
 import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import {
@@ -46,7 +47,7 @@ import {
   findItemFromList,
   handleDeleteEntry,
 } from "../Reusable/Resusable";
-import { eventStrList } from "../Reusable/MenuStringList";
+import { eventStrList, eventTags } from "../Reusable/MenuStringList";
 
 const EventCreate = (props) => {
   // context
@@ -72,7 +73,7 @@ const EventCreate = (props) => {
     start_date: moment().toDate(),
     end_date: moment().toDate(),
     location: "",
-    details: "",
+    tags: [],
     description: "",
     creator_uid: ediumUser?.uid,
     is_deleted: false,
@@ -550,24 +551,34 @@ const EventCreate = (props) => {
             }
           />
           {/* Details */}
-          <DefaultTextField
-            sx={{
-              mt: 5,
-            }}
+          <Autocomplete
+            sx={{ mt: 5 }}
             fullWidth
-            label="Details"
-            margin="none"
-            helperText="Keywords to shortly describe the new event seperated by commas (e.g. tags)"
-            value={newEvent.details}
-            onChange={(e) =>
-              setNewEvent({ ...newEvent, details: e.target.value })
-            }
+            freeSolo
+            clearOnBlur
+            multiple
+            filterSelectedOptions
+            options={eventTags}
+            value={newEvent?.tags}
+            onChange={(event, newValue) => {
+              setNewEvent({ ...newEvent, tags: newValue });
+            }}
+            renderInput={(params) => (
+              <DefaultTextField
+                {...params}
+                label="Details"
+                helperText="Keywords to shortly describe the new event (e.g. tags)"
+                required
+                inputProps={{
+                  ...params.inputProps,
+                  required: newEvent?.tags?.length === 0,
+                }}
+              />
+            )}
           />
           {/* Description */}
           <DefaultTextField
-            sx={{
-              mt: 5,
-            }}
+            sx={{ mt: 5 }}
             fullWidth
             required
             label="Description"

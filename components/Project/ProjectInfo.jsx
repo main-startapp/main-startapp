@@ -22,10 +22,11 @@ const ProjectInfo = () => {
   const projectCreator = fullProject?.creator_uid;
   const projectAllTags = fullProject?.allTags;
 
-  const [tCode, setTCode] = useState("");
-  useEffect(() => {
-    setTCode("");
-  }, [fullProject]);
+  // transfer code
+  // const [tCode, setTCode] = useState("");
+  // useEffect(() => {
+  //   setTCode("");
+  // }, [fullProject]);
 
   // useEffect to reset box scrollbar position
   const boxRef = useRef();
@@ -147,7 +148,7 @@ const ProjectInfo = () => {
               >
                 {"Positions:"}
               </Typography>
-              {project?.position_list?.map((position, index) => (
+              {project.position_list.map((position, index) => (
                 <PositionListItem
                   key={index}
                   index={index}
@@ -155,15 +156,9 @@ const ProjectInfo = () => {
                   posTitle={position.title}
                   posResp={position.responsibility}
                   posWeeklyHour={position.weekly_hour}
-                  posLevel={position?.level || ""}
+                  appURL={position?.url}
+                  appDeadline={position?.deadline}
                   creator={projectCreator}
-                  appFormURL={
-                    project.application_form_url !== ""
-                      ? project.application_form_url
-                      : position.url
-                      ? position.url
-                      : ""
-                  }
                 />
               ))}
             </Box>
@@ -178,7 +173,7 @@ const ProjectInfo = () => {
               >
                 {"Details: "}
               </Typography>
-              {projectAllTags?.map((tag, index) => (
+              {projectAllTags.map((tag, index) => (
                 <Chip
                   key={index}
                   color={"lightPrimary"}

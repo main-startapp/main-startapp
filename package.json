@@ -37,6 +37,7 @@
     "react-loading": "^2.0.3",
     "react-quill": "^2.0.0",
     "react-schedule-selector": "^3.0.0",
+    "react-social-media-embed": "^2.3.4",
     "string-similarity": "^4.0.4",
     "styled-components": "^5.3.3"
   },

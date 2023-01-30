@@ -1,17 +1,41 @@
-.ql-toolbar.ql-snow + .ql-container.ql-snow {
-    border: solid #dbdbdb 1px;
+.ql-container.ql-snow {
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
     background-color: #f0f0f0;
+    border: none !important;
+    height: 128px;
+    font-size: 16px;
 }
 
 .ql-toolbar.ql-snow {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    border: solid #dbdbdb 1px !important;
     background-color: #f0f0f0;
+    border: none !important;
 }
 
-.ql-container {
-    font-size: 17px !important;
+.ql-container>.ql-editor.ql-blank::before {
+    font-family: "Roboto";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    color: #9e9e9e;
 }
+
+.ql-editor.ql-blank:focus::before {
+    content: '';
+}
+
+/* .text-label {
+    color: #9e9e9e;
+    font-weight: 500;
+    font-size: 15px;
+    position: absolute;
+    top: -12px;
+    left: 15px;
+}
+
+
+.text-container {
+    position: relative;
+} */
