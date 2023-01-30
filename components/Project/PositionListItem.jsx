@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { useContext, useEffect, useState } from "react";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import { db } from "../../firebase";
@@ -22,17 +23,18 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { Interweave } from "interweave";
+import moment from "moment";
 
 // prefer not doing any dynamic calculation in this leaf component
 const PositionListItem = (props) => {
   const index = props.index;
   const posID = props.posID;
-  const posTitle = props.posTitle;
-  const posResp = props.posResp;
-  const posWeeklyHour = props.posWeeklyHour;
-  const posLevel = props.posLevel;
-  const creator = props.creator; // creator's user data
-  const appFormURL = props.appFormURL;
+  const posTitle = props.posTitle || "";
+  const posResp = props.posResp || "";
+  const posWeeklyHour = props.posWeeklyHour || "";
+  const appURL = props.appURL || "";
+  const appDeadline = props.appDeadline || "";
+  const creator = props.creator || null; // creator's user data
 
   // context
   const {
@@ -47,6 +49,7 @@ const PositionListItem = (props) => {
 
   // local var
   const project = fullProject?.project;
+  const dayDiff = appDeadline ? moment().diff(appDeadline, "days") : ""; // +: past; -: future
 
   // useEffect to reset accordion expansion
   const [expandState, setExpandState] = useState("collapseIt");
@@ -192,16 +195,16 @@ const PositionListItem = (props) => {
   };
 
   // components
-  const appFormButton = (
+  const appURLButton = (
     <Button
       color="primary"
-      disabled={!ediumUser?.uid}
+      disabled={!ediumUser?.uid || dayDiff > 0}
       disableElevation
       size="small"
       variant="contained"
       component={Link}
       target="_blank"
-      href={appFormURL}
+      href={appURL}
       rel="noreferrer"
       onClick={(e) => e.stopPropagation()}
       sx={{
@@ -220,6 +223,7 @@ const PositionListItem = (props) => {
       color="primary"
       disabled={
         !ediumUser?.uid ||
+        dayDiff > 0 ||
         ediumUserExt?.join_requests?.some(
           (jr) => jr.project_id === project.id && jr.position_id === posID
         )
@@ -280,23 +284,26 @@ const PositionListItem = (props) => {
             >
               {posTitle}
             </Typography>
-            {posLevel !== "" && (
+            {appDeadline !== "" && (
               <Chip
-                color={posLevel === "Beginner" ? "beginnerGreen" : "error"}
-                label={posLevel}
+                color={dayDiff < -7 || dayDiff > 0 ? "lightPrimary" : "error"} // expired in 1 week: red; else: regular light primary
+                disabled={dayDiff > 0}
+                icon={<AccessTimeIcon />}
+                label={moment(appDeadline).format("MMM Do")}
                 size="small"
                 sx={{
                   ml: 1,
-                  height: "16px",
+                  //height: "16px",
                   borderRadius: 1.5,
-                  fontSize: "0.625rem",
+                  fontSize: "0.75rem",
+                  fontWeight: "medium",
                 }}
               />
             )}
             <Box sx={{ flexGrow: 1 }} />
             {onMedia.onDesktop && ediumUser?.uid !== creator?.uid && (
               <Tooltip title={ediumUser?.uid ? "" : "Edit your profile first"}>
-                <span>{appFormURL ? appFormButton : joinRequestButton}</span>
+                <span>{appURL ? appURLButton : joinRequestButton}</span>
               </Tooltip>
             )}
           </Box>
@@ -313,12 +320,30 @@ const PositionListItem = (props) => {
               flexDirection: "column",
             }}
           >
-            <Typography
-              color="text.primary"
-              sx={{ mb: 1, fontSize: "1rem", fontWeight: "medium" }}
-            >
-              {"Role Description: "}
-            </Typography>
+            <Box sx={{ display: "flex", flexDirection: "row" }}>
+              <Typography
+                color="text.primary"
+                sx={{ mb: 1, fontSize: "1rem", fontWeight: "medium" }}
+              >
+                {"Role Description: "}
+              </Typography>
+              <Chip
+                color="lightPrimary"
+                label={
+                  posWeeklyHour +
+                  (posWeeklyHour === 1 ? " hr" : " hrs") +
+                  "/week"
+                }
+                size="small"
+                sx={{
+                  ml: 1,
+                  //height: "16px",
+                  borderRadius: 1.5,
+                  fontSize: "0.75rem",
+                  fontWeight: "medium",
+                }}
+              />
+            </Box>
             <Typography
               color="text.secondary"
               component="span"
@@ -341,7 +366,7 @@ const PositionListItem = (props) => {
                 <Tooltip
                   title={ediumUser?.uid ? "" : "Edit your profile first"}
                 >
-                  <span>{appFormURL ? appFormButton : joinRequestButton}</span>
+                  <span>{appURL ? appURLButton : joinRequestButton}</span>
                 </Tooltip>
               </Box>
             )}

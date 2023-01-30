@@ -31,7 +31,8 @@ const ProjectListItem = (props) => {
 
   // context
   const { ediumUser, onMedia } = useContext(GlobalContext);
-  const { setFullProject, searchTypeList } = useContext(ProjectContext);
+  const { setFullProject, searchTerm, searchTypeList } =
+    useContext(ProjectContext);
 
   // local vars
   const project = fullProject.project;
@@ -107,7 +108,8 @@ const ProjectListItem = (props) => {
                 <Chip
                   key={index}
                   color={
-                    isStrInStrList(searchTypeList, tag, true)
+                    isStrInStrList(searchTypeList, tag, true) ||
+                    searchTerm === tag
                       ? "primary"
                       : "lightPrimary"
                   }

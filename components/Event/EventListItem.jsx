@@ -29,7 +29,7 @@ const EventListItem = (props) => {
 
   // context
   const { ediumUser, onMedia } = useContext(GlobalContext);
-  const { setFullEvent, searchTypeList } = useContext(EventContext);
+  const { setFullEvent, searchTerm, searchTypeList } = useContext(EventContext);
 
   // local vars
   const event = fullEvent.event;
@@ -39,7 +39,7 @@ const EventListItem = (props) => {
   // time related
   const startMoment = moment(event?.start_date);
   const endMoment = moment(event?.end_date);
-  const isExpired = moment({ hour: 23, minute: 59 }).isAfter(endMoment);
+  const isExpired = moment().isAfter(endMoment);
   const isSameDay = startMoment.format("L") === endMoment.format("L");
   const isSameTime = startMoment.format("LLL") === endMoment.format("LLL");
 
@@ -112,7 +112,8 @@ const EventListItem = (props) => {
                 <Chip
                   key={index}
                   color={
-                    isStrInStrList(searchTypeList, tag, true)
+                    isStrInStrList(searchTypeList, tag, true) ||
+                    searchTerm === tag
                       ? "primary"
                       : "lightPrimary"
                   }

@@ -44,15 +44,20 @@ const getDesignTokens = (mode, onMedia) => ({
           },
           selectedWhite: {
             main: "#fff",
-            contrastText: "rgba(0, 0, 0, 1)",
+            contrastText: "rgba(0, 0, 0, 0.87)",
           },
-          unselectedIcon: { main: grey[600] },
-          textfieldPlaceholder: { main: grey[500] },
+          unselectedIcon: {
+            main: grey[700],
+            contrastText: "rgba(0, 0, 0, 0.87)",
+          },
+          textfieldPlaceholder: {
+            main: grey[500],
+            contrastText: "rgba(0, 0, 0, 0.87)",
+          },
           searchGary: { main: grey[300], contrastText: "rgba(0, 0, 0, 0.87)" },
-          hoverGray: { main: grey[100] },
+          hoverGray: { main: grey[100], contrastText: "rgba(0, 0, 0, 0.87)" },
 
           adminOrange: { main: "#f4511e", contrastText: "#fff" },
-          beginnerGreen: { main: "#59B113", contrastText: "#fff" },
         }
       : {
           // palette values for dark mode
@@ -65,15 +70,14 @@ const getDesignTokens = (mode, onMedia) => ({
           },
           selectedWhite: {
             main: "#fff",
-            contrastText: "rgba(0, 0, 0, 1)",
+            contrastText: "rgba(0, 0, 0, 0.87)",
           },
-          unselectedIcon: { main: grey[600] },
-          textfieldPlaceholder: { main: grey[500] },
+          unselectedIcon: { main: grey[700], contrastText: "#fff" },
+          textfieldPlaceholder: { main: grey[500], contrastText: "#fff" },
           searchGary: { main: grey[600], contrastText: "#fff" },
-          hoverGray: { main: grey[800] },
+          hoverGray: { main: grey[800], contrastText: "#fff" },
 
           adminOrange: { main: "#f4511e", contrastText: "#fff" },
-          beginnerGreen: { main: "#59B113", contrastText: "#fff" },
         }),
   },
 

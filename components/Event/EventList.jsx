@@ -36,7 +36,7 @@ const EventList = () => {
         eventTags = eventTags.concat(eventCreator.org_tags); // org tags
       }
       // category
-      eventTags.push(event?.category?.toLowerCase()); // type
+      eventTags.push(event?.category?.toLowerCase());
       return {
         event: event,
         creator: eventCreator,
@@ -49,11 +49,7 @@ const EventList = () => {
   const sortedFullEvents = useMemo(() => {
     const eventsLength = fullEvents.length;
     for (let i = eventsLength - 1; i > -1; i--) {
-      if (
-        moment({ hour: 23, minute: 59 }).isAfter(
-          moment(fullEvents[i].event.end_date)
-        )
-      ) {
+      if (moment().isAfter(moment(fullEvents[i].event.end_date))) {
         let temp = fullEvents[i];
         fullEvents.splice(i, 1);
         fullEvents.push(temp);
@@ -70,17 +66,22 @@ const EventList = () => {
         if (searchTerm === "" && searchTypeList.length === 0) {
           return true; // no search
         } else if (searchTerm !== "" && searchTypeList.length === 0) {
-          return isStrInStr(fullEvent.event.title, searchTerm, false); // only term: in event title
+          return (
+            isStrInStr(fullEvent.event.title, searchTerm, false) ||
+            isStrInStrList(fullEvent.allTags, searchTerm, true)
+          ); // only term: in event title || in tags exactly
         } else if (searchTerm === "" && searchTypeList.length > 0) {
           return searchTypeList.some((type) => {
-            return isStrInStrList(fullEvent.allTags, type, true);
-          }); // only tags
+            return fullEvent.event.category === type;
+          }); // only type
         } else {
           return (
             searchTypeList.some((type) => {
-              return isStrInStrList(fullEvent.allTags, type, true);
-            }) && isStrInStr(fullEvent.event.title, searchTerm, false)
-          ); // term && tags
+              return fullEvent.event.category === type;
+            }) &&
+            (isStrInStr(fullEvent.event.title, searchTerm, false) ||
+              isStrInStrList(fullEvent.allTags, searchTerm, true))
+          ); // term && type
         }
       }),
     [searchTerm, searchTypeList, sortedFullEvents]
