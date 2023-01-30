@@ -20,6 +20,7 @@ import {
   Paper,
   FormControl,
 } from "@mui/material";
+import NextLink from "next/link";
 
 //============================================================
 // handle connect/message: if chat found, return; if not, create a chat with "request to connect" auto msg.
@@ -348,11 +349,6 @@ export const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export const MenuItemLink = styled(MuiLink)(({ theme }) => ({
-  color: theme.palette.text.primary,
-  textDecoration: "none",
-}));
-
 export const FixedHeightPaper = styled(Paper)(
   ({ theme, isdesktop, mobileheight }) => ({
     display: "flex",
@@ -368,6 +364,11 @@ export const FixedHeightPaper = styled(Paper)(
     borderRadius: isdesktop ? "32px 32px 0px 0px" : "32px 0px 0px 0px",
   })
 );
+
+export const StyledMuiLink = styled(MuiLink)(({ theme }) => ({
+  color: theme.palette.text.primary,
+  textDecoration: "none",
+}));
 //============================================================
 // ADMIN: Duplicate Collections With New Name
 //============================================================

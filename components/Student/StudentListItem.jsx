@@ -95,7 +95,7 @@ const StudentListItem = (props) => {
               {student?.name}
             </Typography>
             <ExportedImage
-              src="/images/u_logo.png"
+              src="/images/ubc_logo_32.png"
               alt=""
               placeholder="empty"
               height={24}

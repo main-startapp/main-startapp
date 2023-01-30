@@ -1,11 +1,4 @@
-import {
-  AppBar,
-  Toolbar,
-  Box,
-  Link as MuiLink,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { AppBar, Toolbar, Box, Stack, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import NextLink from "next/link";
 import ExportedImage from "next-image-export-optimizer";
@@ -48,7 +41,7 @@ const Navbar = () => {
         >
           {/* https://stackoverflow.com/questions/46973910/accessing-files-from-firebase-storage-vs-firebase-hosting */}
           <ExportedImage
-            src="/images/edium_notext_128.png"
+            src="/images/edium_v4_256.png"
             alt=""
             height={40}
             width={40}
@@ -56,7 +49,7 @@ const Navbar = () => {
           {/* tabs */}
           {/* https://stackoverflow.com/questions/32378953/keep-the-middle-item-centered-when-side-items-have-different-widths */}
           <Stack direction="row" spacing={8}>
-            <NextLink href="/">
+            <NextLink href="/" style={{ color: "inherit" }}>
               <LinkIconBox url={url} pathname="/">
                 <DashboardIcon
                   color={
@@ -72,7 +65,12 @@ const Navbar = () => {
                 </LinkTypography>
               </LinkIconBox>
             </NextLink>
-            <NextLink href="/events/">
+            <NextLink
+              href="/events/"
+              style={{
+                color: "inherit",
+              }}
+            >
               <LinkIconBox url={url} pathname="/events/">
                 <DateRangeIcon
                   color={
@@ -90,7 +88,12 @@ const Navbar = () => {
                 </LinkTypography>
               </LinkIconBox>
             </NextLink>
-            <NextLink href="/students/">
+            <NextLink
+              href="/students/"
+              style={{
+                color: "inherit",
+              }}
+            >
               <LinkIconBox url={url} pathname="/students/">
                 <PeopleIcon
                   color={

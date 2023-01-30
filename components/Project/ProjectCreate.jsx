@@ -97,8 +97,8 @@ const ProjectCreate = (props) => {
     weekly_hour: "",
     count: "",
     responsibility: "",
-    application_url: "",
-    application_deadline: "",
+    url: "",
+    deadline: "",
   };
   const [positionFields, setPositionFields] = useState(() =>
     oldProject?.position_list?.length > 0
@@ -800,24 +800,23 @@ const ProjectCreate = (props) => {
                     <DefaultTextField
                       fullWidth
                       type="url"
-                      name="application_url"
+                      name="url"
                       label="Application Form URL"
-                      value={positionField.application_url}
+                      value={positionField.url}
                       onChange={(e) => {
                         handlePosInputChange(index, e);
                       }}
                     />
                     {/* Application deadline container */}
+                    {/* https://stackoverflow.com/questions/63870164/material-ui-pickers-trigger-validation-on-blur-not-on-change */}
                     <LocalizationProvider dateAdapter={AdapterMoment}>
                       <DatePicker
-                        name="application_deadline"
+                        name="deadline"
                         label="Application Deadline"
-                        disablePast
-                        value={positionField.application_deadline}
+                        value={positionField.deadline}
                         onChange={(e) => {
-                          // can't use handlePosInputChange, as datepicker will return null event
                           let pFields = [...positionFields];
-                          pFields[index]["application_deadline"] = e?._d || "";
+                          pFields[index]["deadline"] = e?._isValid ? e?._d : "";
                           setPositionFields(pFields);
                         }}
                         renderInput={(params) => {
