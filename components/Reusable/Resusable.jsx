@@ -20,6 +20,7 @@ import {
   Paper,
   FormControl,
 } from "@mui/material";
+import Router from "next/router";
 import NextLink from "next/link";
 
 //============================================================
@@ -265,6 +266,20 @@ export function ordinal_suffix_of(i) {
   }
   return i + "th";
 }
+
+//============================================================
+// utility function: whether substring is in a list of obj / string
+//============================================================
+export const shallowUpdateURLQuery = (pathName, queryKey, queryValue) => {
+  Router.push(
+    {
+      pathname: pathName,
+      query: queryKey ? { [queryKey]: queryValue } : null,
+    },
+    undefined,
+    { shallow: true }
+  );
+};
 
 //============================================================
 // styled components

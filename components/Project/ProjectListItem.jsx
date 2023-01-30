@@ -31,7 +31,8 @@ const ProjectListItem = (props) => {
 
   // context
   const { ediumUser, onMedia } = useContext(GlobalContext);
-  const { setFullProject, searchTerm, searchTypeList } =
+
+  const { setFullProject, setIsMobileBackClicked, searchTypeList } =
     useContext(ProjectContext);
 
   // local vars
@@ -55,6 +56,7 @@ const ProjectListItem = (props) => {
     <ListItem
       onClick={() => {
         setFullProject(fullProject);
+        setIsMobileBackClicked(false);
       }}
       sx={{
         display: "flex",

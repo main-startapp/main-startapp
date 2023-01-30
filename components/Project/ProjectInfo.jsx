@@ -13,7 +13,8 @@ import { FixedHeightPaper } from "../Reusable/Resusable";
 const ProjectInfo = () => {
   // context
   const { onMedia } = useContext(GlobalContext);
-  const { fullProject, setFullProject } = useContext(ProjectContext);
+  const { fullProject, setFullProject, setIsMobileBackClicked } =
+    useContext(ProjectContext);
   const theme = useTheme();
 
   // local vars
@@ -195,6 +196,7 @@ const ProjectInfo = () => {
           size="small"
           onClick={() => {
             setFullProject(null);
+            setIsMobileBackClicked(true);
           }}
           sx={{ position: "fixed", right: 16, bottom: 80 }}
         >
