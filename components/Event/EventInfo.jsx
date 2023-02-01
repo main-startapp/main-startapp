@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { Suspense, useContext, useEffect, useRef, useState } from "react";
 import {
   Avatar,
   Box,
@@ -18,11 +18,14 @@ import { Interweave } from "interweave";
 import { UrlMatcher } from "interweave-autolink";
 import { motion } from "framer-motion";
 import { FixedHeightPaper } from "../Reusable/Resusable";
+import { useImage } from "react-image";
+import { ErrorBoundary } from "react-error-boundary";
 
 const EventInfo = () => {
   // context
   const { onMedia } = useContext(GlobalContext);
-  const { fullEvent, setFullEvent } = useContext(EventContext);
+  const { fullEvent, setFullEvent, setIsMobileBackClicked } =
+    useContext(EventContext);
   const theme = useTheme();
 
   // local vars
@@ -36,10 +39,17 @@ const EventInfo = () => {
   //   setTCode("");
   // }, [fullEvent]);
 
-  const [isLoaded, setIsLoaded] = useState(false);
-  useEffect(() => {
-    setIsLoaded(false);
-  }, [fullEvent]);
+  function EventImageComponent() {
+    const { src } = useImage({
+      srcList: event?.banner_url,
+    });
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img alt="" src={src} width="100%" />;
+  }
+
+  function ErrorFallback({ error, resetErrorBoundary }) {
+    return <></>;
+  }
 
   // moment
   const startMoment = moment(event?.start_date);
@@ -63,160 +73,159 @@ const EventInfo = () => {
         paddingTop: onMedia.onDesktop ? "32px" : 0,
       }}
     >
-      <Box
-        id="eventinfo-box"
-        ref={boxRef}
-        sx={{
-          flexGrow: 1,
-          overflowY: "scroll",
-          paddingTop: onMedia.onDesktop ? 2 : 2, // align with project list
-          paddingBottom: onMedia.onDesktop ? 6 : 2, // enough space to not covered by messages
-          paddingLeft: onMedia.onDesktop ? 4 : 2,
-          paddingRight: onMedia.onDesktop
-            ? `calc(${theme.spacing(4)} - 0.4rem)`
-            : 2, // considering scrollbar
-        }}
-      >
-        <motion.div
-          key={event?.title}
-          initial={{ opacity: 0, y: "1%" }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+      {fullEvent !== null && (
+        <Box
+          id="eventinfo-box"
+          ref={boxRef}
+          sx={{
+            flexGrow: 1,
+            overflowY: "scroll",
+            paddingTop: onMedia.onDesktop ? 2 : 2, // align with project list
+            paddingBottom: onMedia.onDesktop ? 6 : 4, // enough space to not covered by messages
+            paddingLeft: onMedia.onDesktop ? 4 : 2,
+            paddingRight: onMedia.onDesktop
+              ? `calc(${theme.spacing(4)} - 0.4rem)`
+              : 2, // considering scrollbar
+          }}
         >
-          <Box
-            id="eventinfo-header-box"
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <Avatar
-              sx={{
-                mr: onMedia.onDesktop ? 4 : 2,
-                height: "96px",
-                width: "96px",
-              }}
-              src={event?.icon_url}
-            >
-              <UploadFileIcon />
-            </Avatar>
-            <Typography
-              color="text.primary"
-              variant="h2"
-              sx={{
-                fontSize: onMedia.onDesktop ? "1.875rem" : "1.25rem",
-                fontWeight: "bold",
-              }}
-            >
-              {event?.title}
-            </Typography>
-          </Box>
-          <Divider
-            sx={{
-              mt: 2,
-              borderBottomWidth: 1,
-              borderColor: "divider",
-            }}
-          />
-          <Typography
-            color="text.primary"
-            variant="h3"
-            sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
-          >
-            {"Time & Location: "}
-          </Typography>
-          <Typography color="text.secondary" variant="body1">
-            {isSameDay
-              ? startMoment.format("MMMM Do YYYY, h:mm a") +
-                (isSameTime ? "" : " - " + endMoment.format("h:mm a"))
-              : startMoment.format("MMMM Do YYYY, h:mm a") +
-                " - " +
-                endMoment.format("MMMM Do YYYY, h:mm a")}
-          </Typography>
-          <Typography color="text.secondary" variant="body1">
-            {event?.location}
-          </Typography>
-          <Typography
-            color="text.primary"
-            variant="h3"
-            sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
-          >
-            {"Description:"}
-          </Typography>
-          <Typography color="text.secondary" component="span" variant="body1">
-            <pre
-              style={{
-                fontFamily: "inherit",
-                whiteSpace: "pre-wrap",
-                wordWrap: "break-word",
-                display: "inline",
-              }}
-            >
-              <Interweave
-                content={event?.description}
-                matchers={[new UrlMatcher("url")]}
-              />
-            </pre>
-          </Typography>
-          <Button
-            disableElevation
-            fullWidth
-            variant="contained"
-            component={Link}
-            target="_blank"
-            href={event?.registration_form_url}
-            rel="noreferrer"
-            sx={{
-              mt: 4,
-              borderRadius: 8,
-            }}
-          >
-            {"Attend"}
-          </Button>
-          {eventAllTags?.length > 0 && (
-            <Box id="eventinfo-details-box">
-              <Typography
-                color="text.primary"
-                variant="h3"
-                sx={{ mt: 4, fontSize: "1.25rem", fontWeight: "bold" }}
-              >
-                {"Details: "}
-              </Typography>
-              {eventAllTags?.map((tag, index) => (
-                <Chip
-                  key={index}
-                  color={"lightPrimary"}
-                  label={tag}
-                  sx={{
-                    mr: 1,
-                    mt: 1,
-                    fontSize: "0.875rem",
-                    fontWeight: "medium",
-                  }}
-                />
-              ))}
-            </Box>
-          )}
-          <Box
-            sx={{
-              mt: isLoaded ? 4 : 0,
-              display: "flex",
-              justifyContent: "center",
-              visibility: isLoaded ? "visible" : "collapse",
-            }}
+          <motion.div
+            key={event?.title}
+            initial={{ opacity: 0, y: "1%" }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           >
             <Box
-              component="img"
-              onLoad={() => {
-                setIsLoaded(true);
+              id="eventinfo-header-box"
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
               }}
-              src={event?.banner_url}
-              sx={{ maxWidth: "100%" }}
+            >
+              <Avatar
+                sx={{
+                  mr: onMedia.onDesktop ? 4 : 2,
+                  height: "96px",
+                  width: "96px",
+                }}
+                src={event?.icon_url}
+              >
+                <UploadFileIcon />
+              </Avatar>
+              <Typography
+                color="text.primary"
+                variant="h2"
+                sx={{
+                  fontSize: onMedia.onDesktop ? "1.875rem" : "1.25rem",
+                  fontWeight: "bold",
+                }}
+              >
+                {event?.title}
+              </Typography>
+            </Box>
+            <Divider
+              sx={{
+                mt: 2,
+                borderBottomWidth: 1,
+                borderColor: "divider",
+              }}
             />
-          </Box>
-        </motion.div>
-      </Box>
+            <Typography
+              color="text.primary"
+              variant="h3"
+              sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
+            >
+              {"Time & Location: "}
+            </Typography>
+            <Typography color="text.secondary" variant="body1">
+              {isSameDay
+                ? startMoment.format("MMMM Do YYYY, h:mm a") +
+                  (isSameTime ? "" : " - " + endMoment.format("h:mm a"))
+                : startMoment.format("MMMM Do YYYY, h:mm a") +
+                  " - " +
+                  endMoment.format("MMMM Do YYYY, h:mm a")}
+            </Typography>
+            <Typography color="text.secondary" variant="body1">
+              {event?.location}
+            </Typography>
+            <Typography
+              color="text.primary"
+              variant="h3"
+              sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
+            >
+              {"Description:"}
+            </Typography>
+            <Typography color="text.secondary" component="span" variant="body1">
+              <pre
+                style={{
+                  fontFamily: "inherit",
+                  whiteSpace: "pre-wrap",
+                  wordWrap: "break-word",
+                  display: "inline",
+                }}
+              >
+                <Interweave
+                  content={event?.description}
+                  matchers={[new UrlMatcher("url")]}
+                />
+              </pre>
+            </Typography>
+            <Button
+              disableElevation
+              fullWidth
+              variant="contained"
+              component={Link}
+              target="_blank"
+              href={event?.registration_form_url}
+              rel="noreferrer"
+              sx={{
+                mt: 4,
+                borderRadius: 8,
+              }}
+            >
+              {"Attend"}
+            </Button>
+            {eventAllTags?.length > 0 && (
+              <Box id="eventinfo-details-box">
+                <Typography
+                  color="text.primary"
+                  variant="h3"
+                  sx={{ mt: 4, fontSize: "1.25rem", fontWeight: "bold" }}
+                >
+                  {"Details: "}
+                </Typography>
+                {eventAllTags?.map((tag, index) => (
+                  <Chip
+                    key={index}
+                    color={"lightPrimary"}
+                    label={tag}
+                    sx={{
+                      mr: 1,
+                      mt: 1,
+                      fontSize: "0.875rem",
+                      fontWeight: "medium",
+                    }}
+                  />
+                ))}
+              </Box>
+            )}
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <Box
+                sx={{
+                  mt: 4,
+                  display: "flex",
+                  justifyContent: "center",
+                  position: "relative",
+                }}
+              >
+                <Suspense>
+                  <EventImageComponent />
+                </Suspense>
+              </Box>
+            </ErrorBoundary>
+          </motion.div>
+        </Box>
+      )}
 
       {/* Mobile back button */}
       {!onMedia.onDesktop && fullEvent !== null && (
@@ -225,6 +234,7 @@ const EventInfo = () => {
           size="small"
           onClick={() => {
             setFullEvent(null);
+            setIsMobileBackClicked(true);
           }}
           sx={{ position: "fixed", right: 16, bottom: 80 }}
         >

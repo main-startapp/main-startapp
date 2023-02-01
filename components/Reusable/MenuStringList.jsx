@@ -23,11 +23,11 @@ export const eventStrList = [
   "Community Event",
   "Concert",
   "Conference",
-  "Expo",
   "Festival",
   "Hackathon",
   "Info Session",
   "Networking Session",
+  "Party",
   "Sports",
   "Workshop",
 ];

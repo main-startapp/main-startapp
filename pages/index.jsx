@@ -40,6 +40,7 @@ const Home = () => {
 
   // project state init
   const [fullProject, setFullProject] = useState(null); // the selected project with extra data (creator, tags)
+  const [isSearchingClicked, setIsSearchingClicked] = useState(false); // initialize auto set entry flag for searching
   const [isMobileBackClicked, setIsMobileBackClicked] = useState(false); // initialize show list on mobile
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
@@ -50,6 +51,8 @@ const Home = () => {
       value={{
         fullProject,
         setFullProject,
+        isSearchingClicked,
+        setIsSearchingClicked,
         isMobileBackClicked,
         setIsMobileBackClicked,
         searchTerm,
