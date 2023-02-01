@@ -37,6 +37,8 @@ const Events = () => {
 
   // event state init
   const [fullEvent, setFullEvent] = useState(null); // the selected event with extra data
+  const [isSearchingClicked, setIsSearchingClicked] = useState(false); // initialize auto set entry flag for searching
+  const [isMobileBackClicked, setIsMobileBackClicked] = useState(false); // initialize auto set entry flag for mobile
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
   const [searchTypeList, setSearchTypeList] = useState([]);
@@ -46,6 +48,10 @@ const Events = () => {
       value={{
         fullEvent,
         setFullEvent,
+        isSearchingClicked,
+        setIsSearchingClicked,
+        isMobileBackClicked,
+        setIsMobileBackClicked,
         searchTerm,
         setSearchTerm,
         searchCategory,
@@ -106,30 +112,33 @@ const Events = () => {
               </motion.div>
             </Box>
           </>
-        ) : fullEvent === null ? (
-          <Box
-            id="events-mobile-list-box"
-            sx={{
-              paddingTop: 2,
-              paddingLeft: 2,
-              width: "100%",
-              backgroundColor: "hoverGray.main",
-            }}
-          >
-            <EventList />
-          </Box>
         ) : (
-          <Box
-            id="events-mobile-info-box"
-            sx={{
-              paddingTop: 2,
-              paddingLeft: 2,
-              width: "100%",
-              backgroundColor: "hoverGray.main",
-            }}
-          >
-            <EventInfo />
-          </Box>
+          <>
+            <Box
+              id="events-mobile-list-box"
+              sx={{
+                display: fullEvent === null ? "block" : "none",
+                paddingTop: 2,
+                paddingLeft: 2,
+                width: "100%",
+                backgroundColor: "hoverGray.main",
+              }}
+            >
+              <EventList />
+            </Box>
+            <Box
+              id="events-mobile-info-box"
+              sx={{
+                display: fullEvent === null ? "none" : "block",
+                paddingTop: 2,
+                paddingLeft: 2,
+                width: "100%",
+                backgroundColor: "hoverGray.main",
+              }}
+            >
+              <EventInfo />
+            </Box>
+          </>
         )}
       </Box>
     </EventContext.Provider>

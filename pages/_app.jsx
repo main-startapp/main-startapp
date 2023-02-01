@@ -261,6 +261,7 @@ function MyApp({ Component, pageProps }) {
             }}
           >
             <Head>
+              <title>Edium</title>
               <link rel="icon" href="/images/favicon.ico" />
             </Head>
             <CssBaseline enableColorScheme />

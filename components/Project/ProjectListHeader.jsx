@@ -13,8 +13,12 @@ import { ProjectContext } from "../Context/ShareContexts";
 import { typeStrList } from "../Reusable/MenuStringList";
 
 const ProjectListHeader = () => {
-  const { setSearchTerm, searchTypeList, setSearchTypeList } =
-    useContext(ProjectContext);
+  const {
+    setIsSearchingClicked,
+    setSearchTerm,
+    searchTypeList,
+    setSearchTypeList,
+  } = useContext(ProjectContext);
 
   // tabs related
   const [tabValue, setTabValue] = useState("2");
@@ -63,6 +67,8 @@ const ProjectListHeader = () => {
     let newSearchType = [...searchTypeList];
     newSearchType.push(newTypeList[i].name);
     setSearchTypeList(newSearchType);
+    // isSearchingClicked flag for auto set entry
+    setIsSearchingClicked(true);
   };
 
   const handleRemove = (i) => {
@@ -81,6 +87,8 @@ const ProjectListHeader = () => {
       newTypeList[i].name
     );
     setSearchTypeList(newSearchTypeList);
+    // isSearchingClicked flag for auto set entry
+    setIsSearchingClicked(true);
   };
 
   return (
@@ -108,10 +116,12 @@ const ProjectListHeader = () => {
           onChange={(e) => {
             if (e.target.value.length !== 0) return;
             setSearchTerm("");
+            setIsSearchingClicked(true); // isSearchingClicked flag for auto set entry
           }}
           onKeyPress={(e) => {
             if (e.key === "Enter") {
               setSearchTerm(e.target.value);
+              setIsSearchingClicked(true); // isSearchingClicked flag for auto set entry
             }
           }}
         />
@@ -206,6 +216,7 @@ const ProjectListHeader = () => {
               });
               setTypeList(newTypeList);
               setSearchTypeList([]);
+              setIsSearchingClicked(true); // isSearchingClicked flag for auto set entry
               handleExpand(); // !todo: is this consistent behavior?
             }}
             sx={{

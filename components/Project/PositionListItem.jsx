@@ -270,7 +270,7 @@ const PositionListItem = (props) => {
         >
           <Box
             sx={{
-              mr: 2,
+              paddingRight: onMedia.onDesktop ? 2 : 1,
               width: "100%",
               display: "flex",
               flexDirection: "row",
@@ -284,6 +284,7 @@ const PositionListItem = (props) => {
             >
               {posTitle}
             </Typography>
+            {!onMedia.onDesktop && <Box sx={{ flexGrow: 1 }} />}
             {appDeadline !== "" && (
               <Chip
                 color={dayDiff < -7 || dayDiff > 0 ? "lightPrimary" : "error"} // expired in 1 week: red; else: regular light primary
@@ -292,7 +293,7 @@ const PositionListItem = (props) => {
                 label={moment(appDeadline).format("MMM Do")}
                 size="small"
                 sx={{
-                  ml: 1,
+                  ml: 2,
                   //height: "16px",
                   borderRadius: 1.5,
                   fontSize: "0.75rem",
@@ -300,11 +301,15 @@ const PositionListItem = (props) => {
                 }}
               />
             )}
-            <Box sx={{ flexGrow: 1 }} />
             {onMedia.onDesktop && ediumUser?.uid !== creator?.uid && (
-              <Tooltip title={ediumUser?.uid ? "" : "Edit your profile first"}>
-                <span>{appURL ? appURLButton : joinRequestButton}</span>
-              </Tooltip>
+              <>
+                <Box sx={{ flexGrow: 1 }} />
+                <Tooltip
+                  title={ediumUser?.uid ? "" : "Edit your profile first"}
+                >
+                  <span>{appURL ? appURLButton : joinRequestButton}</span>
+                </Tooltip>
+              </>
             )}
           </Box>
         </StyledAccordionSummary>
@@ -336,7 +341,7 @@ const PositionListItem = (props) => {
                 }
                 size="small"
                 sx={{
-                  ml: 1,
+                  ml: 2,
                   //height: "16px",
                   borderRadius: 1.5,
                   fontSize: "0.75rem",
@@ -362,7 +367,7 @@ const PositionListItem = (props) => {
               </pre>
             </Typography>
             {!onMedia.onDesktop && ediumUser?.uid !== creator?.uid && (
-              <Box sx={{ mt: 1.5, display: "flex", justifyContent: "end" }}>
+              <Box sx={{ mt: 2, display: "flex", justifyContent: "end" }}>
                 <Tooltip
                   title={ediumUser?.uid ? "" : "Edit your profile first"}
                 >

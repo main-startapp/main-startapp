@@ -11,12 +11,23 @@ import {
   FixedHeightPaper,
   isStrInStr,
   isStrInStrList,
+  shallowUpdateURLQuery,
 } from "../Reusable/Resusable";
+import Router from "next/router";
 
 const EventList = () => {
   // context
   const { events, users, ediumUser, onMedia } = useContext(GlobalContext);
-  const { setFullEvent, searchTerm, searchTypeList } = useContext(EventContext);
+  const {
+    fullEvent,
+    setFullEvent,
+    isSearchingClicked,
+    setIsSearchingClicked,
+    isMobileBackClicked,
+    setIsMobileBackClicked,
+    searchTerm,
+    searchTypeList,
+  } = useContext(EventContext);
   const theme = useTheme();
 
   // events with extra info from other dataset (creator, merged tags)
@@ -45,7 +56,7 @@ const EventList = () => {
     });
   }, [events, users]);
 
-  // event list with sorting
+  // event list with predefined sorting
   const sortedFullEvents = useMemo(() => {
     const eventsLength = fullEvents.length;
     for (let i = eventsLength - 1; i > -1; i--) {
@@ -58,42 +69,116 @@ const EventList = () => {
     return fullEvents;
   }, [fullEvents]);
 
-  const filteredFullEvents = useMemo(
-    () =>
-      sortedFullEvents?.filter((fullEvent) => {
-        if (!fullEvent.event.is_visible) return;
+  // event list with filtering
+  const filteredFullEvents = useMemo(() => {
+    return sortedFullEvents?.filter((fullEvent) => {
+      if (!fullEvent.event.is_visible) return false;
 
-        if (searchTerm === "" && searchTypeList.length === 0) {
-          return true; // no search
-        } else if (searchTerm !== "" && searchTypeList.length === 0) {
-          return (
-            isStrInStr(fullEvent.event.title, searchTerm, false) ||
-            isStrInStrList(fullEvent.allTags, searchTerm, true)
-          ); // only term: in event title || in tags exactly
-        } else if (searchTerm === "" && searchTypeList.length > 0) {
-          return searchTypeList.some((type) => {
+      if (searchTerm === "" && searchTypeList.length === 0) {
+        return true; // no search
+      } else if (searchTerm !== "" && searchTypeList.length === 0) {
+        return (
+          isStrInStr(fullEvent.event.title, searchTerm, false) ||
+          isStrInStrList(fullEvent.allTags, searchTerm, true)
+        ); // only term: in event title || in tags exactly
+      } else if (searchTerm === "" && searchTypeList.length > 0) {
+        return searchTypeList.some((type) => {
+          return fullEvent.event.category === type;
+        }); // only type
+      } else {
+        return (
+          searchTypeList.some((type) => {
             return fullEvent.event.category === type;
-          }); // only type
-        } else {
-          return (
-            searchTypeList.some((type) => {
-              return fullEvent.event.category === type;
-            }) &&
-            (isStrInStr(fullEvent.event.title, searchTerm, false) ||
-              isStrInStrList(fullEvent.allTags, searchTerm, true))
-          ); // term && type
-        }
-      }),
-    [searchTerm, searchTypeList, sortedFullEvents]
-  );
+          }) &&
+          (isStrInStr(fullEvent.event.title, searchTerm, false) ||
+            isStrInStrList(fullEvent.allTags, searchTerm, true))
+        ); // term && type
+      }
+    });
+  }, [searchTerm, searchTypeList, sortedFullEvents]);
 
-  // set initial event to be the first in list to render out immediately
+  // event query & auto set initial event
   useEffect(() => {
-    if (onMedia.onDesktop)
-      setFullEvent(
-        filteredFullEvents.length > 0 ? filteredFullEvents[0] : null
+    const queryEID = Router.query?.eid;
+    const currentEID = fullEvent?.event?.id;
+    // special case 1 (desktop): app can't distinguish between searching list change and click an entry (case 1 both arey query && current entry), thus isSearchingClicked flag was introduced
+    // special case 2 (mobile): mobile app can't distinguish between user input a query or user clicked back button (case 2 both are query && !current entry), thus isMobileBackClicked flag was introduced
+    // case 1 (desktop & mobile): user click a new entry => current entry, update url
+    // case 1.1 (desktop & mobile): if query and current entry exist and are equal, do nothing
+    // case 2 (desktop & mobile): user directly input a url with a valid query => query && !current entry, set it to user's
+    // case 3 (desktop): the query is invalid or no query => !query && !current entry, set it to the 1st entry then update url
+    // case 3.1 (mobile): on mobile, remove query
+    if (onMedia.onDesktop && isSearchingClicked) {
+      // user changed searching settings (onDesktop && searching clicked => show 1st entry)
+      if (filteredFullEvents?.length > 0) {
+        setFullEvent(filteredFullEvents[0]);
+        shallowUpdateURLQuery(
+          Router.pathname,
+          "eid",
+          filteredFullEvents[0].event.id
+        );
+      } else {
+        setFullEvent(null);
+        shallowUpdateURLQuery(Router.pathname, null, null);
+      }
+      setIsSearchingClicked(false);
+      return;
+    }
+
+    if (!onMedia.onDesktop && isMobileBackClicked) {
+      // user clicked back button on mobile (onMobile && back button clicked) => show mobile list without url query
+      shallowUpdateURLQuery(Router.pathname, null, null);
+      setIsMobileBackClicked(false);
+      return; // special case 2
+    }
+
+    if (currentEID && currentEID === queryEID) return; // case 1.1
+
+    if (currentEID) {
+      // user clicked a new entry on the list (currentID && currentID != queryID) => display query id
+      // case 1.1 can be merged with this, it will do a redundant shallowUpdate
+      shallowUpdateURLQuery(Router.pathname, "eid", fullEvent.event.id);
+      return; // case 1
+    }
+
+    if (queryEID) {
+      const foundFullEvent = filteredFullEvents?.find(
+        (filteredFullEvent) => filteredFullEvent.event.id === queryEID
       );
-  }, [filteredFullEvents, onMedia.onDesktop, setFullEvent]);
+      if (foundFullEvent) {
+        // user directly input a url with valid query (no currentID && found queryID) => set this found entry
+        setFullEvent(foundFullEvent);
+        return; // case 2
+      }
+    }
+
+    if (!onMedia.onDesktop && filteredFullEvents?.length > 0) {
+      // user input url with no query or invalid query on mobile (no currentID && onMobile && back button not clicked && can't find query) => show mobile list without url query
+      // entries length check to ensure filtered entry list has finished calculation
+      shallowUpdateURLQuery(Router.pathname, null, null);
+      return; // case 3.1
+    }
+
+    if (onMedia.onDesktop && filteredFullEvents?.length > 0) {
+      // user input url with no query or invalid query on desktop (no currentID && onDekstop && can't find query) => set the 1st entry and update url query
+      setFullEvent(filteredFullEvents[0]);
+      shallowUpdateURLQuery(
+        Router.pathname,
+        "eid",
+        filteredFullEvents[0].event.id
+      );
+      return; // case 3
+    }
+  }, [
+    filteredFullEvents,
+    fullEvent?.event?.id,
+    isMobileBackClicked,
+    isSearchingClicked,
+    onMedia.onDesktop,
+    setFullEvent,
+    setIsMobileBackClicked,
+    setIsSearchingClicked,
+  ]);
 
   return (
     <FixedHeightPaper

@@ -103,30 +103,33 @@ const Students = () => {
               </motion.div>
             </Box>
           </>
-        ) : student === null ? (
-          <Box
-            id="students-mobile-list-box"
-            sx={{
-              paddingTop: 2,
-              paddingLeft: 2,
-              width: "100%",
-              backgroundColor: "hoverGray.main",
-            }}
-          >
-            <StudentGrid />
-          </Box>
         ) : (
-          <Box
-            id="students-mobile-info-box"
-            sx={{
-              paddingTop: 2,
-              paddingLeft: 2,
-              width: "100%",
-              backgroundColor: "hoverGray.main",
-            }}
-          >
-            <StudentProfile />
-          </Box>
+          <>
+            <Box
+              id="students-mobile-list-box"
+              sx={{
+                display: student === null ? "block" : "none",
+                paddingTop: 2,
+                paddingLeft: 2,
+                width: "100%",
+                backgroundColor: "hoverGray.main",
+              }}
+            >
+              <StudentGrid />
+            </Box>
+            <Box
+              id="students-mobile-info-box"
+              sx={{
+                display: student === null ? "none" : "block",
+                paddingTop: 2,
+                paddingLeft: 2,
+                width: "100%",
+                backgroundColor: "hoverGray.main",
+              }}
+            >
+              <StudentProfile />
+            </Box>
+          </>
         )}
       </Box>
     </StudentContext.Provider>

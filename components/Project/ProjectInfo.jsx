@@ -44,152 +44,154 @@ const ProjectInfo = () => {
         paddingTop: onMedia.onDesktop ? "32px" : 0,
       }}
     >
-      <Box
-        id="projectinfo-box"
-        ref={boxRef}
-        sx={{
-          flexGrow: 1,
-          overflowY: "scroll",
-          paddingTop: onMedia.onDesktop ? 2 : 2, // align with project list
-          paddingBottom: onMedia.onDesktop ? 6 : 2, // enough space for messages
-          paddingLeft: onMedia.onDesktop ? 4 : 2,
-          paddingRight: onMedia.onDesktop
-            ? `calc(${theme.spacing(4)} - 0.4rem)`
-            : 2, // onDesktop: scrollbar
-        }}
-      >
-        <motion.div
-          key={project?.title}
-          initial={{ opacity: 0, y: "1%" }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+      {fullProject !== null && (
+        <Box
+          id="projectinfo-box"
+          ref={boxRef}
+          sx={{
+            flexGrow: 1,
+            overflowY: "scroll",
+            paddingTop: onMedia.onDesktop ? 2 : 2, // align with project list
+            paddingBottom: onMedia.onDesktop ? 6 : 2, // enough space for messages
+            paddingLeft: onMedia.onDesktop ? 4 : 2,
+            paddingRight: onMedia.onDesktop
+              ? `calc(${theme.spacing(4)} - 0.4rem)`
+              : 2, // onDesktop: scrollbar
+          }}
         >
-          <Box
-            id="projectinfo-header-box"
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-            }}
+          <motion.div
+            key={project?.title}
+            initial={{ opacity: 0, y: "1%" }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            <Avatar
+            <Box
+              id="projectinfo-header-box"
               sx={{
-                mr: onMedia.onDesktop ? 4 : 2,
-                height: "96px",
-                width: "96px",
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
               }}
-              src={project?.icon_url}
             >
-              <UploadFileIcon />
-            </Avatar>
+              <Avatar
+                sx={{
+                  mr: onMedia.onDesktop ? 4 : 2,
+                  height: "96px",
+                  width: "96px",
+                }}
+                src={project?.icon_url}
+              >
+                <UploadFileIcon />
+              </Avatar>
+              <Typography
+                color="text.primary"
+                variant="h2"
+                sx={{
+                  fontSize: onMedia.onDesktop ? "1.875rem" : "1.25rem",
+                  fontWeight: "bold",
+                }}
+              >
+                {project?.title}
+              </Typography>
+            </Box>
+
+            <Divider
+              sx={{
+                mt: 2,
+                borderBottomWidth: 1,
+                borderColor: "divider",
+              }}
+            />
+
             <Typography
               color="text.primary"
-              variant="h2"
+              variant="h3"
               sx={{
-                fontSize: onMedia.onDesktop ? "1.875rem" : "1.25rem",
+                mt: 4,
+                mb: 1,
+                fontSize: "1.25rem",
                 fontWeight: "bold",
               }}
             >
-              {project?.title}
+              {"Description:"}
             </Typography>
-          </Box>
-
-          <Divider
-            sx={{
-              mt: 2,
-              borderBottomWidth: 1,
-              borderColor: "divider",
-            }}
-          />
-
-          <Typography
-            color="text.primary"
-            variant="h3"
-            sx={{
-              mt: 4,
-              mb: 1,
-              fontSize: "1.25rem",
-              fontWeight: "bold",
-            }}
-          >
-            {"Description:"}
-          </Typography>
-          <Typography color="text.secondary" component="span" variant="body1">
-            <pre
-              style={{
-                fontFamily: "inherit",
-                whiteSpace: "pre-wrap",
-                wordWrap: "break-word",
-                display: "inline",
-              }}
-            >
-              <Interweave
-                content={project?.description}
-                matchers={[new UrlMatcher("url")]}
-              />
-            </pre>
-          </Typography>
-
-          {project?.position_list?.length > 0 && (
-            <Box
-              id="projectinfo-positions-box"
-              sx={{
-                mt: 4,
-                paddingX: 2,
-                paddingY: 2,
-                borderRadius: 2,
-                backgroundColor: "primary.main",
-              }}
-            >
-              <Typography
-                color="white"
-                variant="h3"
-                sx={{ fontSize: "1.25rem", fontWeight: "bold" }}
+            <Typography color="text.secondary" component="span" variant="body1">
+              <pre
+                style={{
+                  fontFamily: "inherit",
+                  whiteSpace: "pre-wrap",
+                  wordWrap: "break-word",
+                  display: "inline",
+                }}
               >
-                {"Positions:"}
-              </Typography>
-              {project.position_list.map((position, index) => (
-                <PositionListItem
-                  key={index}
-                  index={index}
-                  posID={position.id}
-                  posTitle={position.title}
-                  posResp={position.responsibility}
-                  posWeeklyHour={position.weekly_hour}
-                  appURL={position?.url}
-                  appDeadline={position?.deadline}
-                  creator={projectCreator}
+                <Interweave
+                  content={project?.description}
+                  matchers={[new UrlMatcher("url")]}
                 />
-              ))}
-            </Box>
-          )}
+              </pre>
+            </Typography>
 
-          {projectAllTags?.length > 0 && (
-            <Box id="projectinfo-details-box">
-              <Typography
-                color="text.primary"
-                variant="h3"
-                sx={{ mt: 4, fontSize: "1.25rem", fontWeight: "bold" }}
+            {project?.position_list?.length > 0 && (
+              <Box
+                id="projectinfo-positions-box"
+                sx={{
+                  mt: 4,
+                  paddingX: 2,
+                  paddingY: 2,
+                  borderRadius: 2,
+                  backgroundColor: "primary.main",
+                }}
               >
-                {"Details: "}
-              </Typography>
-              {projectAllTags.map((tag, index) => (
-                <Chip
-                  key={index}
-                  color={"lightPrimary"}
-                  label={tag}
-                  sx={{
-                    mr: 1,
-                    mt: 1,
-                    fontSize: "0.875rem",
-                    fontWeight: "medium",
-                  }}
-                />
-              ))}
-            </Box>
-          )}
-        </motion.div>
-      </Box>
+                <Typography
+                  color="white"
+                  variant="h3"
+                  sx={{ fontSize: "1.25rem", fontWeight: "bold" }}
+                >
+                  {"Positions:"}
+                </Typography>
+                {project.position_list.map((position, index) => (
+                  <PositionListItem
+                    key={index}
+                    index={index}
+                    posID={position.id}
+                    posTitle={position.title}
+                    posResp={position.responsibility}
+                    posWeeklyHour={position.weekly_hour}
+                    appURL={position?.url}
+                    appDeadline={position?.deadline}
+                    creator={projectCreator}
+                  />
+                ))}
+              </Box>
+            )}
+
+            {projectAllTags?.length > 0 && (
+              <Box id="projectinfo-details-box">
+                <Typography
+                  color="text.primary"
+                  variant="h3"
+                  sx={{ mt: 4, fontSize: "1.25rem", fontWeight: "bold" }}
+                >
+                  {"Details: "}
+                </Typography>
+                {projectAllTags.map((tag, index) => (
+                  <Chip
+                    key={index}
+                    color={"lightPrimary"}
+                    label={tag}
+                    sx={{
+                      mr: 1,
+                      mt: 1,
+                      fontSize: "0.875rem",
+                      fontWeight: "medium",
+                    }}
+                  />
+                ))}
+              </Box>
+            )}
+          </motion.div>
+        </Box>
+      )}
       {!onMedia.onDesktop && fullProject !== null && (
         <Fab
           color="primary"

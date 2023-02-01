@@ -1,6 +1,6 @@
 import { useContext, useMemo, useEffect } from "react";
 import NextLink from "next/link";
-import { Box, Button, Paper, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Tooltip, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import ProjectListItem from "./ProjectListItem";
@@ -24,6 +24,8 @@ const ProjectList = () => {
   const {
     fullProject,
     setFullProject,
+    isSearchingClicked,
+    setIsSearchingClicked,
     isMobileBackClicked,
     setIsMobileBackClicked,
     searchTerm,
@@ -105,48 +107,66 @@ const ProjectList = () => {
   useEffect(() => {
     const queryPID = Router.query?.pid;
     const currentPID = fullProject?.project?.id;
+    // special case 1 (desktop): app can't distinguish between searching list change and click an entry (case 1 both arey query && current entry), thus isSearchingClicked flag was introduced
+    // special case 2 (mobile): mobile app can't distinguish between user input a query or user clicked back button (case 2 both are query && !current entry), thus isMobileBackClicked flag was introduced
     // case 1 (desktop & mobile): user click a new entry => current entry, update url
     // case 1.1 (desktop & mobile): if query and current entry exist and are equal, do nothing
     // case 2 (desktop & mobile): user directly input a url with a valid query => query && !current entry, set it to user's
-    // case 2.1 (mobile): mobile app can't distinguish between user input a query or user clicked back button (since both are query && !current entry), thus isMobileBackClicked flag was introduced
     // case 3 (desktop): the query is invalid or no query => !query && !current entry, set it to the 1st entry then update url
     // case 3.1 (mobile): on mobile, remove query
+    if (onMedia.onDesktop && isSearchingClicked) {
+      // user changed searching settings (onDesktop && searching clicked => show 1st entry)
+      if (filteredFullProjects?.length > 0) {
+        setFullProject(filteredFullProjects[0]);
+        shallowUpdateURLQuery(
+          Router.pathname,
+          "pid",
+          filteredFullProjects[0].project.id
+        );
+      } else {
+        setFullProject(null);
+        shallowUpdateURLQuery(Router.pathname, null, null);
+      }
+      setIsSearchingClicked(false);
+      return;
+    }
+
+    if (!onMedia.onDesktop && isMobileBackClicked) {
+      // user clicked back button on mobile (onMobile && back button clicked) => show mobile list without url query
+      shallowUpdateURLQuery(Router.pathname, null, null);
+      setIsMobileBackClicked(false);
+      return; // special case 2
+    }
+
     if (currentPID && currentPID === queryPID) return; // case 1.1
 
     if (currentPID) {
-      // user clicked a new project on the list (currentPID && currentPID != queryPID) => display query pid
+      // user clicked a new entry on the list (currentID && currentID != queryID) => display query id
       // case 1.1 can be merged with this, it will do a redundant shallowUpdate
       shallowUpdateURLQuery(Router.pathname, "pid", fullProject.project.id);
       return; // case 1
     }
 
-    if (!onMedia.onDesktop && isMobileBackClicked) {
-      // user clicked back button on mobile (no currentPID && onMobile && back button clicked) => show mobile list without url query
-      shallowUpdateURLQuery(Router.pathname, null, null);
-      setIsMobileBackClicked(false);
-      return; // case 2.1
-    }
-
     if (queryPID) {
-      const foundFullProject = filteredFullProjects.find(
-        (filteredfullProject) => filteredfullProject.project.id === queryPID
+      const foundFullProject = filteredFullProjects?.find(
+        (filteredFullProject) => filteredFullProject.project.id === queryPID
       );
       if (foundFullProject) {
-        // user directly input a url with valid query (no currentPID && found project with queryPID) => set this found project
+        // user directly input a url with valid query (no currentID && found queryID) => set this found entry
         setFullProject(foundFullProject);
         return; // case 2
       }
     }
 
-    if (!onMedia.onDesktop && filteredFullProjects.length > 0) {
-      // user input url with no query or invalid query on mobile (no currentPID && onMobile && back button not clicked && can't find query) => show mobile list without url query
-      // project length check to ensure filteredFullProject list has finished calculation
+    if (!onMedia.onDesktop && filteredFullProjects?.length > 0) {
+      // user input url with no query or invalid query on mobile (no currentID && onMobile && back button not clicked && can't find query) => show mobile list without url query
+      // entries length check to ensure filtered entry list has finished calculation
       shallowUpdateURLQuery(Router.pathname, null, null);
       return; // case 3.1
     }
 
-    if (onMedia.onDesktop && filteredFullProjects.length > 0) {
-      // user input url with no query or invalid query on desktop (no currentPID && onDekstop && can't find query) => set the 1st project and update url query
+    if (onMedia.onDesktop && filteredFullProjects?.length > 0) {
+      // user input url with no query or invalid query on desktop (no currentID && onDekstop && can't find query) => set the 1st entry and update url query
       setFullProject(filteredFullProjects[0]);
       shallowUpdateURLQuery(
         Router.pathname,
@@ -158,10 +178,12 @@ const ProjectList = () => {
   }, [
     filteredFullProjects,
     fullProject?.project?.id,
+    isMobileBackClicked,
+    isSearchingClicked,
     onMedia.onDesktop,
     setFullProject,
-    isMobileBackClicked,
     setIsMobileBackClicked,
+    setIsSearchingClicked,
   ]);
 
   // https://stackoverflow.com/questions/45767405/the-difference-between-flex1-and-flex-grow1
