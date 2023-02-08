@@ -9,9 +9,9 @@ const Loading = ({ type, color }) => {
       direction="row"
       alignItems="center"
       justifyContent="center"
-      sx={{ minHeight: "100vh" }}
+      sx={{ minHeight: "100dvh" }}
     >
-      <ReactLoading type={type} color={color} height={"20%"} width={"20%"} />
+      <ReactLoading type={type} color={color} height={"10%"} width={"10%"} />
     </Grid>
   );
 };

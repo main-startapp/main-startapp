@@ -198,7 +198,7 @@ const PositionListItem = (props) => {
   const appURLButton = (
     <Button
       color="primary"
-      disabled={!ediumUser?.uid || dayDiff > 0}
+      disabled={dayDiff > 0}
       disableElevation
       size="small"
       variant="contained"
@@ -224,6 +224,7 @@ const PositionListItem = (props) => {
       disabled={
         !ediumUser?.uid ||
         dayDiff > 0 ||
+        ediumUser?.uid === creator?.uid ||
         ediumUserExt?.join_requests?.some(
           (jr) => jr.project_id === project.id && jr.position_id === posID
         )
@@ -278,8 +279,8 @@ const PositionListItem = (props) => {
             }}
           >
             <Typography
-              variant="h4"
               color="text.primary"
+              variant="h4"
               sx={{ fontSize: "1rem", fontWeight: "medium" }}
             >
               {posTitle}
@@ -301,11 +302,13 @@ const PositionListItem = (props) => {
                 }}
               />
             )}
-            {onMedia.onDesktop && ediumUser?.uid !== creator?.uid && (
+            {onMedia.onDesktop && (
               <>
                 <Box sx={{ flexGrow: 1 }} />
                 <Tooltip
-                  title={ediumUser?.uid ? "" : "Edit your profile first"}
+                  title={
+                    !ediumUser?.uid && !appURL ? "Sign in or Edit profile" : ""
+                  }
                 >
                   <span>{appURL ? appURLButton : joinRequestButton}</span>
                 </Tooltip>
@@ -314,10 +317,6 @@ const PositionListItem = (props) => {
           </Box>
         </StyledAccordionSummary>
         <AccordionDetails sx={{ padding: 4 }}>
-          {/* <Divider
-            sx={{ mb: 1.5, borderBottomWidth: 1.5, borderColor: "#dbdbdb" }}
-          /> */}
-
           <Box
             sx={{
               width: "100%",
@@ -366,10 +365,12 @@ const PositionListItem = (props) => {
                 <Interweave content={posResp} />
               </pre>
             </Typography>
-            {!onMedia.onDesktop && ediumUser?.uid !== creator?.uid && (
+            {!onMedia.onDesktop && (
               <Box sx={{ mt: 2, display: "flex", justifyContent: "end" }}>
                 <Tooltip
-                  title={ediumUser?.uid ? "" : "Edit your profile first"}
+                  title={
+                    !ediumUser?.uid && !appURL ? "Sign in or Edit profile" : ""
+                  }
                 >
                   <span>{appURL ? appURLButton : joinRequestButton}</span>
                 </Tooltip>

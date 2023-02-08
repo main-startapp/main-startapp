@@ -30,7 +30,7 @@ const EventInfo = () => {
 
   // local vars
   const event = fullEvent?.event;
-  const eventCreator = fullEvent?.creator_uid;
+  const eventCreator = fullEvent?.creator;
   const eventAllTags = fullEvent?.allTags;
 
   // transfer code
@@ -81,7 +81,7 @@ const EventInfo = () => {
             flexGrow: 1,
             overflowY: "scroll",
             paddingTop: onMedia.onDesktop ? 2 : 2, // align with project list
-            paddingBottom: onMedia.onDesktop ? 6 : 4, // enough space to not covered by messages
+            paddingBottom: onMedia.onDesktop ? 6 : 4, // enough space to not covered by messages; overall padding top = 2*8+32 = 48 = 6*8 = padding bottom
             paddingLeft: onMedia.onDesktop ? 4 : 2,
             paddingRight: onMedia.onDesktop
               ? `calc(${theme.spacing(4)} - 0.4rem)`
@@ -197,7 +197,7 @@ const EventInfo = () => {
                 {eventAllTags?.map((tag, index) => (
                   <Chip
                     key={index}
-                    color={"lightPrimary"}
+                    color="lightPrimary"
                     label={tag}
                     sx={{
                       mr: 1,

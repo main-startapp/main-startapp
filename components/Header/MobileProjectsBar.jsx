@@ -212,8 +212,8 @@ const MobileProjectsBar = () => {
           </Typography>
           {searchTypeList.length > 0 && (
             <Chip
-              label={searchTypeList.length + " selected"}
               color="selectedWhite"
+              label={searchTypeList.length + " selected"}
               size="small"
               onDelete={() => {
                 const newTypeList = [...typeList];

@@ -1,18 +1,11 @@
-import {
-  Box,
-  Button,
-  Divider,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { Box, Button, Divider, Typography } from "@mui/material";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
 } from "firebase/auth";
 import { useRef, useState } from "react";
 import { auth } from "../../firebase";
+import { SignTextField } from "./Signin";
 
 const Signup = (props) => {
   // props
@@ -59,23 +52,34 @@ const Signup = (props) => {
         case "password":
           if (!value) {
             stateObj[name] = "Please enter Password";
-          } else if (value?.length < 6) {
-            stateObj[name] = "Password must contains 6 or more characters";
-          } else if (input.confirmPassword && value !== input.confirmPassword) {
+          } else if (value.length < 8) {
+            stateObj[name] = "Password must be at least 8 characters";
+          } else if (!/^\S*$/.test(value)) {
+            stateObj[name] = "Password must not contain whitespaces";
+          } else if (!/^(?=.*[A-Z]).*$/.test(value)) {
+            stateObj[name] =
+              "Password must contain at least 1 uppercase letter";
+          } else if (!/^(?=.*[a-z]).*$/.test(value)) {
+            stateObj[name] =
+              "Password must contain at least 1 lowercase letter";
+          } else if (!/^(?=.*[0-9]).*$/.test(value)) {
+            stateObj[name] = "Password must contain at least 1 digit";
+          } else if (
+            !/^(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹]).*$/.test(value)
+          ) {
+            stateObj[name] = "Password must contain at least 1 special symbol";
+          } else if (
+            !input.confirmPassword ||
+            (input.confirmPassword && value !== input.confirmPassword)
+          ) {
             stateObj["confirmPassword"] =
               "Password and Confirm Password do not match";
-          } else {
-            stateObj["confirmPassword"] = input.confirmPassword
-              ? ""
-              : errorMsg.confirmPassword;
           }
           break;
 
         case "confirmPassword":
           if (!value) {
             stateObj[name] = "Please enter Confirm Password";
-          } else if (value?.length < 6) {
-            stateObj[name] = "Password must contains 6 or more characters";
           } else if (input.password && value !== input.password) {
             stateObj[name] = "Password and Confirm Password do not match";
           }
@@ -92,8 +96,11 @@ const Signup = (props) => {
   const handleConfirm = (e) => {
     e.preventDefault();
     if (!formRef.current.reportValidity()) return;
+
     const hasError = Object.values(errorMsg).some((error) => error.length > 0);
     if (hasError) return;
+    // !todo: add another layer of validation here?
+
     createUserWithEmailAndPassword(auth, input.email, input.password)
       // .then(async (userCredential) => {
       //   const user = userCredential.user;
@@ -117,20 +124,21 @@ const Signup = (props) => {
   };
 
   return (
-    <Box>
-      <Divider
-        sx={{
-          mt: "2vh",
-          width: isMobile ? "68vmin" : "38vmin",
-          color: "lightgray",
-        }}
-      >
-        {"Create an Account"}
-      </Divider>
-      <Box sx={{ mt: "2vh", width: isMobile ? "68vmin" : "38vmin" }}>
+    <>
+      <Box sx={{ mt: 6 }}>
+        <Divider
+          sx={{
+            width: isMobile ? "256px" : "414px",
+            color: "#d3d3d3",
+          }}
+        >
+          {"Create an Account"}
+        </Divider>
+      </Box>
+
+      <Box sx={{ mt: 3, width: isMobile ? "256px" : "414px" }}>
         <form ref={formRef}>
-          <StyledTextField
-            sx={{ paddingY: 0, fontSize: "0.9em" }}
+          <SignTextField
             fullWidth
             margin="none"
             label="Email"
@@ -144,15 +152,10 @@ const Signup = (props) => {
             helperText={errorMsg.email || " "}
           />
 
-          <StyledTextField
-            sx={{ paddingY: 0, fontSize: "0.9em" }}
+          <SignTextField
             fullWidth
             margin="none"
-            label={
-              isMobile
-                ? "Password (>5 characters)"
-                : "Password (6 or more characters)"
-            }
+            label="Password"
             name="password"
             type="password"
             variant="outlined"
@@ -163,8 +166,7 @@ const Signup = (props) => {
             helperText={errorMsg.password || " "}
           />
 
-          <StyledTextField
-            sx={{ paddingY: 0, fontSize: "0.9em" }}
+          <SignTextField
             fullWidth
             margin="none"
             label="Password Confirmation"
@@ -181,39 +183,34 @@ const Signup = (props) => {
       </Box>
       <Box
         sx={{
-          mt: "1vh",
-          width: isMobile ? "68vmin" : "38vmin",
+          width: isMobile ? "256px" : "414px",
           display: "flex",
           justifyContent: "flex-end",
         }}
       >
         <Button
+          color="primary"
           disableElevation
-          sx={{
-            border: 1.5,
-            borderColor: "#dbdbdb",
-            borderRadius: 8,
-            color: "white",
-            backgroundColor: "#3e95c2",
-            fontSize: "0.8em",
-            textTransform: "none",
-            paddingX: 5,
-            paddingY: 0.1,
-          }}
           variant="contained"
           onClick={(e) => handleConfirm(e)}
+          sx={{
+            width: "112px",
+            height: "24px",
+            borderRadius: 8,
+            fontSize: "0.75rem",
+          }}
         >
           {"Confirm"}
         </Button>
       </Box>
-      <Box sx={{ mt: "2vh", display: "flex", justifyContent: "center" }}>
-        <Typography sx={{ fontSize: "0.9em" }}>
+      <Box sx={{ mt: 6, mb: 3, display: "flex", justifyContent: "center" }}>
+        <Typography sx={{ fontSize: "0.875rem" }}>
           {"Already on Edium? "} &nbsp;
         </Typography>
         <Typography
+          color="primary.light"
           sx={{
-            color: "#3e95c2",
-            fontSize: "0.9em",
+            fontSize: "0.875rem",
             ":hover": {
               cursor: "pointer",
             },
@@ -223,47 +220,8 @@ const Signup = (props) => {
           {"Sign in"}
         </Typography>
       </Box>
-    </Box>
+    </>
   );
 };
 
 export default Signup;
-
-// !todo: directly use theme.palette.error
-// https://v4.mui.com/customization/palette/
-const StyledTextField = styled(TextField)(({ theme }) => ({
-  "& .MuiInputBase-input": { padding: theme.spacing(1, 2) },
-
-  "& .MuiFormLabel-root": { top: "-0.4em", fontSize: "0.9em" },
-  "& .MuiInputLabel-shrink": { top: "0" }, // to counter root adjustment
-  "& .MuiFormLabel-root.Mui-focused": { top: "0" }, // to counter root adjustment
-
-  "& .MuiOutlinedInput-root": {
-    borderRadius: 2,
-    backgroundColor: "white",
-  },
-  "& .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
-    borderColor: "#dbdbdb",
-  },
-  "&:hover .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
-    borderColor: "#dbdbdb !important",
-  },
-  "&:hover .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
-    borderColor: "#d32f2f !important",
-  },
-  "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
-    borderColor: "#3e95c2 !important",
-  },
-  "& .MuiOutlinedInput-root.Mui-focused.Mui-error .MuiOutlinedInput-notchedOutline":
-    {
-      borderWidth: 1.5,
-      borderColor: "#d32f2f !important",
-    },
-  "& .MuiFormHelperText-root": {
-    fontSize: "12px",
-  },
-}));

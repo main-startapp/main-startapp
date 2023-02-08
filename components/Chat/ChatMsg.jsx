@@ -334,10 +334,6 @@ const ChatMsg = (props) => {
       <Avatar
         sx={{
           m: "12px",
-          // color: "#dbdbdb",
-          // backgroundColor: "#ffffff",
-          // border: 1,
-          // borderColor: "#dbdbdb",
           height: "48px",
           width: "48px",
         }}

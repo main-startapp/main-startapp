@@ -227,7 +227,7 @@ const ProjectList = () => {
           }}
         >
           <Tooltip
-            title={ediumUser?.uid ? "" : "Edit your profile first"}
+            title={!ediumUser?.uid ? "Sign in or Edit profile" : ""}
             style={{ width: "100%" }} // !important: make create button fullwidth
           >
             <span>

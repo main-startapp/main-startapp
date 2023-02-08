@@ -35,7 +35,7 @@ const getDesignTokens = (mode, onMedia) => ({
           secondary: { main: "#6ff9d1" },
           text: {
             primary: "rgba(0, 0, 0, 1)",
-            secondary: "rgba(0, 0, 0, 87)",
+            secondary: "rgba(0, 0, 0, 0.87)",
           },
 
           lightPrimary: {
@@ -46,11 +46,11 @@ const getDesignTokens = (mode, onMedia) => ({
             main: "#fff",
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
-          unselectedIcon: {
+          unselectedGray: {
             main: grey[700],
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
-          textfieldPlaceholder: {
+          placholderGray: {
             main: grey[500],
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
@@ -72,8 +72,8 @@ const getDesignTokens = (mode, onMedia) => ({
             main: "#fff",
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
-          unselectedIcon: { main: grey[700], contrastText: "#fff" },
-          textfieldPlaceholder: { main: grey[500], contrastText: "#fff" },
+          unselectedGray: { main: grey[700], contrastText: "#fff" },
+          placholderGray: { main: grey[500], contrastText: "#fff" },
           searchGary: { main: grey[600], contrastText: "#fff" },
           hoverGray: { main: grey[800], contrastText: "#fff" },
 
@@ -223,6 +223,10 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <ThemeProvider theme={theme}>
+      <Head>
+        <title>Edium</title>
+        <link rel="icon" href="/images/favicon.ico" />
+      </Head>
       <AuthProvider>
         <LocalizationProvider dateAdapter={AdapterMoment}>
           <GlobalContext.Provider
@@ -260,10 +264,6 @@ function MyApp({ Component, pageProps }) {
               setIsAnimated,
             }}
           >
-            <Head>
-              <title>Edium</title>
-              <link rel="icon" href="/images/favicon.ico" />
-            </Head>
             <CssBaseline enableColorScheme />
             <DBListener />
             {onMedia.onDesktop && <Navbar />}
