@@ -161,11 +161,11 @@ const ChatAccordionContact = (props) => {
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
         <Badge
+          color="secondary"
+          badgeContent={chat[my_unread_key]}
           sx={{
             mb: "12px",
           }}
-          badgeContent={chat[my_unread_key]}
-          color="secondary"
         />
       </Box>
     </ContactBox>

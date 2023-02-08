@@ -10,7 +10,7 @@ const UserIconMenu = (props) => {
   const avatarHeight = props.avatarHeight;
 
   // context
-  const { currentUser } = useAuth();
+  const { currentUser, setSigninFlag } = useAuth();
   const { ediumUser } = useContext(GlobalContext);
 
   // menu
@@ -25,7 +25,14 @@ const UserIconMenu = (props) => {
     setAnchorEl(null);
   };
 
-  const handleMenuLogout = (e) => {
+  const handleMenuSignin = (e) => {
+    // signout user -> close menu
+    e.stopPropagation();
+    setSigninFlag(true);
+    setAnchorEl(null);
+  };
+
+  const handleMenuSignout = (e) => {
     // signout user -> close menu
     e.stopPropagation();
     auth.signOut();
@@ -37,7 +44,6 @@ const UserIconMenu = (props) => {
     <>
       <IconButton
         id="navbar-menu-button"
-        disabled={!currentUser}
         aria-controls={open ? "navbar-menu" : undefined}
         aria-haspopup="true"
         aria-expanded={open ? "true" : undefined}
@@ -71,35 +77,45 @@ const UserIconMenu = (props) => {
           },
         }}
       >
-        <MenuItem
-          onClick={(e) => {
-            handleMenuClose(e);
-          }}
-        >
-          <NextLink
-            href={{
-              pathname: "/students/create",
-            }}
-            passHref
-            style={{
-              color: "inherit",
-            }}
-          >
-            Edit Profile
-          </NextLink>
-        </MenuItem>
-        {/* <MenuItem onClick={handleUserMenuClose}>
-              <NextLink href="/team/management" passHref>
-                <MenuItemLink>Team Management</MenuItemLink>
-              </NextLink>
-            </MenuItem> */}
-        <MenuItem
-          onClick={(e) => {
-            handleMenuLogout(e);
-          }}
-        >
-          Log Out
-        </MenuItem>
+        {currentUser
+          ? [
+              <MenuItem
+                key="editProfile"
+                onClick={(e) => {
+                  handleMenuClose(e);
+                }}
+              >
+                <NextLink
+                  href={{
+                    pathname: "/students/create",
+                  }}
+                  passHref
+                  style={{
+                    color: "inherit",
+                  }}
+                >
+                  Edit Profile
+                </NextLink>
+              </MenuItem>,
+              <MenuItem
+                key="signOut"
+                onClick={(e) => {
+                  handleMenuSignout(e);
+                }}
+              >
+                Sign Out
+              </MenuItem>,
+            ]
+          : [
+              <MenuItem
+                key="singIn"
+                onClick={(e) => {
+                  handleMenuSignin(e);
+                }}
+              >
+                Sign In
+              </MenuItem>,
+            ]}
       </Menu>
     </>
   );

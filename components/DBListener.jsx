@@ -116,11 +116,15 @@ const DBListener = () => {
 
   // listen to realtime events collection, public
   useEffect(() => {
+    // time
+    //const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
     // db query
     const collectionRef = collection(db, "events");
     const q = query(
       collectionRef,
       where("is_deleted", "==", false),
+      //where("end_date", ">", sevenDaysAgo),
       orderBy("start_date", "asc")
     );
 

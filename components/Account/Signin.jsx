@@ -2,22 +2,21 @@ import {
   Box,
   Button,
   Divider,
-  Grid,
+  Paper,
   TextField,
-  Tooltip,
   Typography,
   useMediaQuery,
 } from "@mui/material";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { styled } from "@mui/material/styles";
+import { styled, useTheme } from "@mui/material/styles";
 import ExportedImage from "next-image-export-optimizer";
 import { useState } from "react";
 import { auth, googleProvider } from "../../firebase";
-import useWindowDimensions from "../Reusable/WindowDimensions";
 import GoogleIcon from "@mui/icons-material/Google";
 import AppleIcon from "@mui/icons-material/Apple";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import Signup from "./Signup";
+import { motion } from "framer-motion";
 
 // sign in, sign up, log in
 // https://ux.stackexchange.com/questions/1080/using-sign-in-vs-using-log-in
@@ -25,11 +24,11 @@ import Signup from "./Signup";
 const Signin = () => {
   const [isSignup, setIsSignup] = useState(false);
   const [input, setInput] = useState({ email: "", password: "" });
-  const [errorMsg, setErrorMsg] = useState({ email: "", password: "" });
+  const [errorMsg, setErrorMsg] = useState("");
 
   // independent media query
   const isMobile = useMediaQuery("(max-width:767px)");
-  const { winWidth, winHeight } = useWindowDimensions();
+  const theme = useTheme();
 
   // Configure FirebaseUI.
   // const uiConfig = {
@@ -54,30 +53,25 @@ const Signin = () => {
   const handleSignIn = () => {
     signInWithEmailAndPassword(auth, input.email, input.password).catch(
       (error) => {
-        let emailMsg = "";
-        let passwordMsg = "";
+        let msg = "";
         switch (error.code) {
           case "auth/user-not-found":
-            emailMsg = "User not found";
-            passwordMsg = "";
+            msg = "User not found";
             break;
 
           case "auth/invalid-email":
-            emailMsg = "Email is invalid";
-            passwordMsg = "";
+            msg = "Email is invalid";
             break;
 
           case "auth/wrong-password":
-            emailMsg = "";
-            passwordMsg = "Wrong password";
+            msg = "Wrong password";
             break;
 
           default:
-            emailMsg = "Double check your Email";
-            passwordMsg = "Double check your Password";
+            msg = "Check email or password";
             break;
         }
-        setErrorMsg({ email: emailMsg, password: passwordMsg });
+        setErrorMsg(msg);
       }
     );
   };
@@ -89,67 +83,42 @@ const Signin = () => {
   };
 
   const signinComp = (
-    <Box>
-      {/* <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} /> */}
-      <StyledButton
-        sx={{
-          mt: "2vh",
-          width: isMobile ? "68vmin" : "38vmin",
-          fontSize: "0.9em",
-          border: 1.5,
-          borderColor: "#dbdbdb",
-          ":hover": { backgroundColor: "#3e95c2", color: "white" },
-        }}
+    <>
+      <SignButton
         variant="contained"
         disableElevation
         startIcon={<GoogleIcon />}
         onClick={signInWithGoogle}
-      >
-        Sign in with Google
-      </StyledButton>
-
-      {/* <StyledButton
-          sx={{
-            mt: "1vh",
-            width: isMobile ? "68vmin" : "38vmin",
-            border: 1.5,
-            borderColor: "#dbdbdb",
-          }}
-          variant="contained"
-          disableElevation
-          startIcon={<AppleIcon />}
-          //onClick={}
-        >
-          Sign in with Apple
-        </StyledButton>
-
-        <StyledButton
-          sx={{
-            mt: "1vh",
-            width: isMobile ? "68vmin" : "38vmin",
-            border: 1.5,
-            borderColor: "#dbdbdb",
-          }}
-          variant="contained"
-          disableElevation
-          startIcon={<FacebookIcon />}
-          //onClick={}
-        >
-          Sign in with Facebook
-        </StyledButton> */}
-
-      <Divider
         sx={{
-          mt: "2vh",
-          width: isMobile ? "68vmin" : "38vmin",
-          color: "lightgray",
+          mt: 6,
+          width: "256px",
+          fontSize: "0.875rem",
+          background: "#fff",
+          color: "#000",
+          ":hover": {
+            background:
+              "linear-gradient(-120deg, #4285f4, #34a853, #fbbc05, #ea4335)",
+            color: "#fff",
+          },
         }}
       >
-        {"or Sign in with Email"}
-      </Divider>
-      <Box sx={{ mt: "2vh", width: isMobile ? "68vmin" : "38vmin" }}>
-        <StyledTextField
-          sx={{ paddingY: 0, fontSize: "0.9em" }}
+        Sign in with Google
+      </SignButton>
+
+      <Box sx={{ mt: 3 }}>
+        <Divider
+          sx={{
+            width: "256px",
+            color: "#d3d3d3",
+          }}
+        >
+          {"or Sign in with Email"}
+        </Divider>
+      </Box>
+
+      <Box sx={{ mt: 3, width: "256px" }}>
+        <SignTextField
+          //sx={{ paddingY: 0, fontSize: "1rem" }}
           fullWidth
           margin="none"
           label="Email"
@@ -158,11 +127,10 @@ const Signin = () => {
           variant="outlined"
           value={input.email}
           onChange={(e) => setInput({ ...input, email: e.target.value })}
-          error={!!errorMsg.email}
-          helperText={errorMsg.email || " "}
+          error={!!errorMsg}
         />
-        <StyledTextField
-          sx={{ paddingY: 0, fontSize: "0.9em" }}
+        <SignTextField
+          sx={{ mt: 1.5 }}
           fullWidth
           margin="none"
           label="Password"
@@ -171,45 +139,41 @@ const Signin = () => {
           variant="outlined"
           value={input.password}
           onChange={(e) => setInput({ ...input, password: e.target.value })}
-          error={!!errorMsg.password}
-          helperText={errorMsg.password || " "}
+          error={!!errorMsg}
+          helperText={errorMsg || " "}
         />
       </Box>
+
       <Box
         sx={{
-          width: isMobile ? "68vmin" : "38vmin",
+          width: "256px",
           display: "flex",
           justifyContent: "flex-end",
         }}
       >
         <Button
+          color="primary"
           disableElevation
-          sx={{
-            mt: "1vh",
-            border: 1.5,
-            borderColor: "#dbdbdb",
-            borderRadius: 8,
-            color: "white",
-            backgroundColor: "#3e95c2",
-            fontSize: "0.8em",
-            textTransform: "none",
-            paddingX: 5,
-            paddingY: 0.1,
-          }}
           variant="contained"
           onClick={handleSignIn}
+          sx={{
+            width: "112px",
+            height: "24px",
+            borderRadius: 8,
+            fontSize: "0.75rem",
+          }}
         >
           {"Sign in"}
         </Button>
       </Box>
-      <Box sx={{ mt: "2vh", display: "flex", justifyContent: "center" }}>
-        <Typography sx={{ fontSize: "0.9em" }}>
+      <Box sx={{ mt: 6, mb: 3, display: "flex", justifyContent: "center" }}>
+        <Typography sx={{ fontSize: "0.875rem" }}>
           {"Not registered yet? "} &nbsp;
         </Typography>
         <Typography
+          color="primary.light"
           sx={{
-            color: "#3e95c2",
-            fontSize: "0.9em",
+            fontSize: "0.875rem",
             ":hover": {
               cursor: "pointer",
             },
@@ -219,111 +183,108 @@ const Signin = () => {
           {"Join now"}
         </Typography>
       </Box>
-    </Box>
+    </>
   );
 
   return (
-    <Grid
-      container
-      spacing={0}
-      direction="row"
-      alignItems="center"
-      justifyContent="center"
+    <Box
+      id="singin-main-box"
       sx={{
-        backgroundColor: "#fafafa",
+        display: "flex",
+        justifyContent: "center",
+        overflow: "hidden",
+        ":hover": {
+          cursor: "default",
+        },
       }}
     >
-      <Grid
-        item
-        xs={isMobile ? 10 : 6}
+      <Paper
         sx={{
-          backgroundColor: "#ffffff",
-          borderLeft: 1.5,
-          borderRight: 1.5,
-          borderColor: "#dbdbdb",
-          paddingX: 3,
-          height: `${winHeight}px`,
+          minHeight: "100dvh",
+          width: isMobile ? "100%" : "572px", // each side is in golden ratio
           display: "flex",
-          flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
+          borderRadius: "0px 0px 0px 0px",
         }}
       >
-        <Box
-          sx={{
-            position: "relative",
-            height: isMobile ? "60vmin" : "40vmin",
-            width: isMobile ? "60vmin" : "40vmin",
+        <motion.div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
+          key={isSignup}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
         >
-          <ExportedImage src="/images/edium_v4_256.png" alt="" fill priority />
-        </Box>
+          <ExportedImage
+            style={{ marginTop: "24px" }}
+            alt=""
+            src="/images/edium_v4_256.png"
+            width={256}
+            height={256}
+          />
 
-        <Typography
-          sx={{
-            mt: "1vh",
-            fontSize: isMobile ? "1.5em" : "2.5em",
-            fontWeight: "bold",
-          }}
-        >
-          Welcome to EDIUM!
-        </Typography>
+          <Typography
+            sx={{
+              mt: 2,
+              fontSize: "1.75rem",
+              fontWeight: "bold",
+            }}
+          >
+            Welcome to EDIUM!
+          </Typography>
 
-        {isSignup ? (
-          <Signup setIsSignup={setIsSignup} isMobile={isMobile} />
-        ) : (
-          signinComp
-        )}
-      </Grid>
-    </Grid>
+          {isSignup ? (
+            <Signup setIsSignup={setIsSignup} isMobile={isMobile} />
+          ) : (
+            signinComp
+          )}
+        </motion.div>
+      </Paper>
+    </Box>
   );
 };
 
 export default Signin;
 
-const StyledButton = styled(Button)(({ theme }) => ({
-  color: "black",
-  backgroundColor: "white",
-  borderRadius: 8,
+const SignButton = styled(Button)(({ theme }) => ({
+  border: `1px solid #d3d3d3`,
+  borderRadius: theme.shape.borderRadius * 2,
   textTransform: "none",
-  display: "flex",
-  justifyContent: "center",
 }));
 
-const StyledTextField = styled(TextField)(({ theme }) => ({
+export const SignTextField = styled(TextField)(({ theme }) => ({
   "& .MuiInputBase-input": { padding: theme.spacing(1, 2) },
 
-  "& .MuiFormLabel-root": { top: "-0.4em", fontSize: "0.9em" },
+  "& .MuiFormLabel-root": {
+    top: "-0.4rem",
+    fontSize: "0.875rem",
+    fontWeight: theme.typography.fontWeightMedium,
+    color: theme.palette.placholderGray.main,
+  },
   "& .MuiInputLabel-shrink": { top: "0" }, // to counter root adjustment
   "& .MuiFormLabel-root.Mui-focused": { top: "0" }, // to counter root adjustment
 
   "& .MuiOutlinedInput-root": {
-    borderRadius: 2,
-    backgroundColor: "white",
-  },
-  "& .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
-    borderColor: "#dbdbdb",
-  },
-  "&:hover .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
-    borderColor: "#dbdbdb !important",
-  },
-  "&:hover .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
-    borderColor: "#d32f2f !important",
-  },
-  "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderWidth: 1.5,
-    borderColor: "#3e95c2 !important",
-  },
-  "& .MuiOutlinedInput-root.Mui-focused.Mui-error .MuiOutlinedInput-notchedOutline":
-    {
-      borderWidth: 1.5,
-      borderColor: "#d32f2f !important",
+    backgroundColor: "#fff",
+    borderRadius: theme.shape.borderRadius,
+    "& fieldset": {
+      border: `1px solid #d3d3d3`,
     },
+    "&:hover fieldset": {
+      border: `1px solid #d3d3d3`,
+    },
+    "&.Mui-focused fieldset": {
+      border: `1px solid #d3d3d3`,
+    },
+  },
+
   "& .MuiFormHelperText-root": {
-    color: "lightgray",
+    color: "error",
+    height: "24px",
     fontSize: "12px",
   },
 }));

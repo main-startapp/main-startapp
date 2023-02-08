@@ -53,7 +53,7 @@ const Navbar = () => {
               <LinkIconBox url={url} pathname="/">
                 <DashboardIcon
                   color={
-                    url.pathname === "/" ? "text.primary" : "unselectedIcon"
+                    url.pathname === "/" ? "text.primary" : "unselectedGray"
                   }
                   sx={{
                     height: "40px",
@@ -76,7 +76,7 @@ const Navbar = () => {
                   color={
                     url.pathname === "/events/"
                       ? "text.primary"
-                      : "unselectedIcon"
+                      : "unselectedGray"
                   }
                   sx={{
                     height: "40px",
@@ -99,7 +99,7 @@ const Navbar = () => {
                   color={
                     url.pathname === "/students/"
                       ? "text.primary"
-                      : "unselectedIcon"
+                      : "unselectedGray"
                   }
                   sx={{
                     height: "40px",
@@ -138,5 +138,5 @@ const LinkTypography = styled(Typography)(({ theme, url, pathname }) => ({
   color:
     url.pathname === pathname
       ? theme.palette.text.primary
-      : theme.palette.unselectedIcon.main,
+      : theme.palette.unselectedGray.main,
 }));

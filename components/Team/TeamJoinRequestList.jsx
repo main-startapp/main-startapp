@@ -64,9 +64,9 @@ const TeamJoinRequestList = () => {
       }}
     >
       <Typography
+        color="text.primary"
         sx={{
           fontWeight: "bold",
-          color: "black",
           // backgroundColor: "#3e95c2",
           // borderTopLeftRadius: 15,
           // borderTopRightRadius: 15,
@@ -75,7 +75,6 @@ const TeamJoinRequestList = () => {
           alignItems: "center",
           ml: "15px",
         }}
-        color="text.primary"
       >
         {"Join Requests"}
       </Typography>

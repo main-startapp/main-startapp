@@ -19,7 +19,7 @@ const ProjectInfo = () => {
 
   // local vars
   const project = fullProject?.project;
-  const projectCreator = fullProject?.creator_uid;
+  const projectCreator = fullProject?.creator;
   const projectAllTags = fullProject?.allTags;
 
   // transfer code
@@ -143,7 +143,7 @@ const ProjectInfo = () => {
                 }}
               >
                 <Typography
-                  color="white"
+                  color="primary.contrastText"
                   variant="h3"
                   sx={{ fontSize: "1.25rem", fontWeight: "bold" }}
                 >
@@ -177,7 +177,7 @@ const ProjectInfo = () => {
                 {projectAllTags.map((tag, index) => (
                   <Chip
                     key={index}
-                    color={"lightPrimary"}
+                    color="lightPrimary"
                     label={tag}
                     sx={{
                       mr: 1,

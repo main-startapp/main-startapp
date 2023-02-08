@@ -8,32 +8,40 @@ const AuthContext = createContext({});
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [signinFlag, setSigninFlag] = useState(false);
 
   useEffect(() => {
     const auth = getAuth();
     // https://www.reddit.com/r/webdev/comments/us599i/what_is_the_difference_between_firebase/
     return auth.onIdTokenChanged(async (user) => {
+      // unset flags
+      setIsLoading(false);
+      setSigninFlag(false);
+
+      // return if no user
       if (!user) {
         setCurrentUser(null);
-        setIsLoading(false);
         return;
       }
-      const token = await user.getIdToken().catch((error) => {
-        console.log(error?.message);
-      });
+      // const token = await user.getIdToken().catch((error) => {
+      //   console.log(error?.message);
+      // });
       // console.log(user.emailVerified);
       setCurrentUser(user);
-      setIsLoading(false);
     });
   }, []);
 
   if (isLoading) {
-    return <Loading type="spokes" color="#3e95c2" />;
+    return <Loading type="spokes" color="#193773" />;
   }
+
   const url = new URL(window.location.href);
-  if (currentUser || url.pathname === "/" || url.pathname === "/events/") {
+  if (
+    !signinFlag &&
+    (currentUser || url.pathname === "/" || url.pathname === "/events/")
+  ) {
     return (
-      <AuthContext.Provider value={{ currentUser }}>
+      <AuthContext.Provider value={{ currentUser, setSigninFlag }}>
         {children}
       </AuthContext.Provider>
     );

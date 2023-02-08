@@ -438,7 +438,7 @@ const ProjectCreate = (props) => {
               onChange={() => {
                 setIsCheckedTransferable(!isCheckedTransferable);
               }}
-              sx={{ ml: 2, color: "textfieldPlaceholder.main", padding: 0 }}
+              sx={{ ml: 2, color: "placholderGray.main", padding: 0 }}
             />
           </Box>
         )}
@@ -459,9 +459,11 @@ const ProjectCreate = (props) => {
             <Button
               sx={{
                 ml: 4,
+                color: newProject.icon_url
+                  ? "text.primary"
+                  : "placholderGray.main",
                 backgroundColor: "#f0f0f0",
                 borderRadius: 2,
-                color: "#9e9e9e",
                 height: "56px",
                 textTransform: "none",
                 width: "50%",
@@ -478,7 +480,6 @@ const ProjectCreate = (props) => {
               <Typography
                 sx={{
                   fontWeight: "medium",
-                  color: theme.palette.textfieldPlaceholder.main,
                   fontSize: "16px",
                 }}
               >
@@ -679,7 +680,7 @@ const ProjectCreate = (props) => {
               alignItems: "center",
             }}
           >
-            <Typography sx={{ color: "textfieldPlaceholder.main" }}>
+            <Typography color="placholderGray.main">
               {"I want to add positions"}
             </Typography>
             <Checkbox
@@ -687,7 +688,7 @@ const ProjectCreate = (props) => {
               onChange={() => {
                 setIsCheckedPosition(!isCheckedPosition);
               }}
-              sx={{ ml: 2, color: "textfieldPlaceholder.main", padding: 0 }}
+              sx={{ ml: 2, color: "placholderGray.main", padding: 0 }}
             />
           </Box>
           {/* firebase dynamic array: http://y2u.be/zgKH12s_95A */}

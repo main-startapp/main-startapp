@@ -21,7 +21,6 @@ import {
   FormControl,
 } from "@mui/material";
 import Router from "next/router";
-import NextLink from "next/link";
 
 //============================================================
 // handle connect/message: if chat found, return; if not, create a chat with "request to connect" auto msg.
@@ -300,7 +299,7 @@ export const DefaultFormControl = styled(FormControl)(({ theme }) => ({
   },
   "& .MuiFormLabel-root": {
     fontWeight: theme.typography.fontWeightMedium,
-    color: theme.palette.textfieldPlaceholder.main,
+    color: theme.palette.placholderGray.main,
     fontSize: "16px",
   },
 }));
@@ -325,8 +324,8 @@ export const DefaultTextField = styled(TextField)(({ theme }) => ({
   },
   "& .MuiFormLabel-root": {
     fontWeight: theme.typography.fontWeightMedium,
-    color: theme.palette.textfieldPlaceholder.main,
-    fontSize: "16px",
+    color: theme.palette.placholderGray.main,
+    fontSize: "1rem",
   },
 }));
 
@@ -374,7 +373,6 @@ export const FixedHeightPaper = styled(Paper)(
       : `calc(100dvh - ${mobileheight}px - ${theme.spacing(2)} - 64px)`,
     marginTop: isdesktop ? 0 : `${mobileheight}px`, // mobile top bar
     marginBottom: isdesktop ? 0 : "64px", // mobile bottom navbar
-    backgroundColor: theme.palette.background.paper,
     borderTop: isdesktop ? `1px solid ${theme.palette.divider}` : 0,
     borderRadius: isdesktop ? "32px 32px 0px 0px" : "32px 0px 0px 0px",
   })
