@@ -10,7 +10,7 @@ import { SignTextField } from "./Signin";
 const Signup = (props) => {
   // props
   const setIsSignup = props.setIsSignup;
-  const isMobile = props.isMobile;
+  const onDesktop = props.onDesktop;
 
   // context / ref
   const formRef = useRef();
@@ -128,15 +128,15 @@ const Signup = (props) => {
       <Box sx={{ mt: 6 }}>
         <Divider
           sx={{
-            width: isMobile ? "256px" : "414px",
-            color: "#d3d3d3",
+            width: onDesktop ? "414px" : "256px",
+            color: "gray300.main",
           }}
         >
           {"Create an Account"}
         </Divider>
       </Box>
 
-      <Box sx={{ mt: 3, width: isMobile ? "256px" : "414px" }}>
+      <Box sx={{ mt: 3, width: onDesktop ? "414px" : "256px" }}>
         <form ref={formRef}>
           <SignTextField
             fullWidth
@@ -183,7 +183,7 @@ const Signup = (props) => {
       </Box>
       <Box
         sx={{
-          width: isMobile ? "256px" : "414px",
+          width: onDesktop ? "414px" : "256px",
           display: "flex",
           justifyContent: "flex-end",
         }}
@@ -208,9 +208,10 @@ const Signup = (props) => {
           {"Already on Edium? "} &nbsp;
         </Typography>
         <Typography
-          color="primary.light"
+          color="secondary"
           sx={{
             fontSize: "0.875rem",
+            fontWeight: "bold",
             ":hover": {
               cursor: "pointer",
             },

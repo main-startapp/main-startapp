@@ -121,7 +121,7 @@ const Events = () => {
                 paddingTop: 2,
                 paddingLeft: 2,
                 width: "100%",
-                backgroundColor: "hoverGray.main",
+                backgroundColor: "gray100.main",
               }}
             >
               <EventList />
@@ -133,7 +133,7 @@ const Events = () => {
                 paddingTop: 2,
                 paddingLeft: 2,
                 width: "100%",
-                backgroundColor: "hoverGray.main",
+                backgroundColor: "gray100.main",
               }}
             >
               <EventInfo />

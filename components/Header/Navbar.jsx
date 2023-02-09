@@ -41,7 +41,7 @@ const Navbar = () => {
         >
           {/* https://stackoverflow.com/questions/46973910/accessing-files-from-firebase-storage-vs-firebase-hosting */}
           <ExportedImage
-            src="/images/edium_v4_256.png"
+            src="/images/edium_v4_512.png"
             alt=""
             height={40}
             width={40}
@@ -52,9 +52,7 @@ const Navbar = () => {
             <NextLink href="/" style={{ color: "inherit" }}>
               <LinkIconBox url={url} pathname="/">
                 <DashboardIcon
-                  color={
-                    url.pathname === "/" ? "text.primary" : "unselectedGray"
-                  }
+                  color={url.pathname === "/" ? "text.primary" : "gray700"}
                   sx={{
                     height: "40px",
                     fontSize: "28px",
@@ -74,9 +72,7 @@ const Navbar = () => {
               <LinkIconBox url={url} pathname="/events/">
                 <DateRangeIcon
                   color={
-                    url.pathname === "/events/"
-                      ? "text.primary"
-                      : "unselectedGray"
+                    url.pathname === "/events/" ? "text.primary" : "gray700"
                   }
                   sx={{
                     height: "40px",
@@ -97,9 +93,7 @@ const Navbar = () => {
               <LinkIconBox url={url} pathname="/students/">
                 <PeopleIcon
                   color={
-                    url.pathname === "/students/"
-                      ? "text.primary"
-                      : "unselectedGray"
+                    url.pathname === "/students/" ? "text.primary" : "gray700"
                   }
                   sx={{
                     height: "40px",
@@ -138,5 +132,5 @@ const LinkTypography = styled(Typography)(({ theme, url, pathname }) => ({
   color:
     url.pathname === pathname
       ? theme.palette.text.primary
-      : theme.palette.unselectedGray.main,
+      : theme.palette.gray700.main,
 }));

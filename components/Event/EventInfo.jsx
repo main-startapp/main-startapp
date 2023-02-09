@@ -633,7 +633,7 @@ export default EventInfo;
             }}
           >
             <ExportedImage
-              src="/images/edium_v4_256.png"
+              src="/images/edium_v4_512.png"
               alt=""
               width={256}
               height={256}

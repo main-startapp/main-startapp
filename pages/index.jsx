@@ -124,7 +124,7 @@ const Home = () => {
                 paddingTop: 2,
                 paddingLeft: 2,
                 width: "100%",
-                backgroundColor: "hoverGray.main",
+                backgroundColor: "gray100.main",
               }}
             >
               <ProjectList />
@@ -136,7 +136,7 @@ const Home = () => {
                 paddingTop: 2,
                 paddingLeft: 2,
                 width: "100%",
-                backgroundColor: "hoverGray.main",
+                backgroundColor: "gray100.main",
               }}
             >
               <ProjectInfo />

@@ -383,7 +383,7 @@ const ChatMsg = (props) => {
         alignItems: "center",
         borderBottom: 1,
         borderColor: "divider",
-        //backgroundColor: "searchGary.main",
+        //backgroundColor: "gray300.main",
         paddingRight: "3px",
       }}
     >

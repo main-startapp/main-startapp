@@ -244,7 +244,7 @@ const MobileEventsBar = () => {
           </Typography>
           {searchTypeList.length > 0 && (
             <Chip
-              color="selectedWhite"
+              color="pureWhite"
               label={searchTypeList.length + " selected"}
               size="small"
               onDelete={() => {
@@ -287,7 +287,7 @@ const MobileEventsBar = () => {
             typeList?.map((type, index) => (
               <Chip
                 key={index}
-                color={type.isSelected ? "selectedWhite" : "lightPrimary"}
+                color={type.isSelected ? "pureWhite" : "lightPrimary"}
                 label={type.name}
                 size="small"
                 onClick={() => {
@@ -304,7 +304,7 @@ const MobileEventsBar = () => {
                   fontWeight: "medium",
                   "&.MuiChip-root:hover": {
                     backgroundColor: type.isSelected
-                      ? "selectedWhite.main"
+                      ? "pureWhite.main"
                       : "lightPrimary.main",
                   },
                   "& .MuiChip-deleteIcon": {

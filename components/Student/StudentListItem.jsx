@@ -52,7 +52,7 @@ const StudentListItem = (props) => {
         borderBottom: 1,
         borderColor: "divider",
         "&:hover": {
-          backgroundColor: "hoverGray.main",
+          backgroundColor: "gray100.main",
         },
         overflow: "hidden",
         paddingY: 2,

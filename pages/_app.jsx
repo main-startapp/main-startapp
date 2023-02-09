@@ -42,20 +42,20 @@ const getDesignTokens = (mode, onMedia) => ({
             main: "#e5eeff",
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
-          selectedWhite: {
+          pureWhite: {
             main: "#fff",
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
-          unselectedGray: {
+          gray700: {
             main: grey[700],
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
-          placholderGray: {
+          gray500: {
             main: grey[500],
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
-          searchGary: { main: grey[300], contrastText: "rgba(0, 0, 0, 0.87)" },
-          hoverGray: { main: grey[100], contrastText: "rgba(0, 0, 0, 0.87)" },
+          gray300: { main: grey[300], contrastText: "rgba(0, 0, 0, 0.87)" },
+          gray100: { main: grey[100], contrastText: "rgba(0, 0, 0, 0.87)" },
 
           adminOrange: { main: "#f4511e", contrastText: "#fff" },
         }
@@ -68,14 +68,14 @@ const getDesignTokens = (mode, onMedia) => ({
             main: "#E5EEFF",
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
-          selectedWhite: {
+          pureWhite: {
             main: "#fff",
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
-          unselectedGray: { main: grey[700], contrastText: "#fff" },
-          placholderGray: { main: grey[500], contrastText: "#fff" },
-          searchGary: { main: grey[600], contrastText: "#fff" },
-          hoverGray: { main: grey[800], contrastText: "#fff" },
+          gray700: { main: grey[700], contrastText: "#fff" },
+          gray500: { main: grey[500], contrastText: "#fff" },
+          gray300: { main: grey[600], contrastText: "#fff" },
+          gray100: { main: grey[800], contrastText: "#fff" },
 
           adminOrange: { main: "#f4511e", contrastText: "#fff" },
         }),

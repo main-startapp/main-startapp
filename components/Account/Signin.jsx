@@ -27,7 +27,7 @@ const Signin = () => {
   const [errorMsg, setErrorMsg] = useState("");
 
   // independent media query
-  const isMobile = useMediaQuery("(max-width:767px)");
+  const onDesktop = useMediaQuery("(min-width:1024px)");
   const theme = useTheme();
 
   // Configure FirebaseUI.
@@ -93,13 +93,14 @@ const Signin = () => {
           mt: 6,
           width: "256px",
           fontSize: "0.875rem",
-          background: "#fff",
-          color: "#000",
+          background:
+            "linear-gradient(45deg, #4285f4 0%, #4285f4 25%, #ea4335 25%, #ea4335 50%, #fbbc05 50%, #fbbc05 75%, #34a853 75%, #34a853 100%)",
+          color: "#fff",
           ":hover": {
             background:
-              "linear-gradient(-120deg, #4285f4, #34a853, #fbbc05, #ea4335)",
-            color: "#fff",
+              "linear-gradient(45deg, #4285f4, #ea4335, #fbbc05, #34a853)",
           },
+          //transition: "background", // to sync background ans text color transition
         }}
       >
         Sign in with Google
@@ -109,7 +110,7 @@ const Signin = () => {
         <Divider
           sx={{
             width: "256px",
-            color: "#d3d3d3",
+            color: "gray300.main",
           }}
         >
           {"or Sign in with Email"}
@@ -171,9 +172,10 @@ const Signin = () => {
           {"Not registered yet? "} &nbsp;
         </Typography>
         <Typography
-          color="primary.light"
+          color="secondary"
           sx={{
             fontSize: "0.875rem",
+            fontWeight: "bold",
             ":hover": {
               cursor: "pointer",
             },
@@ -199,13 +201,19 @@ const Signin = () => {
       }}
     >
       <Paper
+        elevation={2}
         sx={{
-          minHeight: "100dvh",
-          width: isMobile ? "100%" : "572px", // each side is in golden ratio
+          mt: onDesktop ? 4 : 0,
+          minHeight: onDesktop
+            ? `calc(100dvh - 1px - ${theme.spacing(4)})`
+            : "100dvh", // window height - border - margin top
+          width: onDesktop ? "572px" : "100%", // each side is in golden ratio
           display: "flex",
+          flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          borderRadius: "0px 0px 0px 0px",
+          borderTop: onDesktop ? `1px solid ${theme.palette.divider}` : 0,
+          borderRadius: onDesktop ? "32px 32px 0px 0px" : "0px 0px 0px 0px",
         }}
       >
         <motion.div
@@ -222,9 +230,10 @@ const Signin = () => {
           <ExportedImage
             style={{ marginTop: "24px" }}
             alt=""
-            src="/images/edium_v4_256.png"
+            src="/images/edium_v4_512.png"
             width={256}
             height={256}
+            unoptimized={true}
           />
 
           <Typography
@@ -238,7 +247,7 @@ const Signin = () => {
           </Typography>
 
           {isSignup ? (
-            <Signup setIsSignup={setIsSignup} isMobile={isMobile} />
+            <Signup setIsSignup={setIsSignup} onDesktop={onDesktop} />
           ) : (
             signinComp
           )}
@@ -251,40 +260,47 @@ const Signin = () => {
 export default Signin;
 
 const SignButton = styled(Button)(({ theme }) => ({
-  border: `1px solid #d3d3d3`,
+  border: "none",
   borderRadius: theme.shape.borderRadius * 2,
   textTransform: "none",
+  height: "40px",
 }));
 
+// similar to DefaultTextField but thinner
 export const SignTextField = styled(TextField)(({ theme }) => ({
-  "& .MuiInputBase-input": { padding: theme.spacing(1, 2) },
+  "& .MuiInputBase-input": {
+    padding: theme.spacing(1, 2),
+    fontSize: "0.875rem",
+    height: "24px", // 40 overall == sign in button
+  },
 
   "& .MuiFormLabel-root": {
-    top: "-0.4rem",
+    top: "-6px",
     fontSize: "0.875rem",
     fontWeight: theme.typography.fontWeightMedium,
-    color: theme.palette.placholderGray.main,
+    color: theme.palette.gray500.main,
   },
-  "& .MuiInputLabel-shrink": { top: "0" }, // to counter root adjustment
-  "& .MuiFormLabel-root.Mui-focused": { top: "0" }, // to counter root adjustment
+  "& .MuiInputLabel-shrink": { top: "1px" }, // to counter root adjustment
+  "& .MuiFormLabel-root.Mui-focused": { top: "1px" }, // to counter root adjustment
 
   "& .MuiOutlinedInput-root": {
-    backgroundColor: "#fff",
-    borderRadius: theme.shape.borderRadius,
+    backgroundColor: theme.palette.gray100.main,
+    borderRadius: theme.shape.borderRadius * 2,
+
     "& fieldset": {
-      border: `1px solid #d3d3d3`,
+      border: "none",
     },
     "&:hover fieldset": {
-      border: `1px solid #d3d3d3`,
+      border: "none",
     },
     "&.Mui-focused fieldset": {
-      border: `1px solid #d3d3d3`,
+      border: "none",
     },
   },
 
   "& .MuiFormHelperText-root": {
     color: "error",
-    height: "24px",
-    fontSize: "12px",
+    height: "1.5rem", // 24px
+    fontSize: "0.75rem", // 12px
   },
 }));
