@@ -3,16 +3,13 @@ import {
   Box,
   Button,
   Checkbox,
-  Container,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Divider,
   FormControl,
   FormHelperText,
-  Grid,
   InputLabel,
   Link,
   MenuItem,
@@ -20,7 +17,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
+import AddLinkIcon from "@mui/icons-material/AddLink";
 import {
   collection,
   doc,
@@ -43,11 +40,14 @@ import moment from "moment";
 import { useRouter } from "next/router";
 import { useAuth } from "../Context/AuthContext";
 import {
+  DefaultFormControl,
   DefaultTextField,
   findItemFromList,
+  FixedHeightPaper,
   handleDeleteEntry,
 } from "../Reusable/Resusable";
 import { eventStrList, eventTags } from "../Reusable/MenuStringList";
+import { useTheme } from "@mui/material/styles";
 
 const EventCreate = (props) => {
   // context
@@ -57,6 +57,7 @@ const EventCreate = (props) => {
   const { showAlert } = useContext(EventContext);
   const router = useRouter();
   const formRef = useRef();
+  const theme = useTheme();
 
   // click spam
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
@@ -97,9 +98,13 @@ const EventCreate = (props) => {
 
   // check box
   const [isCheckedTransferable, setIsCheckedTransferable] = useState(false);
-  const [isChecked, setIsChecked] = useState(true);
+
   useEffect(() => {
-    if (oldEvent) {
+    if (!oldEvent) {
+      // if admin, check transfer project by default
+      if (currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2")
+        setIsCheckedTransferable(true);
+    } else {
       // update, checked value depends on oldEvent
       // if creator is admin, check if updating transferable event
       if (
@@ -327,56 +332,52 @@ const EventCreate = (props) => {
   };
 
   return (
-    <Grid
-      container
-      spacing={0}
-      direction="row"
-      alignItems="center"
-      justifyContent="center"
+    <FixedHeightPaper
+      elevation={onMedia.onDesktop ? 2 : 0}
+      isdesktop={onMedia.onDesktop ? 1 : 0}
+      mobileheight={0}
       sx={{
-        backgroundColor: "#fafafa",
-        height: onMedia.onDesktop
-          ? `calc(${winHeight}px - 64px)`
-          : `calc(${winHeight}px - 48px - 60px)`,
-        overflow: "auto",
+        paddingTop: onMedia.onDesktop ? "32px" : 0,
       }}
     >
-      <Grid
-        item
-        xs={onMedia.onDesktop ? 8 : 10}
+      <Box
+        id="projectcreate-box"
         sx={{
-          backgroundColor: "#ffffff",
-          borderLeft: 1.5,
-          borderRight: 1.5,
-          borderColor: "#dbdbdb",
-          paddingX: 3,
-          minHeight: "100%",
+          flexGrow: 1,
+          //overflowX: "hidden",
+          overflowY: "scroll",
+          //paddingTop: onMedia.onDesktop ? 2 : 2, // align with project list
+          paddingBottom: onMedia.onDesktop ? 8 : 4, // enough space for messages
+          paddingLeft: onMedia.onDesktop ? 4 : 2,
+          paddingRight: onMedia.onDesktop
+            ? `calc(${theme.spacing(4)} - 0.4rem)`
+            : 2, // onDesktop: scrollbar
         }}
       >
         <Typography
           sx={{
             display: "flex",
             justifyContent: "center",
-            fontSize: "2em",
+            fontSize: "2rem",
             fontWeight: "bold",
-            mt: 5,
-            mb: 5,
+            mt: 4,
+            mb: 8,
           }}
         >
           {oldEvent ? "Update Event" : "Create New Event"}
         </Typography>
         {ediumUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" && (
-          <Box sx={{ mb: 5, display: "flex" }}>
+          <Box sx={{ mb: 4, display: "flex" }}>
+            <Typography sx={{ color: "adminOrange.main", fontWeight: "bold" }}>
+              {"This is a transferable event"}
+            </Typography>
             <Checkbox
-              sx={{ mr: 1.5, color: "#dbdbdb", padding: 0 }}
               checked={isCheckedTransferable}
               onChange={() => {
                 setIsCheckedTransferable(!isCheckedTransferable);
               }}
+              sx={{ ml: 2, color: "gray500.main", padding: 0 }}
             />
-            <Typography sx={{ color: "#f4511e", fontWeight: "bold" }}>
-              {"ADMIN This is a transferable event"}
-            </Typography>
           </Box>
         )}
         <form ref={formRef}>
@@ -385,10 +386,8 @@ const EventCreate = (props) => {
             <DefaultTextField
               required
               fullWidth
-              sx={{
-                mr: 5,
-              }}
               label="Event Title"
+              helperText="Name of your event"
               margin="none"
               value={newEvent.title}
               onChange={(e) =>
@@ -397,23 +396,32 @@ const EventCreate = (props) => {
             />
             <Button
               sx={{
+                ml: 4,
+                color: newEvent.icon_url ? "text.primary" : "gray500.main",
                 backgroundColor: "#f0f0f0",
-                border: 1.5,
                 borderRadius: 2,
-                borderColor: "#dbdbdb",
-                color: "rgba(0, 0, 0, 0.6)",
-
                 height: "56px",
                 textTransform: "none",
-                minWidth: "20%",
-                paddingLeft: "30px",
+                width: "50%",
+                maxWidth: "112px",
+                border: "none",
+                padding: "16.5px 14px",
+                display: "flex",
+                justifyContent: "space-between",
               }}
               // variant="contained"
               disableElevation
               onClick={handleDialogOpen}
             >
-              <UploadFileIcon sx={{ position: "absolute", left: "5%" }} />
-              <Typography>{"Logo Link"}</Typography>
+              <Typography
+                sx={{
+                  fontWeight: "medium",
+                  fontSize: "16px",
+                }}
+              >
+                {"Logo"}
+              </Typography>
+              <AddLinkIcon sx={{ fontSize: "24px", fontWeight: "medium" }} />
             </Button>
             <Dialog
               open={isDialogOpen}
@@ -442,9 +450,18 @@ const EventCreate = (props) => {
                   fullWidth
                   variant="standard"
                   value={newEvent.icon_url}
-                  onChange={(e) =>
-                    setNewEvent({ ...newEvent, icon_url: e.target.value })
-                  }
+                  onChange={(e) => {
+                    let url = e.target.value;
+                    if (url.includes("https://imgur.com/")) {
+                      url = url
+                        .replace("https://imgur.com/", "https://i.imgur.com/")
+                        .concat(".png");
+                    }
+                    setNewEvent({
+                      ...newEvent,
+                      icon_url: url,
+                    });
+                  }}
                 />
               </DialogContent>
               <DialogActions>
@@ -453,31 +470,8 @@ const EventCreate = (props) => {
             </Dialog>
           </Box>
           {/* Category select & start/end date */}
-          <Box display="flex" justifyContent="space-between" mt={5}>
-            <FormControl
-              required
-              fullWidth
-              sx={{
-                mr: 5,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                  backgroundColor: "#f0f0f0",
-                },
-                "& .MuiOutlinedInput-notchedOutline": {
-                  border: 1.5,
-                  borderColor: "#dbdbdb",
-                },
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  border: 1.5,
-                  borderColor: "#dbdbdb",
-                },
-                ".MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                  {
-                    border: 1.5,
-                    borderColor: "#3e95c2",
-                  },
-              }}
-            >
+          <Box display="flex" justifyContent="space-between" sx={{ mt: 4 }}>
+            <DefaultFormControl required fullWidth sx={{ width: "50%" }}>
               <InputLabel>Category</InputLabel>
               <Select
                 label="Category"
@@ -498,15 +492,15 @@ const EventCreate = (props) => {
                 id="eventcreate-category-helper-text"
                 sx={{ color: "lightgray", fontSize: "12px" }}
               >
-                {"A general category of your event"}
+                {"General category of your event"}
               </FormHelperText>
-            </FormControl>
+            </DefaultFormControl>
 
             <LocalizationProvider dateAdapter={AdapterMoment}>
               <DesktopDateTimePicker
                 renderInput={(props) => (
                   <DefaultTextField
-                    sx={{ minWidth: "20%", mr: 5 }}
+                    sx={{ minWidth: "20%", ml: 4 }}
                     helperText="Start date and time"
                     {...props}
                   />
@@ -522,7 +516,7 @@ const EventCreate = (props) => {
               <DesktopDateTimePicker
                 renderInput={(props) => (
                   <DefaultTextField
-                    sx={{ minWidth: "20%" }}
+                    sx={{ minWidth: "20%", ml: 4 }}
                     helperText="End date and time"
                     {...props}
                   />
@@ -539,7 +533,7 @@ const EventCreate = (props) => {
           {/* !todo: can use some services like google places or leaflet to autocomplete */}
           <DefaultTextField
             sx={{
-              mt: 5,
+              mt: 4,
             }}
             fullWidth
             label="Location"
@@ -552,7 +546,7 @@ const EventCreate = (props) => {
           />
           {/* Details */}
           <Autocomplete
-            sx={{ mt: 5 }}
+            sx={{ mt: 4 }}
             fullWidth
             freeSolo
             clearOnBlur
@@ -578,7 +572,7 @@ const EventCreate = (props) => {
           />
           {/* Description */}
           <DefaultTextField
-            sx={{ mt: 5 }}
+            sx={{ mt: 4 }}
             fullWidth
             required
             label="Description"
@@ -595,14 +589,13 @@ const EventCreate = (props) => {
           {/* Optional Banner */}
           <DefaultTextField
             sx={{
-              mt: 5,
-              mb: 0,
+              mt: 4,
             }}
             fullWidth
             label="Banner URL"
             type="url"
             margin="none"
-            helperText="Optional banner shown on the event page"
+            helperText="Banner shown on the event page"
             value={newEvent.banner_url}
             onChange={(e) =>
               setNewEvent({
@@ -611,127 +604,64 @@ const EventCreate = (props) => {
               })
             }
           />
-          {/* application form */}
-          <Container
+          <DefaultTextField
             sx={{
-              mx: 0,
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              height: 40,
+              mt: 4,
             }}
-            disableGutters
-          >
-            <Divider
-              sx={{
-                borderBottomWidth: 1.5,
-                borderColor: "#dbdbdb",
-                height: "10px",
-                width: "101.5%",
-                mb: 2.5,
-              }}
-            />
-            {/* <Checkbox
-              sx={{
-                mr: 1.5,
-                color: "#dbdbdb",
-                padding: 0,
-                "&.Mui-checked": {
-                  color: "#3e95c2",
-                },
-              }}
-              defaultChecked
-              value={isChecked}
-              onChange={() => {
-                if (isChecked) {
-                  setNewEvent({ ...newEvent, registration_form_url: "" });
-                }
-                setIsChecked(!isChecked);
-              }}
-            />
-            <Typography sx={{ color: "rgba(0,0,0,0.6)" }}>
-              {"I want to add a registration form"}
-            </Typography> */}
-          </Container>
-          {isChecked && (
-            <DefaultTextField
-              sx={{
-                mt: 0,
-              }}
-              required
-              fullWidth
-              label="Registration Form URL"
-              type="url"
-              margin="none"
-              helperText="Users will be redirect to this URL when they click Attend"
-              value={newEvent.registration_form_url}
-              onChange={(e) =>
-                setNewEvent({
-                  ...newEvent,
-                  registration_form_url: e.target.value,
-                })
-              }
-            />
-          )}
+            fullWidth
+            label="Registration Form URL"
+            type="url"
+            margin="none"
+            helperText="Users will be redirect to this URL when they click Attend"
+            value={newEvent.registration_form_url}
+            onChange={(e) =>
+              setNewEvent({
+                ...newEvent,
+                registration_form_url: e.target.value,
+              })
+            }
+          />
+
           {/* Buttons */}
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Box sx={{ mt: 8, display: "flex", justifyContent: "space-between" }}>
             {oldEvent && (
               <Button
-                sx={{
-                  mt: 5,
-                  mb: 5,
-                  border: 1.5,
-                  borderColor: "#dbdbdb",
-                  borderRadius: 8,
-                  backgroundColor: "#3e95c2",
-                  textTransform: "none",
-                  paddingX: 5,
-                }}
-                variant="contained"
-                disableElevation
+                color="primary"
                 disabled={!isClickable || !ediumUser?.uid}
+                disableElevation
+                variant="contained"
                 onClick={() => handleDelete(newEvent.id)}
+                sx={{
+                  width: "128px",
+                  height: "32px",
+                  borderRadius: 8,
+                }}
               >
                 {"Delete"}
               </Button>
             )}
             <Box sx={{ flexGrow: 1 }} />
             <Button
-              sx={{
-                mt: 5,
-                ml: 2.5,
-                mb: 5,
-                border: 1.5,
-                borderColor: "#dbdbdb",
-                borderRadius: 8,
-                backgroundColor: "#fafafa",
-                color: "black",
-                textTransform: "none",
-                paddingX: 5,
-              }}
-              variant="contained"
-              disableElevation
+              color="primary"
               disabled={!isClickable || !ediumUser?.uid}
+              disableElevation
+              variant="outlined"
               onClick={(e) => handleDiscard(e)}
+              sx={{
+                ml: onMedia.onDesktop ? 4 : 2,
+                width: "128px",
+                height: "32px",
+                borderRadius: 8,
+              }}
             >
               {"Discard"}
             </Button>
 
             <Button
-              sx={{
-                mt: 5,
-                ml: 2.5,
-                mb: 5,
-                border: 1.5,
-                borderColor: "#dbdbdb",
-                borderRadius: 8,
-                backgroundColor: "#3e95c2",
-                textTransform: "none",
-                paddingX: 5,
-              }}
-              variant="contained"
-              disableElevation
+              color="primary"
               disabled={!isClickable || !ediumUser?.uid}
+              disableElevation
+              variant="contained"
               onClick={(e) => {
                 if (
                   currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
@@ -742,13 +672,19 @@ const EventCreate = (props) => {
                   handleSubmit(e);
                 }
               }}
+              sx={{
+                ml: onMedia.onDesktop ? 4 : 2,
+                width: "128px",
+                height: "32px",
+                borderRadius: 8,
+              }}
             >
               {"Confirm"}
             </Button>
           </Box>
         </form>
-      </Grid>
-    </Grid>
+      </Box>
+    </FixedHeightPaper>
   );
 };
 

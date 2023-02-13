@@ -171,6 +171,7 @@ const EventInfo = () => {
               </pre>
             </Typography>
             <Button
+              disabled={!event?.registration_form_url}
               disableElevation
               fullWidth
               variant="contained"
@@ -183,7 +184,9 @@ const EventInfo = () => {
                 borderRadius: 8,
               }}
             >
-              {"Attend"}
+              {event?.registration_form_url
+                ? "Attend"
+                : "Registration Not Required"}
             </Button>
             {eventAllTags?.length > 0 && (
               <Box id="eventinfo-details-box">

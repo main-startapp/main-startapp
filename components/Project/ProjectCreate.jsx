@@ -430,7 +430,7 @@ const ProjectCreate = (props) => {
         </Typography>
         {currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" && (
           <Box sx={{ mb: 4, display: "flex" }}>
-            <Typography sx={{ color: "#f4511e", fontWeight: "bold" }}>
+            <Typography sx={{ color: "adminOrange.main", fontWeight: "bold" }}>
               {"This is a transferable project"}
             </Typography>
             <Checkbox
@@ -450,6 +450,7 @@ const ProjectCreate = (props) => {
               fullWidth
               label="Project Title"
               helperText="Name of your project/club/organization"
+              margin="none"
               value={newProject.title}
               onChange={(e) =>
                 setNewProject({ ...newProject, title: e.target.value })
