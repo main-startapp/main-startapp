@@ -5,6 +5,7 @@ import {
   Chip,
   IconButton,
   ListItem,
+  ListItemButton,
   ListItemText,
   Menu,
   MenuItem,
@@ -61,197 +62,203 @@ const EventListItem = (props) => {
         setFullEvent(fullEvent);
       }}
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-start",
+        padding: 0,
         borderBottom: 1,
         borderColor: "divider",
         "&:hover": {
           backgroundColor: "gray100.main",
         },
-        overflow: "hidden",
-        paddingY: 2,
-        paddingX: 2,
         opacity: isExpired ? "50%" : "100%",
       }}
     >
-      <Box
-        id="eventlistitem-upper-box"
+      <ListItemButton
         sx={{
+          paddingY: 2,
+          paddingX: 2,
           display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          width: "100%",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          overflow: "hidden",
         }}
       >
-        {/* event icon uploaded by users*/}
-        <Avatar
+        <Box
+          id="eventlistitem-upper-box"
           sx={{
-            mr: 2,
-            height: "48px",
-            width: "48px",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            width: "100%",
           }}
-          src={event?.icon_url}
         >
-          <UploadFileIcon />
-        </Avatar>
-        <Box sx={{ width: "100%" }}>
-          <ListItemText
-            primary={
-              <Typography
-                variant="h2"
-                sx={{ fontSize: "1rem", fontWeight: "bold" }}
-              >
-                {event?.title}
-              </Typography>
-            }
-          />
-          {eventAllTags?.length > 0 && (
-            <Box sx={{ mt: 1, height: "1.75rem", overflow: "hidden" }}>
-              {eventAllTags?.map((tag, index) => (
-                <Chip
-                  key={index}
-                  color={
-                    isStrInStrList(searchTypeList, tag, true) ||
-                    searchTerm === tag
-                      ? "primary"
-                      : "lightPrimary"
-                  }
-                  label={tag}
-                  sx={{
-                    mr: 1,
-                    mb: 1,
-                    fontSize: "0.75rem",
-                    fontWeight: "medium",
-                    height: "1.5rem",
-                  }}
-                />
-              ))}
-            </Box>
-          )}
-        </Box>
-        {ediumUser?.uid === event?.creator_uid && (
-          <IconButton
-            id="eventlistitem-menu-button"
-            aria-controls={open ? "eventlistitem-menu" : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? "true" : undefined}
-            onClick={(e) => {
-              handleMenuClick(e);
+          {/* event icon uploaded by users*/}
+          <Avatar
+            sx={{
+              mr: 2,
+              height: "48px",
+              width: "48px",
             }}
-            sx={{ padding: 0 }}
+            src={event?.icon_url}
           >
-            <MoreVertIcon />
-          </IconButton>
-        )}
-        <Menu
-          id="eventlistitem-menu"
-          anchorEl={anchorEl}
-          open={open}
-          onClose={(e) => {
-            handleMenuClose(e);
-          }}
-          MenuListProps={{
-            "aria-labelledby": "eventlistitem-menu-button",
-          }}
-        >
+            <UploadFileIcon />
+          </Avatar>
+          <Box sx={{ width: "100%" }}>
+            <ListItemText
+              primary={
+                <Typography
+                  variant="h2"
+                  sx={{ fontSize: "1rem", fontWeight: "bold" }}
+                >
+                  {event?.title}
+                </Typography>
+              }
+            />
+            {eventAllTags?.length > 0 && (
+              <Box sx={{ mt: 1, height: "1.75rem", overflow: "hidden" }}>
+                {eventAllTags?.map((tag, index) => (
+                  <Chip
+                    key={index}
+                    color={
+                      isStrInStrList(searchTypeList, tag, true) ||
+                      searchTerm === tag
+                        ? "primary"
+                        : "lightPrimary"
+                    }
+                    label={tag}
+                    sx={{
+                      mr: 1,
+                      mb: 1,
+                      fontSize: "0.75rem",
+                      fontWeight: "medium",
+                      height: "1.5rem",
+                    }}
+                  />
+                ))}
+              </Box>
+            )}
+          </Box>
           {ediumUser?.uid === event?.creator_uid && (
-            <MenuItem
+            <IconButton
+              id="eventlistitem-menu-button"
+              aria-controls={open ? "eventlistitem-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? "true" : undefined}
               onClick={(e) => {
-                handleMenuClose(e);
+                handleMenuClick(e);
               }}
+              sx={{ padding: 0 }}
             >
-              <NextLink
-                href={{
-                  pathname: "/events/create",
-                  query: { eventID: event?.id },
-                }}
-                as="/events/create"
-                passHref
-                style={{
-                  color: "inherit",
+              <MoreVertIcon />
+            </IconButton>
+          )}
+          <Menu
+            id="eventlistitem-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={(e) => {
+              handleMenuClose(e);
+            }}
+            MenuListProps={{
+              "aria-labelledby": "eventlistitem-menu-button",
+            }}
+          >
+            {ediumUser?.uid === event?.creator_uid && (
+              <MenuItem
+                onClick={(e) => {
+                  handleMenuClose(e);
                 }}
               >
-                Modify
-              </NextLink>
-            </MenuItem>
-          )}
-          {ediumUser?.uid === event?.creator_uid && (
-            <MenuItem
-              onClick={(e) => {
-                handleVisibility("events", event);
-                handleMenuClose(e);
-              }}
-            >
-              {event?.is_visible ? "Hide" : "Display"}
-            </MenuItem>
-          )}
-          {ediumUser?.uid === event?.creator_uid && (
-            <MenuItem
-              onClick={(e) => {
-                handleDeleteEntry(
-                  "events",
-                  "evets_ext",
-                  "my_event_ids",
-                  event?.id,
-                  ediumUser?.uid
-                );
-                setFullEvent(null);
-                handleMenuClose(e);
-              }}
-            >
-              Delete
-            </MenuItem>
-          )}
-        </Menu>
-      </Box>
-      <Box
-        id="eventlistitem-lower-box"
-        // padding right to align with more icon
-        sx={{ mt: 2, paddingRight: "10px", width: "100%" }}
-      >
-        <ListItemText
-          secondary={
-            <Typography
-              color="text.secondary"
-              variant="body2"
-              // sx={{
-              //   display: "-webkit-box",
-              //   overflow: "hidden",
-              //   WebkitBoxOrient: "vertical",
-              //   WebkitLineClamp: 1,
-              // }}
-            >
-              {event.category}
-              <br />
-              {isSameDay
-                ? startMoment.format("MMM Do h:mm a") +
-                  (isSameTime ? "" : " - " + endMoment.format("h:mm a"))
-                : startMoment.format("MMM Do h:mm a") +
-                  " - " +
-                  endMoment.format("MMM Do h:mm a")}
-            </Typography>
-          }
-        />
-        {onMedia.onDesktop && (
+                <NextLink
+                  href={{
+                    pathname: "/events/create",
+                    query: { eventID: event?.id },
+                  }}
+                  as="/events/create"
+                  passHref
+                  style={{
+                    color: "inherit",
+                  }}
+                >
+                  Modify
+                </NextLink>
+              </MenuItem>
+            )}
+            {ediumUser?.uid === event?.creator_uid && (
+              <MenuItem
+                onClick={(e) => {
+                  handleVisibility("events", event);
+                  handleMenuClose(e);
+                }}
+              >
+                {event?.is_visible ? "Hide" : "Display"}
+              </MenuItem>
+            )}
+            {ediumUser?.uid === event?.creator_uid && (
+              <MenuItem
+                onClick={(e) => {
+                  handleDeleteEntry(
+                    "events",
+                    "evets_ext",
+                    "my_event_ids",
+                    event?.id,
+                    ediumUser?.uid
+                  );
+                  setFullEvent(null);
+                  handleMenuClose(e);
+                }}
+              >
+                Delete
+              </MenuItem>
+            )}
+          </Menu>
+        </Box>
+        <Box
+          id="eventlistitem-lower-box"
+          // padding right to align with more icon
+          sx={{ mt: 2, paddingRight: "10px", width: "100%" }}
+        >
           <ListItemText
             secondary={
               <Typography
                 color="text.secondary"
                 variant="body2"
-                sx={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  fontWeight: "light",
-                }}
+                // sx={{
+                //   display: "-webkit-box",
+                //   overflow: "hidden",
+                //   WebkitBoxOrient: "vertical",
+                //   WebkitLineClamp: 1,
+                // }}
               >
-                {moment(event.last_timestamp).format("MMM Do, YYYY")}
+                {event.category}
+                <br />
+                {isSameDay
+                  ? startMoment.format("MMM Do h:mm a") +
+                    (isSameTime ? "" : " - " + endMoment.format("h:mm a"))
+                  : startMoment.format("MMM Do h:mm a") +
+                    " - " +
+                    endMoment.format("MMM Do h:mm a")}
               </Typography>
             }
-            sx={{ mt: 2 }}
           />
-        )}
-      </Box>
+          {onMedia.onDesktop && (
+            <ListItemText
+              secondary={
+                <Typography
+                  color="text.secondary"
+                  variant="body2"
+                  sx={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    fontWeight: "light",
+                  }}
+                >
+                  {moment(event.last_timestamp).format("MMM Do, YYYY")}
+                </Typography>
+              }
+              sx={{ mt: 2 }}
+            />
+          )}
+        </Box>
+      </ListItemButton>
     </ListItem>
   );
 };

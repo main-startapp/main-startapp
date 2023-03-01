@@ -1,13 +1,12 @@
 import { useContext, useMemo, useEffect } from "react";
 import NextLink from "next/link";
-import { Box, Button, Paper, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Tooltip, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import EventListItem from "./EventListItem";
 import moment from "moment";
 import EventListHeader from "./EventListHeader";
 import {
-  findItemFromList,
   FixedHeightPaper,
   isStrInStr,
   isStrInStrList,
@@ -17,10 +16,11 @@ import Router from "next/router";
 
 const EventList = () => {
   // context
-  const { events, users, ediumUser, onMedia } = useContext(GlobalContext);
+  const { ediumUser, onMedia } = useContext(GlobalContext);
   const {
     fullEvent,
     setFullEvent,
+    fullEvents,
     isSearchingClicked,
     setIsSearchingClicked,
     isMobileBackClicked,
@@ -29,32 +29,6 @@ const EventList = () => {
     searchTypeList,
   } = useContext(EventContext);
   const theme = useTheme();
-
-  // events with extra info from other dataset (creator, merged tags)
-  const fullEvents = useMemo(() => {
-    return events?.map((event) => {
-      // creator
-      const eventCreator = findItemFromList(users, "uid", event?.creator_uid);
-      // allTags
-      let eventTags = [];
-      if (event?.tags?.length > 0) {
-        eventTags = eventTags.concat(event.tags); // event tags
-      }
-      if (
-        eventCreator?.role === "org_admin" &&
-        eventCreator?.org_tags?.length > 0
-      ) {
-        eventTags = eventTags.concat(eventCreator.org_tags); // org tags
-      }
-      // category
-      eventTags.push(event?.category?.toLowerCase());
-      return {
-        event: event,
-        creator: eventCreator,
-        allTags: eventTags,
-      };
-    });
-  }, [events, users]);
 
   // event list with predefined sorting
   const sortedFullEvents = useMemo(() => {
@@ -99,10 +73,8 @@ const EventList = () => {
 
   // event query & auto set initial event
   useEffect(() => {
-    const queryEID = Router.query?.eid;
-    const currentEID = fullEvent?.event?.id;
-    // special case 1 (desktop): app can't distinguish between searching list change and click an entry (case 1 both arey query && current entry), thus isSearchingClicked flag was introduced
-    // special case 2 (mobile): mobile app can't distinguish between user input a query or user clicked back button (case 2 both are query && !current entry), thus isMobileBackClicked flag was introduced
+    // trigger 1 (desktop): app can't distinguish between searching list change and click an entry (case 1 both arey query && current entry), thus isSearchingClicked flag was introduced
+    // trigger 2 (mobile): mobile app can't distinguish between user input a query or user clicked back button (case 2 both are query && !current entry), thus isMobileBackClicked flag was introduced
     // case 1 (desktop & mobile): user click a new entry => current entry, update url
     // case 1.1 (desktop & mobile): if query and current entry exist and are equal, do nothing
     // case 2 (desktop & mobile): user directly input a url with a valid query => query && !current entry, set it to user's
@@ -122,15 +94,18 @@ const EventList = () => {
         shallowUpdateURLQuery(Router.pathname, null, null);
       }
       setIsSearchingClicked(false);
-      return;
+      return; // trigger 1
     }
 
     if (!onMedia.onDesktop && isMobileBackClicked) {
       // user clicked back button on mobile (onMobile && back button clicked) => show mobile list without url query
       shallowUpdateURLQuery(Router.pathname, null, null);
       setIsMobileBackClicked(false);
-      return; // special case 2
+      return; // trigger 2
     }
+
+    const queryEID = Router.query?.eid;
+    const currentEID = fullEvent?.event?.id;
 
     if (currentEID && currentEID === queryEID) return; // case 1.1
 

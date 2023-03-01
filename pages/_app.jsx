@@ -1,4 +1,5 @@
 import "../styles/globals.css";
+import "../styles/fc.css";
 import "../styles/quill.snow.css";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
@@ -65,7 +66,7 @@ const getDesignTokens = (mode, onMedia) => ({
           secondary: { main: "#6ff9d1" },
 
           lightPrimary: {
-            main: "#E5EEFF",
+            main: "#e5eeff",
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
           pureWhite: {

@@ -20,10 +20,11 @@ import Router from "next/router";
 // behavior: filters projects based on the search term and/or search category
 const ProjectList = () => {
   // context
-  const { projects, users, ediumUser, onMedia } = useContext(GlobalContext);
+  const { ediumUser, onMedia } = useContext(GlobalContext);
   const {
     fullProject,
     setFullProject,
+    fullProjects,
     isSearchingClicked,
     setIsSearchingClicked,
     isMobileBackClicked,
@@ -32,36 +33,6 @@ const ProjectList = () => {
     searchTypeList,
   } = useContext(ProjectContext);
   const theme = useTheme();
-
-  // projects with extra info from other dataset (creator, merged tags)
-  const fullProjects = useMemo(() => {
-    return projects?.map((project) => {
-      // creator
-      const projectCreator = findItemFromList(
-        users,
-        "uid",
-        project?.creator_uid
-      );
-      // allTags
-      let projectTags = [];
-      if (project?.tags?.length > 0) {
-        projectTags = projectTags.concat(project.tags); // project tags
-      }
-      if (
-        projectCreator?.role === "org_admin" &&
-        projectCreator?.org_tags?.length > 0
-      ) {
-        projectTags = projectTags.concat(projectCreator.org_tags); // org tags
-      }
-      // type
-      projectTags.push(project?.type?.toLowerCase());
-      return {
-        project: project,
-        creator: projectCreator,
-        allTags: projectTags,
-      };
-    });
-  }, [projects, users]);
 
   // project list with filtering
   const filteredFullProjects = useMemo(() => {
@@ -105,10 +76,8 @@ const ProjectList = () => {
 
   // project query & auto set initial project
   useEffect(() => {
-    const queryPID = Router.query?.pid;
-    const currentPID = fullProject?.project?.id;
-    // special case 1 (desktop): app can't distinguish between searching list change and click an entry (case 1 both arey query && current entry), thus isSearchingClicked flag was introduced
-    // special case 2 (mobile): mobile app can't distinguish between user input a query or user clicked back button (case 2 both are query && !current entry), thus isMobileBackClicked flag was introduced
+    // trigger 1 (desktop): app can't distinguish between searching list change and click an entry (case 1 both arey query && current entry), thus isSearchingClicked flag was introduced
+    // trigger 2 (mobile): mobile app can't distinguish between user input a query or user clicked back button (case 2 both are query && !current entry), thus isMobileBackClicked flag was introduced
     // case 1 (desktop & mobile): user click a new entry => current entry, update url
     // case 1.1 (desktop & mobile): if query and current entry exist and are equal, do nothing
     // case 2 (desktop & mobile): user directly input a url with a valid query => query && !current entry, set it to user's
@@ -128,15 +97,18 @@ const ProjectList = () => {
         shallowUpdateURLQuery(Router.pathname, null, null);
       }
       setIsSearchingClicked(false);
-      return;
+      return; // trigger 1
     }
 
     if (!onMedia.onDesktop && isMobileBackClicked) {
       // user clicked back button on mobile (onMobile && back button clicked) => show mobile list without url query
       shallowUpdateURLQuery(Router.pathname, null, null);
       setIsMobileBackClicked(false);
-      return; // special case 2
+      return; // trigger 2
     }
+
+    const queryPID = Router.query?.pid;
+    const currentPID = fullProject?.project?.id;
 
     if (currentPID && currentPID === queryPID) return; // case 1.1
 

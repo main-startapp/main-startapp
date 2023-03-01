@@ -1,0 +1,38 @@
+:root {
+    --fc-button-bg-color: #193773 !important;
+    --fc-button-border-color: #193773 !important;
+    --fc-button-hover-bg-color: #112650 !important;
+    --fc-button-hover-border-color: #112650 !important;
+    --fc-button-active-bg-color: #112650 !important;
+    --fc-button-active-border-color: #112650 !important;
+}
+
+/* .fc td,
+.fc th {
+    border-width: 2px !important;
+    border-color: #fff !important;
+}
+
+.fc-daygrid-day-frame {
+    background-color: #f0f0f0 !important;
+} */
+
+.fc-daygrid-event-dot {
+    display: none !important;
+}
+
+.fc-list-event-dot {
+    display: none !important;
+}
+
+.fc-h-event .fc-event-time {
+    overflow: visible !important;
+}
+
+.fc-event-time {
+    display: none !important;
+}
+
+.fc-day-today {
+    background: #e5eeff !important;
+}
