@@ -10,8 +10,10 @@ import {
   DialogTitle,
   FormControl,
   FormHelperText,
+  IconButton,
   InputLabel,
   Link,
+  Menu,
   MenuItem,
   Select,
   TextField,
@@ -34,6 +36,7 @@ import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import {
   LocalizationProvider,
   DesktopDateTimePicker,
+  DesktopDatePicker,
 } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
@@ -46,7 +49,7 @@ import {
   FixedHeightPaper,
   handleDeleteEntry,
 } from "../Reusable/Resusable";
-import { eventStrList, eventTags } from "../Reusable/MenuStringList";
+import { eventStrList, eventTags, timeSlots } from "../Reusable/MenuStringList";
 import { useTheme } from "@mui/material/styles";
 
 const EventCreate = (props) => {
@@ -327,9 +330,26 @@ const EventCreate = (props) => {
 
   const handleDateTimeChange = (e, isStart) => {
     isStart
-      ? setNewEvent({ ...newEvent, start_date: e?._d })
-      : setNewEvent({ ...newEvent, end_date: e?._d });
+      ? setNewEvent({ ...newEvent, start_date: e.toDate() })
+      : setNewEvent({ ...newEvent, end_date: e.toDate() });
   };
+
+  const [testDate, setTestDate] = useState(null);
+  const [testTimeSlot, setTestTimeSlot] = useState("");
+  const [testTimePeriod, setTestTimePeriod] = useState("am");
+  const [testDuration, setTestDuration] = useState(0);
+  const [testDurationUnit, setTestDurationUnit] = useState("hours");
+  const [testStartDate, setTestStartDate] = useState(null);
+  const [testEndDate, setTestEndDate] = useState(null);
+  function getTimeSlotString(timeSlot) {
+    let hour = Math.floor(timeSlot);
+    let min = Math.floor((timeSlot - hour) * 60);
+    let hourStr = hour < 10 ? "0" + hour.toString() : hour.toString();
+    let minStr = min < 10 ? "0" + min.toString() : min.toString();
+    let periodStr = hour < 12 ? "am" : "pm";
+    let ret = hourStr + ":" + minStr;
+    return ret;
+  }
 
   return (
     <FixedHeightPaper
@@ -398,7 +418,7 @@ const EventCreate = (props) => {
               sx={{
                 ml: 4,
                 color: newEvent.icon_url ? "text.primary" : "gray500.main",
-                backgroundColor: "#f0f0f0",
+                backgroundColor: "gray100.main",
                 borderRadius: 2,
                 height: "56px",
                 textTransform: "none",
@@ -529,12 +549,131 @@ const EventCreate = (props) => {
               />
             </LocalizationProvider>
           </Box>
+          {/* WIP Time */}
+          {/* <Box
+            display="flex"
+            justifyContent="space-between"
+            sx={{ mt: 4, width: "60%" }}
+          >
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+              <DesktopDatePicker
+                renderInput={(props) => (
+                  <DefaultTextField
+                    sx={{ width: "100%" }}
+                    helperText="Start date and time"
+                    {...props}
+                  />
+                )}
+                value={testDate}
+                onChange={(e) => {
+                  setTestDate(e.toDate());
+                  if (testTimeSlot)
+                    setTestStartDate(e.add(testTimeSlot, "h").toDate());
+                }}
+              />
+            </LocalizationProvider>
+
+            <DefaultFormControl fullWidth sx={{ width: "50%", ml: 4 }}>
+              <InputLabel>Time</InputLabel>
+              <Select
+                label=""
+                IconComponent={null}
+                value={testTimeSlot}
+                onChange={(e) => {
+                  setTestTimeSlot(e.target.value);
+                  setTestStartDate(
+                    moment(testDate).add(e.target.value, "h").toDate()
+                  );
+                }}
+                endAdornment={
+                  <IconButton
+                    onClick={() => {
+                      setTestTimePeriod(testTimePeriod === "am" ? "pm" : "am");
+                    }}
+                    sx={{
+                      height: "40px",
+                      width: "40px",
+                      position: "absolute",
+                      right: 0,
+                    }}
+                  >
+                    <Typography sx={{ fontSize: "1rem", fontWeight: "medium" }}>
+                      {testTimePeriod === "am" ? "am" : "pm"}
+                    </Typography>
+                  </IconButton>
+                }
+              >
+                {timeSlots
+                  ?.filter((timeSlot) => {
+                    return testTimePeriod === "am"
+                      ? timeSlot < 12
+                      : timeSlot >= 12;
+                  })
+                  ?.map((timeSlot, index) => {
+                    return (
+                      <MenuItem key={index} value={timeSlot}>
+                        {getTimeSlotString(timeSlot)}
+                      </MenuItem>
+                    );
+                  })}
+              </Select>
+              <FormHelperText
+                id="eventcreate-wip-time-helper-text"
+                sx={{ color: "lightgray", fontSize: "12px" }}
+              >
+                {"Time"}
+              </FormHelperText>
+            </DefaultFormControl>
+
+            <DefaultTextField
+              fullWidth
+              value={testDuration}
+              onChange={(e) => {
+                setTestDuration(e.target.value);
+                setTestEndDate(
+                  moment(testStartDate)
+                    .add(e.target.value, testDurationUnit)
+                    .toDate()
+                );
+              }}
+              sx={{ width: "50%", ml: 4 }}
+              InputProps={{
+                endAdornment: (
+                  <IconButton
+                    onClick={() => {
+                      setTestDurationUnit(
+                        testDurationUnit === "hours" ? "days" : "hours"
+                      );
+                    }}
+                    sx={{
+                      height: "40px",
+                      width: "40px",
+                      position: "absolute",
+                      right: 0,
+                    }}
+                  >
+                    <Typography sx={{ fontSize: "1rem", fontWeight: "medium" }}>
+                      {testDurationUnit === "hours"
+                        ? testDuration > 1
+                          ? "hrs"
+                          : "hr"
+                        : testDuration > 1
+                        ? "days"
+                        : "day"}
+                    </Typography>
+                  </IconButton>
+                ),
+              }}
+            />
+          </Box>
+          <Box display="flex" justifyContent="space-between" sx={{ mt: 4 }}>
+            <Typography>{testStartDate?.toString()}</Typography>
+            <Typography>{testEndDate?.toString()}</Typography>
+          </Box> */}
           {/* Location */}
           {/* !todo: can use some services like google places or leaflet to autocomplete */}
           <DefaultTextField
-            sx={{
-              mt: 4,
-            }}
+            sx={{ mt: 4 }}
             fullWidth
             label="Location"
             margin="none"

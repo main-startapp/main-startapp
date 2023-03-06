@@ -29,14 +29,14 @@ const Navbar = () => {
       >
         <Box
           sx={{
-            mx: 4,
+            mx: 8,
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
             //height: "100%",
             width: "100%",
-            maxWidth: "1376px",
+            maxWidth: "1312px",
           }}
         >
           {/* https://stackoverflow.com/questions/46973910/accessing-files-from-firebase-storage-vs-firebase-hosting */}

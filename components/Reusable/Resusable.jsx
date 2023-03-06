@@ -286,7 +286,7 @@ export const shallowUpdateURLQuery = (pathName, queryKey, queryValue) => {
 export const DefaultFormControl = styled(FormControl)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
     borderRadius: theme.shape.borderRadius * 2,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: theme.palette.gray100.main,
     "& fieldset": {
       border: "none",
     },

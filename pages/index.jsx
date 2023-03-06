@@ -121,7 +121,7 @@ const Home = () => {
               id="projects-desktop-list-box"
               sx={{
                 paddingTop: 4,
-                paddingLeft: 4,
+                paddingLeft: 8,
                 paddingRight: 2,
                 width: "38.88889%",
                 maxWidth: "560px",
@@ -140,7 +140,7 @@ const Home = () => {
               sx={{
                 paddingTop: 4,
                 paddingLeft: 2,
-                paddingRight: 4,
+                paddingRight: 8,
                 width: "61.11111%",
                 maxWidth: "880px",
               }}

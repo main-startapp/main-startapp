@@ -9,9 +9,10 @@ import dayGridPlugin from "@fullcalendar/daygrid"; // a plugin!
 import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 // icons
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import EventIcon from "@mui/icons-material/Event";
-import ChairIcon from "@mui/icons-material/Chair";
-import WorkIcon from "@mui/icons-material/Work";
+import CelebrationIcon from "@mui/icons-material/Celebration";
+import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import { EventInfoContent } from "./EventInfo";
 
 const EventCalendar = () => {
@@ -27,25 +28,30 @@ const EventCalendar = () => {
 
   // xiao ming color scheme no.145
   // pink #f5d1d9; yellow #f5eacf; blue #d0e7f4
-  // roast red #ff5583; roast yellow #ffbb3b; roast blue #1396ff
   function getColor(eventType) {
     switch (eventType) {
+      case "Concert":
       case "Festival":
       case "Party":
       case "Sports":
-        return "#f5d1d9";
+        return "#f7c3c1";
+      //return "#e2cae3";
 
       case "Community Event":
-      case "Concert":
-      case "Hackathon":
         return "#f5eacf";
+      //return "#ead1c5";
 
       case "Case Competition":
+      case "Hackathon":
+        return "#e1ecd1";
+      //return "#c1c7dd";
+
       case "Conference":
       case "Info Session":
       case "Networking Session":
       case "Workshop":
-        return "#d0e7f4";
+        return "#c9d9e4";
+      //return "#d5e7f2";
 
       default:
         return "#bbb7b6"; // gray granite
@@ -54,15 +60,24 @@ const EventCalendar = () => {
 
   const StyledIcon = (props) => {
     switch (props.type) {
+      case "Concert":
       case "Festival":
       case "Party":
       case "Sports":
-        return <ChairIcon {...props} />;
+        return <CelebrationIcon {...props} />;
 
       case "Community Event":
-      case "Concert":
+        return <EventIcon {...props} />;
+
+      case "Case Competition":
       case "Hackathon":
-        return <WorkIcon {...props} />;
+        return <EmojiEventsIcon {...props} />;
+
+      case "Conference":
+      case "Info Session":
+      case "Networking Session":
+      case "Workshop":
+        return <BusinessCenterIcon {...props} />;
 
       default:
         return <EventIcon {...props} />;
@@ -79,9 +94,11 @@ const EventCalendar = () => {
         width: "100%",
         maxWidth: "100%",
         borderWidth: viewType === "dayGridMonth" ? "2px" : "0px",
-        backgroundColor: getColor(eventType),
+        backgroundColor:
+          viewType === "dayGridMonth" ? getColor(eventType) : "transparent",
         borderStyle: "solid",
-        borderColor: getColor(eventType),
+        borderColor:
+          viewType === "dayGridMonth" ? getColor(eventType) : "transparent",
         borderRadius: "4px",
         paddingX: viewType === "dayGridMonth" ? "4px" : "0px",
         paddingY: viewType === "dayGridMonth" ? "2px" : "0px",
@@ -91,7 +108,7 @@ const EventCalendar = () => {
       <StyledIcon
         type={eventType}
         sx={{
-          fontSize: viewType === "dayGridMonth" ? "13px" : "1rem",
+          fontSize: viewType === "dayGridMonth" ? "15px" : "1rem",
           //color: viewType === "dayGridMonth" ? getColor(eventType) : "black",
           color: "rgba(0,0,0,0.87)",
         }}
@@ -152,7 +169,7 @@ const EventCalendar = () => {
       <Box
         id="eventinfo-box"
         sx={{
-          minHeight: "1024px",
+          // height: "1024px",
           flexGrow: 1,
           overflowY: "scroll",
           paddingTop: onMedia.onDesktop ? 2 : 2, // align with project list

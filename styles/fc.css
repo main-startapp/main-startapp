@@ -36,3 +36,9 @@
 .fc-day-today {
     background: #e5eeff !important;
 }
+
+.fc-daygrid-dot-event {
+    margin-left: 2px !important;
+    margin-right: 2px !important;
+}
+

@@ -94,3 +94,6 @@ export const projectTags = ["business", "engineering", "computer science"];
 
 // event - tags
 export const eventTags = ["business", "engineering", "computer science"];
+
+// time
+export const timeSlots = [0, 0.5, 1, 1.5, 11, 11.8, 12, 12.7, 20.8, 23.5];

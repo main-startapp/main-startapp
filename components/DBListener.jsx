@@ -6,6 +6,7 @@ import {
   query,
   where,
 } from "firebase/firestore";
+import moment from "moment";
 import { useContext, useEffect } from "react";
 import { db } from "../firebase";
 import { useAuth } from "./Context/AuthContext";
@@ -118,7 +119,7 @@ const DBListener = () => {
   useEffect(() => {
     // time
     function daysAgo(days) {
-      return new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+      return moment().subtract(30, "days").toDate();
     }
 
     // db query

@@ -131,7 +131,7 @@ const Events = () => {
                 id="events-desktop-list-box"
                 sx={{
                   paddingTop: 4,
-                  paddingLeft: 4,
+                  paddingLeft: 8,
                   paddingRight: 2,
                   width: "38.88889%",
                   maxWidth: "560px",
@@ -150,7 +150,7 @@ const Events = () => {
                 sx={{
                   paddingTop: 4,
                   paddingLeft: 2,
-                  paddingRight: 4,
+                  paddingRight: 8,
                   width: "61.11111%",
                   maxWidth: "880px",
                 }}
@@ -164,17 +164,17 @@ const Events = () => {
                 </motion.div>
               </Box>
             </Box>
-
             <Box
               id="events-desktop-calendar-view-box"
               sx={{
-                paddingTop: 4,
                 visibility: modeType === "calendar" ? "visible" : "hidden",
                 width: modeType === "calendar" ? "100%" : "0%",
-                maxWidth: "1376px",
+                maxWidth: "1440px",
               }}
             >
-              <EventCalendar />
+              <Box sx={{ paddingTop: 4, paddingX: 8 }}>
+                <EventCalendar />
+              </Box>
             </Box>
             <Tooltip title="List View" placement="right">
               <ViewPaper
@@ -186,7 +186,7 @@ const Events = () => {
                 sx={{
                   backgroundColor:
                     modeType === "list" ? "lightPrimary.main" : "default",
-                  width: modeType === "list" ? "72px" : "56px",
+                  width: modeType === "list" ? "54px" : "40px",
                   top: `calc(65px + 32px)`,
                   ":hover": {
                     cursor: "pointer",
@@ -206,7 +206,7 @@ const Events = () => {
                 sx={{
                   backgroundColor:
                     modeType === "calendar" ? "lightPrimary.main" : "default",
-                  width: modeType === "calendar" ? "72px" : "56px",
+                  width: modeType === "calendar" ? "54px" : "42px",
                   top: `calc(65px + 32px + 56px + 8px)`,
                   ":hover": {
                     cursor: "pointer",
@@ -259,6 +259,6 @@ const ViewPaper = styled(Paper)(({ theme }) => ({
   display: "flex",
   justifyContent: "flex-end",
   alignItems: "center",
-  paddingRight: "16px",
+  paddingRight: "12px",
   borderRadius: "0px 16px 16px 0px",
 }));
