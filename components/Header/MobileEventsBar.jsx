@@ -92,7 +92,7 @@ const MobileEventsBar = () => {
   //           if (e.target.value.length !== 0) return;
   //           setSearchTerm("");
   //         }}
-  //         onKeyPress={(e) => {
+  //         onKeyDown={(e) => {
   //           if (e.key === "Enter") {
   //             setSearchTerm(e.target.value);
   //           }
@@ -187,7 +187,7 @@ const MobileEventsBar = () => {
                   if (e.target.value.length !== 0) return;
                   setSearchTerm("");
                 }}
-                onKeyPress={(e) => {
+                onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     setSearchTerm(e.target.value);
                   }

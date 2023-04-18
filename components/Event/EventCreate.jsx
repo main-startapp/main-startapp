@@ -1,3 +1,6 @@
+// react
+import { useContext, useEffect, useRef, useState } from "react";
+// mui
 import {
   Autocomplete,
   Box,
@@ -20,6 +23,10 @@ import {
   Typography,
 } from "@mui/material";
 import AddLinkIcon from "@mui/icons-material/AddLink";
+import { useTheme, styled } from "@mui/material/styles";
+// mui x
+import { DateTimeField } from "@mui/x-date-pickers";
+// firebase
 import {
   collection,
   doc,
@@ -29,19 +36,12 @@ import {
   setDoc,
   arrayRemove,
   arrayUnion,
+  Timestamp,
 } from "firebase/firestore";
-import { useContext, useEffect, useRef, useState } from "react";
+// edium
 import { db } from "../../firebase";
-import { GlobalContext, EventContext } from "../Context/ShareContexts";
-import {
-  LocalizationProvider,
-  DesktopDateTimePicker,
-  DesktopDatePicker,
-} from "@mui/x-date-pickers";
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
-import moment from "moment";
-import { useRouter } from "next/router";
 import { useAuth } from "../Context/AuthContext";
+import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import {
   DefaultFormControl,
   DefaultTextField,
@@ -49,9 +49,16 @@ import {
   FixedHeightPaper,
   handleDeleteEntry,
 } from "../Reusable/Resusable";
-import { eventStrList, eventTags, timeSlots } from "../Reusable/MenuStringList";
-import { useTheme } from "@mui/material/styles";
+import { eventStrList, eventTags } from "../Reusable/MenuStringList";
+import { EventInfoContent } from "./EventInfo";
+// time
+import dayjs from "dayjs";
+// nextjs
+import { useRouter } from "next/router";
+// slate
+import SlateEditor from "../SlateEditor";
 
+// comp
 const EventCreate = (props) => {
   // context
   const { currentUser } = useAuth();
@@ -61,6 +68,9 @@ const EventCreate = (props) => {
   const router = useRouter();
   const formRef = useRef();
   const theme = useTheme();
+
+  // edit / preview modes
+  const [isEditMode, setIsEditMode] = useState(true);
 
   // click spam
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
@@ -73,18 +83,23 @@ const EventCreate = (props) => {
   // init new event
   const emptyEvent = {
     title: "",
-    category: "",
-    start_date: moment().toDate(),
-    end_date: moment().toDate(),
+    type: "",
+    start_date: null,
+    end_date: null,
     location: "",
     tags: [],
-    description: "",
     creator_uid: ediumUser?.uid,
     is_deleted: false,
     is_visible: true,
     icon_url: "",
     banner_url: "",
     registration_form_url: "",
+    test_desc: [
+      {
+        type: "paragraph",
+        children: [{ text: "" }],
+      },
+    ],
   };
   const [newEvent, setNewEvent] = useState(() =>
     oldEvent ? oldEvent : emptyEvent
@@ -328,28 +343,20 @@ const EventCreate = (props) => {
     }, 2000); // wait 2 seconds then go to `events` page
   };
 
-  const handleDateTimeChange = (e, isStart) => {
-    isStart
-      ? setNewEvent({ ...newEvent, start_date: e.toDate() })
-      : setNewEvent({ ...newEvent, end_date: e.toDate() });
+  // wip time
+  const [testDuration, setTestDuration] = useState("");
+  const [testDurationUnit, setTestDurationUnit] = useState("hours");
+
+  const [focusState, setFocusState] = useState("title ");
+  const focusRef = useRef();
+  const updateFocus = (nextState) => {
+    setFocusState(nextState);
+    setTimeout(() => {
+      focusRef?.current?.focus();
+    }, 100);
   };
 
-  const [testDate, setTestDate] = useState(null);
-  const [testTimeSlot, setTestTimeSlot] = useState("");
-  const [testTimePeriod, setTestTimePeriod] = useState("am");
-  const [testDuration, setTestDuration] = useState(0);
-  const [testDurationUnit, setTestDurationUnit] = useState("hours");
-  const [testStartDate, setTestStartDate] = useState(null);
-  const [testEndDate, setTestEndDate] = useState(null);
-  function getTimeSlotString(timeSlot) {
-    let hour = Math.floor(timeSlot);
-    let min = Math.floor((timeSlot - hour) * 60);
-    let hourStr = hour < 10 ? "0" + hour.toString() : hour.toString();
-    let minStr = min < 10 ? "0" + min.toString() : min.toString();
-    let periodStr = hour < 12 ? "am" : "pm";
-    let ret = hourStr + ":" + minStr;
-    return ret;
-  }
+  console.log(newEvent.test_desc);
 
   return (
     <FixedHeightPaper
@@ -364,7 +371,8 @@ const EventCreate = (props) => {
         id="projectcreate-box"
         sx={{
           flexGrow: 1,
-          //overflowX: "hidden",
+          position: "relative", // https://stackoverflow.com/questions/3970455/how-to-make-the-overflow-css-property-work-with-hidden-as-value
+          overflowX: "hidden",
           overflowY: "scroll",
           //paddingTop: onMedia.onDesktop ? 2 : 2, // align with project list
           paddingBottom: onMedia.onDesktop ? 8 : 4, // enough space for messages
@@ -374,6 +382,7 @@ const EventCreate = (props) => {
             : 2, // onDesktop: scrollbar
         }}
       >
+        {/* Title */}
         <Typography
           sx={{
             display: "flex",
@@ -386,194 +395,402 @@ const EventCreate = (props) => {
         >
           {oldEvent ? "Update Event" : "Create New Event"}
         </Typography>
-        {ediumUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" && (
-          <Box sx={{ mb: 4, display: "flex" }}>
-            <Typography sx={{ color: "adminOrange.main", fontWeight: "bold" }}>
-              {"This is a transferable event"}
-            </Typography>
-            <Checkbox
-              checked={isCheckedTransferable}
-              onChange={() => {
-                setIsCheckedTransferable(!isCheckedTransferable);
-              }}
-              sx={{ ml: 2, color: "gray500.main", padding: 0 }}
-            />
-          </Box>
-        )}
-        <form ref={formRef}>
-          {/* Title textfield & Upload logo button */}
-          <Box display="flex" justifyContent="space-between" alignItems="start">
-            <DefaultTextField
-              required
-              fullWidth
-              label="Event Title"
-              helperText="Name of your event"
-              margin="none"
-              value={newEvent.title}
-              onChange={(e) =>
-                setNewEvent({ ...newEvent, title: e.target.value })
-              }
-            />
-            <Button
+
+        {/* Modes: Edit / Preview */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Box
+            sx={{
+              height: "40px",
+              width: "240px",
+              borderRadius: 8,
+              backgroundColor: "gray300.main",
+              display: "flex",
+              justifyContent: isEditMode ? "start" : "end",
+              // justifyContent: "space-between",
+              alignItems: "center",
+              ":hover": { cursor: "pointer" },
+            }}
+            onClick={() => {
+              setIsEditMode(!isEditMode);
+            }}
+          >
+            {!isEditMode && (
+              <Typography
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  width: "50%",
+                  color: "gray700.main",
+                  fontWeight: "medium",
+                }}
+              >
+                Edit
+              </Typography>
+            )}
+            <Box
               sx={{
-                ml: 4,
-                color: newEvent.icon_url ? "text.primary" : "gray500.main",
-                backgroundColor: "gray100.main",
-                borderRadius: 2,
-                height: "56px",
-                textTransform: "none",
+                height: "80%",
                 width: "50%",
-                maxWidth: "112px",
-                border: "none",
-                padding: "16.5px 14px",
+                mx: "2%",
+                borderRadius: 8,
+                backgroundColor: "secondary.main",
                 display: "flex",
-                justifyContent: "space-between",
+                justifyContent: "center",
+                alignItems: "center",
               }}
-              // variant="contained"
-              disableElevation
-              onClick={handleDialogOpen}
             >
               <Typography
                 sx={{
                   fontWeight: "medium",
-                  fontSize: "16px",
                 }}
               >
-                {"Logo"}
+                {isEditMode ? "Edit" : "Preview"}
               </Typography>
-              <AddLinkIcon sx={{ fontSize: "24px", fontWeight: "medium" }} />
-            </Button>
-            <Dialog
-              open={isDialogOpen}
-              onClose={handleDialogClose}
-              fullWidth
-              maxWidth="md"
-            >
-              <DialogTitle>Upload Logo from URL</DialogTitle>
-              <DialogContent>
-                <DialogContentText>
-                  {"Please enter the URL of your icon here. "}
-                  <Link
-                    target="_blank"
-                    href={"https://imgur.com/upload"}
-                    rel="noreferrer"
-                  >
-                    Imgur
-                  </Link>
-                  {" is a good image hosting service to start with."}
-                </DialogContentText>
-                <TextField
-                  autoFocus
-                  margin="dense"
-                  label="Icon URL"
-                  type="url"
+            </Box>
+            {isEditMode && (
+              <Typography
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  width: "50%",
+                  color: "gray700.main",
+                  fontWeight: "medium",
+                }}
+              >
+                Preview
+              </Typography>
+            )}
+          </Box>
+        </Box>
+        {isEditMode ? (
+          <>
+            {/* Admin Option */}
+            {ediumUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" && (
+              <Box sx={{ mt: 4, display: "flex", flexDirection: "row" }}>
+                <Typography
+                  sx={{ color: "adminOrange.main", fontWeight: "bold" }}
+                >
+                  {"This is a transferable event"}
+                </Typography>
+                <Checkbox
+                  checked={isCheckedTransferable}
+                  onChange={() => {
+                    setIsCheckedTransferable(!isCheckedTransferable);
+                  }}
+                  sx={{ ml: 2, color: "gray500.main", padding: 0 }}
+                />
+              </Box>
+            )}
+            <form ref={formRef}>
+              {/* Title textfield & Upload logo button */}
+              <Box
+                sx={{
+                  mt: 4,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "start",
+                }}
+              >
+                <DefaultTextField
                   fullWidth
-                  variant="standard"
-                  value={newEvent.icon_url}
-                  onChange={(e) => {
-                    let url = e.target.value;
-                    if (url.includes("https://imgur.com/")) {
-                      url = url
-                        .replace("https://imgur.com/", "https://i.imgur.com/")
-                        .concat(".png");
+                  margin="none"
+                  required
+                  label="Event Title"
+                  helperText="Name of your event"
+                  value={newEvent.title}
+                  onChange={(e) =>
+                    setNewEvent({ ...newEvent, title: e.target.value })
+                  }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      updateFocus("datetime");
                     }
-                    setNewEvent({
-                      ...newEvent,
-                      icon_url: url,
-                    });
                   }}
                 />
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={handleDialogClose}>Confirm</Button>
-              </DialogActions>
-            </Dialog>
-          </Box>
-          {/* Category select & start/end date */}
-          <Box display="flex" justifyContent="space-between" sx={{ mt: 4 }}>
-            <DefaultFormControl required fullWidth sx={{ width: "50%" }}>
-              <InputLabel>Category</InputLabel>
-              <Select
-                label="Category"
-                value={newEvent.category}
-                onChange={(e) =>
-                  setNewEvent({ ...newEvent, category: e.target.value })
-                }
-              >
-                {eventStrList?.map((eventStr, index) => {
-                  return (
-                    <MenuItem key={index} value={eventStr}>
-                      {eventStr}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-              <FormHelperText
-                id="eventcreate-category-helper-text"
-                sx={{ color: "lightgray", fontSize: "12px" }}
-              >
-                {"General category of your event"}
-              </FormHelperText>
-            </DefaultFormControl>
-
-            <LocalizationProvider dateAdapter={AdapterMoment}>
-              <DesktopDateTimePicker
-                renderInput={(props) => (
-                  <DefaultTextField
-                    sx={{ minWidth: "20%", ml: 4 }}
-                    helperText="Start date and time"
-                    {...props}
+                <Button
+                  sx={{
+                    ml: 4,
+                    color: newEvent.icon_url ? "text.primary" : "gray500.main",
+                    backgroundColor: "gray100.main",
+                    borderRadius: 2,
+                    height: "56px",
+                    textTransform: "none",
+                    width: "50%",
+                    maxWidth: "112px",
+                    border: "none",
+                    padding: "16.5px 14px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                  // variant="contained"
+                  disableElevation
+                  onClick={handleDialogOpen}
+                >
+                  <Typography
+                    sx={{
+                      fontWeight: "medium",
+                      fontSize: "16px",
+                    }}
+                  >
+                    {"Logo"}
+                  </Typography>
+                  <AddLinkIcon
+                    sx={{ fontSize: "24px", fontWeight: "medium" }}
                   />
-                )}
-                value={newEvent.start_date}
-                onChange={(e) => {
-                  handleDateTimeChange(e, true);
-                }}
-              />
-            </LocalizationProvider>
+                </Button>
+                <Dialog
+                  open={isDialogOpen}
+                  onClose={handleDialogClose}
+                  fullWidth
+                  maxWidth="md"
+                >
+                  <DialogTitle>Upload Logo from URL</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>
+                      {"Please enter the URL of your icon here. "}
+                      <Link
+                        target="_blank"
+                        href={"https://imgur.com/upload"}
+                        rel="noreferrer"
+                      >
+                        Imgur
+                      </Link>
+                      {" is a good image hosting service to start with."}
+                    </DialogContentText>
+                    <TextField
+                      fullWidth
+                      margin="dense"
+                      type="url"
+                      variant="standard"
+                      label="Icon URL"
+                      value={newEvent.icon_url}
+                      onChange={(e) => {
+                        let url = e.target.value;
+                        if (url.includes("https://imgur.com/")) {
+                          url = url
+                            .replace(
+                              "https://imgur.com/",
+                              "https://i.imgur.com/"
+                            )
+                            .concat(".png");
+                        }
+                        setNewEvent({
+                          ...newEvent,
+                          icon_url: url,
+                        });
+                      }}
+                    />
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleDialogClose}>Confirm</Button>
+                  </DialogActions>
+                </Dialog>
+              </Box>
 
-            <LocalizationProvider dateAdapter={AdapterMoment}>
-              <DesktopDateTimePicker
-                renderInput={(props) => (
-                  <DefaultTextField
-                    sx={{ minWidth: "20%", ml: 4 }}
-                    helperText="End date and time"
-                    {...props}
-                  />
-                )}
-                value={newEvent.end_date}
-                minDateTime={moment(newEvent.start_date)}
-                onChange={(e) => {
-                  handleDateTimeChange(e, false);
-                }}
-              />
-            </LocalizationProvider>
-          </Box>
-          {/* WIP Time */}
-          {/* <Box
-            display="flex"
-            justifyContent="space-between"
-            sx={{ mt: 4, width: "60%" }}
-          >
-            <LocalizationProvider dateAdapter={AdapterMoment}>
-              <DesktopDatePicker
-                renderInput={(props) => (
-                  <DefaultTextField
-                    sx={{ width: "100%" }}
-                    helperText="Start date and time"
-                    {...props}
-                  />
-                )}
-                value={testDate}
-                onChange={(e) => {
-                  setTestDate(e.toDate());
-                  if (testTimeSlot)
-                    setTestStartDate(e.add(testTimeSlot, "h").toDate());
-                }}
-              />
-            </LocalizationProvider>
+              {/* Type select & start/end date */}
+              <Box display="flex" justifyContent="space-between" sx={{ mt: 4 }}>
+                <DefaultFormControl required fullWidth sx={{ width: "50%" }}>
+                  <InputLabel>Type</InputLabel>
+                  <Select
+                    label="Type"
+                    value={newEvent.type}
+                    onChange={(e) => {
+                      setNewEvent({ ...newEvent, type: e.target.value });
+                    }}
+                  >
+                    {eventStrList?.map((eventStr, index) => {
+                      return (
+                        <MenuItem key={index} value={eventStr}>
+                          {eventStr}
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
+                  <FormHelperText
+                    id="eventcreate-type-helper-text"
+                    sx={{ color: "lightgray", fontSize: "12px" }}
+                  >
+                    {"General type of your event"}
+                  </FormHelperText>
+                </DefaultFormControl>
 
-            <DefaultFormControl fullWidth sx={{ width: "50%", ml: 4 }}>
+                {/* mui x 6.x */}
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  sx={{ ml: 4, width: "50%" }}
+                >
+                  <StyledDateTimeField
+                    inputRef={focusState === "datetime" ? focusRef : null}
+                    sx={{ width: "60%" }}
+                    required
+                    label="Start Date and Time"
+                    helperText="Event start time"
+                    value={
+                      newEvent.start_date ? dayjs(newEvent.start_date) : null
+                    }
+                    onChange={(newValue) => {
+                      setNewEvent({
+                        ...newEvent,
+                        start_date: newValue?.toDate(),
+                        end_date: testDuration
+                          ? dayjs(newValue)
+                              .add(testDuration, testDurationUnit)
+                              ?.toDate()
+                          : null,
+                      });
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        updateFocus("duration");
+                      }
+                    }}
+                  />
+                  <DefaultTextField
+                    inputRef={focusState === "duration" ? focusRef : null}
+                    sx={{ width: "40%", ml: 4 }}
+                    //error={!Number(testDuration)}
+                    fullWidth
+                    required
+                    label="Duration"
+                    helperText="Event duration"
+                    value={testDuration}
+                    onChange={(e) => {
+                      setTestDuration(e.target.value);
+                      if (newEvent.start_date) {
+                        setNewEvent({
+                          ...newEvent,
+                          end_date: dayjs(newEvent.start_date)
+                            .add(e.target.value, testDurationUnit)
+                            ?.toDate(),
+                        });
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+                        e.preventDefault();
+                        setTestDurationUnit(
+                          testDurationUnit === "hours" ? "days" : "hours"
+                        );
+                        if (testDuration && newEvent.start_date)
+                          testDurationUnit === "hours"
+                            ? setNewEvent({
+                                ...newEvent,
+                                end_date: dayjs(newEvent.start_date)
+                                  .add(testDuration, "days")
+                                  ?.toDate(),
+                              })
+                            : setNewEvent({
+                                ...newEvent,
+                                end_date: dayjs(newEvent.start_date)
+                                  .add(testDuration, "hours")
+                                  ?.toDate(),
+                              });
+                      }
+                      if (e.key === "Enter") {
+                        updateFocus("regurl");
+                      }
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <IconButton
+                          onClick={(e) => {
+                            setTestDurationUnit(
+                              testDurationUnit === "hours" ? "days" : "hours"
+                            );
+                            if (testDuration && newEvent.start_date)
+                              testDurationUnit === "hours"
+                                ? setNewEvent({
+                                    ...newEvent,
+                                    end_date: dayjs(newEvent.start_date)
+                                      .add(testDuration, "days")
+                                      ?.toDate(),
+                                  })
+                                : setNewEvent({
+                                    ...newEvent,
+                                    end_date: dayjs(newEvent.start_date)
+                                      .add(testDuration, "hours")
+                                      ?.toDate(),
+                                  });
+                          }}
+                          sx={{
+                            height: "40px",
+                            width: "40px",
+                            position: "absolute",
+                            right: 0,
+                          }}
+                        >
+                          <Typography
+                            sx={{ fontSize: "1rem", fontWeight: "medium" }}
+                          >
+                            {testDurationUnit === "hours"
+                              ? testDuration > 1
+                                ? "hrs"
+                                : "hr"
+                              : testDuration > 1
+                              ? "days"
+                              : "day"}
+                          </Typography>
+                        </IconButton>
+                      ),
+                    }}
+                  />
+
+                  {/* <DatePicker
+              label="Start Date"
+              value={testDate}
+              onChange={(newValue) => {
+                setTestDate(newValue?.toDate());
+              }}
+              onAccept={() => {
+                updateFocus("time");
+              }}
+              renderInput={(props) => (
+                <DefaultTextField
+                  {...props}
+                  helperText="Start date"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      updateFocus("time");
+                    }
+                  }}
+                  sx={{ width: "100%" }}
+                />
+              )}
+            /> */}
+
+                  {/* <TimePicker
+              inputRef={focusState === "time" ? focusRef : null}
+              label="Start Time"
+              value={testTime}
+              onChange={(newValue) => {
+                setTestTime(newValue?.toDate());
+              }}
+              onAccept={() => {
+                updateFocus("duration");
+              }}
+              renderInput={(props) => (
+                <DefaultTextField
+                  {...props}
+                  helperText="Start time"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      updateFocus("duration");
+                    }
+                  }}
+                  sx={{ ml: 4, width: "100%" }}
+                />
+              )}
+            /> */}
+
+                  {/* <DefaultFormControl fullWidth sx={{ width: "50%", ml: 4 }}>
               <InputLabel>Time</InputLabel>
               <Select
                 label=""
@@ -581,9 +798,10 @@ const EventCreate = (props) => {
                 value={testTimeSlot}
                 onChange={(e) => {
                   setTestTimeSlot(e.target.value);
-                  setTestStartDate(
-                    moment(testDate).add(e.target.value, "h").toDate()
-                  );
+                  if (testDate)
+                    setTestStartDate(
+                      moment(testDate).add(e.target.value, "h").toDate()
+                    );
                 }}
                 endAdornment={
                   <IconButton
@@ -623,94 +841,81 @@ const EventCreate = (props) => {
               >
                 {"Time"}
               </FormHelperText>
-            </DefaultFormControl>
+            </DefaultFormControl> */}
+                </Box>
+              </Box>
 
-            <DefaultTextField
-              fullWidth
-              value={testDuration}
-              onChange={(e) => {
-                setTestDuration(e.target.value);
-                setTestEndDate(
-                  moment(testStartDate)
-                    .add(e.target.value, testDurationUnit)
-                    .toDate()
-                );
-              }}
-              sx={{ width: "50%", ml: 4 }}
-              InputProps={{
-                endAdornment: (
-                  <IconButton
-                    onClick={() => {
-                      setTestDurationUnit(
-                        testDurationUnit === "hours" ? "days" : "hours"
-                      );
-                    }}
-                    sx={{
-                      height: "40px",
-                      width: "40px",
-                      position: "absolute",
-                      right: 0,
-                    }}
-                  >
-                    <Typography sx={{ fontSize: "1rem", fontWeight: "medium" }}>
-                      {testDurationUnit === "hours"
-                        ? testDuration > 1
-                          ? "hrs"
-                          : "hr"
-                        : testDuration > 1
-                        ? "days"
-                        : "day"}
-                    </Typography>
-                  </IconButton>
-                ),
-              }}
-            />
-          </Box>
-          <Box display="flex" justifyContent="space-between" sx={{ mt: 4 }}>
-            <Typography>{testStartDate?.toString()}</Typography>
-            <Typography>{testEndDate?.toString()}</Typography>
-          </Box> */}
-          {/* Location */}
-          {/* !todo: can use some services like google places or leaflet to autocomplete */}
-          <DefaultTextField
-            sx={{ mt: 4 }}
-            fullWidth
-            label="Location"
-            margin="none"
-            helperText="Full address with postal code / Access to virtual event"
-            value={newEvent.location}
-            onChange={(e) =>
-              setNewEvent({ ...newEvent, location: e.target.value })
-            }
-          />
-          {/* Details */}
-          <Autocomplete
-            sx={{ mt: 4 }}
-            fullWidth
-            freeSolo
-            clearOnBlur
-            multiple
-            filterSelectedOptions
-            options={eventTags}
-            value={newEvent?.tags}
-            onChange={(event, newValue) => {
-              setNewEvent({ ...newEvent, tags: newValue });
-            }}
-            renderInput={(params) => (
+              {/* registration url */}
               <DefaultTextField
-                {...params}
-                label="Details"
-                helperText="Keywords to shortly describe the new event (e.g. tags)"
-                required
-                inputProps={{
-                  ...params.inputProps,
-                  required: newEvent?.tags?.length === 0,
+                inputRef={focusState === "regurl" ? focusRef : null}
+                sx={{ mt: 4 }}
+                fullWidth
+                margin="none"
+                type="url"
+                label="Registration Form URL"
+                helperText="Users will be redirect to this URL when they click Attend"
+                value={newEvent.registration_form_url}
+                onChange={(e) =>
+                  setNewEvent({
+                    ...newEvent,
+                    registration_form_url: e.target.value,
+                  })
+                }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    updateFocus("location");
+                  }
                 }}
               />
-            )}
-          />
-          {/* Description */}
-          <DefaultTextField
+              {/* Location */}
+              {/* !todo: can use some services like google places or leaflet to autocomplete */}
+              <DefaultTextField
+                inputRef={focusState === "location" ? focusRef : null}
+                sx={{ mt: 4 }}
+                fullWidth
+                margin="none"
+                required
+                label="Location"
+                helperText="Full address / Access to virtual event"
+                value={newEvent.location}
+                onChange={(e) =>
+                  setNewEvent({ ...newEvent, location: e.target.value })
+                }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    updateFocus("details");
+                  }
+                }}
+              />
+              {/* Details */}
+              <Autocomplete
+                sx={{ mt: 4 }}
+                clearOnBlur
+                filterSelectedOptions
+                freeSolo
+                fullWidth
+                multiple
+                options={eventTags}
+                value={newEvent?.tags}
+                onChange={(event, newValue) => {
+                  setNewEvent({ ...newEvent, tags: newValue });
+                }}
+                renderInput={(params) => (
+                  <DefaultTextField
+                    {...params}
+                    inputRef={focusState === "details" ? focusRef : null}
+                    required
+                    label="Details"
+                    helperText="Keywords to shortly describe the new event (e.g. tags)"
+                    inputProps={{
+                      ...params.inputProps,
+                      required: newEvent?.tags?.length === 0,
+                    }}
+                  />
+                )}
+              />
+              {/* Description */}
+              {/* <DefaultTextField
             sx={{ mt: 4 }}
             fullWidth
             required
@@ -724,107 +929,167 @@ const EventCreate = (props) => {
             onChange={(e) =>
               setNewEvent({ ...newEvent, description: e.target.value })
             }
-          />
-          {/* Optional Banner */}
-          <DefaultTextField
-            sx={{
-              mt: 4,
-            }}
-            fullWidth
-            label="Banner URL"
-            type="url"
-            margin="none"
-            helperText="Banner shown on the event page"
-            value={newEvent.banner_url}
-            onChange={(e) =>
-              setNewEvent({
-                ...newEvent,
-                banner_url: e.target.value,
-              })
-            }
-          />
-          <DefaultTextField
-            sx={{
-              mt: 4,
-            }}
-            fullWidth
-            label="Registration Form URL"
-            type="url"
-            margin="none"
-            helperText="Users will be redirect to this URL when they click Attend"
-            value={newEvent.registration_form_url}
-            onChange={(e) =>
-              setNewEvent({
-                ...newEvent,
-                registration_form_url: e.target.value,
-              })
-            }
-          />
-
-          {/* Buttons */}
-          <Box sx={{ mt: 8, display: "flex", justifyContent: "space-between" }}>
-            {oldEvent && (
-              <Button
-                color="primary"
-                disabled={!isClickable || !ediumUser?.uid}
-                disableElevation
-                variant="contained"
-                onClick={() => handleDelete(newEvent.id)}
+          /> */}
+              {/* WIP Description */}
+              <Box
                 sx={{
-                  width: "128px",
-                  height: "32px",
-                  borderRadius: 8,
+                  mt: 4,
+                  backgroundColor: "gray100.main",
+                  borderRadius: 2,
+                  paddingX: "14px",
+                  paddingY: "16.5px",
+                  "&:hover": {
+                    cursor: "text",
+                  },
                 }}
               >
-                {"Delete"}
-              </Button>
-            )}
-            <Box sx={{ flexGrow: 1 }} />
-            <Button
-              color="primary"
-              disabled={!isClickable || !ediumUser?.uid}
-              disableElevation
-              variant="outlined"
-              onClick={(e) => handleDiscard(e)}
-              sx={{
-                ml: onMedia.onDesktop ? 4 : 2,
-                width: "128px",
-                height: "32px",
-                borderRadius: 8,
-              }}
-            >
-              {"Discard"}
-            </Button>
+                <SlateEditor
+                  valueObj={newEvent}
+                  valueKey="test_desc"
+                  onChange={setNewEvent}
+                  isReadOnly={false}
+                />
+              </Box>
+              <FormHelperText
+                sx={{
+                  color: "lightgray",
+                  fontSize: "12px",
+                  mx: "14px",
+                  mt: "3px",
+                }}
+              >
+                Description Helper Text
+              </FormHelperText>
 
-            <Button
-              color="primary"
-              disabled={!isClickable || !ediumUser?.uid}
-              disableElevation
-              variant="contained"
-              onClick={(e) => {
-                if (
-                  currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
-                  isCheckedTransferable
-                ) {
-                  handleSubmitTransferable(e);
-                } else {
-                  handleSubmit(e);
-                }
-              }}
-              sx={{
-                ml: onMedia.onDesktop ? 4 : 2,
-                width: "128px",
-                height: "32px",
-                borderRadius: 8,
-              }}
-            >
-              {"Confirm"}
-            </Button>
+              {/* Social Media: IG, Youtube, Imgur */}
+              <Box sx={{ mt: 4, display: "flex", flexDirection: "row" }}>
+                <DefaultTextField
+                  fullWidth
+                  margin="none"
+                  type="url"
+                  label="Social Media URL"
+                  helperText="Supports Instagram"
+                  value={newEvent.banner_url}
+                  onChange={(e) =>
+                    setNewEvent({
+                      ...newEvent,
+                      banner_url: e.target.value,
+                    })
+                  }
+                />
+              </Box>
+              {/* Buttons */}
+              <Box
+                sx={{ mt: 8, display: "flex", justifyContent: "space-between" }}
+              >
+                {oldEvent && (
+                  <Button
+                    color="primary"
+                    disabled={!isClickable || !ediumUser?.uid}
+                    disableElevation
+                    variant="contained"
+                    onClick={() => handleDelete(newEvent.id)}
+                    sx={{
+                      width: "128px",
+                      height: "32px",
+                      borderRadius: 8,
+                    }}
+                  >
+                    {"Delete"}
+                  </Button>
+                )}
+                <Box sx={{ flexGrow: 1 }} />
+                <Button
+                  color="primary"
+                  disabled={!isClickable || !ediumUser?.uid}
+                  disableElevation
+                  variant="outlined"
+                  onClick={(e) => handleDiscard(e)}
+                  sx={{
+                    ml: onMedia.onDesktop ? 4 : 2,
+                    width: "128px",
+                    height: "32px",
+                    borderRadius: 8,
+                  }}
+                >
+                  {"Discard"}
+                </Button>
+
+                <Button
+                  color="primary"
+                  disabled={!isClickable || !ediumUser?.uid}
+                  disableElevation
+                  variant="contained"
+                  onClick={(e) => {
+                    if (
+                      currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" &&
+                      isCheckedTransferable
+                    ) {
+                      handleSubmitTransferable(e);
+                    } else {
+                      handleSubmit(e);
+                    }
+                  }}
+                  sx={{
+                    ml: onMedia.onDesktop ? 4 : 2,
+                    width: "128px",
+                    height: "32px",
+                    borderRadius: 8,
+                  }}
+                >
+                  {"Confirm"}
+                </Button>
+              </Box>
+            </form>
+          </>
+        ) : (
+          <Box sx={{ mt: 4 }}>
+            <EventInfoContent
+              event={newEvent}
+              eventCreator={null}
+              eventAllTags={newEvent?.tags}
+            />
           </Box>
-        </form>
+        )}
       </Box>
     </FixedHeightPaper>
   );
 };
 
 export default EventCreate;
+
+export const StyledDateTimeField = styled(DateTimeField)(({ theme }) => ({
+  "& .MuiOutlinedInput-root": {
+    borderRadius: theme.shape.borderRadius * 2,
+    backgroundColor: theme.palette.gray100.main,
+    "& fieldset": {
+      border: "none",
+    },
+    "&:hover fieldset": {
+      border: "none",
+    },
+    "&.Mui-focused fieldset": {
+      border: "none",
+    },
+  },
+  // "& .MuiOutlinedInput-notchedOutline": {
+  //   border: "none",
+  // },
+  // "&:hover .MuiOutlinedInput-notchedOutline": {
+  //   border: "none",
+  // },
+  // "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+  //   border: "none",
+  // },
+  "& .MuiFormHelperText-root": {
+    color: "lightgray",
+    height: "1.5rem", // 24px
+    fontSize: "0.75rem", // 12px
+  },
+  "& .MuiFormLabel-root": {
+    fontWeight: theme.typography.fontWeightMedium,
+    color: theme.palette.gray500.main,
+    fontSize: "1rem",
+    zIndex: 1,
+  },
+}));

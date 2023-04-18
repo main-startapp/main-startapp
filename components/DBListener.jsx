@@ -1,3 +1,8 @@
+// react
+import { useContext, useEffect } from "react";
+// firebase
+import { db } from "../firebase";
+// mui
 import {
   collection,
   doc,
@@ -6,16 +11,15 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import moment from "moment";
-import { useContext, useEffect } from "react";
-import { db } from "../firebase";
+// edium
 import { useAuth } from "./Context/AuthContext";
 import { GlobalContext } from "./Context/ShareContexts";
+// time
+import dayjs from "dayjs";
 
 // purpose: Firebase prefer consistent subscription. This comp serves this purpose by subscribing the essential db and also providing the derived data required by other comps.
 // https://stackoverflow.com/questions/61094496/how-can-i-secure-my-component-state-details-from-react-dev-tool-on-production
 // tldr; you can't. don't pass sensitive data to client
-
 const DBListener = () => {
   // context
   const { currentUser } = useAuth();
@@ -119,7 +123,7 @@ const DBListener = () => {
   useEffect(() => {
     // time
     function daysAgo(days) {
-      return moment().subtract(30, "days").toDate();
+      return dayjs().subtract(30, "days").toDate();
     }
 
     // db query

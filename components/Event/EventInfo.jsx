@@ -1,4 +1,6 @@
-import { Suspense, useContext, useEffect, useRef, useState } from "react";
+// react
+import { useContext, useEffect, useRef } from "react";
+// mui
 import {
   Avatar,
   Box,
@@ -10,44 +12,37 @@ import {
   Typography,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { EventContext, GlobalContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
+// edium
+import { EventContext, GlobalContext } from "../Context/ShareContexts";
+import { FixedHeightPaper } from "../Reusable/Resusable";
+// motion
+import { motion } from "framer-motion";
+// time
 import moment from "moment";
+// interweave
 import { Interweave } from "interweave";
 import { UrlMatcher } from "interweave-autolink";
-import { motion } from "framer-motion";
-import { FixedHeightPaper } from "../Reusable/Resusable";
-import { useImage } from "react-image";
-import { ErrorBoundary } from "react-error-boundary";
+// rsme
+import { InstagramEmbed } from "react-social-media-embed";
+import SlateEditor from "../SlateEditor";
 
-export const EventInfoContent = () => {
+export const EventInfoContent = ({ event, eventCreator, eventAllTags }) => {
   // context
   const { onMedia } = useContext(GlobalContext);
-  const { fullEvent } = useContext(EventContext);
+  // const { fullEvent } = useContext(EventContext);
 
   // local vars
-  const event = fullEvent?.event;
-  const eventCreator = fullEvent?.creator;
-  const eventAllTags = fullEvent?.allTags;
+  // const event = fullEvent?.event;
+  // const eventCreator = fullEvent?.creator;
+  // const eventAllTags = fullEvent?.allTags;
 
   // transfer code
   // const [tCode, setTCode] = useState("");
   // useEffect(() => {
   //   setTCode("");
   // }, [fullEvent]);
-
-  function EventImageComponent() {
-    const { src } = useImage({
-      srcList: event?.banner_url,
-    });
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img alt="" src={src} width="100%" />;
-  }
-
-  function ErrorFallback({ error, resetErrorBoundary }) {
-    return <></>;
-  }
 
   // moment
   const startMoment = moment(event?.start_date);
@@ -118,34 +113,44 @@ export const EventInfoContent = () => {
       >
         {"Description:"}
       </Typography>
-      <Typography color="text.secondary" component="span" variant="body1">
-        <pre
-          style={{
-            fontFamily: "inherit",
-            whiteSpace: "pre-wrap",
-            wordWrap: "break-word",
-            display: "inline",
-          }}
-        >
-          <Interweave
-            content={event?.description}
-            matchers={[new UrlMatcher("url")]}
-          />
-        </pre>
-      </Typography>
+      {event?.description && (
+        <Typography color="text.secondary" component="span" variant="body1">
+          <pre
+            style={{
+              fontFamily: "inherit",
+              whiteSpace: "pre-wrap",
+              wordWrap: "break-word",
+              display: "inline",
+            }}
+          >
+            <Interweave
+              content={event.description}
+              matchers={[new UrlMatcher("url")]}
+            />
+          </pre>
+        </Typography>
+      )}
+      {event?.test_desc && (
+        <SlateEditor
+          valueObj={event}
+          valueKey="test_desc"
+          onChange={null}
+          isReadOnly={true}
+        />
+      )}
       <Button
-        disabled={!event?.registration_form_url}
-        disableElevation
-        fullWidth
-        variant="contained"
-        component={Link}
-        target="_blank"
-        href={event?.registration_form_url}
-        rel="noreferrer"
         sx={{
           mt: 4,
           borderRadius: 8,
         }}
+        disabled={!event?.registration_form_url}
+        disableElevation
+        fullWidth
+        variant="contained"
+        LinkComponent={Link}
+        target="_blank"
+        href={event?.registration_form_url}
+        rel="noreferrer"
       >
         {event?.registration_form_url ? "Attend" : "Registration Not Required"}
       </Button>
@@ -173,7 +178,7 @@ export const EventInfoContent = () => {
           ))}
         </Box>
       )}
-      <ErrorBoundary FallbackComponent={ErrorFallback}>
+      {/* <ErrorBoundary FallbackComponent={ErrorFallback}>
         <Box
           sx={{
             mt: 4,
@@ -186,7 +191,19 @@ export const EventInfoContent = () => {
             <EventImageComponent />
           </Suspense>
         </Box>
-      </ErrorBoundary>
+      </ErrorBoundary> */}
+      {event?.banner_url && event.banner_url.includes("instagram") && (
+        <Box
+          sx={{
+            mt: 4,
+            display: "flex",
+            justifyContent: "center",
+            // height: `calc()`,
+          }}
+        >
+          <InstagramBlock url={event.banner_url} />
+        </Box>
+      )}
     </>
   );
 };
@@ -235,7 +252,11 @@ const EventInfo = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <EventInfoContent />
+            <EventInfoContent
+              event={fullEvent?.event}
+              eventCreator={fullEvent?.creator}
+              eventAllTags={fullEvent?.allTags}
+            />
           </motion.div>
         </Box>
       )}
@@ -259,6 +280,46 @@ const EventInfo = () => {
 };
 
 export default EventInfo;
+
+// this embed comp has our own footer imitating IG's, because we only support square post.
+// Longer rectangle post will be cropped and covered by our footer.
+// Ironically, the footer color now matches their button color.
+export const InstagramBlock = ({ url }) => {
+  return (
+    <Box
+      sx={{
+        borderRadius: "3px",
+        boxShadow: 2,
+      }}
+    >
+      <Box
+        sx={{
+          height: `calc(54px + 480px)`,
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <InstagramEmbed url={url} width={480} />
+      </Box>
+      <Link
+        sx={{
+          height: "44px",
+          display: "flex",
+          alignItems: "center",
+          marginX: "12px",
+          fontSize: "14px",
+          color: "#0095f6",
+        }}
+        target="_blank"
+        href={url}
+        rel="noreferrer"
+        underline="none"
+      >
+        View more on Instagram
+      </Link>
+    </Box>
+  );
+};
 
 {
   /* <Box

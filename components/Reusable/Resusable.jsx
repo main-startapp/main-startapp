@@ -332,6 +332,9 @@ export const DefaultTextField = styled(TextField)(({ theme }) => ({
       border: "none",
     },
   },
+  // "& .MuiOutlinedInput-input": {
+  //   padding: "16px",
+  // },
   // "& .MuiOutlinedInput-notchedOutline": {
   //   border: "none",
   // },
@@ -350,6 +353,7 @@ export const DefaultTextField = styled(TextField)(({ theme }) => ({
     fontWeight: theme.typography.fontWeightMedium,
     color: theme.palette.gray500.main,
     fontSize: "1rem",
+    zIndex: 1,
   },
 }));
 

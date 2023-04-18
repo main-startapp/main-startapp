@@ -203,32 +203,23 @@ const ProjectList = () => {
             style={{ width: "100%" }} // !important: make create button fullwidth
           >
             <span>
-              <NextLink
-                href={{
-                  pathname: "/projects/create",
+              <Button
+                sx={{
+                  height: "48px",
+                  borderRadius: 8,
                 }}
-                as="/projects/create"
-                passHref
-                style={{
-                  color: "inherit",
-                }}
+                color="secondary"
+                disabled={!ediumUser?.uid}
+                disableElevation
+                fullWidth
+                variant="contained"
+                LinkComponent={NextLink}
+                href="/projects/create"
               >
-                <Button
-                  color="secondary"
-                  disabled={!ediumUser?.uid}
-                  disableElevation
-                  fullWidth
-                  variant="contained"
-                  sx={{
-                    height: "48px",
-                    borderRadius: 8,
-                  }}
-                >
-                  <Typography variant="button" sx={{ fontSize: "1.125rem" }}>
-                    {"Create Project"}
-                  </Typography>
-                </Button>
-              </NextLink>
+                <Typography variant="button" sx={{ fontSize: "1.125rem" }}>
+                  {"Create Project"}
+                </Typography>
+              </Button>
             </span>
           </Tooltip>
         </Box>

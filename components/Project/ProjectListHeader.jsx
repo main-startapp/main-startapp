@@ -118,7 +118,7 @@ const ProjectListHeader = () => {
             setSearchTerm("");
             setIsSearchingClicked(true); // isSearchingClicked flag for auto set entry
           }}
-          onKeyPress={(e) => {
+          onKeyDown={(e) => {
             if (e.key === "Enter") {
               setSearchTerm(e.target.value);
               setIsSearchingClicked(true); // isSearchingClicked flag for auto set entry

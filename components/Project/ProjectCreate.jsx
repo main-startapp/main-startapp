@@ -1,3 +1,6 @@
+// react
+import { useContext, useEffect, useRef, useState } from "react";
+// mui
 import {
   Autocomplete,
   Box,
@@ -18,9 +21,11 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
 import AddLinkIcon from "@mui/icons-material/AddLink";
+// firebase
 import {
   collection,
   doc,
@@ -31,13 +36,10 @@ import {
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
-import { useContext, useEffect, useRef, useState } from "react";
+// edium
 import { db } from "../../firebase";
+import { useAuth } from "../Context/AuthContext";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
-import { useRouter } from "next/router";
 import {
   DefaultFormControl,
   DefaultTextField,
@@ -45,15 +47,18 @@ import {
   FixedHeightPaper,
   handleDeleteEntry,
 } from "../Reusable/Resusable";
-import { useAuth } from "../Context/AuthContext";
 import {
   projectTags,
   typeStrList,
   categoryStrList,
 } from "../Reusable/MenuStringList";
+import { StyledDateTimeField } from "../Event/EventCreate";
 import TextEditor from "../TextEditor";
-import { useTheme } from "@mui/material/styles";
+// next
+import { useRouter } from "next/router";
+import dayjs from "dayjs";
 
+// comp
 const ProjectCreate = (props) => {
   // context
   const { currentUser } = useAuth();
@@ -98,7 +103,7 @@ const ProjectCreate = (props) => {
     count: "",
     responsibility: "",
     url: "",
-    deadline: "",
+    deadline: null,
   };
   const [positionFields, setPositionFields] = useState(() =>
     oldProject?.position_list?.length > 0
@@ -406,7 +411,8 @@ const ProjectCreate = (props) => {
         id="projectcreate-box"
         sx={{
           flexGrow: 1,
-          //overflowX: "hidden",
+          position: "relative",
+          overflowX: "hidden",
           overflowY: "scroll",
           //paddingTop: onMedia.onDesktop ? 2 : 2, // align with project list
           paddingBottom: onMedia.onDesktop ? 8 : 4, // enough space for messages
@@ -721,13 +727,11 @@ const ProjectCreate = (props) => {
                     />
                     {/* Weekly hour */}
                     <DefaultTextField
+                      sx={{ ml: 2, minWidth: "20%" }}
                       required
                       type="number"
                       name="weekly_hour" // has to be the same as key
                       label="Weekly Hour"
-                      inputProps={{
-                        min: 1,
-                      }}
                       value={positionField.weekly_hour}
                       onChange={(e) => {
                         e.target.value > 1
@@ -735,7 +739,9 @@ const ProjectCreate = (props) => {
                           : (e.target.value = 1);
                         handlePosInputChange(index, e);
                       }}
-                      sx={{ ml: 2, minWidth: "20%" }}
+                      inputProps={{
+                        min: 1,
+                      }}
                     />
 
                     {/* Number of people */}
@@ -808,30 +814,29 @@ const ProjectCreate = (props) => {
                       }}
                     />
                     {/* Application deadline container */}
-                    {/* https://stackoverflow.com/questions/63870164/material-ui-pickers-trigger-validation-on-blur-not-on-change */}
-                    <LocalizationProvider dateAdapter={AdapterMoment}>
-                      <DatePicker
-                        name="deadline"
-                        label="Application Deadline"
-                        value={positionField.deadline}
-                        onChange={(e) => {
-                          let pFields = [...positionFields];
-                          pFields[index]["deadline"] = e?._isValid ? e?._d : "";
-                          setPositionFields(pFields);
-                        }}
-                        renderInput={(params) => {
-                          return (
-                            <DefaultTextField
-                              {...params}
-                              sx={{
-                                minWidth: "25%",
-                                ml: 2,
-                              }}
-                            />
-                          );
-                        }}
-                      />
-                    </LocalizationProvider>
+
+                    <StyledDateTimeField
+                      // inputRef={focusState === "datetime" ? focusRef : null}
+                      sx={{ ml: 2, width: "50%" }}
+                      required
+                      name="deadline"
+                      label="Application Deadline"
+                      value={
+                        positionField.deadline
+                          ? dayjs(positionField.deadline)
+                          : null
+                      }
+                      onChange={(newValue) => {
+                        let pFields = [...positionFields];
+                        pFields[index]["deadline"] = newValue?.toDate();
+                        setPositionFields(pFields);
+                      }}
+                      // onKeyDown={(e) => {
+                      //   if (e.key === "Enter") {
+                      //     updateFocus("duration");
+                      //   }
+                      // }}
+                    />
                   </Box>
                 </Box>
               );

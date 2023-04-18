@@ -197,22 +197,22 @@ const PositionListItem = (props) => {
   // components
   const appURLButton = (
     <Button
-      color="primary"
-      disabled={dayDiff > 0}
-      disableElevation
-      size="small"
-      variant="contained"
-      component={Link}
-      target="_blank"
-      href={appURL}
-      rel="noreferrer"
-      onClick={(e) => e.stopPropagation()}
       sx={{
         borderRadius: 8,
         paddingX: 2,
         paddingY: 0,
         fontSize: "0.75rem",
       }}
+      color="primary"
+      disabled={dayDiff > 0}
+      disableElevation
+      size="small"
+      variant="contained"
+      LinkComponent={Link}
+      target="_blank"
+      href={appURL}
+      rel="noreferrer"
+      onClick={(e) => e.stopPropagation()}
     >
       {"Apply"}
     </Button>

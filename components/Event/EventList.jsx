@@ -198,32 +198,23 @@ const EventList = () => {
             style={{ width: "100%" }} // !important: make create button fullwidth
           >
             <span>
-              <NextLink
-                href={{
-                  pathname: "/events/create",
+              <Button
+                sx={{
+                  height: "48px",
+                  borderRadius: 8,
                 }}
-                as="/events/create"
-                passHref
-                style={{
-                  color: "inherit",
-                }}
+                color="secondary"
+                disabled={!ediumUser?.uid}
+                disableElevation
+                fullWidth
+                variant="contained"
+                LinkComponent={NextLink}
+                href="/events/create"
               >
-                <Button
-                  color="secondary"
-                  disabled={!ediumUser?.uid}
-                  disableElevation
-                  fullWidth
-                  variant="contained"
-                  sx={{
-                    height: "48px",
-                    borderRadius: 8,
-                  }}
-                >
-                  <Typography variant="button" sx={{ fontSize: "1.125rem" }}>
-                    {"Create Event"}
-                  </Typography>
-                </Button>
-              </NextLink>
+                <Typography variant="button" sx={{ fontSize: "1.125rem" }}>
+                  {"Create Event"}
+                </Typography>
+              </Button>
             </span>
           </Tooltip>
         </Box>

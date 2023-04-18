@@ -529,7 +529,7 @@ const ChatMsg = (props) => {
           }}
           value={message.text}
           onChange={(e) => setMessage({ ...message, text: e.target.value })}
-          onKeyPress={(e) => {
+          onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
               if (message.text) {

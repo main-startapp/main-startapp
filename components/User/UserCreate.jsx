@@ -177,7 +177,7 @@ const UserCreate = () => {
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "center",
-            ":hover": { cursor: "pointer" },
+            // ":hover": { cursor: "pointer" },
           }}
         >
           <Box
@@ -192,6 +192,7 @@ const UserCreate = () => {
               justifyContent: isStudentMode ? "start" : "end",
               // justifyContent: "space-between",
               alignItems: "center",
+              ":hover": { cursor: "pointer" },
             }}
             onClick={() => {
               if (isCreate) setIsStudentMode(!isStudentMode);

@@ -1,6 +1,7 @@
 import "../styles/globals.css";
 import "../styles/fc.css";
 import "../styles/quill.snow.css";
+import "../styles/rsme.css";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
@@ -10,8 +11,8 @@ import { CssBaseline } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { grey } from "@mui/material/colors";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { AuthProvider } from "../components/Context/AuthContext";
 import { GlobalContext } from "../components/Context/ShareContexts";
 import Navbar from "../components/Header/Navbar";
@@ -229,7 +230,7 @@ function MyApp({ Component, pageProps }) {
         <link rel="icon" href="/images/favicon.ico" />
       </Head>
       <AuthProvider>
-        <LocalizationProvider dateAdapter={AdapterMoment}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
           <GlobalContext.Provider
             value={{
               projects,
