@@ -684,7 +684,7 @@ const ProjectCreate = (props) => {
           >
             <SlateEditor
               valueObj={newProject}
-              valueKey="test_desc"
+              valueKey="slate_desc"
               onChange={setNewProject}
               isReadOnly={false}
             />

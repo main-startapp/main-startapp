@@ -1,6 +1,6 @@
 import { Box, Button, Dialog, DialogContent, Typography } from "@mui/material";
 import { useContext, useEffect, useMemo, useState } from "react";
-import ScheduleSelector from "react-schedule-selector";
+// import ScheduleSelector from "react-schedule-selector";
 import { useAuth } from "../Context/AuthContext";
 import { TeamContext } from "../Context/ShareContexts";
 import { db } from "../../firebase";
@@ -133,7 +133,7 @@ const TeamScheduler = () => {
             <Button onClick={handleSubmitSchedule}>Save</Button>
           </Box>
           <Box sx={{ width: "50%" }}>
-            <ScheduleSelector
+            {/* <ScheduleSelector
               selection={schedule}
               startDate={startDate}
               dateFormat="ddd"
@@ -146,7 +146,7 @@ const TeamScheduler = () => {
               onChange={(e) => {
                 handleScheduleChange(e);
               }}
-            />
+            /> */}
           </Box>
         </DialogContent>
       </Dialog>

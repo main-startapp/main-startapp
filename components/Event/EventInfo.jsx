@@ -110,7 +110,7 @@ export const EventInfoContent = ({ event, eventCreator, eventAllTags }) => {
       >
         {"Description:"}
       </Typography>
-      {event?.description && (
+      {event?.description && !event?.slate_desc && (
         <Typography color="text.secondary" component="span" variant="body1">
           <pre
             style={{
@@ -127,10 +127,10 @@ export const EventInfoContent = ({ event, eventCreator, eventAllTags }) => {
           </pre>
         </Typography>
       )}
-      {event?.test_desc && (
+      {event?.slate_desc && (
         <SlateEditor
           valueObj={event}
-          valueKey="test_desc"
+          valueKey="slate_desc"
           onChange={null}
           isReadOnly={true}
         />
@@ -278,9 +278,9 @@ const EventInfo = () => {
 
 export default EventInfo;
 
-// this embed comp has our own footer imitating IG's, because we only support square post.
+// This embed comp has our own footer imitating IG's.
 // Longer rectangle post will be cropped and covered by our footer.
-// Ironically, the footer color now matches their button color.
+// Ironically, the footer color now matches their button color. And their original color is a bit off.
 export const InstagramBlock = ({ url }) => {
   return (
     <Box
@@ -291,7 +291,7 @@ export const InstagramBlock = ({ url }) => {
     >
       <Box
         sx={{
-          height: `calc(54px + 480px)`,
+          height: `calc(54px + 480px)`, // header + post
           position: "relative",
           overflow: "hidden",
         }}
