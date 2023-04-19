@@ -17,14 +17,11 @@ import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 // edium
 import { EventContext, GlobalContext } from "../Context/ShareContexts";
 import { FixedHeightPaper } from "../Reusable/Resusable";
-// motion
+// misc libs
 import { motion } from "framer-motion";
-// time
-import moment from "moment";
-// interweave
+import dayjs from "dayjs";
 import { Interweave } from "interweave";
 import { UrlMatcher } from "interweave-autolink";
-// rsme
 import { InstagramEmbed } from "react-social-media-embed";
 import SlateEditor from "../SlateEditor";
 
@@ -44,9 +41,9 @@ export const EventInfoContent = ({ event, eventCreator, eventAllTags }) => {
   //   setTCode("");
   // }, [fullEvent]);
 
-  // moment
-  const startMoment = moment(event?.start_date);
-  const endMoment = moment(event?.end_date);
+  // time
+  const startMoment = dayjs(event?.start_date);
+  const endMoment = dayjs(event?.end_date);
   const isSameDay = startMoment.format("L") === endMoment.format("L");
   const isSameTime = startMoment.format("LLL") === endMoment.format("LLL");
 

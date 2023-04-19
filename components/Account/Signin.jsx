@@ -172,7 +172,7 @@ const Signin = () => {
           {"Not registered yet? "} &nbsp;
         </Typography>
         <Typography
-          color="secondary"
+          color="secondary" // color can only use predifined color like primary or text.primary
           sx={{
             fontSize: "0.875rem",
             fontWeight: "bold",

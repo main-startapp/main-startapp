@@ -1,4 +1,8 @@
+// react
 import { useContext, useState } from "react";
+// next
+import NextLink from "next/link";
+// mui
 import {
   Avatar,
   Box,
@@ -11,16 +15,18 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
-import moment from "moment";
-import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+// edium
+import { GlobalContext, EventContext } from "../Context/ShareContexts";
+
 import {
   handleDeleteEntry,
   handleVisibility,
   isStrInStrList,
 } from "../Reusable/Resusable";
-import NextLink from "next/link";
+// time
+import dayjs from "dayjs";
 
 // prefer not doing any dynamic calculation in this leaf component
 const EventListItem = (props) => {
@@ -38,9 +44,9 @@ const EventListItem = (props) => {
   const eventAllTags = fullEvent.allTags;
 
   // time related
-  const startMoment = moment(event?.start_date);
-  const endMoment = moment(event?.end_date);
-  const isExpired = moment().isAfter(endMoment);
+  const startMoment = dayjs(event?.start_date);
+  const endMoment = dayjs(event?.end_date);
+  const isExpired = dayjs().isAfter(endMoment);
   const isSameDay = startMoment.format("L") === endMoment.format("L");
   const isSameTime = startMoment.format("LLL") === endMoment.format("LLL");
 
@@ -251,7 +257,7 @@ const EventListItem = (props) => {
                     fontWeight: "light",
                   }}
                 >
-                  {moment(event.last_timestamp).format("MMM Do, YYYY")}
+                  {dayjs(event.last_timestamp).format("MMM Do, YYYY")}
                 </Typography>
               }
               sx={{ mt: 2 }}

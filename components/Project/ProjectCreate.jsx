@@ -53,10 +53,10 @@ import {
   categoryStrList,
 } from "../Reusable/MenuStringList";
 import { StyledDateTimeField } from "../Event/EventCreate";
-import TextEditor from "../TextEditor";
 // next
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
+import SlateEditor from "../SlateEditor";
 
 // comp
 const ProjectCreate = (props) => {
@@ -87,9 +87,12 @@ const ProjectCreate = (props) => {
     type: "",
     tags: [],
     short_description: "",
-    description: "",
-    is_visible: true,
-    is_deleted: false,
+    slate_desc: [
+      {
+        type: "paragraph",
+        children: [{ text: "" }],
+      },
+    ],
   };
   const [newProject, setNewProject] = useState(() =>
     oldProject ? oldProject : emptyProject
@@ -123,7 +126,6 @@ const ProjectCreate = (props) => {
   // check box
   const [isCheckedTransferable, setIsCheckedTransferable] = useState(false);
   const [isCheckedPosition, setIsCheckedPosition] = useState(false);
-  const [showDescOverlay, setShowDescOverlay] = useState(true);
 
   useEffect(() => {
     if (!oldProject) {
@@ -163,6 +165,8 @@ const ProjectCreate = (props) => {
         ...newProject,
         position_list: isCheckedPosition ? positionFields : [],
         creator_uid: ediumUser?.uid,
+        is_deleted: false,
+        is_visible: true,
         create_timestamp: serverTimestamp(),
         last_timestamp: serverTimestamp(),
       };
@@ -248,6 +252,8 @@ const ProjectCreate = (props) => {
         ...newProject,
         position_list: isCheckedPosition ? positionFields : [],
         creator_uid: ediumUser?.uid,
+        is_deleted: false,
+        is_visible: true,
         create_timestamp: serverTimestamp(),
         last_timestamp: serverTimestamp(),
       };
@@ -436,7 +442,9 @@ const ProjectCreate = (props) => {
         </Typography>
         {currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" && (
           <Box sx={{ mb: 4, display: "flex" }}>
-            <Typography sx={{ color: "adminOrange.main", fontWeight: "bold" }}>
+            <Typography
+              sx={{ color: "adminOrange.main", fontWeight: "medium" }}
+            >
               {"This is a transferable project"}
             </Typography>
             <Checkbox
@@ -647,6 +655,7 @@ const ProjectCreate = (props) => {
 
           {/* Short description */}
           <DefaultTextField
+            sx={{ mt: 4 }}
             required
             fullWidth
             label="Short Description"
@@ -658,16 +667,28 @@ const ProjectCreate = (props) => {
                 short_description: e.target.value,
               })
             }
-            sx={{ mt: 4, mb: 4 }}
           />
 
           {/* Description */}
-          <TextEditor
-            update={setNewProject}
-            project={newProject}
-            overlay={showDescOverlay}
-            showOverlay={setShowDescOverlay}
-          />
+          <Box
+            sx={{
+              mt: 4,
+              backgroundColor: "gray100.main",
+              borderRadius: 2,
+              paddingX: "14px",
+              paddingY: "16.5px",
+              "&:hover": {
+                cursor: "text",
+              },
+            }}
+          >
+            <SlateEditor
+              valueObj={newProject}
+              valueKey="test_desc"
+              onChange={setNewProject}
+              isReadOnly={false}
+            />
+          </Box>
           <FormHelperText
             sx={{ color: "lightgray", fontSize: "12px", mx: "14px", mt: "3px" }}
           >
@@ -685,15 +706,15 @@ const ProjectCreate = (props) => {
               alignItems: "center",
             }}
           >
-            <Typography color="gray500.main">
+            <Typography sx={{ color: "gray500.main", fontWeight: "medium" }}>
               {"I want to add positions"}
             </Typography>
             <Checkbox
+              sx={{ ml: 2, color: "gray500.main", padding: 0 }}
               checked={isCheckedPosition}
               onChange={() => {
                 setIsCheckedPosition(!isCheckedPosition);
               }}
-              sx={{ ml: 2, color: "gray500.main", padding: 0 }}
             />
           </Box>
           {/* firebase dynamic array: http://y2u.be/zgKH12s_95A */}

@@ -1,10 +1,14 @@
+// react
 import { useContext, useMemo, useEffect } from "react";
+// next
 import NextLink from "next/link";
+import Router from "next/router";
+// mui
 import { Box, Button, Tooltip, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+// edium
 import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import EventListItem from "./EventListItem";
-import moment from "moment";
 import EventListHeader from "./EventListHeader";
 import {
   FixedHeightPaper,
@@ -12,7 +16,8 @@ import {
   isStrInStrList,
   shallowUpdateURLQuery,
 } from "../Reusable/Resusable";
-import Router from "next/router";
+// time
+import dayjs from "dayjs";
 
 const EventList = () => {
   // context
@@ -34,7 +39,7 @@ const EventList = () => {
   const sortedFullEvents = useMemo(() => {
     const eventsLength = fullEvents.length;
     for (let i = eventsLength - 1; i > -1; i--) {
-      if (moment().isAfter(moment(fullEvents[i].event.end_date))) {
+      if (dayjs().isAfter(dayjs(fullEvents[i].event.end_date))) {
         let temp = fullEvents[i];
         fullEvents.splice(i, 1);
         fullEvents.push(temp);

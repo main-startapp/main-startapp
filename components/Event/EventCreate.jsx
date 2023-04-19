@@ -1,5 +1,7 @@
 // react
 import { useContext, useEffect, useRef, useState } from "react";
+// next
+import { useRouter } from "next/router";
 // mui
 import {
   Autocomplete,
@@ -11,12 +13,10 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  FormControl,
   FormHelperText,
   IconButton,
   InputLabel,
   Link,
-  Menu,
   MenuItem,
   Select,
   TextField,
@@ -36,7 +36,6 @@ import {
   setDoc,
   arrayRemove,
   arrayUnion,
-  Timestamp,
 } from "firebase/firestore";
 // edium
 import { db } from "../../firebase";
@@ -51,12 +50,9 @@ import {
 } from "../Reusable/Resusable";
 import { eventStrList, eventTags } from "../Reusable/MenuStringList";
 import { EventInfoContent } from "./EventInfo";
+import SlateEditor from "../SlateEditor";
 // time
 import dayjs from "dayjs";
-// nextjs
-import { useRouter } from "next/router";
-// slate
-import SlateEditor from "../SlateEditor";
 
 // comp
 const EventCreate = (props) => {
@@ -75,6 +71,20 @@ const EventCreate = (props) => {
   // click spam
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
 
+  // time
+  const [eventDuration, setEventDuration] = useState("");
+  const [eventDurationUnit, setEventDurationUnit] = useState("hours");
+
+  // focus
+  const [focusState, setFocusState] = useState("title ");
+  const focusRef = useRef();
+  const updateFocus = (nextState) => {
+    setFocusState(nextState);
+    setTimeout(() => {
+      focusRef?.current?.focus();
+    }, 100);
+  };
+
   // can be wrapped up in useMemo if necessary, no premature optimization
   const oldEvent = props.eventID
     ? findItemFromList(events, "id", props.eventID)
@@ -83,23 +93,20 @@ const EventCreate = (props) => {
   // init new event
   const emptyEvent = {
     title: "",
+    icon_url: "",
     type: "",
     start_date: null,
     end_date: null,
     location: "",
     tags: [],
-    creator_uid: ediumUser?.uid,
-    is_deleted: false,
-    is_visible: true,
-    icon_url: "",
-    banner_url: "",
-    registration_form_url: "",
-    test_desc: [
+    slate_desc: [
       {
         type: "paragraph",
         children: [{ text: "" }],
       },
     ],
+    registration_form_url: "",
+    banner_url: "",
   };
   const [newEvent, setNewEvent] = useState(() =>
     oldEvent ? oldEvent : emptyEvent
@@ -116,7 +123,6 @@ const EventCreate = (props) => {
 
   // check box
   const [isCheckedTransferable, setIsCheckedTransferable] = useState(false);
-
   useEffect(() => {
     if (!oldEvent) {
       // if admin, check transfer project by default
@@ -147,6 +153,9 @@ const EventCreate = (props) => {
       const collectionRef = collection(db, "events");
       const eventRef = {
         ...newEvent,
+        creator_uid: ediumUser?.uid,
+        is_deleted: false,
+        is_visible: true,
         create_timestamp: serverTimestamp(),
         last_timestamp: serverTimestamp(),
       };
@@ -226,6 +235,9 @@ const EventCreate = (props) => {
       const collectionRef = collection(db, "events");
       const eventRef = {
         ...newEvent,
+        creator_uid: ediumUser?.uid,
+        is_deleted: false,
+        is_visible: true,
         create_timestamp: serverTimestamp(),
         last_timestamp: serverTimestamp(),
       };
@@ -342,21 +354,6 @@ const EventCreate = (props) => {
       router.push(`/events`);
     }, 2000); // wait 2 seconds then go to `events` page
   };
-
-  // wip time
-  const [testDuration, setTestDuration] = useState("");
-  const [testDurationUnit, setTestDurationUnit] = useState("hours");
-
-  const [focusState, setFocusState] = useState("title ");
-  const focusRef = useRef();
-  const updateFocus = (nextState) => {
-    setFocusState(nextState);
-    setTimeout(() => {
-      focusRef?.current?.focus();
-    }, 100);
-  };
-
-  console.log(newEvent.test_desc);
 
   return (
     <FixedHeightPaper
@@ -475,7 +472,7 @@ const EventCreate = (props) => {
             {ediumUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" && (
               <Box sx={{ mt: 4, display: "flex", flexDirection: "row" }}>
                 <Typography
-                  sx={{ color: "adminOrange.main", fontWeight: "bold" }}
+                  sx={{ color: "adminOrange.main", fontWeight: "medium" }}
                 >
                   {"This is a transferable event"}
                 </Typography>
@@ -640,9 +637,9 @@ const EventCreate = (props) => {
                       setNewEvent({
                         ...newEvent,
                         start_date: newValue?.toDate(),
-                        end_date: testDuration
+                        end_date: eventDuration
                           ? dayjs(newValue)
-                              .add(testDuration, testDurationUnit)
+                              .add(eventDuration, eventDurationUnit)
                               ?.toDate()
                           : null,
                       });
@@ -656,19 +653,19 @@ const EventCreate = (props) => {
                   <DefaultTextField
                     inputRef={focusState === "duration" ? focusRef : null}
                     sx={{ width: "40%", ml: 4 }}
-                    //error={!Number(testDuration)}
+                    //error={!Number(eventDuration)}
                     fullWidth
                     required
                     label="Duration"
                     helperText="Event duration"
-                    value={testDuration}
+                    value={eventDuration}
                     onChange={(e) => {
-                      setTestDuration(e.target.value);
+                      setEventDuration(e.target.value);
                       if (newEvent.start_date) {
                         setNewEvent({
                           ...newEvent,
                           end_date: dayjs(newEvent.start_date)
-                            .add(e.target.value, testDurationUnit)
+                            .add(e.target.value, eventDurationUnit)
                             ?.toDate(),
                         });
                       }
@@ -676,21 +673,21 @@ const EventCreate = (props) => {
                     onKeyDown={(e) => {
                       if (e.key === "ArrowUp" || e.key === "ArrowDown") {
                         e.preventDefault();
-                        setTestDurationUnit(
-                          testDurationUnit === "hours" ? "days" : "hours"
+                        setEventDurationUnit(
+                          eventDurationUnit === "hours" ? "days" : "hours"
                         );
-                        if (testDuration && newEvent.start_date)
-                          testDurationUnit === "hours"
+                        if (eventDuration && newEvent.start_date)
+                          eventDurationUnit === "hours"
                             ? setNewEvent({
                                 ...newEvent,
                                 end_date: dayjs(newEvent.start_date)
-                                  .add(testDuration, "days")
+                                  .add(eventDuration, "days")
                                   ?.toDate(),
                               })
                             : setNewEvent({
                                 ...newEvent,
                                 end_date: dayjs(newEvent.start_date)
-                                  .add(testDuration, "hours")
+                                  .add(eventDuration, "hours")
                                   ?.toDate(),
                               });
                       }
@@ -702,21 +699,21 @@ const EventCreate = (props) => {
                       endAdornment: (
                         <IconButton
                           onClick={(e) => {
-                            setTestDurationUnit(
-                              testDurationUnit === "hours" ? "days" : "hours"
+                            setEventDurationUnit(
+                              eventDurationUnit === "hours" ? "days" : "hours"
                             );
-                            if (testDuration && newEvent.start_date)
-                              testDurationUnit === "hours"
+                            if (eventDuration && newEvent.start_date)
+                              eventDurationUnit === "hours"
                                 ? setNewEvent({
                                     ...newEvent,
                                     end_date: dayjs(newEvent.start_date)
-                                      .add(testDuration, "days")
+                                      .add(eventDuration, "days")
                                       ?.toDate(),
                                   })
                                 : setNewEvent({
                                     ...newEvent,
                                     end_date: dayjs(newEvent.start_date)
-                                      .add(testDuration, "hours")
+                                      .add(eventDuration, "hours")
                                       ?.toDate(),
                                   });
                           }}
@@ -730,11 +727,11 @@ const EventCreate = (props) => {
                           <Typography
                             sx={{ fontSize: "1rem", fontWeight: "medium" }}
                           >
-                            {testDurationUnit === "hours"
-                              ? testDuration > 1
+                            {eventDurationUnit === "hours"
+                              ? eventDuration > 1
                                 ? "hrs"
                                 : "hr"
-                              : testDuration > 1
+                              : eventDuration > 1
                               ? "days"
                               : "day"}
                           </Typography>
@@ -742,131 +739,8 @@ const EventCreate = (props) => {
                       ),
                     }}
                   />
-
-                  {/* <DatePicker
-              label="Start Date"
-              value={testDate}
-              onChange={(newValue) => {
-                setTestDate(newValue?.toDate());
-              }}
-              onAccept={() => {
-                updateFocus("time");
-              }}
-              renderInput={(props) => (
-                <DefaultTextField
-                  {...props}
-                  helperText="Start date"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      updateFocus("time");
-                    }
-                  }}
-                  sx={{ width: "100%" }}
-                />
-              )}
-            /> */}
-
-                  {/* <TimePicker
-              inputRef={focusState === "time" ? focusRef : null}
-              label="Start Time"
-              value={testTime}
-              onChange={(newValue) => {
-                setTestTime(newValue?.toDate());
-              }}
-              onAccept={() => {
-                updateFocus("duration");
-              }}
-              renderInput={(props) => (
-                <DefaultTextField
-                  {...props}
-                  helperText="Start time"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      updateFocus("duration");
-                    }
-                  }}
-                  sx={{ ml: 4, width: "100%" }}
-                />
-              )}
-            /> */}
-
-                  {/* <DefaultFormControl fullWidth sx={{ width: "50%", ml: 4 }}>
-              <InputLabel>Time</InputLabel>
-              <Select
-                label=""
-                IconComponent={null}
-                value={testTimeSlot}
-                onChange={(e) => {
-                  setTestTimeSlot(e.target.value);
-                  if (testDate)
-                    setTestStartDate(
-                      moment(testDate).add(e.target.value, "h").toDate()
-                    );
-                }}
-                endAdornment={
-                  <IconButton
-                    onClick={() => {
-                      setTestTimePeriod(testTimePeriod === "am" ? "pm" : "am");
-                    }}
-                    sx={{
-                      height: "40px",
-                      width: "40px",
-                      position: "absolute",
-                      right: 0,
-                    }}
-                  >
-                    <Typography sx={{ fontSize: "1rem", fontWeight: "medium" }}>
-                      {testTimePeriod === "am" ? "am" : "pm"}
-                    </Typography>
-                  </IconButton>
-                }
-              >
-                {timeSlots
-                  ?.filter((timeSlot) => {
-                    return testTimePeriod === "am"
-                      ? timeSlot < 12
-                      : timeSlot >= 12;
-                  })
-                  ?.map((timeSlot, index) => {
-                    return (
-                      <MenuItem key={index} value={timeSlot}>
-                        {getTimeSlotString(timeSlot)}
-                      </MenuItem>
-                    );
-                  })}
-              </Select>
-              <FormHelperText
-                id="eventcreate-wip-time-helper-text"
-                sx={{ color: "lightgray", fontSize: "12px" }}
-              >
-                {"Time"}
-              </FormHelperText>
-            </DefaultFormControl> */}
                 </Box>
               </Box>
-
-              {/* registration url */}
-              <DefaultTextField
-                inputRef={focusState === "regurl" ? focusRef : null}
-                sx={{ mt: 4 }}
-                fullWidth
-                margin="none"
-                type="url"
-                label="Registration Form URL"
-                helperText="Users will be redirect to this URL when they click Attend"
-                value={newEvent.registration_form_url}
-                onChange={(e) =>
-                  setNewEvent({
-                    ...newEvent,
-                    registration_form_url: e.target.value,
-                  })
-                }
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    updateFocus("location");
-                  }
-                }}
-              />
               {/* Location */}
               {/* !todo: can use some services like google places or leaflet to autocomplete */}
               <DefaultTextField
@@ -915,22 +789,6 @@ const EventCreate = (props) => {
                 )}
               />
               {/* Description */}
-              {/* <DefaultTextField
-            sx={{ mt: 4 }}
-            fullWidth
-            required
-            label="Description"
-            margin="none"
-            multiline
-            minRows={4}
-            maxRows={8}
-            helperText="A brief description of the new event (e.g. goal, content, format, timeline)"
-            value={newEvent.description}
-            onChange={(e) =>
-              setNewEvent({ ...newEvent, description: e.target.value })
-            }
-          /> */}
-              {/* WIP Description */}
               <Box
                 sx={{
                   mt: 4,
@@ -945,7 +803,7 @@ const EventCreate = (props) => {
               >
                 <SlateEditor
                   valueObj={newEvent}
-                  valueKey="test_desc"
+                  valueKey="slate_desc"
                   onChange={setNewEvent}
                   isReadOnly={false}
                 />
@@ -958,9 +816,31 @@ const EventCreate = (props) => {
                   mt: "3px",
                 }}
               >
-                Description Helper Text
+                A brief description of the new event (e.g. goal, content,
+                format, timeline)
               </FormHelperText>
-
+              {/* registration url */}
+              <DefaultTextField
+                inputRef={focusState === "regurl" ? focusRef : null}
+                sx={{ mt: 4 }}
+                fullWidth
+                margin="none"
+                type="url"
+                label="Registration Form URL"
+                helperText="Users will be redirect to this URL when they click Attend"
+                value={newEvent.registration_form_url}
+                onChange={(e) =>
+                  setNewEvent({
+                    ...newEvent,
+                    registration_form_url: e.target.value,
+                  })
+                }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    updateFocus("location");
+                  }
+                }}
+              />
               {/* Social Media: IG, Youtube, Imgur */}
               <Box sx={{ mt: 4, display: "flex", flexDirection: "row" }}>
                 <DefaultTextField
@@ -1072,15 +952,6 @@ export const StyledDateTimeField = styled(DateTimeField)(({ theme }) => ({
       border: "none",
     },
   },
-  // "& .MuiOutlinedInput-notchedOutline": {
-  //   border: "none",
-  // },
-  // "&:hover .MuiOutlinedInput-notchedOutline": {
-  //   border: "none",
-  // },
-  // "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-  //   border: "none",
-  // },
   "& .MuiFormHelperText-root": {
     color: "lightgray",
     height: "1.5rem", // 24px

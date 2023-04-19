@@ -401,11 +401,11 @@ const ChatMsg = (props) => {
         <Typography
           color="text.secondary"
           sx={{
-            fontSize: "0.75em",
             display: "-webkit-box",
             overflow: "hidden",
             WebkitBoxOrient: "vertical",
             WebkitLineClamp: 1,
+            fontSize: "0.75em",
           }}
         >
           {joinRequests[0].projectTitle} {joinRequests[0].positionTitle}

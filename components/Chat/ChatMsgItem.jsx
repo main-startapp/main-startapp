@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { useContext } from "react";
 import { GlobalContext } from "../Context/ShareContexts";
-import moment from "moment";
+import dayjs from "dayjs";
 
 const ChatMsgItem = (props) => {
   const message = props.message;
@@ -31,7 +31,7 @@ const ChatMsgItem = (props) => {
             sx={{ display: "inline", color: "lightgray", fontSize: "0.875em" }}
           >
             {" · "}
-            {moment(message?.sent_at?.toDate().getTime()).format("M/D LT")}
+            {dayjs(message?.sent_at?.toDate().getTime()).format("M/D LT")}
           </Typography>
         </Box>
       )}
@@ -52,7 +52,7 @@ const ChatMsgItem = (props) => {
             sx={{ display: "inline", color: "lightgray", fontSize: "0.875rem" }}
           >
             {" · "}
-            {moment(message?.sent_at?.toDate().getTime()).format("M/D LT")}
+            {dayjs(message?.sent_at?.toDate().getTime()).format("M/D LT")}
           </Typography>
         </Box>
       )}

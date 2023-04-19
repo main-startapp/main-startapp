@@ -1,4 +1,8 @@
+// react
 import { useContext, useState } from "react";
+// next
+import NextLink from "next/link";
+// mui
 import {
   Avatar,
   Box,
@@ -10,17 +14,18 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
-import moment from "moment";
-import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+// edium
+import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import {
   handleDeleteEntry,
   handleVisibility,
   isStrInStrList,
 } from "../Reusable/Resusable";
+// misc libs
 import { convert } from "html-to-text";
-import NextLink from "next/link";
+import dayjs from "dayjs";
 
 // the project list item component in the project list: has full project data but only shows some brief information
 // prefer not doing any dynamic calculation in this leaf component
@@ -267,7 +272,7 @@ const ProjectListItem = (props) => {
                   fontWeight: "light",
                 }}
               >
-                {moment(project.last_timestamp).format("MMM Do, YYYY")}
+                {dayjs(project.last_timestamp).format("MMM Do, YYYY")}
               </Typography>
             }
             sx={{ mt: 2 }}

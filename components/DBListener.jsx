@@ -16,6 +16,8 @@ import { useAuth } from "./Context/AuthContext";
 import { GlobalContext } from "./Context/ShareContexts";
 // time
 import dayjs from "dayjs";
+var advancedFormat = require("dayjs/plugin/advancedFormat");
+dayjs.extend(advancedFormat); // we only need to do it once
 
 // purpose: Firebase prefer consistent subscription. This comp serves this purpose by subscribing the essential db and also providing the derived data required by other comps.
 // https://stackoverflow.com/questions/61094496/how-can-i-secure-my-component-state-details-from-react-dev-tool-on-production

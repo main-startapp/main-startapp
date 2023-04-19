@@ -1,9 +1,13 @@
+// react
 import { useContext, useEffect, useMemo, useState } from "react";
+// mui
 import { Avatar, Badge, Box, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import moment from "moment";
+// edium
 import { GlobalContext } from "../Context/ShareContexts";
 import { handleUnread } from "../Reusable/Resusable";
+// time
+import dayjs from "dayjs";
 
 const ChatAccordionContact = (props) => {
   const chat = props.chat;
@@ -97,13 +101,13 @@ const ChatAccordionContact = (props) => {
           }}
         >
           <Typography
-            fontSize="1rem"
-            fontWeight="medium"
             sx={{
               display: "-webkit-box",
               overflow: "hidden",
               WebkitBoxOrient: "vertical",
               WebkitLineClamp: 1,
+              fontSize: "1rem",
+              fontWeight: "medium",
             }}
           >
             {contact?.name}
@@ -114,12 +118,12 @@ const ChatAccordionContact = (props) => {
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <Typography
                 color="text.secondary"
-                fontSize="0.75rem"
                 sx={{
                   display: "-webkit-box",
                   overflow: "hidden",
                   WebkitBoxOrient: "vertical",
                   WebkitLineClamp: 1,
+                  fontSize: "0.75rem",
                 }}
               >
                 {"Join Request"}
@@ -127,12 +131,12 @@ const ChatAccordionContact = (props) => {
             </Box>
             <Typography
               color="text.secondary"
-              fontSize="0.75rem"
               sx={{
                 display: "-webkit-box",
                 overflow: "hidden",
                 WebkitBoxOrient: "vertical",
                 WebkitLineClamp: 1,
+                fontSize: "0.75rem",
               }}
             >
               {lastJR.projectTitle} {lastJR.positionTitle}
@@ -140,7 +144,7 @@ const ChatAccordionContact = (props) => {
           </Box>
         ) : (
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Typography fontSize="0.75rem">
+            <Typography sx={{ fontSize: "0.75rem" }}>
               {contact?.desired_position}
             </Typography>
           </Box>
@@ -156,8 +160,8 @@ const ChatAccordionContact = (props) => {
           alignItems: "center",
         }}
       >
-        <Typography fontSize="0.75rem">
-          {moment(chat?.last_timestamp?.toDate().getTime()).format("MMM D")}
+        <Typography sx={{ fontSize: "0.75rem" }}>
+          {dayjs(chat?.last_timestamp?.toDate().getTime()).format("MMM D")}
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
         <Badge

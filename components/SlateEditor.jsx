@@ -19,7 +19,7 @@ import {
   useSelected,
 } from "slate-react";
 import { withHistory } from "slate-history";
-// misc lib
+// misc libs
 import isHotkey, { isKeyHotkey } from "is-hotkey";
 import isUrl from "is-url";
 // emotion

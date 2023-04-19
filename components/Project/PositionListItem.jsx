@@ -1,3 +1,6 @@
+// react
+import { useContext, useEffect, useState } from "react";
+// mui
 import {
   Accordion,
   AccordionDetails,
@@ -12,8 +15,9 @@ import {
 import { styled } from "@mui/material/styles";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import { useContext, useEffect, useState } from "react";
+// edium
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
+// firebase
 import { db } from "../../firebase";
 import {
   addDoc,
@@ -22,8 +26,9 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
+// misc libs
 import { Interweave } from "interweave";
-import moment from "moment";
+import dayjs from "dayjs";
 
 // prefer not doing any dynamic calculation in this leaf component
 const PositionListItem = (props) => {
@@ -49,7 +54,7 @@ const PositionListItem = (props) => {
 
   // local var
   const project = fullProject?.project;
-  const dayDiff = appDeadline ? moment().diff(appDeadline, "days") : ""; // +: past; -: future
+  const dayDiff = appDeadline ? dayjs().diff(appDeadline, "days") : ""; // +: past; -: future
 
   // useEffect to reset accordion expansion
   const [expandState, setExpandState] = useState("collapseIt");
@@ -291,7 +296,7 @@ const PositionListItem = (props) => {
                 color={dayDiff < -7 || dayDiff > 0 ? "lightPrimary" : "error"} // expired in 1 week: red; else: regular light primary
                 disabled={dayDiff > 0}
                 icon={<AccessTimeIcon />}
-                label={moment(appDeadline).format("MMM Do")}
+                label={dayjs(appDeadline).format("MMM Do")}
                 size="small"
                 sx={{
                   ml: 2,
