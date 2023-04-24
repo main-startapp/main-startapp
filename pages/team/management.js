@@ -19,7 +19,6 @@ const TeamManagement = () => {
     setChatPartner(null);
   }, [setChat, setChatPartner, setShowChat, setShowMsg]);
 
-  // local vars
   // team states init
   const [project, setProject] = useState(null);
   const [projectExt, setProjectExt] = useState(null);
