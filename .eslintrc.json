@@ -3,15 +3,8 @@
     "browser": true,
     "es2021": true
   },
-  "extends": ["next/core-web-vitals", "plugin:prettier/recommended"],
-  "plugins": ["prettier"],
+  "extends": ["next/core-web-vitals", "prettier"],
   "rules": {
-    "no-unused-vars": "off",
-    "prettier/prettier": [
-      "error",
-      {
-        "endOfLine": "auto"
-      }
-    ]
+    "no-unused-vars": "off"
   }
 }
