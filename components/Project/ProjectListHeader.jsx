@@ -165,12 +165,10 @@ const ProjectListHeader = () => {
                 sx={{
                   backgroundColor: "background.paper",
                   borderRadius: "0px 0px 8px 8px",
-                  // borderBottom: 1,
-                  // borderColor: "divider",
                   paddingTop: 2,
                   paddingBottom: 1,
                   paddingX: 2,
-                  boxShadow: 2,
+                  boxShadow: `0px 1px 2px #ccc`,
                 }}
               >
                 {typeList?.map((type, index) => (

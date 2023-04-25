@@ -110,8 +110,8 @@ const Students = () => {
               id="students-mobile-list-box"
               sx={{
                 display: student === null ? "block" : "none",
-                paddingTop: 2,
-                paddingLeft: 2,
+                // paddingTop: 2,
+                // paddingLeft: 2,
                 width: "100%",
                 backgroundColor: "gray100.main",
               }}
@@ -122,8 +122,8 @@ const Students = () => {
               id="students-mobile-info-box"
               sx={{
                 display: student === null ? "none" : "block",
-                paddingTop: 2,
-                paddingLeft: 2,
+                // paddingTop: 2,
+                // paddingLeft: 2,
                 width: "100%",
                 backgroundColor: "gray100.main",
               }}

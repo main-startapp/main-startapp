@@ -188,7 +188,7 @@ const Events = () => {
                   backgroundColor:
                     modeType === "list" ? "lightPrimary.main" : "default",
                   width: modeType === "list" ? "54px" : "40px",
-                  top: `calc(65px + 32px)`,
+                  top: `calc(64px + 32px)`,
                   ":hover": {
                     cursor: "pointer",
                   },
@@ -208,7 +208,7 @@ const Events = () => {
                   backgroundColor:
                     modeType === "calendar" ? "lightPrimary.main" : "default",
                   width: modeType === "calendar" ? "54px" : "42px",
-                  top: `calc(65px + 32px + 56px + 8px)`,
+                  top: `calc(64px + 32px + 56px + 8px)`,
                   ":hover": {
                     cursor: "pointer",
                   },
@@ -224,8 +224,8 @@ const Events = () => {
               id="events-mobile-list-box"
               sx={{
                 display: fullEvent === null ? "block" : "none",
-                paddingTop: 2,
-                paddingLeft: 2,
+                // paddingTop: 2,
+                // paddingLeft: 2,
                 width: "100%",
                 backgroundColor: "gray100.main",
               }}
@@ -236,8 +236,8 @@ const Events = () => {
               id="events-mobile-info-box"
               sx={{
                 display: fullEvent === null ? "none" : "block",
-                paddingTop: 2,
-                paddingLeft: 2,
+                // paddingTop: 2,
+                // paddingLeft: 2,
                 width: "100%",
                 backgroundColor: "gray100.main",
               }}

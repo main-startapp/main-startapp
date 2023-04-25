@@ -12,7 +12,14 @@ const Navbar = () => {
   const url = new URL(window.location.href);
 
   return (
-    <AppBar color="background" elevation={0} position="static">
+    <AppBar
+      elevation={2}
+      sx={{
+        boxShadow: `0px 1px 2px #ccc`,
+        position: "static",
+        backgroundColor: "background.paper",
+      }}
+    >
       <Toolbar
         sx={{
           display: "flex",
@@ -21,9 +28,7 @@ const Navbar = () => {
           // "@media (min-width: 600px)": {
           //   minHeight: 0,
           // },
-          height: "65px", // 64+border
-          borderBottom: 1,
-          borderColor: "divider",
+          height: "64px",
         }}
         disableGutters
       >
@@ -52,10 +57,11 @@ const Navbar = () => {
             <NextLink href="/" style={{ color: "inherit" }}>
               <LinkIconBox url={url} pathname="/">
                 <DashboardIcon
-                  color={url.pathname === "/" ? "text.primary" : "gray700"}
                   sx={{
                     height: "40px",
                     fontSize: "28px",
+                    color:
+                      url.pathname === "/" ? "text.primary" : "gray700.main",
                   }}
                 />
                 <LinkTypography url={url} pathname="/">
@@ -71,12 +77,13 @@ const Navbar = () => {
             >
               <LinkIconBox url={url} pathname="/events/">
                 <DateRangeIcon
-                  color={
-                    url.pathname === "/events/" ? "text.primary" : "gray700"
-                  }
                   sx={{
                     height: "40px",
                     fontSize: "28px",
+                    color:
+                      url.pathname === "/events/"
+                        ? "text.primary"
+                        : "gray700.main",
                   }}
                 />
                 <LinkTypography url={url} pathname="/events/">
@@ -92,12 +99,13 @@ const Navbar = () => {
             >
               <LinkIconBox url={url} pathname="/students/">
                 <PeopleIcon
-                  color={
-                    url.pathname === "/students/" ? "text.primary" : "gray700"
-                  }
                   sx={{
                     height: "40px",
                     fontSize: "28px",
+                    color:
+                      url.pathname === "/students/"
+                        ? "text.primary"
+                        : "gray700.main",
                   }}
                 />
                 <LinkTypography url={url} pathname="/students/">

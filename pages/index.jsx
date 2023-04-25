@@ -161,8 +161,8 @@ const Home = () => {
               id="projects-mobile-list-box"
               sx={{
                 display: fullProject === null ? "block" : "none",
-                paddingTop: 2,
-                paddingLeft: 2,
+                // paddingTop: 2,
+                // paddingLeft: 2,
                 width: "100%",
                 backgroundColor: "gray100.main",
               }}
@@ -173,8 +173,8 @@ const Home = () => {
               id="projects-mobile-info-box"
               sx={{
                 display: fullProject === null ? "none" : "block",
-                paddingTop: 2,
-                paddingLeft: 2,
+                // paddingTop: 2,
+                // paddingLeft: 2,
                 width: "100%",
                 backgroundColor: "gray100.main",
               }}

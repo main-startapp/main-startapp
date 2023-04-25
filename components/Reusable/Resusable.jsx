@@ -395,14 +395,14 @@ export const FixedHeightPaper = styled(Paper)(
   ({ theme, isdesktop, mobileheight }) => ({
     display: "flex",
     flexDirection: "column",
-    height: isdesktop ? `calc(100dvh - 65px - ${theme.spacing(4)})` : "auto", // onDesktop: fixed height, onMobile: auto to enable hiding address bar
+    height: isdesktop ? `calc(100dvh - 64px - ${theme.spacing(4)})` : "auto", // onDesktop: fixed height, onMobile: auto to enable hiding address bar
     minHeight: isdesktop
-      ? `calc(100dvh - 65px - ${theme.spacing(4)})`
-      : `calc(100dvh - ${mobileheight}px - ${theme.spacing(2)} - 64px)`,
+      ? `calc(100dvh - 64px - ${theme.spacing(4)})`
+      : `calc(100dvh - ${mobileheight}px - 64px)`,
     marginTop: isdesktop ? 0 : `${mobileheight}px`, // mobile top bar
     marginBottom: isdesktop ? 0 : "64px", // mobile bottom navbar
     borderTop: isdesktop ? `1px solid ${theme.palette.divider}` : 0,
-    borderRadius: isdesktop ? "32px 32px 0px 0px" : "32px 0px 0px 0px",
+    borderRadius: isdesktop ? "32px 32px 0px 0px" : "0px 0px 0px 0px",
   })
 );
 
