@@ -123,57 +123,63 @@ const UserStudentCreate = (props) => {
     redirectTo();
   };
 
-  // reuseable comps
-  const nameTextField = (
-    <DefaultTextField
-      required
-      sx={
-        onMedia.onDesktop
-          ? { mr: 5, width: "75%", paddingY: 0 }
-          : { width: "100%", mb: 5 }
-      }
-      label="Name"
-      margin="none"
-      value={newStudent.name}
-      onChange={(e) => {
-        setNewStudent({ ...newStudent, name: e.target.value });
-      }}
-    />
-  );
+  // reusable comps
+  const NameTextField = () => {
+    return (
+      <DefaultTextField
+        required
+        sx={
+          onMedia.onDesktop
+            ? { mr: 5, width: "75%", paddingY: 0 }
+            : { width: "100%", mb: 5 }
+        }
+        label="Name"
+        margin="none"
+        value={newStudent.name}
+        onChange={(e) => {
+          setNewStudent({ ...newStudent, name: e.target.value });
+        }}
+      />
+    );
+  };
 
-  const yearTextField = (
-    <DefaultTextField
-      required
-      sx={onMedia.onDesktop ? { width: "25%" } : { width: "100%" }}
-      margin="none"
-      label="Year of education"
-      value={newStudent.year_of_ed}
-      type="number"
-      inputProps={{
-        min: 0,
-        max: 10,
-      }}
-      onChange={(e) => {
-        setNewStudent({ ...newStudent, year_of_ed: e.target.value });
-      }}
-    />
-  );
+  const YearTextField = () => {
+    return (
+      <DefaultTextField
+        required
+        sx={onMedia.onDesktop ? { width: "25%" } : { width: "100%" }}
+        margin="none"
+        label="Year of education"
+        value={newStudent.year_of_ed}
+        type="number"
+        inputProps={{
+          min: 0,
+          max: 10,
+        }}
+        onChange={(e) => {
+          setNewStudent({ ...newStudent, year_of_ed: e.target.value });
+        }}
+      />
+    );
+  };
 
-  const positionTextField = (
-    <DefaultTextField
-      required
-      sx={
-        onMedia.onDesktop ? { mr: 5, width: "50%" } : { width: "100%", mb: 5 }
-      }
-      label="Desired Position"
-      margin="none"
-      value={newStudent.desired_position}
-      helperText="Project position you would like to try"
-      onChange={(e) => {
-        setNewStudent({ ...newStudent, desired_position: e.target.value });
-      }}
-    />
-  );
+  const PositionTextField = () => {
+    return (
+      <DefaultTextField
+        required
+        sx={
+          onMedia.onDesktop ? { mr: 5, width: "50%" } : { width: "100%", mb: 5 }
+        }
+        label="Desired Position"
+        margin="none"
+        value={newStudent.desired_position}
+        helperText="Project position you would like to try"
+        onChange={(e) => {
+          setNewStudent({ ...newStudent, desired_position: e.target.value });
+        }}
+      />
+    );
+  };
 
   // const fieldSelect = (
   //   <FormControl
@@ -229,32 +235,34 @@ const UserStudentCreate = (props) => {
   //   </FormControl>
   // );
 
-  const foiAutoComplete = (
-    <Autocomplete
-      sx={onMedia.onDesktop ? { width: "50%" } : { width: "100%" }}
-      freeSolo
-      clearOnBlur
-      options={foiOptions}
-      value={newStudent.field_of_interest}
-      onChange={(event, newValue) => {
-        if (newValue) {
-          newValue = newValue.charAt(0).toUpperCase() + newValue.slice(1);
-        }
-        setNewStudent({
-          ...newStudent,
-          field_of_interest: newValue,
-        });
-      }}
-      renderInput={(params) => (
-        <DefaultTextField
-          {...params}
-          label="Field of Interest"
-          helperText="Doesn't have to be related to your major"
-          required
-        />
-      )}
-    />
-  );
+  const FoiAutoComplete = () => {
+    return (
+      <Autocomplete
+        sx={onMedia.onDesktop ? { width: "50%" } : { width: "100%" }}
+        freeSolo
+        clearOnBlur
+        options={foiOptions}
+        value={newStudent.field_of_interest}
+        onChange={(event, newValue) => {
+          if (newValue) {
+            newValue = newValue.charAt(0).toUpperCase() + newValue.slice(1);
+          }
+          setNewStudent({
+            ...newStudent,
+            field_of_interest: newValue,
+          });
+        }}
+        renderInput={(params) => (
+          <DefaultTextField
+            {...params}
+            label="Field of Interest"
+            helperText="Doesn't have to be related to your major"
+            required
+          />
+        )}
+      />
+    );
+  };
 
   return (
     <form ref={formRef}>
@@ -268,13 +276,13 @@ const UserStudentCreate = (props) => {
             alignItems: "start",
           }}
         >
-          {nameTextField}
-          {yearTextField}
+          <NameTextField />
+          <YearTextField />
         </Box>
       ) : (
         <Box sx={{ mt: 5, display: "flex", flexDirection: "column" }}>
-          {nameTextField}
-          {yearTextField}
+          <NameTextField />
+          <YearTextField />
         </Box>
       )}
       {/* desired position and field of interest */}
@@ -287,13 +295,13 @@ const UserStudentCreate = (props) => {
             alignItems: "start",
           }}
         >
-          {positionTextField}
-          {foiAutoComplete}
+          <PositionTextField />
+          <FoiAutoComplete />
         </Box>
       ) : (
         <Box sx={{ mt: 5, display: "flex", flexDirection: "column" }}>
-          {positionTextField}
-          {foiAutoComplete}
+          <PositionTextField />
+          <FoiAutoComplete />
         </Box>
       )}
       {/* social media links list */}

@@ -2,14 +2,13 @@ import { Box, Chip, Collapse, Tab, Typography } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { styled } from "@mui/material/styles";
 import {
-  removeValueFromArray,
   SearchBox,
   SearchIconWrapper,
   StyledInputBase,
 } from "../Reusable/Resusable";
 import SearchIcon from "@mui/icons-material/Search";
 import { EventContext } from "../Context/ShareContexts";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { categoryStrList, eventStrList } from "../Reusable/MenuStringList";
 import { handleChipClick } from "../Project/ProjectListHeader";
 

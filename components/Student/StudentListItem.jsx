@@ -5,7 +5,6 @@ import {
   Chip,
   IconButton,
   ListItem,
-  ListItemText,
   Typography,
 } from "@mui/material";
 import { GlobalContext, StudentContext } from "../Context/ShareContexts";
@@ -146,25 +145,22 @@ const StudentListItem = (props) => {
         </IconButton>
       </Box>
 
-      <ListItemText
-        secondary={
-          <Typography
-            color="text.secondary"
-            variant="body2"
-            sx={{
-              display: "-webkit-box",
-              overflow: "hidden",
-              WebkitBoxOrient: "vertical",
-              WebkitLineClamp: 1,
-            }}
-          >
-            {student?.year_of_ed !== (null || undefined) &&
-              ordinal_suffix_of(student.year_of_ed) + " year"}
-            {student?.major !== (null || undefined) && " " + student.major}
-          </Typography>
-        }
-        sx={{ mt: 2, mb: 2 }}
-      />
+      <Typography
+        color="text.secondary"
+        sx={{
+          mt: 2,
+          mb: 2,
+          display: "-webkit-box",
+          overflow: "hidden",
+          WebkitBoxOrient: "vertical",
+          WebkitLineClamp: 1,
+          fontSize: "0.875rem",
+        }}
+      >
+        {student?.year_of_ed !== (null || undefined) &&
+          ordinal_suffix_of(student.year_of_ed) + " year"}
+        {student?.major !== (null || undefined) && " " + student.major}
+      </Typography>
 
       {interestList.length > 0 && (
         <Box sx={{ height: "1.75rem", overflow: "hidden" }}>

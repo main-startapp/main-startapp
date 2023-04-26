@@ -199,58 +199,62 @@ const PositionListItem = (props) => {
     setForceChatExpand(true);
   };
 
-  // components
-  const appURLButton = (
-    <Button
-      sx={{
-        borderRadius: 8,
-        paddingX: 2,
-        paddingY: 0,
-        fontSize: "0.75rem",
-      }}
-      color="primary"
-      disabled={dayDiff > 0}
-      disableElevation
-      size="small"
-      variant="contained"
-      LinkComponent={Link}
-      target="_blank"
-      href={appURL}
-      rel="noreferrer"
-      onClick={(e) => e.stopPropagation()}
-    >
-      {"Apply"}
-    </Button>
-  );
+  // reusable comps
+  const AppURLButton = () => {
+    return (
+      <Button
+        sx={{
+          borderRadius: 8,
+          paddingX: 2,
+          paddingY: 0,
+          fontSize: "0.75rem",
+        }}
+        color="primary"
+        disabled={dayDiff > 0}
+        disableElevation
+        size="small"
+        variant="contained"
+        LinkComponent={Link}
+        target="_blank"
+        href={appURL}
+        rel="noreferrer"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {"Apply"}
+      </Button>
+    );
+  };
 
-  const joinRequestButton = (
-    <Button
-      color="primary"
-      disabled={
-        !ediumUser?.uid ||
-        dayDiff > 0 ||
-        ediumUser?.uid === creator?.uid ||
-        ediumUserExt?.join_requests?.some(
-          (jr) => jr.project_id === project.id && jr.position_id === posID
-        )
-      }
-      disableElevation
-      size="small"
-      variant="contained"
-      onClick={(e) => {
-        e.stopPropagation();
-        handleJoinRequest();
-      }}
-      sx={{
-        borderRadius: 8,
-        paddingX: 2,
-        paddingY: 0,
-        fontSize: "0.75rem",
-      }}
-    >
-      {"Join"}
-    </Button>
-  );
+  const JoinRequestButton = () => {
+    return (
+      <Button
+        color="primary"
+        disabled={
+          !ediumUser?.uid ||
+          dayDiff > 0 ||
+          ediumUser?.uid === creator?.uid ||
+          ediumUserExt?.join_requests?.some(
+            (jr) => jr.project_id === project.id && jr.position_id === posID
+          )
+        }
+        disableElevation
+        size="small"
+        variant="contained"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleJoinRequest();
+        }}
+        sx={{
+          borderRadius: 8,
+          paddingX: 2,
+          paddingY: 0,
+          fontSize: "0.75rem",
+        }}
+      >
+        {"Join"}
+      </Button>
+    );
+  };
 
   return (
     <Box
@@ -315,7 +319,9 @@ const PositionListItem = (props) => {
                     !ediumUser?.uid && !appURL ? "Sign in or Edit profile" : ""
                   }
                 >
-                  <span>{appURL ? appURLButton : joinRequestButton}</span>
+                  <span>
+                    {appURL ? <AppURLButton /> : <JoinRequestButton />}
+                  </span>
                 </Tooltip>
               </>
             )}
@@ -377,7 +383,9 @@ const PositionListItem = (props) => {
                     !ediumUser?.uid && !appURL ? "Sign in or Edit profile" : ""
                   }
                 >
-                  <span>{appURL ? appURLButton : joinRequestButton}</span>
+                  <span>
+                    {appURL ? <AppURLButton /> : <JoinRequestButton />}
+                  </span>
                 </Tooltip>
               </Box>
             )}

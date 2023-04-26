@@ -82,111 +82,114 @@ const Signin = () => {
     });
   };
 
-  const signinComp = (
-    <>
-      <SignButton
-        variant="contained"
-        disableElevation
-        startIcon={<GoogleIcon />}
-        onClick={signInWithGoogle}
-        sx={{
-          mt: 6,
-          width: "256px",
-          fontSize: "0.875rem",
-          background:
-            "linear-gradient(45deg, #4285f4 0%, #4285f4 25%, #ea4335 25%, #ea4335 50%, #fbbc05 50%, #fbbc05 75%, #34a853 75%, #34a853 100%)",
-          color: "#fff",
-          ":hover": {
+  // reusable comps
+  const SigninComp = () => {
+    return (
+      <>
+        <SignButton
+          variant="contained"
+          disableElevation
+          startIcon={<GoogleIcon />}
+          onClick={signInWithGoogle}
+          sx={{
+            mt: 6,
+            width: "256px",
+            fontSize: "0.875rem",
             background:
-              "linear-gradient(45deg, #4285f4, #ea4335, #fbbc05, #34a853)",
-          },
-          //transition: "background", // to sync background ans text color transition
-        }}
-      >
-        Sign in with Google
-      </SignButton>
+              "linear-gradient(45deg, #4285f4 0%, #4285f4 25%, #ea4335 25%, #ea4335 50%, #fbbc05 50%, #fbbc05 75%, #34a853 75%, #34a853 100%)",
+            color: "#fff",
+            ":hover": {
+              background:
+                "linear-gradient(45deg, #4285f4, #ea4335, #fbbc05, #34a853)",
+            },
+            //transition: "background", // to sync background ans text color transition
+          }}
+        >
+          Sign in with Google
+        </SignButton>
 
-      <Box sx={{ mt: 3 }}>
-        <Divider
+        <Box sx={{ mt: 3 }}>
+          <Divider
+            sx={{
+              width: "256px",
+              color: "gray300.main",
+            }}
+          >
+            {"or Sign in with Email"}
+          </Divider>
+        </Box>
+
+        <Box sx={{ mt: 3, width: "256px" }}>
+          <SignTextField
+            //sx={{ paddingY: 0, fontSize: "1rem" }}
+            fullWidth
+            margin="none"
+            label="Email"
+            name="email"
+            type="email"
+            variant="outlined"
+            value={input.email}
+            onChange={(e) => setInput({ ...input, email: e.target.value })}
+            error={!!errorMsg}
+          />
+          <SignTextField
+            sx={{ mt: 1.5 }}
+            fullWidth
+            margin="none"
+            label="Password"
+            name="password"
+            type="password"
+            variant="outlined"
+            value={input.password}
+            onChange={(e) => setInput({ ...input, password: e.target.value })}
+            error={!!errorMsg}
+            helperText={errorMsg || " "}
+          />
+        </Box>
+
+        <Box
           sx={{
             width: "256px",
-            color: "gray300.main",
+            display: "flex",
+            justifyContent: "flex-end",
           }}
         >
-          {"or Sign in with Email"}
-        </Divider>
-      </Box>
-
-      <Box sx={{ mt: 3, width: "256px" }}>
-        <SignTextField
-          //sx={{ paddingY: 0, fontSize: "1rem" }}
-          fullWidth
-          margin="none"
-          label="Email"
-          name="email"
-          type="email"
-          variant="outlined"
-          value={input.email}
-          onChange={(e) => setInput({ ...input, email: e.target.value })}
-          error={!!errorMsg}
-        />
-        <SignTextField
-          sx={{ mt: 1.5 }}
-          fullWidth
-          margin="none"
-          label="Password"
-          name="password"
-          type="password"
-          variant="outlined"
-          value={input.password}
-          onChange={(e) => setInput({ ...input, password: e.target.value })}
-          error={!!errorMsg}
-          helperText={errorMsg || " "}
-        />
-      </Box>
-
-      <Box
-        sx={{
-          width: "256px",
-          display: "flex",
-          justifyContent: "flex-end",
-        }}
-      >
-        <Button
-          color="primary"
-          disableElevation
-          variant="contained"
-          onClick={handleSignIn}
-          sx={{
-            width: "112px",
-            height: "24px",
-            borderRadius: 8,
-            fontSize: "0.75rem",
-          }}
-        >
-          {"Sign in"}
-        </Button>
-      </Box>
-      <Box sx={{ mt: 6, mb: 3, display: "flex", justifyContent: "center" }}>
-        <Typography sx={{ fontSize: "0.875rem" }}>
-          {"Not registered yet? "} &nbsp;
-        </Typography>
-        <Typography
-          color="secondary" // color can only use predifined color like primary or text.primary
-          sx={{
-            fontSize: "0.875rem",
-            fontWeight: "bold",
-            ":hover": {
-              cursor: "pointer",
-            },
-          }}
-          onClick={() => setIsSignup(true)}
-        >
-          {"Join now"}
-        </Typography>
-      </Box>
-    </>
-  );
+          <Button
+            color="primary"
+            disableElevation
+            variant="contained"
+            onClick={handleSignIn}
+            sx={{
+              width: "112px",
+              height: "24px",
+              borderRadius: 8,
+              fontSize: "0.75rem",
+            }}
+          >
+            {"Sign in"}
+          </Button>
+        </Box>
+        <Box sx={{ mt: 6, mb: 3, display: "flex", justifyContent: "center" }}>
+          <Typography sx={{ fontSize: "0.875rem" }}>
+            {"Not registered yet? "} &nbsp;
+          </Typography>
+          <Typography
+            color="secondary" // color can only use predifined color like primary or text.primary
+            sx={{
+              fontSize: "0.875rem",
+              fontWeight: "bold",
+              ":hover": {
+                cursor: "pointer",
+              },
+            }}
+            onClick={() => setIsSignup(true)}
+          >
+            {"Join now"}
+          </Typography>
+        </Box>
+      </>
+    );
+  };
 
   return (
     <Box
@@ -250,7 +253,7 @@ const Signin = () => {
           {isSignup ? (
             <Signup setIsSignup={setIsSignup} onDesktop={onDesktop} />
           ) : (
-            signinComp
+            <SigninComp />
           )}
         </motion.div>
       </Paper>

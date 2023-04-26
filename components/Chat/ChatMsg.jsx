@@ -317,271 +317,279 @@ const ChatMsg = (props) => {
     }
   }, [messages, showMsg]);
 
-  // reusable comp
-  const headerBox = (
-    <Box
-      sx={{
-        position: "sticky",
-        top: 0,
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        borderBottom: 1,
-        borderColor: "divider",
-        zIndex: 1,
-      }}
-    >
-      <Avatar
-        sx={{
-          m: "12px",
-          height: "48px",
-          width: "48px",
-        }}
-        src={chatPartner?.photo_url}
-        referrerPolicy="no-referrer"
-      />
-      <Typography sx={{ fontWeight: "medium", fontSize: "1rem" }}>
-        {chatPartner?.name}
-      </Typography>
-      <Box sx={{ flexGrow: 1 }} />
-      {setIsMaximized !== undefined && (
-        <>
-          {isMaximized ? (
-            <IconButton
-              onClick={(e) => {
-                handleMaximize();
-              }}
-            >
-              <CloseFullscreenRoundedIcon sx={{ fontSize: "0.9em" }} />
-            </IconButton>
-          ) : (
-            <IconButton
-              onClick={(e) => {
-                handleMaximize();
-              }}
-            >
-              <OpenInFullRoundedIcon sx={{ fontSize: "0.9em" }} />
-            </IconButton>
-          )}
-          <IconButton
-            onClick={(e) => {
-              handleClose();
-            }}
-          >
-            <CloseRoundedIcon sx={{ fontSize: "1.2em" }} />
-          </IconButton>
-        </>
-      )}
-    </Box>
-  );
-
-  const joinRequestBox = joinRequests?.length > 0 && (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        borderBottom: 1,
-        borderColor: "divider",
-        //backgroundColor: "gray300.main",
-        paddingRight: "3px",
-      }}
-    >
+  // reusable comps
+  const HeaderBox = () => {
+    return (
       <Box
         sx={{
-          mx: "12px",
-          my: "6px",
+          position: "sticky",
+          top: 0,
           display: "flex",
-          flexDirection: "column",
+          flexDirection: "row",
+          alignItems: "center",
+          borderBottom: 1,
+          borderColor: "divider",
+          zIndex: 1,
         }}
       >
-        <Typography color="text.secondary" sx={{ fontSize: "0.75em" }}>
-          Join Request
+        <Avatar
+          sx={{
+            m: "12px",
+            height: "48px",
+            width: "48px",
+          }}
+          src={chatPartner?.photo_url}
+          referrerPolicy="no-referrer"
+        />
+        <Typography sx={{ fontWeight: "medium", fontSize: "1rem" }}>
+          {chatPartner?.name}
         </Typography>
-        <Typography
-          color="text.secondary"
-          sx={{
-            display: "-webkit-box",
-            overflow: "hidden",
-            WebkitBoxOrient: "vertical",
-            WebkitLineClamp: 1,
-            fontSize: "0.75em",
-          }}
-        >
-          {joinRequests[0].projectTitle} {joinRequests[0].positionTitle}
-        </Typography>
+        <Box sx={{ flexGrow: 1 }} />
+        {setIsMaximized !== undefined && (
+          <>
+            {isMaximized ? (
+              <IconButton
+                onClick={(e) => {
+                  handleMaximize();
+                }}
+              >
+                <CloseFullscreenRoundedIcon sx={{ fontSize: "0.9em" }} />
+              </IconButton>
+            ) : (
+              <IconButton
+                onClick={(e) => {
+                  handleMaximize();
+                }}
+              >
+                <OpenInFullRoundedIcon sx={{ fontSize: "0.9em" }} />
+              </IconButton>
+            )}
+            <IconButton
+              onClick={(e) => {
+                handleClose();
+              }}
+            >
+              <CloseRoundedIcon sx={{ fontSize: "1.2em" }} />
+            </IconButton>
+          </>
+        )}
       </Box>
-      <Box sx={{ flexGrow: 1 }} />
-      <IconButton
-        onClick={(e) => {
-          handleAccept(joinRequests[0], "title", "title");
-        }}
-      >
-        <CheckCircleIcon
-          sx={{
-            fontSize: "0.9em",
-            color: "#a4ca87",
-          }}
-        />
-      </IconButton>
-      <IconButton
-        onClick={(e) => {
-          handleDialogOpen();
-        }}
-      >
-        <CancelIcon
-          sx={{
-            fontSize: "0.9em",
-            color: "#e56b6b",
-          }}
-        />
-      </IconButton>
-      <Dialog open={isDialogOpen} onClose={handleDialogClose}>
-        <DialogTitle>Message</DialogTitle>
-        <DialogContent sx={{ paddingBottom: 0 }}>
-          <DialogContentText>
-            Leave a note to let them know this position was not a match.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            multiline
-            minRows={5}
-            margin="dense"
-            id="chatmsg-decline-msg-textfield"
-            // label="Message"
-            value={declineMsg}
-            fullWidth
-            onChange={(e) => setDeclineMsg(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              handleDecline(joinRequests[0]);
-              handleDialogClose();
-            }}
-          >
-            Send
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
-  );
+    );
+  };
 
-  const messageBox = (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        flexGrow: 1,
-        overflow: "auto",
-        borderColor: "divider",
-      }}
-    >
-      {messages?.map((message, index) => {
-        const isSameAuthor =
-          index > 0 && messages[index - 1].sent_by === message.sent_by;
-        const isLastMsg = messages.length - 1 === index;
-        return (
-          <ChatMsgItem
-            key={index}
-            message={message}
-            isSameAuthor={isSameAuthor}
-            chatPartner={chatPartner}
-            isLastMsg={isLastMsg}
-          />
-        );
-      })}
-      <div ref={scrollRef} />
-    </Box>
-  );
-
-  const inputBox = (
-    <Box
-      sx={{
-        position: "sticky",
-        bottom: 0,
-        zIndex: 1,
-      }}
-    >
-      <Box
-        sx={{
-          borderTop: 2.5,
-          borderColor: focused ? "secondary.main" : "divider",
-        }}
-      >
-        <TextField
-          sx={{
-            flex: 1,
-            my: "6px",
-            mx: "12px",
-            "& .MuiInputBase-root": {
-              padding: 0,
-              fontSize: "0.875rem",
-            },
-          }}
-          variant="standard"
-          placeholder="Write a message..."
-          multiline
-          rows={4}
-          InputProps={{
-            disableUnderline: true,
-          }}
-          value={message.text}
-          onChange={(e) => setMessage({ ...message, text: e.target.value })}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              if (message.text) {
-                handleSubmit(e);
-              }
-            }
-          }}
-          onFocus={onFocus}
-          onBlur={onBlur}
-        />
-      </Box>
+  const JoinRequestBox = () => {
+    return (
       <Box
         sx={{
           display: "flex",
           flexDirection: "row",
-          justifyContent: "flex-end",
-          borderTop: 1,
+          alignItems: "center",
+          borderBottom: 1,
           borderColor: "divider",
-          paddingY: "6px",
-          paddingX: "12px",
+          //backgroundColor: "gray300.main",
+          paddingRight: "3px",
         }}
       >
-        <Button
-          variant="contained"
-          disabled={!message.text || !isClickable}
-          disableElevation
+        <Box
           sx={{
-            backgroundColor: "secondary",
-            borderRadius: 8,
-            paddingX: 0,
-            paddingY: 0,
-            fontSize: "0.75rem",
-            position: "relative",
+            mx: "12px",
+            my: "6px",
+            display: "flex",
+            flexDirection: "column",
           }}
-          onClick={(e) => handleSubmit(e)}
         >
-          Send
-        </Button>
+          <Typography color="text.secondary" sx={{ fontSize: "0.75em" }}>
+            Join Request
+          </Typography>
+          <Typography
+            color="text.secondary"
+            sx={{
+              display: "-webkit-box",
+              overflow: "hidden",
+              WebkitBoxOrient: "vertical",
+              WebkitLineClamp: 1,
+              fontSize: "0.75em",
+            }}
+          >
+            {joinRequests[0].projectTitle} {joinRequests[0].positionTitle}
+          </Typography>
+        </Box>
+        <Box sx={{ flexGrow: 1 }} />
+        <IconButton
+          onClick={(e) => {
+            handleAccept(joinRequests[0], "title", "title");
+          }}
+        >
+          <CheckCircleIcon
+            sx={{
+              fontSize: "0.9em",
+              color: "#a4ca87",
+            }}
+          />
+        </IconButton>
+        <IconButton
+          onClick={(e) => {
+            handleDialogOpen();
+          }}
+        >
+          <CancelIcon
+            sx={{
+              fontSize: "0.9em",
+              color: "#e56b6b",
+            }}
+          />
+        </IconButton>
+        <Dialog open={isDialogOpen} onClose={handleDialogClose}>
+          <DialogTitle>Message</DialogTitle>
+          <DialogContent sx={{ paddingBottom: 0 }}>
+            <DialogContentText>
+              Leave a note to let them know this position was not a match.
+            </DialogContentText>
+            <TextField
+              autoFocus
+              multiline
+              minRows={5}
+              margin="dense"
+              id="chatmsg-decline-msg-textfield"
+              // label="Message"
+              value={declineMsg}
+              fullWidth
+              onChange={(e) => setDeclineMsg(e.target.value)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                handleDecline(joinRequests[0]);
+                handleDialogClose();
+              }}
+            >
+              Send
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
-    </Box>
-  );
+    );
+  };
+
+  const MessageBox = () => {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          flexGrow: 1,
+          overflow: "auto",
+          borderColor: "divider",
+        }}
+      >
+        {messages?.map((message, index) => {
+          const isSameAuthor =
+            index > 0 && messages[index - 1].sent_by === message.sent_by;
+          const isLastMsg = messages.length - 1 === index;
+          return (
+            <ChatMsgItem
+              key={index}
+              message={message}
+              isSameAuthor={isSameAuthor}
+              chatPartner={chatPartner}
+              isLastMsg={isLastMsg}
+            />
+          );
+        })}
+        <div ref={scrollRef} />
+      </Box>
+    );
+  };
+
+  const InputBox = () => {
+    return (
+      <Box
+        sx={{
+          position: "sticky",
+          bottom: 0,
+          zIndex: 1,
+        }}
+      >
+        <Box
+          sx={{
+            borderTop: 2.5,
+            borderColor: focused ? "secondary.main" : "divider",
+          }}
+        >
+          <TextField
+            sx={{
+              flex: 1,
+              my: "6px",
+              mx: "12px",
+              "& .MuiInputBase-root": {
+                padding: 0,
+                fontSize: "0.875rem",
+              },
+            }}
+            variant="standard"
+            placeholder="Write a message..."
+            multiline
+            rows={4}
+            InputProps={{
+              disableUnderline: true,
+            }}
+            value={message.text}
+            onChange={(e) => setMessage({ ...message, text: e.target.value })}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                if (message.text) {
+                  handleSubmit(e);
+                }
+              }
+            }}
+            onFocus={onFocus}
+            onBlur={onBlur}
+          />
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "flex-end",
+            borderTop: 1,
+            borderColor: "divider",
+            paddingY: "6px",
+            paddingX: "12px",
+          }}
+        >
+          <Button
+            variant="contained"
+            disabled={!message.text || !isClickable}
+            disableElevation
+            sx={{
+              backgroundColor: "secondary",
+              borderRadius: 8,
+              paddingX: 0,
+              paddingY: 0,
+              fontSize: "0.75rem",
+              position: "relative",
+            }}
+            onClick={(e) => handleSubmit(e)}
+          >
+            Send
+          </Button>
+        </Box>
+      </Box>
+    );
+  };
 
   return (
     <>
       {/* header */}
-      {headerBox}
+      <HeaderBox />
       {/* join requests */}
-      {joinRequestBox}
+      {joinRequests?.length > 0 && <JoinRequestBox />}
       {/* messages */}
-      {messageBox}
+      <MessageBox />
       {/* input */}
-      {inputBox}
+      <InputBox />
     </>
   );
 };

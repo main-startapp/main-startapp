@@ -9,8 +9,6 @@ import {
   Chip,
   IconButton,
   ListItem,
-  ListItemButton,
-  ListItemText,
   Menu,
   MenuItem,
   Typography,
@@ -26,6 +24,7 @@ import {
 } from "../Reusable/Resusable";
 // misc libs
 import dayjs from "dayjs";
+import { FaClock, FaMapPin } from "react-icons/fa";
 
 // prefer not doing any dynamic calculation in this leaf component
 const EventListItem = ({ index, fullEvent, last }) => {
@@ -58,210 +57,296 @@ const EventListItem = ({ index, fullEvent, last }) => {
     setAnchorEl(null);
   };
 
+  // reusable comps
+  const UniversalAvatar = ({ lengthStr, variant }) => {
+    return (
+      <Avatar
+        sx={{
+          mr: 2,
+          height: lengthStr,
+          width: lengthStr,
+        }}
+        src={event?.icon_url}
+        variant={variant}
+      >
+        <UploadFileIcon />
+      </Avatar>
+    );
+  };
+
+  const TitleItemText = ({ fontSize }) => {
+    return (
+      <Typography
+        variant="h2"
+        sx={{
+          fontSize: fontSize || "1rem",
+          fontWeight: "bold",
+          display: "-webkit-box",
+          overflow: "hidden",
+          WebkitBoxOrient: "vertical",
+          WebkitLineClamp: 1,
+        }}
+      >
+        {event?.title}
+      </Typography>
+    );
+  };
+
+  const TagsList = ({ fontSize, height }) => {
+    return eventAllTags?.map((tag, index) => (
+      <Chip
+        key={index}
+        label={tag}
+        sx={{
+          mr: 1,
+          mb: 1,
+          fontSize: fontSize || "0.75rem",
+          fontWeight: "medium",
+          height: height || "1.5rem",
+        }}
+        color={
+          isStrInStrList(searchCateList, tag, true) ||
+          isStrInStrList(searchTypeList, tag, true) ||
+          searchTerm === tag
+            ? "primary"
+            : "lightPrimary"
+        }
+      />
+    ));
+  };
+
+  const MoreIcon = () => {
+    return (
+      <IconButton
+        id="eventlistitem-menu-button"
+        aria-controls={open ? "eventlistitem-menu" : undefined}
+        aria-haspopup="true"
+        aria-expanded={open ? "true" : undefined}
+        onClick={(e) => {
+          handleMenuClick(e);
+        }}
+        sx={{ padding: 0 }}
+      >
+        <MoreVertIcon />
+      </IconButton>
+    );
+  };
+
+  const MoreMenu = () => {
+    return (
+      <Menu
+        id="eventlistitem-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={(e) => {
+          handleMenuClose(e);
+        }}
+        MenuListProps={{
+          "aria-labelledby": "eventlistitem-menu-button",
+        }}
+      >
+        {ediumUser?.uid === event?.creator_uid && (
+          <MenuItem
+            onClick={(e) => {
+              handleMenuClose(e);
+            }}
+          >
+            <NextLink
+              href={{
+                pathname: "/events/create",
+                query: { eventID: event?.id },
+              }}
+              as="/events/create"
+              passHref
+              style={{
+                color: "inherit",
+              }}
+            >
+              Modify
+            </NextLink>
+          </MenuItem>
+        )}
+        {ediumUser?.uid === event?.creator_uid && (
+          <MenuItem
+            onClick={(e) => {
+              handleVisibility("events", event);
+              handleMenuClose(e);
+            }}
+          >
+            {event?.is_visible ? "Hide" : "Display"}
+          </MenuItem>
+        )}
+        {ediumUser?.uid === event?.creator_uid && (
+          <MenuItem
+            onClick={(e) => {
+              handleDeleteEntry(
+                "events",
+                "evets_ext",
+                "my_event_ids",
+                event?.id,
+                ediumUser?.uid
+              );
+              setFullEvent(null);
+              handleMenuClose(e);
+            }}
+          >
+            Delete
+          </MenuItem>
+        )}
+      </Menu>
+    );
+  };
+
+  const TimeItemText = ({ fontSize }) => {
+    return (
+      <Typography
+        color="text.secondary"
+        sx={{
+          display: "-webkit-box",
+          overflow: "hidden",
+          WebkitBoxOrient: "vertical",
+          WebkitLineClamp: 1,
+          fontSize: fontSize,
+        }}
+      >
+        {isSameDay
+          ? startMoment.format("MMM Do h:mm a") +
+            (isSameTime ? "" : " - " + endMoment.format("h:mm a"))
+          : startMoment.format("MMM Do h:mm a") +
+            " - " +
+            endMoment.format("MMM Do h:mm a")}
+      </Typography>
+    );
+  };
+
+  const LocationItemText = ({ fontSize }) => {
+    return (
+      <Typography
+        color="text.secondary"
+        sx={{
+          display: "-webkit-box",
+          overflow: "hidden",
+          WebkitBoxOrient: "vertical",
+          WebkitLineClamp: 1,
+          fontSize: fontSize,
+        }}
+      >
+        {event?.location}
+      </Typography>
+    );
+  };
+
+  const TimestampItemText = ({ fontSize }) => {
+    return (
+      <Typography
+        color="text.secondary"
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          fontWeight: "light",
+          fontSize: fontSize,
+        }}
+      >
+        {dayjs(event?.last_timestamp).format("MMM Do, YYYY")}
+      </Typography>
+    );
+  };
+
   return (
     <ListItem
       onClick={() => {
         setFullEvent(fullEvent);
       }}
       sx={{
-        padding: 0,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
         borderBottom: index === last ? 0 : 1,
         borderColor: "divider",
         "&:hover": {
           backgroundColor: "gray100.main",
         },
+        overflow: "hidden",
+        paddingY: 2,
+        paddingX: 2,
         opacity: isExpired ? "50%" : "100%",
       }}
     >
-      <ListItemButton
-        sx={{
-          paddingY: 2,
-          paddingX: 2,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          overflow: "hidden",
-        }}
-      >
-        <Box
-          id="eventlistitem-upper-box"
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {/* event icon uploaded by users*/}
-          <Avatar
+      {onMedia.onDesktop ? (
+        <>
+          <Box
+            id="eventlistitem-upper-box"
             sx={{
-              mr: 2,
-              height: "48px",
-              width: "48px",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              width: "100%",
+              paddingLeft: "10px",
             }}
-            src={event?.icon_url}
           >
-            <UploadFileIcon />
-          </Avatar>
-          <Box sx={{ width: "100%" }}>
-            <ListItemText
-              primary={
-                <Typography
-                  variant="h2"
-                  sx={{ fontSize: "1rem", fontWeight: "bold" }}
-                >
-                  {event?.title}
-                </Typography>
-              }
-            />
-            {eventAllTags?.length > 0 && (
-              <Box sx={{ mt: 1, height: "1.75rem", overflow: "hidden" }}>
-                {eventAllTags?.map((tag, index) => (
-                  <Chip
-                    key={index}
-                    color={
-                      isStrInStrList(searchCateList, tag, true) ||
-                      isStrInStrList(searchTypeList, tag, true) ||
-                      searchTerm === tag
-                        ? "primary"
-                        : "lightPrimary"
-                    }
-                    label={tag}
-                    sx={{
-                      mr: 1,
-                      mb: 1,
-                      fontSize: "0.75rem",
-                      fontWeight: "medium",
-                      height: "1.5rem",
-                    }}
-                  />
-                ))}
+            {/* event icon uploaded by users*/}
+            <UniversalAvatar lengthStr="48px" variant="circular" />
+            <Box sx={{ display: "flex", flexDirection: "column" }}>
+              <TitleItemText />
+              <Box sx={{ mt: 1, height: "1.5rem", overflow: "hidden" }}>
+                <TagsList />
               </Box>
+            </Box>
+            {ediumUser?.uid === event?.creator_uid && (
+              <>
+                <MoreIcon />
+                <MoreMenu />
+              </>
             )}
           </Box>
-          {ediumUser?.uid === event?.creator_uid && (
-            <IconButton
-              id="eventlistitem-menu-button"
-              aria-controls={open ? "eventlistitem-menu" : undefined}
-              aria-haspopup="true"
-              aria-expanded={open ? "true" : undefined}
-              onClick={(e) => {
-                handleMenuClick(e);
-              }}
-              sx={{ padding: 0 }}
-            >
-              <MoreVertIcon />
-            </IconButton>
-          )}
-          <Menu
-            id="eventlistitem-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={(e) => {
-              handleMenuClose(e);
-            }}
-            MenuListProps={{
-              "aria-labelledby": "eventlistitem-menu-button",
-            }}
+          <Box
+            id="eventlistitem-lower-box"
+            sx={{ mt: 2, paddingX: "10px", width: "100%" }} // padding to align with more icon
           >
-            {ediumUser?.uid === event?.creator_uid && (
-              <MenuItem
-                onClick={(e) => {
-                  handleMenuClose(e);
+            <TimeItemText fontSize="0.875rem" />
+            <LocationItemText fontSize="0.875rem" />
+            <TimestampItemText fontSize="0.875rem" />
+          </Box>
+        </>
+      ) : (
+        <>
+          <Box sx={{ display: "flex", flexDirection: "row" }}>
+            <UniversalAvatar lengthStr="88px" variant="rounded" />
+            <Box sx={{ display: "flex", flexDirection: "column" }}>
+              <TitleItemText />
+              <Box sx={{ mt: "4px", height: "1.5rem", overflow: "hidden" }}>
+                <TagsList />
+              </Box>
+              <Box
+                sx={{
+                  mt: "4px",
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
                 }}
               >
-                <NextLink
-                  href={{
-                    pathname: "/events/create",
-                    query: { eventID: event?.id },
-                  }}
-                  as="/events/create"
-                  passHref
-                  style={{
-                    color: "inherit",
-                  }}
-                >
-                  Modify
-                </NextLink>
-              </MenuItem>
-            )}
-            {ediumUser?.uid === event?.creator_uid && (
-              <MenuItem
-                onClick={(e) => {
-                  handleVisibility("events", event);
-                  handleMenuClose(e);
+                {/* we need this box to fix the icon size */}
+                <Box sx={{ mr: "4px", fontSize: "0.625rem" }}>
+                  <FaClock size="0.625rem" />
+                </Box>
+                <TimeItemText fontSize="0.75rem" />
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
                 }}
               >
-                {event?.is_visible ? "Hide" : "Display"}
-              </MenuItem>
-            )}
-            {ediumUser?.uid === event?.creator_uid && (
-              <MenuItem
-                onClick={(e) => {
-                  handleDeleteEntry(
-                    "events",
-                    "evets_ext",
-                    "my_event_ids",
-                    event?.id,
-                    ediumUser?.uid
-                  );
-                  setFullEvent(null);
-                  handleMenuClose(e);
-                }}
-              >
-                Delete
-              </MenuItem>
-            )}
-          </Menu>
-        </Box>
-        <Box
-          id="eventlistitem-lower-box"
-          // padding right to align with more icon
-          sx={{ mt: 2, paddingRight: "10px", width: "100%" }}
-        >
-          <ListItemText
-            secondary={
-              <Typography
-                color="text.secondary"
-                variant="body2"
-                // sx={{
-                //   display: "-webkit-box",
-                //   overflow: "hidden",
-                //   WebkitBoxOrient: "vertical",
-                //   WebkitLineClamp: 1,
-                // }}
-              >
-                {event.category}
-                <br />
-                {isSameDay
-                  ? startMoment.format("MMM Do h:mm a") +
-                    (isSameTime ? "" : " - " + endMoment.format("h:mm a"))
-                  : startMoment.format("MMM Do h:mm a") +
-                    " - " +
-                    endMoment.format("MMM Do h:mm a")}
-              </Typography>
-            }
-          />
-          {onMedia.onDesktop && (
-            <ListItemText
-              secondary={
-                <Typography
-                  color="text.secondary"
-                  variant="body2"
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    fontWeight: "light",
-                  }}
-                >
-                  {dayjs(event.last_timestamp).format("MMM Do, YYYY")}
-                </Typography>
-              }
-              sx={{ mt: 2 }}
-            />
-          )}
-        </Box>
-      </ListItemButton>
+                <Box sx={{ mr: "4px", fontSize: "0.625rem" }}>
+                  <FaMapPin size="0.625rem" />
+                </Box>
+                <LocationItemText fontSize="0.75rem" />
+              </Box>
+            </Box>
+          </Box>
+        </>
+      )}
     </ListItem>
   );
 };
