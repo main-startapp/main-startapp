@@ -18,7 +18,7 @@ import { EventInfoContent } from "./EventInfo";
 const EventCalendar = () => {
   // context
   const { onMedia } = useContext(GlobalContext);
-  const { fullEvents, setFullEvent } = useContext(EventContext);
+  const { fullEvents, fullEvent, setFullEvent } = useContext(EventContext);
   const theme = useTheme();
 
   // modal
@@ -139,7 +139,7 @@ const EventCalendar = () => {
       title: eventData.event.title,
       start: eventData.event.start_date,
       end: eventData.event.end_date,
-      type: eventData.event.category, //!todo: may renamed to type
+      type: eventData.event.type,
       fullEvent: eventData,
     };
   }
@@ -231,7 +231,11 @@ const EventCalendar = () => {
                 paddingY: 0,
               }}
             >
-              <EventInfoContent />
+              <EventInfoContent
+                event={fullEvent?.event}
+                eventCreator={fullEvent?.creator}
+                eventAllTags={fullEvent?.allTags}
+              />
             </Box>
           </Paper>
         </Modal>

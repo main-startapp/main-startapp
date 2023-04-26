@@ -27,7 +27,7 @@ const MobileBottomNav = () => {
         bottom: 0,
         height: "64px",
         width: "100%",
-        boxShadow: 2,
+        boxShadow: `0px -1px 2px #ccc`,
         zIndex: 100,
       }}
     >

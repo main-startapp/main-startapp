@@ -29,15 +29,10 @@ import dayjs from "dayjs";
 
 // the project list item component in the project list: has full project data but only shows some brief information
 // prefer not doing any dynamic calculation in this leaf component
-const ProjectListItem = (props) => {
-  const index = props.index;
-  const fullProject = props.fullProject;
-  const last = props.last;
-
+const ProjectListItem = ({ index, fullProject, last }) => {
   // context
   const { ediumUser, onMedia } = useContext(GlobalContext);
-
-  const { setFullProject, searchTerm, searchTypeList } =
+  const { setFullProject, searchTerm, searchCateList, searchTypeList } =
     useContext(ProjectContext);
 
   // local vars
@@ -66,7 +61,7 @@ const ProjectListItem = (props) => {
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-start",
-        borderBottom: 1,
+        borderBottom: index === last ? 0 : 1,
         borderColor: "divider",
         "&:hover": {
           backgroundColor: "gray100.main",
@@ -114,6 +109,7 @@ const ProjectListItem = (props) => {
                 <Chip
                   key={index}
                   color={
+                    isStrInStrList(searchCateList, tag, true) ||
                     isStrInStrList(searchTypeList, tag, true) ||
                     searchTerm === tag
                       ? "primary"

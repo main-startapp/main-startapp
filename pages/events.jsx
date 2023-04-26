@@ -48,7 +48,7 @@ const Events = () => {
   const [isSearchingClicked, setIsSearchingClicked] = useState(false); // initialize auto set entry flag for searching
   const [isMobileBackClicked, setIsMobileBackClicked] = useState(false); // initialize auto set entry flag for mobile
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchCategory, setSearchCategory] = useState("");
+  const [searchCateList, setSearchCateList] = useState([]);
   const [searchTypeList, setSearchTypeList] = useState([]);
 
   const [modeType, setModeType] = useState("list");
@@ -62,6 +62,8 @@ const Events = () => {
         const eventCreator = findItemFromList(users, "uid", event?.creator_uid);
         // allTags
         let eventTags = [];
+        if (event?.category) eventTags.push(event?.category);
+        if (event?.type) eventTags.push(event?.type);
         if (event?.tags?.length > 0) {
           eventTags = eventTags.concat(event.tags); // event tags
         }
@@ -71,8 +73,6 @@ const Events = () => {
         ) {
           eventTags = eventTags.concat(eventCreator.org_tags); // org tags
         }
-        // category
-        eventTags.push(event?.category?.toLowerCase());
         return {
           event: event,
           creator: eventCreator,
@@ -95,8 +95,8 @@ const Events = () => {
         setIsMobileBackClicked,
         searchTerm,
         setSearchTerm,
-        searchCategory,
-        setSearchCategory,
+        searchCateList,
+        setSearchCateList,
         searchTypeList,
         setSearchTypeList,
         setModeType,

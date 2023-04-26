@@ -48,7 +48,11 @@ import {
   FixedHeightPaper,
   handleDeleteEntry,
 } from "../Reusable/Resusable";
-import { eventStrList, eventTags } from "../Reusable/MenuStringList";
+import {
+  categoryStrList,
+  eventStrList,
+  eventTags,
+} from "../Reusable/MenuStringList";
 import { EventInfoContent } from "./EventInfo";
 import SlateEditor from "../SlateEditor";
 // time
@@ -94,6 +98,7 @@ const EventCreate = (props) => {
   const emptyEvent = {
     title: "",
     icon_url: "",
+    category: "",
     type: "",
     start_date: null,
     end_date: null,
@@ -591,9 +596,39 @@ const EventCreate = (props) => {
                 </Dialog>
               </Box>
 
-              {/* Type select & start/end date */}
-              <Box display="flex" justifyContent="space-between" sx={{ mt: 4 }}>
-                <DefaultFormControl required fullWidth sx={{ width: "50%" }}>
+              {/* Category select & type select */}
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="start"
+                sx={{ mt: 4 }}
+              >
+                <DefaultFormControl required fullWidth>
+                  <InputLabel>Category</InputLabel>
+                  <Select
+                    label="Category"
+                    value={newEvent.category}
+                    onChange={(e) => {
+                      setNewEvent({ ...newEvent, category: e.target.value });
+                    }}
+                  >
+                    {categoryStrList?.map((cateStr, index) => {
+                      return (
+                        <MenuItem key={index} value={cateStr}>
+                          {cateStr}
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
+                  <FormHelperText
+                    id="eventcreate-category-helper-text"
+                    sx={{ color: "lightgray", fontSize: "12px" }}
+                  >
+                    {"General category of your event"}
+                  </FormHelperText>
+                </DefaultFormControl>
+
+                <DefaultFormControl required fullWidth sx={{ ml: 4 }}>
                   <InputLabel>Type</InputLabel>
                   <Select
                     label="Type"
@@ -617,129 +652,127 @@ const EventCreate = (props) => {
                     {"General type of your event"}
                   </FormHelperText>
                 </DefaultFormControl>
+              </Box>
 
+              {/* Start date & duration */}
+              <Box display="flex" justifyContent="space-between" sx={{ mt: 4 }}>
                 {/* mui x 6.x */}
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  sx={{ ml: 4, width: "50%" }}
-                >
-                  <StyledDateTimeField
-                    inputRef={focusState === "datetime" ? focusRef : null}
-                    sx={{ width: "60%" }}
-                    required
-                    label="Start Date and Time"
-                    helperText="Event start time"
-                    value={
-                      newEvent.start_date ? dayjs(newEvent.start_date) : null
+
+                <StyledDateTimeField
+                  inputRef={focusState === "datetime" ? focusRef : null}
+                  fullWidth
+                  required
+                  label="Start Date and Time"
+                  helperText="Event start time"
+                  value={
+                    newEvent.start_date ? dayjs(newEvent.start_date) : null
+                  }
+                  onChange={(newValue) => {
+                    setNewEvent({
+                      ...newEvent,
+                      start_date: newValue?.toDate(),
+                      end_date: eventDuration
+                        ? dayjs(newValue)
+                            .add(eventDuration, eventDurationUnit)
+                            ?.toDate()
+                        : null,
+                    });
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      updateFocus("duration");
                     }
-                    onChange={(newValue) => {
+                  }}
+                />
+                <DefaultTextField
+                  inputRef={focusState === "duration" ? focusRef : null}
+                  sx={{ ml: 4 }}
+                  //error={!Number(eventDuration)}
+                  fullWidth
+                  required
+                  label="Duration"
+                  helperText="Event duration"
+                  value={eventDuration}
+                  onChange={(e) => {
+                    setEventDuration(e.target.value);
+                    if (newEvent.start_date) {
                       setNewEvent({
                         ...newEvent,
-                        start_date: newValue?.toDate(),
-                        end_date: eventDuration
-                          ? dayjs(newValue)
-                              .add(eventDuration, eventDurationUnit)
-                              ?.toDate()
-                          : null,
+                        end_date: dayjs(newEvent.start_date)
+                          .add(e.target.value, eventDurationUnit)
+                          ?.toDate(),
                       });
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        updateFocus("duration");
-                      }
-                    }}
-                  />
-                  <DefaultTextField
-                    inputRef={focusState === "duration" ? focusRef : null}
-                    sx={{ width: "40%", ml: 4 }}
-                    //error={!Number(eventDuration)}
-                    fullWidth
-                    required
-                    label="Duration"
-                    helperText="Event duration"
-                    value={eventDuration}
-                    onChange={(e) => {
-                      setEventDuration(e.target.value);
-                      if (newEvent.start_date) {
-                        setNewEvent({
-                          ...newEvent,
-                          end_date: dayjs(newEvent.start_date)
-                            .add(e.target.value, eventDurationUnit)
-                            ?.toDate(),
-                        });
-                      }
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-                        e.preventDefault();
-                        setEventDurationUnit(
-                          eventDurationUnit === "hours" ? "days" : "hours"
-                        );
-                        if (eventDuration && newEvent.start_date)
-                          eventDurationUnit === "hours"
-                            ? setNewEvent({
-                                ...newEvent,
-                                end_date: dayjs(newEvent.start_date)
-                                  .add(eventDuration, "days")
-                                  ?.toDate(),
-                              })
-                            : setNewEvent({
-                                ...newEvent,
-                                end_date: dayjs(newEvent.start_date)
-                                  .add(eventDuration, "hours")
-                                  ?.toDate(),
-                              });
-                      }
-                      if (e.key === "Enter") {
-                        updateFocus("regurl");
-                      }
-                    }}
-                    InputProps={{
-                      endAdornment: (
-                        <IconButton
-                          onClick={(e) => {
-                            setEventDurationUnit(
-                              eventDurationUnit === "hours" ? "days" : "hours"
-                            );
-                            if (eventDuration && newEvent.start_date)
-                              eventDurationUnit === "hours"
-                                ? setNewEvent({
-                                    ...newEvent,
-                                    end_date: dayjs(newEvent.start_date)
-                                      .add(eventDuration, "days")
-                                      ?.toDate(),
-                                  })
-                                : setNewEvent({
-                                    ...newEvent,
-                                    end_date: dayjs(newEvent.start_date)
-                                      .add(eventDuration, "hours")
-                                      ?.toDate(),
-                                  });
-                          }}
-                          sx={{
-                            height: "40px",
-                            width: "40px",
-                            position: "absolute",
-                            right: 0,
-                          }}
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+                      e.preventDefault();
+                      setEventDurationUnit(
+                        eventDurationUnit === "hours" ? "days" : "hours"
+                      );
+                      if (eventDuration && newEvent.start_date)
+                        eventDurationUnit === "hours"
+                          ? setNewEvent({
+                              ...newEvent,
+                              end_date: dayjs(newEvent.start_date)
+                                .add(eventDuration, "days")
+                                ?.toDate(),
+                            })
+                          : setNewEvent({
+                              ...newEvent,
+                              end_date: dayjs(newEvent.start_date)
+                                .add(eventDuration, "hours")
+                                ?.toDate(),
+                            });
+                    }
+                    if (e.key === "Enter") {
+                      updateFocus("regurl");
+                    }
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton
+                        onClick={(e) => {
+                          setEventDurationUnit(
+                            eventDurationUnit === "hours" ? "days" : "hours"
+                          );
+                          if (eventDuration && newEvent.start_date)
+                            eventDurationUnit === "hours"
+                              ? setNewEvent({
+                                  ...newEvent,
+                                  end_date: dayjs(newEvent.start_date)
+                                    .add(eventDuration, "days")
+                                    ?.toDate(),
+                                })
+                              : setNewEvent({
+                                  ...newEvent,
+                                  end_date: dayjs(newEvent.start_date)
+                                    .add(eventDuration, "hours")
+                                    ?.toDate(),
+                                });
+                        }}
+                        sx={{
+                          height: "40px",
+                          width: "40px",
+                          position: "absolute",
+                          right: 0,
+                        }}
+                      >
+                        <Typography
+                          sx={{ fontSize: "1rem", fontWeight: "medium" }}
                         >
-                          <Typography
-                            sx={{ fontSize: "1rem", fontWeight: "medium" }}
-                          >
-                            {eventDurationUnit === "hours"
-                              ? eventDuration > 1
-                                ? "hrs"
-                                : "hr"
-                              : eventDuration > 1
-                              ? "days"
-                              : "day"}
-                          </Typography>
-                        </IconButton>
-                      ),
-                    }}
-                  />
-                </Box>
+                          {eventDurationUnit === "hours"
+                            ? eventDuration > 1
+                              ? "hrs"
+                              : "hr"
+                            : eventDuration > 1
+                            ? "days"
+                            : "day"}
+                        </Typography>
+                      </IconButton>
+                    ),
+                  }}
+                />
               </Box>
               {/* Location */}
               {/* !todo: can use some services like google places or leaflet to autocomplete */}

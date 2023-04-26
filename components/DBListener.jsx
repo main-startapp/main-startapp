@@ -125,7 +125,7 @@ const DBListener = () => {
   useEffect(() => {
     // time
     function daysAgo(days) {
-      return dayjs().subtract(30, "days").toDate();
+      return dayjs().subtract(days, "days").toDate();
     }
 
     // db query
@@ -133,7 +133,7 @@ const DBListener = () => {
     const q = query(
       collectionRef,
       where("is_deleted", "==", false),
-      where("end_date", ">", daysAgo(28)),
+      where("end_date", ">", daysAgo(90)),
       orderBy("end_date", "asc")
     );
 

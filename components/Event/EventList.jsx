@@ -31,6 +31,7 @@ const EventList = () => {
     isMobileBackClicked,
     setIsMobileBackClicked,
     searchTerm,
+    searchCateList,
     searchTypeList,
   } = useContext(EventContext);
   const theme = useTheme();
@@ -49,32 +50,46 @@ const EventList = () => {
   }, [fullEvents]);
 
   // event list with filtering
-  const filteredFullEvents = useMemo(() => {
+  // 1st, filtering visibility and category
+  const fullEventsWIP1st = useMemo(() => {
     return sortedFullEvents?.filter((fullEvent) => {
+      // filter out invisible entry
       if (!fullEvent.event.is_visible) return false;
-
-      if (searchTerm === "" && searchTypeList.length === 0) {
-        return true; // no search
-      } else if (searchTerm !== "" && searchTypeList.length === 0) {
-        return (
-          isStrInStr(fullEvent.event.title, searchTerm, false) ||
-          isStrInStrList(fullEvent.allTags, searchTerm, true)
-        ); // only term: in event title || in tags exactly
-      } else if (searchTerm === "" && searchTypeList.length > 0) {
-        return searchTypeList.some((type) => {
-          return fullEvent.event.category === type;
-        }); // only type
-      } else {
-        return (
-          searchTypeList.some((type) => {
-            return fullEvent.event.category === type;
-          }) &&
-          (isStrInStr(fullEvent.event.title, searchTerm, false) ||
-            isStrInStrList(fullEvent.allTags, searchTerm, true))
-        ); // term && type
-      }
+      // return everything else if no category search
+      if (searchCateList.length === 0) return true;
+      // else return entries match category
+      return searchCateList.some((cate) => {
+        return fullEvent.event.category === cate;
+      });
     });
-  }, [searchTerm, searchTypeList, sortedFullEvents]);
+  }, [searchCateList, sortedFullEvents]);
+
+  // 2nd, filtering type
+  const fullEventsWIP2nd = useMemo(() => {
+    // return prev list if no type search
+    if (searchTypeList.length === 0) return fullEventsWIP1st;
+
+    // else return entries match type
+    return fullEventsWIP1st?.filter((fullEvent) => {
+      return searchTypeList.some((type) => {
+        return fullEvent.event.type === type;
+      });
+    });
+  }, [fullEventsWIP1st, searchTypeList]);
+
+  // 3rd, filtering term, the most expensive one
+  const filteredFullEvents = useMemo(() => {
+    // return prev list if no term search
+    if (searchTerm === "") return fullEventsWIP2nd;
+
+    // else return entries match term
+    return fullEventsWIP2nd?.filter((fullEvent) => {
+      return (
+        isStrInStr(fullEvent.event.title, searchTerm, false) ||
+        isStrInStrList(fullEvent.allTags, searchTerm, true)
+      ); // in event title partially || in tags exactly
+    });
+  }, [fullEventsWIP2nd, searchTerm]);
 
   // event query & auto set initial event
   useEffect(() => {
@@ -196,6 +211,8 @@ const EventList = () => {
             justifyContent: "center",
             paddingY: 3,
             paddingX: 2,
+            borderTop: 1,
+            borderColor: "divider",
           }}
         >
           <Tooltip

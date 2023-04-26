@@ -49,7 +49,7 @@ import {
 } from "../Reusable/Resusable";
 import {
   projectTags,
-  typeStrList,
+  projectStrList,
   categoryStrList,
 } from "../Reusable/MenuStringList";
 import { StyledDateTimeField } from "../Event/EventCreate";
@@ -551,7 +551,7 @@ const ProjectCreate = (props) => {
             </Dialog>
           </Box>
 
-          {/* Category select & type select*/}
+          {/* Category select & type select */}
           <Box
             display="flex"
             justifyContent="space-between"
@@ -568,10 +568,10 @@ const ProjectCreate = (props) => {
                   setNewProject({ ...newProject, category: e.target.value })
                 }
               >
-                {categoryStrList?.map((projectStr, index) => {
+                {categoryStrList?.map((cateStr, index) => {
                   return (
-                    <MenuItem key={index} value={projectStr}>
-                      {projectStr}
+                    <MenuItem key={index} value={cateStr}>
+                      {cateStr}
                     </MenuItem>
                   );
                 })}
@@ -600,8 +600,8 @@ const ProjectCreate = (props) => {
                   setNewProject({ ...newProject, type: e.target.value })
                 }
               >
-                {typeStrList?.map((projectStr, index) => {
-                  // need to change typeStrList to typeStrList
+                {projectStrList?.map((projectStr, index) => {
+                  // need to change projectStrList to projectStrList
                   return (
                     <MenuItem key={index} value={projectStr}>
                       {projectStr}

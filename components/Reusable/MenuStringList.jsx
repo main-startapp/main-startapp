@@ -1,12 +1,4 @@
-// project
-export const typeStrList = [
-  "Charity Initiative",
-  "Club",
-  "Fun Project",
-  "Learning Project",
-  "Startup",
-];
-
+// both
 export const categoryStrList = [
   "Engineering & Tech",
   "Sustainability",
@@ -14,10 +6,19 @@ export const categoryStrList = [
   "Life Sciences",
   "Media & Fine Arts",
   "Education",
-  "Sports",
+  "Others",
 ];
 
-// event
+// project types
+export const projectStrList = [
+  "Charity Initiative",
+  "Club",
+  "Fun Project",
+  "Learning Project",
+  "Startup",
+];
+
+// event types
 export const eventStrList = [
   "Case Competition",
   "Community Event",

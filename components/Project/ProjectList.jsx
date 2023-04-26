@@ -1,7 +1,12 @@
+// react
 import { useContext, useMemo, useEffect } from "react";
+// next
 import NextLink from "next/link";
+import Router from "next/router";
+// mui
 import { Box, Button, Tooltip, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+// edium
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import ProjectListItem from "./ProjectListItem";
 import ProjectListHeader from "./ProjectListHeader";
@@ -13,7 +18,6 @@ import {
   isStrInStrList,
   shallowUpdateURLQuery,
 } from "../Reusable/Resusable";
-import Router from "next/router";
 
 // link/router https://stackoverflow.com/questions/65086108/next-js-link-vs-router-push-vs-a-tag
 // description: a list of projects (project list items); a button to create new project (router.push)
@@ -30,49 +34,58 @@ const ProjectList = () => {
     isMobileBackClicked,
     setIsMobileBackClicked,
     searchTerm,
+    searchCateList,
     searchTypeList,
   } = useContext(ProjectContext);
   const theme = useTheme();
 
   // project list with filtering
-  const filteredFullProjects = useMemo(() => {
+  // 1st, filtering visibility and category
+  const fullProjectsWIP1st = useMemo(() => {
     return fullProjects?.filter((fullProject) => {
+      // filter out invisible entry
       if (!fullProject.project.is_visible) return false;
-
-      if (searchTerm === "" && searchTypeList.length === 0) {
-        return true; // no search
-      } else if (searchTerm !== "" && searchTypeList.length === 0) {
-        return (
-          isStrInStr(fullProject.project.title, searchTerm, false) ||
-          isStrInObjList(
-            fullProject.project.position_list,
-            "title",
-            searchTerm,
-            false
-          ) ||
-          isStrInStrList(fullProject.allTags, searchTerm, true)
-        ); // only term: in project title || in position title || in tags exactly
-      } else if (searchTerm === "" && searchTypeList.length > 0) {
-        return searchTypeList.some((type) => {
-          return fullProject.project.type === type;
-        }); // only type
-      } else {
-        return (
-          searchTypeList.some((type) => {
-            return fullProject.project.type === type;
-          }) &&
-          (isStrInStr(fullProject.project.title, searchTerm, false) ||
-            isStrInObjList(
-              fullProject.project.position_list,
-              "title",
-              searchTerm,
-              false
-            ) ||
-            isStrInStrList(fullProject.allTags, searchTerm, true))
-        ); // term && type
-      }
+      // return everything else if no category search
+      if (searchCateList.length === 0) return true;
+      // else return entries match category
+      return searchCateList.some((cate) => {
+        return fullProject.project.category === cate;
+      });
     });
-  }, [fullProjects, searchTerm, searchTypeList]);
+  }, [fullProjects, searchCateList]);
+
+  // 2nd, filtering type
+  const fullProjectsWIP2nd = useMemo(() => {
+    // return prev list if no type search
+    if (searchTypeList.length === 0) return fullProjectsWIP1st;
+
+    // else return entries match type
+    return fullProjectsWIP1st?.filter((fullProject) => {
+      return searchTypeList.some((type) => {
+        return fullProject.project.type === type;
+      });
+    });
+  }, [fullProjectsWIP1st, searchTypeList]);
+
+  // 3rd, filtering term, the most expensive one
+  const filteredFullProjects = useMemo(() => {
+    // return prev list if no term search
+    if (searchTerm === "") return fullProjectsWIP2nd;
+
+    // else return entries match term
+    return fullProjectsWIP2nd?.filter((fullProject) => {
+      return (
+        isStrInStr(fullProject.project.title, searchTerm, false) ||
+        isStrInObjList(
+          fullProject.project.position_list,
+          "title",
+          searchTerm,
+          false
+        ) ||
+        isStrInStrList(fullProject.allTags, searchTerm, true)
+      ); // in project title partially || in position title partially || in tags exactly
+    });
+  }, [fullProjectsWIP2nd, searchTerm]);
 
   // project query & auto set initial project
   useEffect(() => {
@@ -196,6 +209,8 @@ const ProjectList = () => {
             justifyContent: "center",
             paddingY: 3,
             paddingX: 2,
+            borderTop: 1,
+            borderColor: "divider",
           }}
         >
           <Tooltip

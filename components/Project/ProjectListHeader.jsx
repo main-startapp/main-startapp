@@ -8,20 +8,22 @@ import {
   StyledInputBase,
 } from "../Reusable/Resusable";
 import SearchIcon from "@mui/icons-material/Search";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { ProjectContext } from "../Context/ShareContexts";
-import { typeStrList } from "../Reusable/MenuStringList";
+import { categoryStrList, projectStrList } from "../Reusable/MenuStringList";
 
 const ProjectListHeader = () => {
   const {
     setIsSearchingClicked,
     setSearchTerm,
+    searchCateList,
+    setSearchCateList,
     searchTypeList,
     setSearchTypeList,
   } = useContext(ProjectContext);
 
   // tabs related
-  const [tabValue, setTabValue] = useState("2");
+  const [tabValue, setTabValue] = useState("1");
   const handleChange = (event, newValue) => {
     setTabValue(newValue);
   };
@@ -44,52 +46,18 @@ const ProjectListHeader = () => {
   document.addEventListener("mousedown", handleCollapse);
   window.addEventListener("wheel", handleCollapse);
 
-  // type related
-  const [typeList, setTypeList] = useState([]);
-  useEffect(() => {
-    const retList = [];
-    typeStrList.forEach((typeStr) => {
-      retList.push({ name: typeStr, isSelected: false });
-    });
-    setTypeList(retList);
-  }, []);
+  // category & type related
+  const [cateList, setCateList] = useState(
+    categoryStrList.map((cateStr) => {
+      return { name: cateStr, isSelected: false };
+    })
+  );
 
-  const handleSelect = (i) => {
-    if (typeList[i].isSelected) return;
-    // update the local type list
-    let newTypeList = [...typeList];
-    newTypeList[i] = {
-      ...newTypeList[i],
-      isSelected: true,
-    };
-    setTypeList(newTypeList);
-    // update the project type state
-    let newSearchType = [...searchTypeList];
-    newSearchType.push(newTypeList[i].name);
-    setSearchTypeList(newSearchType);
-    // isSearchingClicked flag for auto set entry
-    setIsSearchingClicked(true);
-  };
-
-  const handleRemove = (i) => {
-    if (!typeList[i].isSelected) return;
-    // update the local type list
-    let newTypeList = [...typeList];
-    newTypeList[i] = {
-      ...newTypeList[i],
-      isSelected: false,
-    };
-    setTypeList(newTypeList);
-    // update the project search type name list
-    let newSearchTypeList = [...searchTypeList];
-    newSearchTypeList = removeValueFromArray(
-      newSearchTypeList,
-      newTypeList[i].name
-    );
-    setSearchTypeList(newSearchTypeList);
-    // isSearchingClicked flag for auto set entry
-    setIsSearchingClicked(true);
-  };
+  const [typeList, setTypeList] = useState(
+    projectStrList.map((typeStr) => {
+      return { name: typeStr, isSelected: false };
+    })
+  );
 
   return (
     <Box
@@ -134,7 +102,7 @@ const ProjectListHeader = () => {
             onChange={handleChange}
             sx={{ minHeight: 0, borderBottom: 1, borderColor: "divider" }}
           >
-            {/* <StyledTab label="Category" value="1" /> */}
+            <StyledTab label="Category" value="1" />
             <StyledTab label="Type" value="2" />
           </TabList>
           <Box id="projectlist-positionref-box" sx={{ position: "relative" }}>
@@ -149,7 +117,7 @@ const ProjectListHeader = () => {
                 zIndex: 1,
               }}
             >
-              {/* <TabPanel
+              <TabPanel
                 value="1"
                 sx={{
                   backgroundColor: "background.paper",
@@ -158,8 +126,32 @@ const ProjectListHeader = () => {
                   borderColor: "divider",
                 }}
               >
-                Item One
-              </TabPanel> */}
+                {cateList?.map((cate, index) => (
+                  <Chip
+                    key={index}
+                    clickable={false}
+                    color={cate.isSelected ? "primary" : "lightPrimary"}
+                    label={cate.name}
+                    size="medium"
+                    onClick={() => {
+                      handleChipClick(
+                        index,
+                        cateList,
+                        setCateList,
+                        searchCateList,
+                        setSearchCateList,
+                        setIsSearchingClicked
+                      );
+                    }}
+                    sx={{
+                      mr: 1,
+                      mb: 1,
+                      fontSize: "0.75rem",
+                      fontWeight: "medium",
+                    }}
+                  />
+                ))}
+              </TabPanel>
               <TabPanel
                 value="2"
                 sx={{
@@ -174,27 +166,30 @@ const ProjectListHeader = () => {
                 {typeList?.map((type, index) => (
                   <Chip
                     key={index}
+                    clickable={false}
                     color={type.isSelected ? "primary" : "lightPrimary"}
                     label={type.name}
                     size="medium"
                     onClick={() => {
-                      handleSelect(index);
+                      handleChipClick(
+                        index,
+                        typeList,
+                        setTypeList,
+                        searchTypeList,
+                        setSearchTypeList,
+                        setIsSearchingClicked
+                      );
                     }}
-                    {...(type.isSelected && {
-                      onDelete: () => {
-                        handleRemove(index);
-                      },
-                    })}
                     sx={{
                       mr: 1,
                       mb: 1,
                       fontSize: "0.75rem",
                       fontWeight: "medium",
-                      "&.MuiChip-root:hover": {
-                        backgroundColor: type.isSelected
-                          ? "primary.main"
-                          : "lightPrimary.main",
-                      },
+                      // "&.MuiChip-root:hover": {
+                      //   backgroundColor: type.isSelected
+                      //     ? "primary.main"
+                      //     : "lightPrimary.main",
+                      // },
                     }}
                   />
                 ))}
@@ -202,20 +197,25 @@ const ProjectListHeader = () => {
             </Collapse>
           </Box>
         </TabContext>
-        {searchTypeList.length > 0 && (
+        {searchCateList.length + searchTypeList.length > 0 && (
           <Chip
+            label={searchCateList.length + searchTypeList.length + " selected"}
             color="primary"
-            label={searchTypeList.length + " selected"}
             size="small"
             onDelete={() => {
-              const newTypeList = [...typeList];
-              newTypeList.forEach((type) => {
-                if (type.isSelected) type.isSelected = false;
-              });
-              setTypeList(newTypeList);
+              setCateList(
+                categoryStrList.map((cateStr) => {
+                  return { name: cateStr, isSelected: false };
+                })
+              );
+              setTypeList(
+                projectStrList.map((typeStr) => {
+                  return { name: typeStr, isSelected: false };
+                })
+              );
+              setSearchCateList([]);
               setSearchTypeList([]);
               setIsSearchingClicked(true); // isSearchingClicked flag for auto set entry
-              handleExpand(); // !todo: is this consistent behavior?
             }}
             sx={{
               position: "absolute",
@@ -244,3 +244,32 @@ const StyledTab = styled(Tab)(({ theme }) => ({
   minWidth: 0,
   fontSize: "1rem",
 }));
+
+export const handleChipClick = (
+  i,
+  localList,
+  setLocalList,
+  sharedList,
+  setSharedList,
+  setSearchingFlag
+) => {
+  // update the local list
+  let newLocalList = [...localList];
+  newLocalList[i] = {
+    ...newLocalList[i],
+    isSelected: !newLocalList[i].isSelected,
+  };
+
+  // update the shared search list
+  let newSharedList = [...sharedList];
+  newSharedList = localList[i].isSelected
+    ? removeValueFromArray(newSharedList, localList[i].name)
+    : [...newSharedList, localList[i].name];
+
+  // set new states
+  setLocalList(newLocalList);
+  setSharedList(newSharedList);
+
+  // isSearchingClicked flag for auto set entry
+  setSearchingFlag(true);
+};

@@ -47,7 +47,7 @@ const Home = () => {
   const [isSearchingClicked, setIsSearchingClicked] = useState(false); // initialize auto set entry flag for searching
   const [isMobileBackClicked, setIsMobileBackClicked] = useState(false); // initialize show list on mobile
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchCategory, setSearchCategory] = useState("");
+  const [searchCateList, setSearchCateList] = useState([]);
   const [searchTypeList, setSearchTypeList] = useState([]);
 
   // build data for this page
@@ -63,6 +63,8 @@ const Home = () => {
         );
         // allTags
         let projectTags = [];
+        if (project?.category) projectTags.push(project?.category);
+        if (project?.type) projectTags.push(project?.type);
         if (project?.tags?.length > 0) {
           projectTags = projectTags.concat(project.tags); // project tags
         }
@@ -72,8 +74,6 @@ const Home = () => {
         ) {
           projectTags = projectTags.concat(projectCreator.org_tags); // org tags
         }
-        // type
-        projectTags.push(project?.type?.toLowerCase());
         return {
           project: project,
           creator: projectCreator,
@@ -96,8 +96,8 @@ const Home = () => {
         setIsMobileBackClicked,
         searchTerm,
         setSearchTerm,
-        searchCategory,
-        setSearchCategory,
+        searchCateList,
+        setSearchCateList,
         searchTypeList,
         setSearchTypeList,
       }}

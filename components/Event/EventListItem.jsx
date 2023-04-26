@@ -19,24 +19,20 @@ import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 // edium
 import { GlobalContext, EventContext } from "../Context/ShareContexts";
-
 import {
   handleDeleteEntry,
   handleVisibility,
   isStrInStrList,
 } from "../Reusable/Resusable";
-// time
+// misc libs
 import dayjs from "dayjs";
 
 // prefer not doing any dynamic calculation in this leaf component
-const EventListItem = (props) => {
-  const index = props.index;
-  const fullEvent = props.fullEvent;
-  const last = props.last;
-
+const EventListItem = ({ index, fullEvent, last }) => {
   // context
   const { ediumUser, onMedia } = useContext(GlobalContext);
-  const { setFullEvent, searchTerm, searchTypeList } = useContext(EventContext);
+  const { setFullEvent, searchTerm, searchCateList, searchTypeList } =
+    useContext(EventContext);
 
   // local vars
   const event = fullEvent.event;
@@ -69,7 +65,7 @@ const EventListItem = (props) => {
       }}
       sx={{
         padding: 0,
-        borderBottom: 1,
+        borderBottom: index === last ? 0 : 1,
         borderColor: "divider",
         "&:hover": {
           backgroundColor: "gray100.main",
@@ -124,6 +120,7 @@ const EventListItem = (props) => {
                   <Chip
                     key={index}
                     color={
+                      isStrInStrList(searchCateList, tag, true) ||
                       isStrInStrList(searchTypeList, tag, true) ||
                       searchTerm === tag
                         ? "primary"

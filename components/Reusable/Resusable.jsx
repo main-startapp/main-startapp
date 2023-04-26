@@ -238,7 +238,7 @@ export const isStrInStr = (str, subStr, isExact) => {
 };
 
 //============================================================
-// utility function: whether substring is in a list of obj / string
+// utility function: whether substring is in a list of objs or a list of strings
 //============================================================
 export const isStrInStrList = (strList, subStr, isExact) => {
   return strList.some((str) => isStrInStr(str, subStr, isExact));
