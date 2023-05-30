@@ -25,10 +25,9 @@ const MobileBottomNav = () => {
       sx={{
         position: "fixed",
         bottom: 0,
-        height: "65px",
+        height: "64px",
         width: "100%",
-        borderTop: 1,
-        borderColor: "divider",
+        boxShadow: `0px -1px 2px #ccc`,
         zIndex: 100,
       }}
     >

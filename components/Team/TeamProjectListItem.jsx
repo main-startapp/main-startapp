@@ -139,7 +139,7 @@ const TeamProjectListItem = (props) => {
                 overflow: "hidden",
                 WebkitBoxOrient: "vertical",
                 WebkitLineClamp: 2,
-                // is there a better way to directly ref to ListItemText Secondary style?
+                // !todo: is there a better way to directly ref to ListItemText Secondary style?
                 fontSize: "0.875rem",
                 lineHeight: 1.43,
                 letterSpacing: "0.01071em",

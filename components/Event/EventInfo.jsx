@@ -1,4 +1,6 @@
-import { Suspense, useContext, useEffect, useRef, useState } from "react";
+// react
+import { useContext, useEffect, useRef } from "react";
+// mui
 import {
   Avatar,
   Box,
@@ -10,28 +12,28 @@ import {
   Typography,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { EventContext, GlobalContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
-import moment from "moment";
+// edium
+import { EventContext, GlobalContext } from "../Context/ShareContexts";
+import { FixedHeightPaper } from "../Reusable/Resusable";
+// misc libs
+import { motion } from "framer-motion";
+import dayjs from "dayjs";
 import { Interweave } from "interweave";
 import { UrlMatcher } from "interweave-autolink";
-import { motion } from "framer-motion";
-import { FixedHeightPaper } from "../Reusable/Resusable";
-import { useImage } from "react-image";
-import { ErrorBoundary } from "react-error-boundary";
+import { InstagramEmbed } from "react-social-media-embed";
+import SlateEditor from "../SlateEditor";
 
-const EventInfo = () => {
+export const EventInfoContent = ({ event, eventCreator, eventAllTags }) => {
   // context
   const { onMedia } = useContext(GlobalContext);
-  const { fullEvent, setFullEvent, setIsMobileBackClicked } =
-    useContext(EventContext);
-  const theme = useTheme();
+  // const { fullEvent } = useContext(EventContext);
 
   // local vars
-  const event = fullEvent?.event;
-  const eventCreator = fullEvent?.creator;
-  const eventAllTags = fullEvent?.allTags;
+  // const event = fullEvent?.event;
+  // const eventCreator = fullEvent?.creator;
+  // const eventAllTags = fullEvent?.allTags;
 
   // transfer code
   // const [tCode, setTCode] = useState("");
@@ -39,23 +41,176 @@ const EventInfo = () => {
   //   setTCode("");
   // }, [fullEvent]);
 
-  function EventImageComponent() {
-    const { src } = useImage({
-      srcList: event?.banner_url,
-    });
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img alt="" src={src} width="100%" />;
-  }
-
-  function ErrorFallback({ error, resetErrorBoundary }) {
-    return <></>;
-  }
-
-  // moment
-  const startMoment = moment(event?.start_date);
-  const endMoment = moment(event?.end_date);
+  // time
+  const startMoment = dayjs(event?.start_date);
+  const endMoment = dayjs(event?.end_date);
   const isSameDay = startMoment.format("L") === endMoment.format("L");
   const isSameTime = startMoment.format("LLL") === endMoment.format("LLL");
+
+  return (
+    <>
+      <Box
+        id="eventinfo-header-box"
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+        }}
+      >
+        <Avatar
+          sx={{
+            mr: onMedia.onDesktop ? 4 : 2,
+            height: "96px",
+            width: "96px",
+          }}
+          src={event?.icon_url}
+        >
+          <UploadFileIcon />
+        </Avatar>
+        <Typography
+          color="text.primary"
+          variant="h2"
+          sx={{
+            fontSize: onMedia.onDesktop ? "1.875rem" : "1.25rem",
+            fontWeight: "bold",
+          }}
+        >
+          {event?.title}
+        </Typography>
+      </Box>
+      <Divider
+        sx={{
+          mt: 2,
+          borderBottomWidth: 1,
+          borderColor: "divider",
+        }}
+      />
+      <Typography
+        color="text.primary"
+        variant="h3"
+        sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
+      >
+        {"Time & Location: "}
+      </Typography>
+      <Typography color="text.secondary" variant="body1">
+        {isSameDay
+          ? startMoment.format("MMMM Do YYYY, h:mm a") +
+            (isSameTime ? "" : " - " + endMoment.format("h:mm a"))
+          : startMoment.format("MMMM Do YYYY, h:mm a") +
+            " - " +
+            endMoment.format("MMMM Do YYYY, h:mm a")}
+      </Typography>
+      <Typography color="text.secondary" variant="body1">
+        {event?.location}
+      </Typography>
+      <Typography
+        color="text.primary"
+        variant="h3"
+        sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
+      >
+        {"Description:"}
+      </Typography>
+      {event?.description && !event?.slate_desc && (
+        <Typography color="text.secondary" component="span" variant="body1">
+          <pre
+            style={{
+              fontFamily: "inherit",
+              whiteSpace: "pre-wrap",
+              wordWrap: "break-word",
+              display: "inline",
+            }}
+          >
+            <Interweave
+              content={event.description}
+              matchers={[new UrlMatcher("url")]}
+            />
+          </pre>
+        </Typography>
+      )}
+      {event?.slate_desc && (
+        <SlateEditor
+          valueObj={event}
+          valueKey="slate_desc"
+          onChange={null}
+          isReadOnly={true}
+        />
+      )}
+      <Button
+        sx={{
+          mt: 4,
+          borderRadius: 8,
+        }}
+        disabled={!event?.registration_form_url}
+        disableElevation
+        fullWidth
+        variant="contained"
+        LinkComponent={Link}
+        target="_blank"
+        href={event?.registration_form_url}
+        rel="noreferrer"
+      >
+        {event?.registration_form_url ? "Attend" : "Registration Not Required"}
+      </Button>
+      {eventAllTags?.length > 0 && (
+        <Box id="eventinfo-details-box">
+          <Typography
+            color="text.primary"
+            variant="h3"
+            sx={{ mt: 4, fontSize: "1.25rem", fontWeight: "bold" }}
+          >
+            {"Details: "}
+          </Typography>
+          {eventAllTags?.map((tag, index) => (
+            <Chip
+              key={index}
+              color="lightPrimary"
+              label={tag}
+              sx={{
+                mr: 1,
+                mt: 1,
+                fontSize: "0.875rem",
+                fontWeight: "medium",
+              }}
+            />
+          ))}
+        </Box>
+      )}
+      {/* <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <Box
+          sx={{
+            mt: 4,
+            display: "flex",
+            justifyContent: "center",
+            position: "relative",
+          }}
+        >
+          <Suspense>
+            <EventImageComponent />
+          </Suspense>
+        </Box>
+      </ErrorBoundary> */}
+      {event?.banner_url && event.banner_url.includes("instagram") && (
+        <Box
+          sx={{
+            mt: 4,
+            display: "flex",
+            justifyContent: "center",
+            // height: `calc()`,
+          }}
+        >
+          <InstagramBlock url={event.banner_url} />
+        </Box>
+      )}
+    </>
+  );
+};
+
+const EventInfo = () => {
+  // context
+  const { onMedia } = useContext(GlobalContext);
+  const { fullEvent, setFullEvent, setIsMobileBackClicked } =
+    useContext(EventContext);
+  const theme = useTheme();
 
   // useEffect to reset box scrollbar position
   const boxRef = useRef();
@@ -89,140 +244,16 @@ const EventInfo = () => {
           }}
         >
           <motion.div
-            key={event?.title}
+            key={fullEvent?.event?.id}
             initial={{ opacity: 0, y: "1%" }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <Box
-              id="eventinfo-header-box"
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <Avatar
-                sx={{
-                  mr: onMedia.onDesktop ? 4 : 2,
-                  height: "96px",
-                  width: "96px",
-                }}
-                src={event?.icon_url}
-              >
-                <UploadFileIcon />
-              </Avatar>
-              <Typography
-                color="text.primary"
-                variant="h2"
-                sx={{
-                  fontSize: onMedia.onDesktop ? "1.875rem" : "1.25rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {event?.title}
-              </Typography>
-            </Box>
-            <Divider
-              sx={{
-                mt: 2,
-                borderBottomWidth: 1,
-                borderColor: "divider",
-              }}
+            <EventInfoContent
+              event={fullEvent?.event}
+              eventCreator={fullEvent?.creator}
+              eventAllTags={fullEvent?.allTags}
             />
-            <Typography
-              color="text.primary"
-              variant="h3"
-              sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
-            >
-              {"Time & Location: "}
-            </Typography>
-            <Typography color="text.secondary" variant="body1">
-              {isSameDay
-                ? startMoment.format("MMMM Do YYYY, h:mm a") +
-                  (isSameTime ? "" : " - " + endMoment.format("h:mm a"))
-                : startMoment.format("MMMM Do YYYY, h:mm a") +
-                  " - " +
-                  endMoment.format("MMMM Do YYYY, h:mm a")}
-            </Typography>
-            <Typography color="text.secondary" variant="body1">
-              {event?.location}
-            </Typography>
-            <Typography
-              color="text.primary"
-              variant="h3"
-              sx={{ mt: 4, mb: 1, fontSize: "1.25rem", fontWeight: "bold" }}
-            >
-              {"Description:"}
-            </Typography>
-            <Typography color="text.secondary" component="span" variant="body1">
-              <pre
-                style={{
-                  fontFamily: "inherit",
-                  whiteSpace: "pre-wrap",
-                  wordWrap: "break-word",
-                  display: "inline",
-                }}
-              >
-                <Interweave
-                  content={event?.description}
-                  matchers={[new UrlMatcher("url")]}
-                />
-              </pre>
-            </Typography>
-            <Button
-              disableElevation
-              fullWidth
-              variant="contained"
-              component={Link}
-              target="_blank"
-              href={event?.registration_form_url}
-              rel="noreferrer"
-              sx={{
-                mt: 4,
-                borderRadius: 8,
-              }}
-            >
-              {"Attend"}
-            </Button>
-            {eventAllTags?.length > 0 && (
-              <Box id="eventinfo-details-box">
-                <Typography
-                  color="text.primary"
-                  variant="h3"
-                  sx={{ mt: 4, fontSize: "1.25rem", fontWeight: "bold" }}
-                >
-                  {"Details: "}
-                </Typography>
-                {eventAllTags?.map((tag, index) => (
-                  <Chip
-                    key={index}
-                    color="lightPrimary"
-                    label={tag}
-                    sx={{
-                      mr: 1,
-                      mt: 1,
-                      fontSize: "0.875rem",
-                      fontWeight: "medium",
-                    }}
-                  />
-                ))}
-              </Box>
-            )}
-            <ErrorBoundary FallbackComponent={ErrorFallback}>
-              <Box
-                sx={{
-                  mt: 4,
-                  display: "flex",
-                  justifyContent: "center",
-                  position: "relative",
-                }}
-              >
-                <Suspense>
-                  <EventImageComponent />
-                </Suspense>
-              </Box>
-            </ErrorBoundary>
           </motion.div>
         </Box>
       )}
@@ -246,6 +277,46 @@ const EventInfo = () => {
 };
 
 export default EventInfo;
+
+// This embed comp has our own footer imitating IG's.
+// Longer rectangle post will be cropped and covered by our footer.
+// Ironically, the footer color now matches their button color. And their original color is a bit off.
+export const InstagramBlock = ({ url }) => {
+  return (
+    <Box
+      sx={{
+        borderRadius: "3px",
+        boxShadow: 2,
+      }}
+    >
+      <Box
+        sx={{
+          height: `calc(54px + 480px)`, // header + post
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <InstagramEmbed url={url} width={480} />
+      </Box>
+      <Link
+        sx={{
+          height: "44px",
+          display: "flex",
+          alignItems: "center",
+          marginX: "12px",
+          fontSize: "14px",
+          color: "#0095f6",
+        }}
+        target="_blank"
+        href={url}
+        rel="noreferrer"
+        underline="none"
+      >
+        View more on Instagram
+      </Link>
+    </Box>
+  );
+};
 
 {
   /* <Box
@@ -633,7 +704,7 @@ export default EventInfo;
             }}
           >
             <ExportedImage
-              src="/images/edium_v4_256.png"
+              src="/images/edium_v4_512.png"
               alt=""
               width={256}
               height={256}

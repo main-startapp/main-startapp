@@ -1,3 +1,8 @@
+// react
+import { useContext, useEffect } from "react";
+// firebase
+import { db } from "../firebase";
+// mui
 import {
   collection,
   doc,
@@ -6,15 +11,17 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { useContext, useEffect } from "react";
-import { db } from "../firebase";
+// edium
 import { useAuth } from "./Context/AuthContext";
 import { GlobalContext } from "./Context/ShareContexts";
+// time
+import dayjs from "dayjs";
+var advancedFormat = require("dayjs/plugin/advancedFormat");
+dayjs.extend(advancedFormat); // we only need to do it once
 
 // purpose: Firebase prefer consistent subscription. This comp serves this purpose by subscribing the essential db and also providing the derived data required by other comps.
 // https://stackoverflow.com/questions/61094496/how-can-i-secure-my-component-state-details-from-react-dev-tool-on-production
 // tldr; you can't. don't pass sensitive data to client
-
 const DBListener = () => {
   // context
   const { currentUser } = useAuth();
@@ -117,15 +124,17 @@ const DBListener = () => {
   // listen to realtime events collection, public
   useEffect(() => {
     // time
-    //const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    function daysAgo(days) {
+      return dayjs().subtract(days, "days").toDate();
+    }
 
     // db query
     const collectionRef = collection(db, "events");
     const q = query(
       collectionRef,
       where("is_deleted", "==", false),
-      //where("end_date", ">", sevenDaysAgo),
-      orderBy("start_date", "asc")
+      where("end_date", ">", daysAgo(180)),
+      orderBy("end_date", "desc")
     );
 
     const unsub = onSnapshot(

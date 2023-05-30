@@ -1,3 +1,6 @@
+// react
+import { useContext, useEffect, useState } from "react";
+// mui
 import {
   Accordion,
   AccordionDetails,
@@ -12,8 +15,9 @@ import {
 import { styled } from "@mui/material/styles";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import { useContext, useEffect, useState } from "react";
+// edium
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
+// firebase
 import { db } from "../../firebase";
 import {
   addDoc,
@@ -22,8 +26,9 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
+// misc libs
 import { Interweave } from "interweave";
-import moment from "moment";
+import dayjs from "dayjs";
 
 // prefer not doing any dynamic calculation in this leaf component
 const PositionListItem = (props) => {
@@ -49,7 +54,7 @@ const PositionListItem = (props) => {
 
   // local var
   const project = fullProject?.project;
-  const dayDiff = appDeadline ? moment().diff(appDeadline, "days") : ""; // +: past; -: future
+  const dayDiff = appDeadline ? dayjs().diff(appDeadline, "days") : ""; // +: past; -: future
 
   // useEffect to reset accordion expansion
   const [expandState, setExpandState] = useState("collapseIt");
@@ -194,58 +199,62 @@ const PositionListItem = (props) => {
     setForceChatExpand(true);
   };
 
-  // components
-  const appURLButton = (
-    <Button
-      color="primary"
-      disabled={dayDiff > 0}
-      disableElevation
-      size="small"
-      variant="contained"
-      component={Link}
-      target="_blank"
-      href={appURL}
-      rel="noreferrer"
-      onClick={(e) => e.stopPropagation()}
-      sx={{
-        borderRadius: 8,
-        paddingX: 2,
-        paddingY: 0,
-        fontSize: "0.75rem",
-      }}
-    >
-      {"Apply"}
-    </Button>
-  );
+  // reusable comps
+  const AppURLButton = () => {
+    return (
+      <Button
+        sx={{
+          borderRadius: 8,
+          paddingX: 2,
+          paddingY: 0,
+          fontSize: "0.75rem",
+        }}
+        color="primary"
+        disabled={dayDiff > 0}
+        disableElevation
+        size="small"
+        variant="contained"
+        LinkComponent={Link}
+        target="_blank"
+        href={appURL}
+        rel="noreferrer"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {"Apply"}
+      </Button>
+    );
+  };
 
-  const joinRequestButton = (
-    <Button
-      color="primary"
-      disabled={
-        !ediumUser?.uid ||
-        dayDiff > 0 ||
-        ediumUser?.uid === creator?.uid ||
-        ediumUserExt?.join_requests?.some(
-          (jr) => jr.project_id === project.id && jr.position_id === posID
-        )
-      }
-      disableElevation
-      size="small"
-      variant="contained"
-      onClick={(e) => {
-        e.stopPropagation();
-        handleJoinRequest();
-      }}
-      sx={{
-        borderRadius: 8,
-        paddingX: 2,
-        paddingY: 0,
-        fontSize: "0.75rem",
-      }}
-    >
-      {"Join"}
-    </Button>
-  );
+  const JoinRequestButton = () => {
+    return (
+      <Button
+        color="primary"
+        disabled={
+          !ediumUser?.uid ||
+          dayDiff > 0 ||
+          ediumUser?.uid === creator?.uid ||
+          ediumUserExt?.join_requests?.some(
+            (jr) => jr.project_id === project.id && jr.position_id === posID
+          )
+        }
+        disableElevation
+        size="small"
+        variant="contained"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleJoinRequest();
+        }}
+        sx={{
+          borderRadius: 8,
+          paddingX: 2,
+          paddingY: 0,
+          fontSize: "0.75rem",
+        }}
+      >
+        {"Join"}
+      </Button>
+    );
+  };
 
   return (
     <Box
@@ -291,7 +300,7 @@ const PositionListItem = (props) => {
                 color={dayDiff < -7 || dayDiff > 0 ? "lightPrimary" : "error"} // expired in 1 week: red; else: regular light primary
                 disabled={dayDiff > 0}
                 icon={<AccessTimeIcon />}
-                label={moment(appDeadline).format("MMM Do")}
+                label={dayjs(appDeadline).format("MMM Do")}
                 size="small"
                 sx={{
                   ml: 2,
@@ -310,7 +319,9 @@ const PositionListItem = (props) => {
                     !ediumUser?.uid && !appURL ? "Sign in or Edit profile" : ""
                   }
                 >
-                  <span>{appURL ? appURLButton : joinRequestButton}</span>
+                  <span>
+                    {appURL ? <AppURLButton /> : <JoinRequestButton />}
+                  </span>
                 </Tooltip>
               </>
             )}
@@ -372,7 +383,9 @@ const PositionListItem = (props) => {
                     !ediumUser?.uid && !appURL ? "Sign in or Edit profile" : ""
                   }
                 >
-                  <span>{appURL ? appURLButton : joinRequestButton}</span>
+                  <span>
+                    {appURL ? <AppURLButton /> : <JoinRequestButton />}
+                  </span>
                 </Tooltip>
               </Box>
             )}

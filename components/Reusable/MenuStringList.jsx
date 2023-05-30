@@ -1,12 +1,4 @@
-// project
-export const typeStrList = [
-  "Charity Initiative",
-  "Club",
-  "Fun Project",
-  "Learning Project",
-  "Startup",
-];
-
+// both
 export const categoryStrList = [
   "Engineering & Tech",
   "Sustainability",
@@ -14,10 +6,19 @@ export const categoryStrList = [
   "Life Sciences",
   "Media & Fine Arts",
   "Education",
-  "Sports",
+  "Others",
 ];
 
-// event
+// project types
+export const projectStrList = [
+  "Charity Initiative",
+  "Club",
+  "Fun Project",
+  "Learning Project",
+  "Startup",
+];
+
+// event types
 export const eventStrList = [
   "Case Competition",
   "Community Event",
@@ -94,3 +95,6 @@ export const projectTags = ["business", "engineering", "computer science"];
 
 // event - tags
 export const eventTags = ["business", "engineering", "computer science"];
+
+// time
+export const timeSlots = [0, 0.5, 1, 1.5, 11, 11.8, 12, 12.7, 20.8, 23.5];

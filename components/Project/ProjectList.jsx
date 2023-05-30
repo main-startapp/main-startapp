@@ -1,7 +1,12 @@
+// react
 import { useContext, useMemo, useEffect } from "react";
+// next
 import NextLink from "next/link";
+import Router from "next/router";
+// mui
 import { Box, Button, Tooltip, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+// edium
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import ProjectListItem from "./ProjectListItem";
 import ProjectListHeader from "./ProjectListHeader";
@@ -13,102 +18,79 @@ import {
   isStrInStrList,
   shallowUpdateURLQuery,
 } from "../Reusable/Resusable";
-import Router from "next/router";
 
 // link/router https://stackoverflow.com/questions/65086108/next-js-link-vs-router-push-vs-a-tag
 // description: a list of projects (project list items); a button to create new project (router.push)
 // behavior: filters projects based on the search term and/or search category
 const ProjectList = () => {
   // context
-  const { projects, users, ediumUser, onMedia } = useContext(GlobalContext);
+  const { ediumUser, onMedia } = useContext(GlobalContext);
   const {
     fullProject,
     setFullProject,
+    fullProjects,
     isSearchingClicked,
     setIsSearchingClicked,
     isMobileBackClicked,
     setIsMobileBackClicked,
     searchTerm,
+    searchCateList,
     searchTypeList,
   } = useContext(ProjectContext);
   const theme = useTheme();
 
-  // projects with extra info from other dataset (creator, merged tags)
-  const fullProjects = useMemo(() => {
-    return projects?.map((project) => {
-      // creator
-      const projectCreator = findItemFromList(
-        users,
-        "uid",
-        project?.creator_uid
-      );
-      // allTags
-      let projectTags = [];
-      if (project?.tags?.length > 0) {
-        projectTags = projectTags.concat(project.tags); // project tags
-      }
-      if (
-        projectCreator?.role === "org_admin" &&
-        projectCreator?.org_tags?.length > 0
-      ) {
-        projectTags = projectTags.concat(projectCreator.org_tags); // org tags
-      }
-      // type
-      projectTags.push(project?.type?.toLowerCase());
-      return {
-        project: project,
-        creator: projectCreator,
-        allTags: projectTags,
-      };
-    });
-  }, [projects, users]);
-
   // project list with filtering
-  const filteredFullProjects = useMemo(() => {
+  // 1st, filtering visibility and category
+  const fullProjectsWIP1st = useMemo(() => {
     return fullProjects?.filter((fullProject) => {
+      // filter out invisible entry
       if (!fullProject.project.is_visible) return false;
-
-      if (searchTerm === "" && searchTypeList.length === 0) {
-        return true; // no search
-      } else if (searchTerm !== "" && searchTypeList.length === 0) {
-        return (
-          isStrInStr(fullProject.project.title, searchTerm, false) ||
-          isStrInObjList(
-            fullProject.project.position_list,
-            "title",
-            searchTerm,
-            false
-          ) ||
-          isStrInStrList(fullProject.allTags, searchTerm, true)
-        ); // only term: in project title || in position title || in tags exactly
-      } else if (searchTerm === "" && searchTypeList.length > 0) {
-        return searchTypeList.some((type) => {
-          return fullProject.project.type === type;
-        }); // only type
-      } else {
-        return (
-          searchTypeList.some((type) => {
-            return fullProject.project.type === type;
-          }) &&
-          (isStrInStr(fullProject.project.title, searchTerm, false) ||
-            isStrInObjList(
-              fullProject.project.position_list,
-              "title",
-              searchTerm,
-              false
-            ) ||
-            isStrInStrList(fullProject.allTags, searchTerm, true))
-        ); // term && type
-      }
+      // return everything else if no category search
+      if (searchCateList.length === 0) return true;
+      // else return entries match category
+      return searchCateList.some((cate) => {
+        return fullProject.project.category === cate;
+      });
     });
-  }, [fullProjects, searchTerm, searchTypeList]);
+  }, [fullProjects, searchCateList]);
+
+  // 2nd, filtering type
+  const fullProjectsWIP2nd = useMemo(() => {
+    // return prev list if no type search
+    if (searchTypeList.length === 0) return fullProjectsWIP1st;
+
+    // else return entries match type
+    return fullProjectsWIP1st?.filter((fullProject) => {
+      return searchTypeList.some((type) => {
+        return fullProject.project.type === type;
+      });
+    });
+  }, [fullProjectsWIP1st, searchTypeList]);
+
+  // 3rd, filtering term, the most expensive one
+  const filteredFullProjects = useMemo(() => {
+    // return prev list if no term search
+    if (searchTerm === "") return fullProjectsWIP2nd;
+
+    // else return entries match term
+    return fullProjectsWIP2nd?.filter((fullProject) => {
+      return (
+        isStrInStr(fullProject.project.title, searchTerm, false) ||
+        isStrInObjList(
+          fullProject.project.position_list,
+          "title",
+          searchTerm,
+          false
+        ) ||
+        isStrInStrList(fullProject.allTags, searchTerm, true)
+      ); // in project title partially || in position title partially || in tags exactly
+    });
+  }, [fullProjectsWIP2nd, searchTerm]);
 
   // project query & auto set initial project
   useEffect(() => {
-    const queryPID = Router.query?.pid;
-    const currentPID = fullProject?.project?.id;
-    // special case 1 (desktop): app can't distinguish between searching list change and click an entry (case 1 both arey query && current entry), thus isSearchingClicked flag was introduced
-    // special case 2 (mobile): mobile app can't distinguish between user input a query or user clicked back button (case 2 both are query && !current entry), thus isMobileBackClicked flag was introduced
+    // trigger 1 (desktop): app can't distinguish between searching list change and click an entry (case 1 both arey query && current entry), thus isSearchingClicked flag was introduced
+    // trigger 2 (mobile): mobile app can't distinguish between user input a query or user clicked back button (case 2 both are query && !current entry), thus isMobileBackClicked flag was introduced
     // case 1 (desktop & mobile): user click a new entry => current entry, update url
     // case 1.1 (desktop & mobile): if query and current entry exist and are equal, do nothing
     // case 2 (desktop & mobile): user directly input a url with a valid query => query && !current entry, set it to user's
@@ -128,15 +110,18 @@ const ProjectList = () => {
         shallowUpdateURLQuery(Router.pathname, null, null);
       }
       setIsSearchingClicked(false);
-      return;
+      return; // trigger 1
     }
 
     if (!onMedia.onDesktop && isMobileBackClicked) {
       // user clicked back button on mobile (onMobile && back button clicked) => show mobile list without url query
       shallowUpdateURLQuery(Router.pathname, null, null);
       setIsMobileBackClicked(false);
-      return; // special case 2
+      return; // trigger 2
     }
+
+    const queryPID = Router.query?.pid;
+    const currentPID = fullProject?.project?.id;
 
     if (currentPID && currentPID === queryPID) return; // case 1.1
 
@@ -224,6 +209,8 @@ const ProjectList = () => {
             justifyContent: "center",
             paddingY: 3,
             paddingX: 2,
+            borderTop: 1,
+            borderColor: "divider",
           }}
         >
           <Tooltip
@@ -231,32 +218,23 @@ const ProjectList = () => {
             style={{ width: "100%" }} // !important: make create button fullwidth
           >
             <span>
-              <NextLink
-                href={{
-                  pathname: "/projects/create",
+              <Button
+                sx={{
+                  height: "48px",
+                  borderRadius: 8,
                 }}
-                as="/projects/create"
-                passHref
-                style={{
-                  color: "inherit",
-                }}
+                color="secondary"
+                disabled={!ediumUser?.uid}
+                disableElevation
+                fullWidth
+                variant="contained"
+                LinkComponent={NextLink}
+                href="/projects/create"
               >
-                <Button
-                  color="secondary"
-                  disabled={!ediumUser?.uid}
-                  disableElevation
-                  fullWidth
-                  variant="contained"
-                  sx={{
-                    height: "48px",
-                    borderRadius: 8,
-                  }}
-                >
-                  <Typography variant="button" sx={{ fontSize: "1.125rem" }}>
-                    {"Create Project"}
-                  </Typography>
-                </Button>
-              </NextLink>
+                <Typography variant="button" sx={{ fontSize: "1.125rem" }}>
+                  {"Create Project"}
+                </Typography>
+              </Button>
             </span>
           </Tooltip>
         </Box>

@@ -27,7 +27,7 @@ const Signin = () => {
   const [errorMsg, setErrorMsg] = useState("");
 
   // independent media query
-  const isMobile = useMediaQuery("(max-width:767px)");
+  const onDesktop = useMediaQuery("(min-width:1024px)");
   const theme = useTheme();
 
   // Configure FirebaseUI.
@@ -82,109 +82,114 @@ const Signin = () => {
     });
   };
 
-  const signinComp = (
-    <>
-      <SignButton
-        variant="contained"
-        disableElevation
-        startIcon={<GoogleIcon />}
-        onClick={signInWithGoogle}
-        sx={{
-          mt: 6,
-          width: "256px",
-          fontSize: "0.875rem",
-          background: "#fff",
-          color: "#000",
-          ":hover": {
+  // reusable comps
+  const SigninComp = () => {
+    return (
+      <>
+        <SignButton
+          variant="contained"
+          disableElevation
+          startIcon={<GoogleIcon />}
+          onClick={signInWithGoogle}
+          sx={{
+            mt: 6,
+            width: "256px",
+            fontSize: "0.875rem",
             background:
-              "linear-gradient(-120deg, #4285f4, #34a853, #fbbc05, #ea4335)",
+              "linear-gradient(45deg, #4285f4 0%, #4285f4 25%, #ea4335 25%, #ea4335 50%, #fbbc05 50%, #fbbc05 75%, #34a853 75%, #34a853 100%)",
             color: "#fff",
-          },
-        }}
-      >
-        Sign in with Google
-      </SignButton>
+            ":hover": {
+              background:
+                "linear-gradient(45deg, #4285f4, #ea4335, #fbbc05, #34a853)",
+            },
+            //transition: "background", // to sync background ans text color transition
+          }}
+        >
+          Sign in with Google
+        </SignButton>
 
-      <Box sx={{ mt: 3 }}>
-        <Divider
+        <Box sx={{ mt: 3 }}>
+          <Divider
+            sx={{
+              width: "256px",
+              color: "gray300.main",
+            }}
+          >
+            {"or Sign in with Email"}
+          </Divider>
+        </Box>
+
+        <Box sx={{ mt: 3, width: "256px" }}>
+          <SignTextField
+            //sx={{ paddingY: 0, fontSize: "1rem" }}
+            fullWidth
+            margin="none"
+            label="Email"
+            name="email"
+            type="email"
+            variant="outlined"
+            value={input.email}
+            onChange={(e) => setInput({ ...input, email: e.target.value })}
+            error={!!errorMsg}
+          />
+          <SignTextField
+            sx={{ mt: 1.5 }}
+            fullWidth
+            margin="none"
+            label="Password"
+            name="password"
+            type="password"
+            variant="outlined"
+            value={input.password}
+            onChange={(e) => setInput({ ...input, password: e.target.value })}
+            error={!!errorMsg}
+            helperText={errorMsg || " "}
+          />
+        </Box>
+
+        <Box
           sx={{
             width: "256px",
-            color: "#d3d3d3",
+            display: "flex",
+            justifyContent: "flex-end",
           }}
         >
-          {"or Sign in with Email"}
-        </Divider>
-      </Box>
-
-      <Box sx={{ mt: 3, width: "256px" }}>
-        <SignTextField
-          //sx={{ paddingY: 0, fontSize: "1rem" }}
-          fullWidth
-          margin="none"
-          label="Email"
-          name="email"
-          type="email"
-          variant="outlined"
-          value={input.email}
-          onChange={(e) => setInput({ ...input, email: e.target.value })}
-          error={!!errorMsg}
-        />
-        <SignTextField
-          sx={{ mt: 1.5 }}
-          fullWidth
-          margin="none"
-          label="Password"
-          name="password"
-          type="password"
-          variant="outlined"
-          value={input.password}
-          onChange={(e) => setInput({ ...input, password: e.target.value })}
-          error={!!errorMsg}
-          helperText={errorMsg || " "}
-        />
-      </Box>
-
-      <Box
-        sx={{
-          width: "256px",
-          display: "flex",
-          justifyContent: "flex-end",
-        }}
-      >
-        <Button
-          color="primary"
-          disableElevation
-          variant="contained"
-          onClick={handleSignIn}
-          sx={{
-            width: "112px",
-            height: "24px",
-            borderRadius: 8,
-            fontSize: "0.75rem",
-          }}
-        >
-          {"Sign in"}
-        </Button>
-      </Box>
-      <Box sx={{ mt: 6, mb: 3, display: "flex", justifyContent: "center" }}>
-        <Typography sx={{ fontSize: "0.875rem" }}>
-          {"Not registered yet? "} &nbsp;
-        </Typography>
-        <Typography
-          color="primary.light"
-          sx={{
-            fontSize: "0.875rem",
-            ":hover": {
-              cursor: "pointer",
-            },
-          }}
-          onClick={() => setIsSignup(true)}
-        >
-          {"Join now"}
-        </Typography>
-      </Box>
-    </>
-  );
+          <Button
+            color="primary"
+            disableElevation
+            variant="contained"
+            onClick={handleSignIn}
+            sx={{
+              width: "112px",
+              height: "24px",
+              borderRadius: 8,
+              fontSize: "0.75rem",
+            }}
+          >
+            {"Sign in"}
+          </Button>
+        </Box>
+        <Box sx={{ mt: 6, mb: 3, display: "flex", justifyContent: "center" }}>
+          <Typography sx={{ fontSize: "0.875rem" }}>
+            {"Not registered yet? "} &nbsp;
+          </Typography>
+          <Typography
+            color="secondary" // color can only use predifined color like primary or text.primary
+            sx={{
+              fontSize: "0.875rem",
+              fontWeight: "bold",
+              ":hover": {
+                cursor: "pointer",
+              },
+            }}
+            onClick={() => setIsSignup(true)}
+          >
+            {"Join now"}
+          </Typography>
+        </Box>
+      </>
+    );
+  };
 
   return (
     <Box
@@ -192,6 +197,7 @@ const Signin = () => {
       sx={{
         display: "flex",
         justifyContent: "center",
+        position: "relative",
         overflow: "hidden",
         ":hover": {
           cursor: "default",
@@ -199,13 +205,19 @@ const Signin = () => {
       }}
     >
       <Paper
+        elevation={2}
         sx={{
-          minHeight: "100dvh",
-          width: isMobile ? "100%" : "572px", // each side is in golden ratio
+          mt: onDesktop ? 4 : 0,
+          minHeight: onDesktop
+            ? `calc(100dvh - 1px - ${theme.spacing(4)})`
+            : "100dvh", // window height - border - margin top
+          width: onDesktop ? "572px" : "100%", // each side is in golden ratio
           display: "flex",
+          flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          borderRadius: "0px 0px 0px 0px",
+          borderTop: onDesktop ? `1px solid ${theme.palette.divider}` : 0,
+          borderRadius: onDesktop ? "32px 32px 0px 0px" : "0px 0px 0px 0px",
         }}
       >
         <motion.div
@@ -222,9 +234,10 @@ const Signin = () => {
           <ExportedImage
             style={{ marginTop: "24px" }}
             alt=""
-            src="/images/edium_v4_256.png"
+            src="/images/edium_v4_512.png"
             width={256}
             height={256}
+            unoptimized={true}
           />
 
           <Typography
@@ -238,9 +251,9 @@ const Signin = () => {
           </Typography>
 
           {isSignup ? (
-            <Signup setIsSignup={setIsSignup} isMobile={isMobile} />
+            <Signup setIsSignup={setIsSignup} onDesktop={onDesktop} />
           ) : (
-            signinComp
+            <SigninComp />
           )}
         </motion.div>
       </Paper>
@@ -251,40 +264,47 @@ const Signin = () => {
 export default Signin;
 
 const SignButton = styled(Button)(({ theme }) => ({
-  border: `1px solid #d3d3d3`,
+  border: "none",
   borderRadius: theme.shape.borderRadius * 2,
   textTransform: "none",
+  height: "40px",
 }));
 
+// similar to DefaultTextField but thinner
 export const SignTextField = styled(TextField)(({ theme }) => ({
-  "& .MuiInputBase-input": { padding: theme.spacing(1, 2) },
+  "& .MuiInputBase-input": {
+    padding: theme.spacing(1, 2),
+    fontSize: "0.875rem",
+    height: "24px", // 40 overall == sign in button
+  },
 
   "& .MuiFormLabel-root": {
-    top: "-0.4rem",
+    top: "-6px",
     fontSize: "0.875rem",
     fontWeight: theme.typography.fontWeightMedium,
-    color: theme.palette.placholderGray.main,
+    color: theme.palette.gray500.main,
   },
-  "& .MuiInputLabel-shrink": { top: "0" }, // to counter root adjustment
-  "& .MuiFormLabel-root.Mui-focused": { top: "0" }, // to counter root adjustment
+  "& .MuiInputLabel-shrink": { top: "1px" }, // to counter root adjustment
+  "& .MuiFormLabel-root.Mui-focused": { top: "1px" }, // to counter root adjustment
 
   "& .MuiOutlinedInput-root": {
-    backgroundColor: "#fff",
-    borderRadius: theme.shape.borderRadius,
+    backgroundColor: theme.palette.gray100.main,
+    borderRadius: theme.shape.borderRadius * 2,
+
     "& fieldset": {
-      border: `1px solid #d3d3d3`,
+      border: "none",
     },
     "&:hover fieldset": {
-      border: `1px solid #d3d3d3`,
+      border: "none",
     },
     "&.Mui-focused fieldset": {
-      border: `1px solid #d3d3d3`,
+      border: "none",
     },
   },
 
   "& .MuiFormHelperText-root": {
     color: "error",
-    height: "24px",
-    fontSize: "12px",
+    height: "1.5rem", // 24px
+    fontSize: "0.75rem", // 12px
   },
 }));

@@ -8,6 +8,7 @@ import Filler from "../../components/Filler";
 import TeamInfo from "../../components/Team/TeamInfo";
 import TeamProjectList from "../../components/Team/TeamProjectList";
 
+//
 const TeamManagement = () => {
   // context
   const { setChat, setChatPartner, setShowChat, setShowMsg, chats, ediumUser } =
@@ -19,7 +20,6 @@ const TeamManagement = () => {
     setChatPartner(null);
   }, [setChat, setChatPartner, setShowChat, setShowMsg]);
 
-  // local vars
   // team states init
   const [project, setProject] = useState(null);
   const [projectExt, setProjectExt] = useState(null);

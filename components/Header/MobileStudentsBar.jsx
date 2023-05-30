@@ -41,7 +41,7 @@ const MobileStudentsBar = () => {
   //           if (e.target.value.length !== 0) return;
   //           setSearchTerm("");
   //         }}
-  //         onKeyPress={(e) => {
+  //         onKeyDown={(e) => {
   //           if (e.key === "Enter") {
   //             setSearchTerm(e.target.value);
   //           }
@@ -89,7 +89,7 @@ const MobileStudentsBar = () => {
                   if (e.target.value.length !== 0) return;
                   setSearchTerm("");
                 }}
-                onKeyPress={(e) => {
+                onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     setSearchTerm(e.target.value);
                   }
@@ -147,7 +147,7 @@ const MobileStudentsBar = () => {
           {searchTypeList.length > 0 && (
             <Chip
               label={searchTypeList.length + " selected"}
-              color="selectedWhite"
+              color="pureWhite"
               size="small"
               onDelete={() => {
                 const newTypeList = [...typeList];
@@ -189,7 +189,7 @@ const MobileStudentsBar = () => {
             typeList?.map((type, index) => (
               <Chip
                 key={index}
-                color={type.isSelected ? "selectedWhite" : "lightPrimary"}
+                color={type.isSelected ? "pureWhite" : "lightPrimary"}
                 label={type.name}
                 size="small"
                 onClick={() => {
@@ -206,7 +206,7 @@ const MobileStudentsBar = () => {
                   fontWeight: "medium",
                   "&.MuiChip-root:hover": {
                     backgroundColor: type.isSelected
-                      ? "selectedWhite.main"
+                      ? "pureWhite.main"
                       : "lightPrimary.main",
                   },
                   "& .MuiChip-deleteIcon": {

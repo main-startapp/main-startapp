@@ -1,3 +1,6 @@
+// react
+import { useContext, useEffect, useRef, useState } from "react";
+// mui
 import {
   Autocomplete,
   Box,
@@ -18,9 +21,11 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
 import AddLinkIcon from "@mui/icons-material/AddLink";
+// firebase
 import {
   collection,
   doc,
@@ -31,13 +36,10 @@ import {
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
-import { useContext, useEffect, useRef, useState } from "react";
+// edium
 import { db } from "../../firebase";
+import { useAuth } from "../Context/AuthContext";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
-import { useRouter } from "next/router";
 import {
   DefaultFormControl,
   DefaultTextField,
@@ -45,15 +47,18 @@ import {
   FixedHeightPaper,
   handleDeleteEntry,
 } from "../Reusable/Resusable";
-import { useAuth } from "../Context/AuthContext";
 import {
   projectTags,
-  typeStrList,
+  projectStrList,
   categoryStrList,
 } from "../Reusable/MenuStringList";
-import TextEditor from "../TextEditor";
-import { useTheme } from "@mui/material/styles";
+import { StyledDateTimeField } from "../Event/EventCreate";
+// next
+import { useRouter } from "next/router";
+import dayjs from "dayjs";
+import SlateEditor from "../SlateEditor";
 
+// comp
 const ProjectCreate = (props) => {
   // context
   const { currentUser } = useAuth();
@@ -82,9 +87,12 @@ const ProjectCreate = (props) => {
     type: "",
     tags: [],
     short_description: "",
-    description: "",
-    is_visible: true,
-    is_deleted: false,
+    slate_desc: [
+      {
+        type: "paragraph",
+        children: [{ text: "" }],
+      },
+    ],
   };
   const [newProject, setNewProject] = useState(() =>
     oldProject ? oldProject : emptyProject
@@ -98,7 +106,7 @@ const ProjectCreate = (props) => {
     count: "",
     responsibility: "",
     url: "",
-    deadline: "",
+    deadline: null,
   };
   const [positionFields, setPositionFields] = useState(() =>
     oldProject?.position_list?.length > 0
@@ -118,7 +126,6 @@ const ProjectCreate = (props) => {
   // check box
   const [isCheckedTransferable, setIsCheckedTransferable] = useState(false);
   const [isCheckedPosition, setIsCheckedPosition] = useState(false);
-  const [showDescOverlay, setShowDescOverlay] = useState(true);
 
   useEffect(() => {
     if (!oldProject) {
@@ -158,6 +165,8 @@ const ProjectCreate = (props) => {
         ...newProject,
         position_list: isCheckedPosition ? positionFields : [],
         creator_uid: ediumUser?.uid,
+        is_deleted: false,
+        is_visible: true,
         create_timestamp: serverTimestamp(),
         last_timestamp: serverTimestamp(),
       };
@@ -243,6 +252,8 @@ const ProjectCreate = (props) => {
         ...newProject,
         position_list: isCheckedPosition ? positionFields : [],
         creator_uid: ediumUser?.uid,
+        is_deleted: false,
+        is_visible: true,
         create_timestamp: serverTimestamp(),
         last_timestamp: serverTimestamp(),
       };
@@ -406,7 +417,8 @@ const ProjectCreate = (props) => {
         id="projectcreate-box"
         sx={{
           flexGrow: 1,
-          //overflowX: "hidden",
+          position: "relative",
+          overflowX: "hidden",
           overflowY: "scroll",
           //paddingTop: onMedia.onDesktop ? 2 : 2, // align with project list
           paddingBottom: onMedia.onDesktop ? 8 : 4, // enough space for messages
@@ -430,7 +442,9 @@ const ProjectCreate = (props) => {
         </Typography>
         {currentUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2" && (
           <Box sx={{ mb: 4, display: "flex" }}>
-            <Typography sx={{ color: "#f4511e", fontWeight: "bold" }}>
+            <Typography
+              sx={{ color: "adminOrange.main", fontWeight: "medium" }}
+            >
               {"This is a transferable project"}
             </Typography>
             <Checkbox
@@ -438,7 +452,7 @@ const ProjectCreate = (props) => {
               onChange={() => {
                 setIsCheckedTransferable(!isCheckedTransferable);
               }}
-              sx={{ ml: 2, color: "placholderGray.main", padding: 0 }}
+              sx={{ ml: 2, color: "gray500.main", padding: 0 }}
             />
           </Box>
         )}
@@ -450,6 +464,7 @@ const ProjectCreate = (props) => {
               fullWidth
               label="Project Title"
               helperText="Name of your project/club/organization"
+              margin="none"
               value={newProject.title}
               onChange={(e) =>
                 setNewProject({ ...newProject, title: e.target.value })
@@ -459,9 +474,7 @@ const ProjectCreate = (props) => {
             <Button
               sx={{
                 ml: 4,
-                color: newProject.icon_url
-                  ? "text.primary"
-                  : "placholderGray.main",
+                color: newProject.icon_url ? "text.primary" : "gray500.main",
                 backgroundColor: "#f0f0f0",
                 borderRadius: 2,
                 height: "56px",
@@ -538,7 +551,7 @@ const ProjectCreate = (props) => {
             </Dialog>
           </Box>
 
-          {/* Category select & type select*/}
+          {/* Category select & type select */}
           <Box
             display="flex"
             justifyContent="space-between"
@@ -555,10 +568,10 @@ const ProjectCreate = (props) => {
                   setNewProject({ ...newProject, category: e.target.value })
                 }
               >
-                {categoryStrList?.map((projectStr, index) => {
+                {categoryStrList?.map((cateStr, index) => {
                   return (
-                    <MenuItem key={index} value={projectStr}>
-                      {projectStr}
+                    <MenuItem key={index} value={cateStr}>
+                      {cateStr}
                     </MenuItem>
                   );
                 })}
@@ -587,8 +600,8 @@ const ProjectCreate = (props) => {
                   setNewProject({ ...newProject, type: e.target.value })
                 }
               >
-                {typeStrList?.map((projectStr, index) => {
-                  // need to change typeStrList to typeStrList
+                {projectStrList?.map((projectStr, index) => {
+                  // need to change projectStrList to projectStrList
                   return (
                     <MenuItem key={index} value={projectStr}>
                       {projectStr}
@@ -642,6 +655,7 @@ const ProjectCreate = (props) => {
 
           {/* Short description */}
           <DefaultTextField
+            sx={{ mt: 4 }}
             required
             fullWidth
             label="Short Description"
@@ -653,16 +667,28 @@ const ProjectCreate = (props) => {
                 short_description: e.target.value,
               })
             }
-            sx={{ mt: 4, mb: 4 }}
           />
 
           {/* Description */}
-          <TextEditor
-            update={setNewProject}
-            project={newProject}
-            overlay={showDescOverlay}
-            showOverlay={setShowDescOverlay}
-          />
+          <Box
+            sx={{
+              mt: 4,
+              backgroundColor: "gray100.main",
+              borderRadius: 2,
+              paddingX: "14px",
+              paddingY: "16.5px",
+              "&:hover": {
+                cursor: "text",
+              },
+            }}
+          >
+            <SlateEditor
+              valueObj={newProject}
+              valueKey="slate_desc"
+              onChange={setNewProject}
+              isReadOnly={false}
+            />
+          </Box>
           <FormHelperText
             sx={{ color: "lightgray", fontSize: "12px", mx: "14px", mt: "3px" }}
           >
@@ -680,15 +706,15 @@ const ProjectCreate = (props) => {
               alignItems: "center",
             }}
           >
-            <Typography color="placholderGray.main">
+            <Typography sx={{ color: "gray500.main", fontWeight: "medium" }}>
               {"I want to add positions"}
             </Typography>
             <Checkbox
+              sx={{ ml: 2, color: "gray500.main", padding: 0 }}
               checked={isCheckedPosition}
               onChange={() => {
                 setIsCheckedPosition(!isCheckedPosition);
               }}
-              sx={{ ml: 2, color: "placholderGray.main", padding: 0 }}
             />
           </Box>
           {/* firebase dynamic array: http://y2u.be/zgKH12s_95A */}
@@ -722,13 +748,11 @@ const ProjectCreate = (props) => {
                     />
                     {/* Weekly hour */}
                     <DefaultTextField
+                      sx={{ ml: 2, minWidth: "20%" }}
                       required
                       type="number"
                       name="weekly_hour" // has to be the same as key
                       label="Weekly Hour"
-                      inputProps={{
-                        min: 1,
-                      }}
                       value={positionField.weekly_hour}
                       onChange={(e) => {
                         e.target.value > 1
@@ -736,7 +760,9 @@ const ProjectCreate = (props) => {
                           : (e.target.value = 1);
                         handlePosInputChange(index, e);
                       }}
-                      sx={{ ml: 2, minWidth: "20%" }}
+                      inputProps={{
+                        min: 1,
+                      }}
                     />
 
                     {/* Number of people */}
@@ -809,30 +835,29 @@ const ProjectCreate = (props) => {
                       }}
                     />
                     {/* Application deadline container */}
-                    {/* https://stackoverflow.com/questions/63870164/material-ui-pickers-trigger-validation-on-blur-not-on-change */}
-                    <LocalizationProvider dateAdapter={AdapterMoment}>
-                      <DatePicker
-                        name="deadline"
-                        label="Application Deadline"
-                        value={positionField.deadline}
-                        onChange={(e) => {
-                          let pFields = [...positionFields];
-                          pFields[index]["deadline"] = e?._isValid ? e?._d : "";
-                          setPositionFields(pFields);
-                        }}
-                        renderInput={(params) => {
-                          return (
-                            <DefaultTextField
-                              {...params}
-                              sx={{
-                                minWidth: "25%",
-                                ml: 2,
-                              }}
-                            />
-                          );
-                        }}
-                      />
-                    </LocalizationProvider>
+
+                    <StyledDateTimeField
+                      // inputRef={focusState === "datetime" ? focusRef : null}
+                      sx={{ ml: 2, width: "50%" }}
+                      required
+                      name="deadline"
+                      label="Application Deadline"
+                      value={
+                        positionField.deadline
+                          ? dayjs(positionField.deadline)
+                          : null
+                      }
+                      onChange={(newValue) => {
+                        let pFields = [...positionFields];
+                        pFields[index]["deadline"] = newValue?.toDate();
+                        setPositionFields(pFields);
+                      }}
+                      // onKeyDown={(e) => {
+                      //   if (e.key === "Enter") {
+                      //     updateFocus("duration");
+                      //   }
+                      // }}
+                    />
                   </Box>
                 </Box>
               );

@@ -117,68 +117,74 @@ const UserOrgCreate = (props) => {
     redirectTo();
   };
 
-  // reuseable comps
-  const nameTextField = (
-    <DefaultTextField
-      required
-      sx={
-        onMedia.onDesktop
-          ? { mr: 5, width: "75%", paddingY: 0 }
-          : { width: "100%", mb: 5 }
-      }
-      label="Organization Title"
-      margin="none"
-      value={newOrgUser.org_title}
-      onChange={(e) => {
-        setNewOrgUser({
-          ...newOrgUser,
-          org_title: e.target.value,
-          name: e.target.value + " Admin",
-        });
-      }}
-    />
-  );
+  // reusable comps
+  const NameTextField = () => {
+    return (
+      <DefaultTextField
+        required
+        sx={
+          onMedia.onDesktop
+            ? { mr: 5, width: "75%", paddingY: 0 }
+            : { width: "100%", mb: 5 }
+        }
+        label="Organization Title"
+        margin="none"
+        value={newOrgUser.org_title}
+        onChange={(e) => {
+          setNewOrgUser({
+            ...newOrgUser,
+            org_title: e.target.value,
+            name: e.target.value + " Admin",
+          });
+        }}
+      />
+    );
+  };
 
-  const departmentAutoComplete = (
-    <Autocomplete
-      sx={onMedia.onDesktop ? { width: "25%" } : { width: "100%" }}
-      options={studentDepartmentStrList}
-      value={newOrgUser.org_department}
-      onChange={(event, newValue) => {
-        setNewOrgUser({ ...newOrgUser, org_department: newValue });
-      }}
-      renderInput={(params) => (
-        <DefaultTextField {...params} label="Department" required />
-      )}
-    />
-  );
+  const DepartmentAutoComplete = () => {
+    return (
+      <Autocomplete
+        sx={onMedia.onDesktop ? { width: "25%" } : { width: "100%" }}
+        options={studentDepartmentStrList}
+        value={newOrgUser.org_department}
+        onChange={(event, newValue) => {
+          setNewOrgUser({ ...newOrgUser, org_department: newValue });
+        }}
+        renderInput={(params) => (
+          <DefaultTextField {...params} label="Department" required />
+        )}
+      />
+    );
+  };
 
-  const tagsAutoComplete = (
-    <Autocomplete
-      sx={{ width: "100%" }}
-      freeSolo
-      clearOnBlur
-      multiple
-      filterSelectedOptions
-      options={tagsOptions}
-      value={newOrgUser.org_tags}
-      onChange={(event, newValue) => {
-        setNewOrgUser({ ...newOrgUser, org_tags: newValue });
-      }}
-      renderInput={(params) => (
-        <DefaultTextField
-          {...params}
-          label="Details"
-          helperText="Tags to shortly describe the organization (e.g. mechanical, design, game dev, etc.)"
-          required
-          inputProps={{
-            ...params.inputProps,
-            required: newOrgUser.org_tags.length === 0,
-          }}
-        />
-      )}
-    />
-  );
+  const TagsAutoComplete = () => {
+    return (
+      <Autocomplete
+        sx={{ width: "100%" }}
+        freeSolo
+        clearOnBlur
+        multiple
+        filterSelectedOptions
+        options={tagsOptions}
+        value={newOrgUser.org_tags}
+        onChange={(event, newValue) => {
+          setNewOrgUser({ ...newOrgUser, org_tags: newValue });
+        }}
+        renderInput={(params) => (
+          <DefaultTextField
+            {...params}
+            label="Details"
+            helperText="Tags to shortly describe the organization (e.g. mechanical, design, game dev, etc.)"
+            required
+            inputProps={{
+              ...params.inputProps,
+              required: newOrgUser.org_tags.length === 0,
+            }}
+          />
+        )}
+      />
+    );
+  };
 
   return (
     <form ref={formRef}>
@@ -191,16 +197,18 @@ const UserOrgCreate = (props) => {
             alignItems: "start",
           }}
         >
-          {nameTextField}
-          {departmentAutoComplete}
+          <NameTextField />
+          <DepartmentAutoComplete />
         </Box>
       ) : (
         <Box sx={{ mt: 5, display: "flex", flexDirection: "column" }}>
-          {nameTextField}
-          {departmentAutoComplete}
+          <NameTextField />
+          <DepartmentAutoComplete />
         </Box>
       )}
-      <Box sx={{ mt: 5 }}>{tagsAutoComplete}</Box>
+      <Box sx={{ mt: 5 }}>
+        <TagsAutoComplete />
+      </Box>
       {/* social media links list */}
       <Divider sx={{ my: 5 }}>
         <Typography sx={{ color: "gray" }}>Optional</Typography>

@@ -1,14 +1,19 @@
-import { useContext, useEffect, useRef, useState } from "react";
+// react
+import { useContext, useEffect, useRef } from "react";
+// mui
 import { Avatar, Box, Chip, Divider, Fab, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
-import PositionListItem from "./PositionListItem";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
+// edium
+import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
+import PositionListItem from "./PositionListItem";
+import { FixedHeightPaper } from "../Reusable/Resusable";
+// misc libs
 import { Interweave } from "interweave";
 import { UrlMatcher } from "interweave-autolink";
 import { motion } from "framer-motion";
-import { FixedHeightPaper } from "../Reusable/Resusable";
+import SlateEditor from "../SlateEditor";
 
 const ProjectInfo = () => {
   // context
@@ -115,22 +120,35 @@ const ProjectInfo = () => {
             >
               {"Description:"}
             </Typography>
-            <Typography color="text.secondary" component="span" variant="body1">
-              <pre
-                style={{
-                  fontFamily: "inherit",
-                  whiteSpace: "pre-wrap",
-                  wordWrap: "break-word",
-                  display: "inline",
-                }}
+            {project?.description && !project?.slate_desc && (
+              <Typography
+                color="text.secondary"
+                component="span"
+                variant="body1"
               >
-                <Interweave
-                  content={project?.description}
-                  matchers={[new UrlMatcher("url")]}
-                />
-              </pre>
-            </Typography>
-
+                <pre
+                  style={{
+                    fontFamily: "inherit",
+                    whiteSpace: "pre-wrap",
+                    wordWrap: "break-word",
+                    display: "inline",
+                  }}
+                >
+                  <Interweave
+                    content={project?.description}
+                    matchers={[new UrlMatcher("url")]}
+                  />
+                </pre>
+              </Typography>
+            )}
+            {project?.slate_desc && (
+              <SlateEditor
+                valueObj={project}
+                valueKey="slate_desc"
+                onChange={null}
+                isReadOnly={true}
+              />
+            )}
             {project?.position_list?.length > 0 && (
               <Box
                 id="projectinfo-positions-box"

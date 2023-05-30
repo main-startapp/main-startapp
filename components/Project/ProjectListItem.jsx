@@ -1,38 +1,37 @@
+// react
 import { useContext, useState } from "react";
+// next
+import NextLink from "next/link";
+// mui
 import {
   Avatar,
   Box,
   Chip,
   IconButton,
   ListItem,
-  ListItemText,
   Menu,
   MenuItem,
   Typography,
 } from "@mui/material";
-import moment from "moment";
-import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+// edium
+import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import {
   handleDeleteEntry,
   handleVisibility,
   isStrInStrList,
 } from "../Reusable/Resusable";
+// misc libs
 import { convert } from "html-to-text";
-import NextLink from "next/link";
+import dayjs from "dayjs";
 
 // the project list item component in the project list: has full project data but only shows some brief information
 // prefer not doing any dynamic calculation in this leaf component
-const ProjectListItem = (props) => {
-  const index = props.index;
-  const fullProject = props.fullProject;
-  const last = props.last;
-
+const ProjectListItem = ({ index, fullProject, last }) => {
   // context
   const { ediumUser, onMedia } = useContext(GlobalContext);
-
-  const { setFullProject, searchTerm, searchTypeList } =
+  const { setFullProject, searchTerm, searchCateList, searchTypeList } =
     useContext(ProjectContext);
 
   // local vars
@@ -61,10 +60,10 @@ const ProjectListItem = (props) => {
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-start",
-        borderBottom: 1,
+        borderBottom: index === last ? 0 : 1,
         borderColor: "divider",
         "&:hover": {
-          backgroundColor: "hoverGray.main",
+          backgroundColor: "gray100.main",
         },
         overflow: "hidden",
         paddingY: 2,
@@ -78,6 +77,7 @@ const ProjectListItem = (props) => {
           flexDirection: "row",
           alignItems: "center",
           width: "100%",
+          paddingLeft: "10px",
         }}
       >
         {/* project icon uploaded by users*/}
@@ -92,23 +92,19 @@ const ProjectListItem = (props) => {
           <UploadFileIcon />
         </Avatar>
         <Box sx={{ width: "100%" }}>
-          <ListItemText
-            disableTypography
-            primary={
-              <Typography
-                variant="h2"
-                sx={{ fontSize: "1rem", fontWeight: "bold" }}
-              >
-                {project?.title}
-              </Typography>
-            }
-          />
+          <Typography
+            variant="h2"
+            sx={{ fontSize: "1rem", fontWeight: "bold" }}
+          >
+            {project?.title}
+          </Typography>
           {projectAllTags?.length > 0 && (
             <Box sx={{ mt: 1, height: "1.75rem", overflow: "hidden" }}>
               {projectAllTags?.map((tag, index) => (
                 <Chip
                   key={index}
                   color={
+                    isStrInStrList(searchCateList, tag, true) ||
                     isStrInStrList(searchTypeList, tag, true) ||
                     searchTerm === tag
                       ? "primary"
@@ -204,74 +200,56 @@ const ProjectListItem = (props) => {
       </Box>
       <Box
         id="projectlistitem-lower-box"
-        // padding right to align with more icon
-        sx={{ mt: 2, paddingRight: "10px", width: "100%" }}
+        sx={{ mt: 2, paddingX: "10px", width: "100%" }} // padding right to align with more icon
       >
-        <ListItemText
-          secondary={
-            <Typography
-              color="text.secondary"
-              variant="body2"
-              sx={{
-                display: "-webkit-box",
-                overflow: "hidden",
-                WebkitBoxOrient: "vertical",
-                WebkitLineClamp: 1,
-              }}
-            >
-              {project?.short_description
-                ? project.short_description
-                : convert(project?.description)}
-            </Typography>
-          }
-          sx={{ mb: 2 }}
-        />
+        <Typography
+          color="text.secondary"
+          sx={{
+            mb: 1,
+            display: "-webkit-box",
+            overflow: "hidden",
+            WebkitBoxOrient: "vertical",
+            WebkitLineClamp: 1,
+            fontSize: "0.875rem",
+          }}
+        >
+          {project?.short_description
+            ? project.short_description
+            : convert(project?.description)}
+        </Typography>
         {project?.position_list?.slice(0, 3)?.map((position, index) => (
-          <ListItemText
+          <Typography
             key={index}
-            secondary={
-              <Typography
-                color="text.secondary"
-                variant="body2"
-                sx={{ fontWeight: "medium" }}
-              >
-                {position.title}
-              </Typography>
-            }
-            sx={{ margin: 0, ml: "5%" }}
-          />
+            color="text.secondary"
+            sx={{
+              fontWeight: "medium",
+              ml: "5%",
+              fontSize: "0.875rem",
+            }}
+          >
+            {position.title}
+          </Typography>
         ))}
         {project?.position_list?.length > 3 && (
-          <ListItemText
-            secondary={
-              <Typography
-                color="text.secondary"
-                variant="body2"
-                sx={{ fontWeight: "medium" }}
-              >
-                {"and more..."}
-              </Typography>
-            }
-            sx={{ margin: 0, ml: "5%" }}
-          />
+          <Typography
+            color="text.secondary"
+            sx={{ fontWeight: "medium", ml: "5%", fontSize: "0.875rem" }}
+          >
+            {"and more..."}
+          </Typography>
         )}
         {onMedia.onDesktop && (
-          <ListItemText
-            secondary={
-              <Typography
-                color="text.secondary"
-                variant="body2"
-                sx={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  fontWeight: "light",
-                }}
-              >
-                {moment(project.last_timestamp).format("MMM Do, YYYY")}
-              </Typography>
-            }
-            sx={{ mt: 2 }}
-          />
+          <Typography
+            color="text.secondary"
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              fontWeight: "light",
+              fontSize: "0.875rem",
+            }}
+          >
+            {dayjs(project.last_timestamp).format("MMM Do, YYYY")}
+          </Typography>
         )}
       </Box>
     </ListItem>

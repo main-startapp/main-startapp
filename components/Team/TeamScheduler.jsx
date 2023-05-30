@@ -1,11 +1,11 @@
 import { Box, Button, Dialog, DialogContent, Typography } from "@mui/material";
 import { useContext, useEffect, useMemo, useState } from "react";
-import moment from "moment";
-import ScheduleSelector from "react-schedule-selector";
+// import ScheduleSelector from "react-schedule-selector";
 import { useAuth } from "../Context/AuthContext";
 import { TeamContext } from "../Context/ShareContexts";
 import { db } from "../../firebase";
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import dayjs from "dayjs";
 
 const TeamScheduler = () => {
   // context
@@ -54,7 +54,7 @@ const TeamScheduler = () => {
     const minutes = date.getMinutes();
     return (
       <Typography sx={{ textAlign: "right", mr: 2 }}>
-        {minutes === 0 ? moment(date).format("h:mm a") : ""}
+        {minutes === 0 ? dayjs(date).format("h:mm a") : ""}
       </Typography>
     );
   };
@@ -133,7 +133,7 @@ const TeamScheduler = () => {
             <Button onClick={handleSubmitSchedule}>Save</Button>
           </Box>
           <Box sx={{ width: "50%" }}>
-            <ScheduleSelector
+            {/* <ScheduleSelector
               selection={schedule}
               startDate={startDate}
               dateFormat="ddd"
@@ -146,7 +146,7 @@ const TeamScheduler = () => {
               onChange={(e) => {
                 handleScheduleChange(e);
               }}
-            />
+            /> */}
           </Box>
         </DialogContent>
       </Dialog>

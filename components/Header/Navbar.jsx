@@ -12,7 +12,14 @@ const Navbar = () => {
   const url = new URL(window.location.href);
 
   return (
-    <AppBar color="background" elevation={0} position="static">
+    <AppBar
+      elevation={2}
+      sx={{
+        boxShadow: `0px 1px 2px #ccc`,
+        position: "static",
+        backgroundColor: "background.paper",
+      }}
+    >
       <Toolbar
         sx={{
           display: "flex",
@@ -21,27 +28,25 @@ const Navbar = () => {
           // "@media (min-width: 600px)": {
           //   minHeight: 0,
           // },
-          height: "65px", // 64+border
-          borderBottom: 1,
-          borderColor: "divider",
+          height: "64px",
         }}
         disableGutters
       >
         <Box
           sx={{
-            mx: 4,
+            mx: 8,
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
             //height: "100%",
             width: "100%",
-            maxWidth: "1376px",
+            maxWidth: "1312px",
           }}
         >
           {/* https://stackoverflow.com/questions/46973910/accessing-files-from-firebase-storage-vs-firebase-hosting */}
           <ExportedImage
-            src="/images/edium_v4_256.png"
+            src="/images/edium_v4_512.png"
             alt=""
             height={40}
             width={40}
@@ -52,12 +57,11 @@ const Navbar = () => {
             <NextLink href="/" style={{ color: "inherit" }}>
               <LinkIconBox url={url} pathname="/">
                 <DashboardIcon
-                  color={
-                    url.pathname === "/" ? "text.primary" : "unselectedGray"
-                  }
                   sx={{
                     height: "40px",
                     fontSize: "28px",
+                    color:
+                      url.pathname === "/" ? "text.primary" : "gray700.main",
                   }}
                 />
                 <LinkTypography url={url} pathname="/">
@@ -73,14 +77,13 @@ const Navbar = () => {
             >
               <LinkIconBox url={url} pathname="/events/">
                 <DateRangeIcon
-                  color={
-                    url.pathname === "/events/"
-                      ? "text.primary"
-                      : "unselectedGray"
-                  }
                   sx={{
                     height: "40px",
                     fontSize: "28px",
+                    color:
+                      url.pathname === "/events/"
+                        ? "text.primary"
+                        : "gray700.main",
                   }}
                 />
                 <LinkTypography url={url} pathname="/events/">
@@ -96,14 +99,13 @@ const Navbar = () => {
             >
               <LinkIconBox url={url} pathname="/students/">
                 <PeopleIcon
-                  color={
-                    url.pathname === "/students/"
-                      ? "text.primary"
-                      : "unselectedGray"
-                  }
                   sx={{
                     height: "40px",
                     fontSize: "28px",
+                    color:
+                      url.pathname === "/students/"
+                        ? "text.primary"
+                        : "gray700.main",
                   }}
                 />
                 <LinkTypography url={url} pathname="/students/">
@@ -138,5 +140,5 @@ const LinkTypography = styled(Typography)(({ theme, url, pathname }) => ({
   color:
     url.pathname === pathname
       ? theme.palette.text.primary
-      : theme.palette.unselectedGray.main,
+      : theme.palette.gray700.main,
 }));

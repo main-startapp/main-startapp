@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { AppBar, Box, Chip, Toolbar, Typography } from "@mui/material";
 import { ProjectContext } from "../Context/ShareContexts";
 import {
@@ -10,14 +10,16 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import UserIconMenu from "./UserIconMenu";
 import TuneIcon from "@mui/icons-material/Tune";
-import { typeStrList } from "../Reusable/MenuStringList";
+import { categoryStrList, projectStrList } from "../Reusable/MenuStringList";
+import { handleChipClick } from "../Project/ProjectListHeader";
 
 const MobileProjectsBar = () => {
   // context
   const {
+    setIsSearchingClicked,
     setSearchTerm,
-    searchCategory,
-    setSearchCategory,
+    searchCateList,
+    setSearchCateList,
     searchTypeList,
     setSearchTypeList,
   } = useContext(ProjectContext);
@@ -26,50 +28,20 @@ const MobileProjectsBar = () => {
   const textRef = useRef();
 
   // selector
-  const [selected, setSelected] = useState("2");
+  const [selected, setSelected] = useState("1");
 
-  // type related
-  const [typeList, setTypeList] = useState([]);
-  useEffect(() => {
-    const retList = [];
-    typeStrList.forEach((typeStr) => {
-      retList.push({ name: typeStr, isSelected: false });
-    });
-    setTypeList(retList);
-  }, []);
+  // category & type related
+  const [cateList, setCateList] = useState(
+    categoryStrList.map((cateStr) => {
+      return { name: cateStr, isSelected: false };
+    })
+  );
 
-  const handleSelect = (i) => {
-    if (typeList[i].isSelected) return;
-    // update the local type list
-    let newTypeList = [...typeList];
-    newTypeList[i] = {
-      ...newTypeList[i],
-      isSelected: true,
-    };
-    setTypeList(newTypeList);
-    // update the project type state
-    let newSearchType = [...searchTypeList];
-    newSearchType.push(newTypeList[i].name);
-    setSearchTypeList(newSearchType);
-  };
-
-  const handleRemove = (i) => {
-    if (!typeList[i].isSelected) return;
-    // update the local type list
-    let newTypeList = [...typeList];
-    newTypeList[i] = {
-      ...newTypeList[i],
-      isSelected: false,
-    };
-    setTypeList(newTypeList);
-    // update the project search type name list
-    let newSearchTypeList = [...searchTypeList];
-    newSearchTypeList = removeValueFromArray(
-      newSearchTypeList,
-      newTypeList[i].name
-    );
-    setSearchTypeList(newSearchTypeList);
-  };
+  const [typeList, setTypeList] = useState(
+    projectStrList.map((typeStr) => {
+      return { name: typeStr, isSelected: false };
+    })
+  );
 
   // const categoryComp = (
   //   <FormControl
@@ -107,7 +79,7 @@ const MobileProjectsBar = () => {
   //       }}
   //     >
   //       <MenuItem value={""}>None</MenuItem>
-  //       {typeStrList?.map((projectStr, index) => {
+  //       {projectStrList?.map((projectStr, index) => {
   //         return (
   //           <MenuItem key={index} value={projectStr}>
   //             {projectStr}
@@ -131,7 +103,7 @@ const MobileProjectsBar = () => {
             // },
             height: "80px",
             paddingX: 2,
-            backgroundColor: "background.default",
+            backgroundColor: "background.paper",
           }}
         >
           <Box
@@ -156,7 +128,7 @@ const MobileProjectsBar = () => {
                   if (e.target.value.length !== 0) return;
                   setSearchTerm("");
                 }}
-                onKeyPress={(e) => {
+                onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     setSearchTerm(e.target.value);
                   }
@@ -184,15 +156,14 @@ const MobileProjectsBar = () => {
         >
           <TuneIcon sx={{ mr: 2 }} />
           <Typography
-            onClick={() => {
-              setSelected("1");
-            }}
             sx={{
               mr: 2,
               fontSize: "1rem",
-              fontWeight: "regular",
               borderBottom: 1,
               borderColor: selected === "1" ? "white" : "primary.main",
+            }}
+            onClick={() => {
+              setSelected("1");
             }}
           >
             Category
@@ -210,18 +181,27 @@ const MobileProjectsBar = () => {
           >
             Type
           </Typography>
-          {searchTypeList.length > 0 && (
+          {searchCateList.length + searchTypeList.length > 0 && (
             <Chip
-              color="selectedWhite"
-              label={searchTypeList.length + " selected"}
+              label={
+                searchCateList.length + searchTypeList.length + " selected"
+              }
+              color="pureWhite"
               size="small"
               onDelete={() => {
-                const newTypeList = [...typeList];
-                newTypeList.forEach((type) => {
-                  if (type.isSelected) type.isSelected = false;
-                });
-                setTypeList(newTypeList);
+                setCateList(
+                  categoryStrList.map((cateStr) => {
+                    return { name: cateStr, isSelected: false };
+                  })
+                );
+                setTypeList(
+                  projectStrList.map((typeStr) => {
+                    return { name: typeStr, isSelected: false };
+                  })
+                );
+                setSearchCateList([]);
                 setSearchTypeList([]);
+                setIsSearchingClicked(true); // isSearchingClicked flag for auto set entry
               }}
               sx={{
                 position: "absolute",
@@ -251,28 +231,64 @@ const MobileProjectsBar = () => {
             },
           }}
         >
+          {selected === "1" &&
+            cateList?.map((cate, index) => (
+              <Chip
+                key={index}
+                clickable={false}
+                color={cate.isSelected ? "pureWhite" : "lightPrimary"}
+                label={cate.name}
+                size="small"
+                onClick={() => {
+                  handleChipClick(
+                    index,
+                    cateList,
+                    setCateList,
+                    searchCateList,
+                    setSearchCateList,
+                    setIsSearchingClicked
+                  );
+                }}
+                sx={{
+                  mr: 1,
+                  fontSize: "0.75rem",
+                  fontWeight: "medium",
+                  "&.MuiChip-root:hover": {
+                    backgroundColor: cate.isSelected
+                      ? "pureWhite.main"
+                      : "lightPrimary.main",
+                  },
+                  "& .MuiChip-deleteIcon": {
+                    color: "primary.main",
+                  },
+                }}
+              />
+            ))}
           {selected === "2" &&
             typeList?.map((type, index) => (
               <Chip
                 key={index}
-                color={type.isSelected ? "selectedWhite" : "lightPrimary"}
+                clickable={false}
+                color={type.isSelected ? "pureWhite" : "lightPrimary"}
                 label={type.name}
                 size="small"
                 onClick={() => {
-                  handleSelect(index);
+                  handleChipClick(
+                    index,
+                    typeList,
+                    setTypeList,
+                    searchTypeList,
+                    setSearchTypeList,
+                    setIsSearchingClicked
+                  );
                 }}
-                {...(type.isSelected && {
-                  onDelete: () => {
-                    handleRemove(index);
-                  },
-                })}
                 sx={{
                   mr: 1,
                   fontSize: "0.75rem",
                   fontWeight: "medium",
                   "&.MuiChip-root:hover": {
                     backgroundColor: type.isSelected
-                      ? "selectedWhite.main"
+                      ? "pureWhite.main"
                       : "lightPrimary.main",
                   },
                   "& .MuiChip-deleteIcon": {

@@ -238,7 +238,7 @@ export const isStrInStr = (str, subStr, isExact) => {
 };
 
 //============================================================
-// utility function: whether substring is in a list of obj / string
+// utility function: whether substring is in a list of objs or a list of strings
 //============================================================
 export const isStrInStrList = (strList, subStr, isExact) => {
   return strList.some((str) => isStrInStr(str, subStr, isExact));
@@ -286,46 +286,74 @@ export const shallowUpdateURLQuery = (pathName, queryKey, queryValue) => {
 export const DefaultFormControl = styled(FormControl)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
     borderRadius: theme.shape.borderRadius * 2,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: theme.palette.gray100.main,
+    "& fieldset": {
+      border: "none",
+    },
+    "&:hover fieldset": {
+      border: "none",
+    },
+    "&.Mui-focused fieldset": {
+      border: "none",
+    },
   },
-  "& .MuiOutlinedInput-notchedOutline": {
-    border: "none",
-  },
-  "&:hover .MuiOutlinedInput-notchedOutline": {
-    border: "none",
-  },
-  ".MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    border: "none",
+  // "& .MuiOutlinedInput-notchedOutline": {
+  //   border: "none",
+  // },
+  // "&:hover .MuiOutlinedInput-notchedOutline": {
+  //   border: "none",
+  // },
+  // ".MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+  //   border: "none",
+  // },
+  "& .MuiFormHelperText-root": {
+    color: "lightgray",
+    height: "1.5rem", // 24px
+    fontSize: "0.75rem", // 12px
   },
   "& .MuiFormLabel-root": {
     fontWeight: theme.typography.fontWeightMedium,
-    color: theme.palette.placholderGray.main,
-    fontSize: "16px",
+    color: theme.palette.gray500.main,
+    fontSize: "1rem",
   },
 }));
 
 export const DefaultTextField = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
     borderRadius: theme.shape.borderRadius * 2,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: theme.palette.gray100.main,
+    "& fieldset": {
+      border: "none",
+    },
+    "&:hover fieldset": {
+      border: "none",
+    },
+    "&.Mui-focused fieldset": {
+      border: "none",
+    },
   },
-  "& .MuiOutlinedInput-notchedOutline": {
-    border: "none",
-  },
-  "&:hover .MuiOutlinedInput-notchedOutline": {
-    border: "none",
-  },
-  "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    border: "none",
-  },
+  // "& .MuiOutlinedInput-input": {
+  //   padding: "16px",
+  // },
+  // "& .MuiOutlinedInput-notchedOutline": {
+  //   border: "none",
+  // },
+  // "&:hover .MuiOutlinedInput-notchedOutline": {
+  //   border: "none",
+  // },
+  // "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+  //   border: "none",
+  // },
   "& .MuiFormHelperText-root": {
     color: "lightgray",
-    fontSize: "12px",
+    height: "1.5rem", // 24px
+    fontSize: "0.75rem", // 12px
   },
   "& .MuiFormLabel-root": {
     fontWeight: theme.typography.fontWeightMedium,
-    color: theme.palette.placholderGray.main,
+    color: theme.palette.gray500.main,
     fontSize: "1rem",
+    zIndex: 1,
   },
 }));
 
@@ -335,7 +363,7 @@ export const SearchBox = styled(Box)(({ theme }) => ({
   maxHeight: "36px",
   border: 0,
   borderRadius: theme.shape.borderRadius * 2,
-  backgroundColor: theme.palette.searchGary.main,
+  backgroundColor: theme.palette.gray300.main,
   // ":hover": { backgroundColor: "#3e95c2" },
   display: "flex",
   alignItems: "center",
@@ -367,14 +395,14 @@ export const FixedHeightPaper = styled(Paper)(
   ({ theme, isdesktop, mobileheight }) => ({
     display: "flex",
     flexDirection: "column",
-    height: isdesktop ? `calc(100dvh - 65px - ${theme.spacing(4)})` : "auto", // onDesktop: fixed height, onMobile: auto to enable hiding address bar
+    height: isdesktop ? `calc(100dvh - 64px - ${theme.spacing(4)})` : "auto", // onDesktop: fixed height, onMobile: auto to enable hiding address bar
     minHeight: isdesktop
-      ? `calc(100dvh - 65px - ${theme.spacing(4)})`
-      : `calc(100dvh - ${mobileheight}px - ${theme.spacing(2)} - 64px)`,
+      ? `calc(100dvh - 64px - ${theme.spacing(4)})`
+      : `calc(100dvh - ${mobileheight}px - 64px)`,
     marginTop: isdesktop ? 0 : `${mobileheight}px`, // mobile top bar
     marginBottom: isdesktop ? 0 : "64px", // mobile bottom navbar
     borderTop: isdesktop ? `1px solid ${theme.palette.divider}` : 0,
-    borderRadius: isdesktop ? "32px 32px 0px 0px" : "32px 0px 0px 0px",
+    borderRadius: isdesktop ? "32px 32px 0px 0px" : "0px 0px 0px 0px",
   })
 );
 

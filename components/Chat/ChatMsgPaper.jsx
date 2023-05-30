@@ -23,6 +23,7 @@ const ChatMsgPaper = () => {
         backgroundColor: "background.paper",
         display: "flex",
         flexDirection: "column",
+        zIndex: 100,
       }}
     >
       <ChatMsg isMaximized={isMaximized} setIsMaximized={setIsMaximized} />

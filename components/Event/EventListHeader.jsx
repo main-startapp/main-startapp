@@ -2,26 +2,28 @@ import { Box, Chip, Collapse, Tab, Typography } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { styled } from "@mui/material/styles";
 import {
-  removeValueFromArray,
   SearchBox,
   SearchIconWrapper,
   StyledInputBase,
 } from "../Reusable/Resusable";
 import SearchIcon from "@mui/icons-material/Search";
 import { EventContext } from "../Context/ShareContexts";
-import { useContext, useEffect, useRef, useState } from "react";
-import { eventStrList } from "../Reusable/MenuStringList";
+import { useContext, useRef, useState } from "react";
+import { categoryStrList, eventStrList } from "../Reusable/MenuStringList";
+import { handleChipClick } from "../Project/ProjectListHeader";
 
 const EventListHeader = () => {
   const {
     setIsSearchingClicked,
     setSearchTerm,
+    searchCateList,
+    setSearchCateList,
     searchTypeList,
     setSearchTypeList,
   } = useContext(EventContext);
 
   // tabs related
-  const [tabValue, setTabValue] = useState("2");
+  const [tabValue, setTabValue] = useState("1");
   const handleChange = (event, newValue) => {
     setTabValue(newValue);
   };
@@ -44,52 +46,18 @@ const EventListHeader = () => {
   document.addEventListener("mousedown", handleCollapse);
   window.addEventListener("wheel", handleCollapse);
 
-  // type related
-  const [typeList, setTypeList] = useState([]);
-  useEffect(() => {
-    const retList = [];
-    eventStrList.forEach((typeStr) => {
-      retList.push({ name: typeStr, isSelected: false });
-    });
-    setTypeList(retList);
-  }, []);
+  // category & type related
+  const [cateList, setCateList] = useState(
+    categoryStrList.map((cateStr) => {
+      return { name: cateStr, isSelected: false };
+    })
+  );
 
-  const handleSelect = (i) => {
-    if (typeList[i].isSelected) return;
-    // update the local type list
-    let newTypeList = [...typeList];
-    newTypeList[i] = {
-      ...newTypeList[i],
-      isSelected: true,
-    };
-    setTypeList(newTypeList);
-    // update the event type state
-    let newSearchType = [...searchTypeList];
-    newSearchType.push(newTypeList[i].name);
-    setSearchTypeList(newSearchType);
-    // isSearchingClicked flag for auto set entry
-    setIsSearchingClicked(true);
-  };
-
-  const handleRemove = (i) => {
-    if (!typeList[i].isSelected) return;
-    // update the local type list
-    let newTypeList = [...typeList];
-    newTypeList[i] = {
-      ...newTypeList[i],
-      isSelected: false,
-    };
-    setTypeList(newTypeList);
-    // update the event search type name list
-    let newSearchTypeList = [...searchTypeList];
-    newSearchTypeList = removeValueFromArray(
-      newSearchTypeList,
-      newTypeList[i].name
-    );
-    setSearchTypeList(newSearchTypeList);
-    // isSearchingClicked flag for auto set entry
-    setIsSearchingClicked(true);
-  };
+  const [typeList, setTypeList] = useState(
+    eventStrList.map((typeStr) => {
+      return { name: typeStr, isSelected: false };
+    })
+  );
 
   return (
     <Box
@@ -118,7 +86,7 @@ const EventListHeader = () => {
             setSearchTerm("");
             setIsSearchingClicked(true); // isSearchingClicked flag for auto set entry
           }}
-          onKeyPress={(e) => {
+          onKeyDown={(e) => {
             if (e.key === "Enter") {
               setSearchTerm(e.target.value);
               setIsSearchingClicked(true); // isSearchingClicked flag for auto set entry
@@ -134,7 +102,7 @@ const EventListHeader = () => {
             onChange={handleChange}
             sx={{ minHeight: 0, borderBottom: 1, borderColor: "divider" }}
           >
-            {/* <StyledTab label="Category" value="1" /> */}
+            <StyledTab label="Category" value="1" />
             <StyledTab label="Type" value="2" />
           </TabList>
           <Box id="eventlist-positionref-box" sx={{ position: "relative" }}>
@@ -149,7 +117,7 @@ const EventListHeader = () => {
                 zIndex: 1,
               }}
             >
-              {/* <TabPanel
+              <TabPanel
                 value="1"
                 sx={{
                   backgroundColor: "background.paper",
@@ -158,45 +126,70 @@ const EventListHeader = () => {
                   borderColor: "divider",
                 }}
               >
-                Item One
-              </TabPanel> */}
-              <TabPanel
-                value="2"
-                sx={{
-                  backgroundColor: "background.paper",
-                  borderRadius: "0px 0px 8px 8px",
-                  // borderBottom: 1,
-                  // borderColor: "divider",
-                  paddingTop: 2,
-                  paddingBottom: 1,
-                  paddingX: 2,
-                  boxShadow: 2,
-                }}
-              >
-                {typeList?.map((type, index) => (
+                {cateList?.map((cate, index) => (
                   <Chip
+                    clickable={false}
                     key={index}
-                    color={type.isSelected ? "primary" : "lightPrimary"}
-                    label={type.name}
+                    color={cate.isSelected ? "primary" : "lightPrimary"}
+                    label={cate.name}
                     size="medium"
                     onClick={() => {
-                      handleSelect(index);
+                      handleChipClick(
+                        index,
+                        cateList,
+                        setCateList,
+                        searchCateList,
+                        setSearchCateList,
+                        setIsSearchingClicked
+                      );
                     }}
-                    {...(type.isSelected && {
-                      onDelete: () => {
-                        handleRemove(index);
-                      },
-                    })}
                     sx={{
                       mr: 1,
                       mb: 1,
                       fontSize: "0.75rem",
                       fontWeight: "medium",
-                      "&.MuiChip-root:hover": {
-                        backgroundColor: type.isSelected
-                          ? "primary.main"
-                          : "lightPrimary.main",
-                      },
+                    }}
+                  />
+                ))}
+              </TabPanel>
+              <TabPanel
+                value="2"
+                sx={{
+                  backgroundColor: "background.paper",
+                  borderRadius: "0px 0px 8px 8px",
+                  paddingTop: 2,
+                  paddingBottom: 1,
+                  paddingX: 2,
+                  boxShadow: `0px 1px 2px #ccc`,
+                }}
+              >
+                {typeList?.map((type, index) => (
+                  <Chip
+                    key={index}
+                    clickable={false}
+                    color={type.isSelected ? "primary" : "lightPrimary"}
+                    label={type.name}
+                    size="medium"
+                    onClick={() => {
+                      handleChipClick(
+                        index,
+                        typeList,
+                        setTypeList,
+                        searchTypeList,
+                        setSearchTypeList,
+                        setIsSearchingClicked
+                      );
+                    }}
+                    sx={{
+                      mr: 1,
+                      mb: 1,
+                      fontSize: "0.75rem",
+                      fontWeight: "medium",
+                      // "&.MuiChip-root:hover": {
+                      //   backgroundColor: type.isSelected
+                      //     ? "primary.main"
+                      //     : "lightPrimary.main",
+                      // },
                     }}
                   />
                 ))}
@@ -204,20 +197,25 @@ const EventListHeader = () => {
             </Collapse>
           </Box>
         </TabContext>
-        {searchTypeList.length > 0 && (
+        {searchCateList.length + searchTypeList.length > 0 && (
           <Chip
-            label={searchTypeList.length + " selected"}
+            label={searchCateList.length + searchTypeList.length + " selected"}
             color="primary"
             size="small"
             onDelete={() => {
-              const newTypeList = [...typeList];
-              newTypeList.forEach((type) => {
-                if (type.isSelected) type.isSelected = false;
-              });
-              setTypeList(newTypeList);
+              setCateList(
+                categoryStrList.map((cateStr) => {
+                  return { name: cateStr, isSelected: false };
+                })
+              );
+              setTypeList(
+                eventStrList.map((typeStr) => {
+                  return { name: typeStr, isSelected: false };
+                })
+              );
+              setSearchCateList([]);
               setSearchTypeList([]);
               setIsSearchingClicked(true); // isSearchingClicked flag for auto set entry
-              handleExpand(); // !todo: is this consistent behavior?
             }}
             sx={{
               height: "24px",

@@ -95,6 +95,7 @@ const ChatAccordion = () => {
         "&.MuiAccordion-root::before": {
           opacity: 0,
         },
+        zIndex: 100,
       }}
       disableGutters
     >

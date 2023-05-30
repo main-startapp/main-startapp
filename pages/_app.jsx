@@ -1,16 +1,24 @@
+// css import
 import "../styles/globals.css";
-import "../styles/quill.snow.css";
+import "../styles/fc.css";
+import "../styles/rsme.css";
+// font weight
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
+// react
 import { useState, useMemo, useEffect } from "react";
+// next
+import Head from "next/head";
+// mui
 import { CssBaseline } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { grey } from "@mui/material/colors";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+// edium
 import { AuthProvider } from "../components/Context/AuthContext";
 import { GlobalContext } from "../components/Context/ShareContexts";
 import Navbar from "../components/Header/Navbar";
@@ -19,7 +27,6 @@ import ChatMsgPaper from "../components/Chat/ChatMsgPaper";
 import DBListener from "../components/DBListener";
 import MobileBottomNav from "../components/Header/MobileBottomNav";
 import useWindowDimensions from "../components/Reusable/WindowDimensions";
-import Head from "next/head";
 
 // makeStyles, useStyles, createStyles, withStyles, styled
 // https://smartdevpreneur.com/material-ui-makestyles-usestyles-createstyles-and-withstyles-explained/
@@ -42,20 +49,20 @@ const getDesignTokens = (mode, onMedia) => ({
             main: "#e5eeff",
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
-          selectedWhite: {
+          pureWhite: {
             main: "#fff",
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
-          unselectedGray: {
+          gray700: {
             main: grey[700],
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
-          placholderGray: {
+          gray500: {
             main: grey[500],
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
-          searchGary: { main: grey[300], contrastText: "rgba(0, 0, 0, 0.87)" },
-          hoverGray: { main: grey[100], contrastText: "rgba(0, 0, 0, 0.87)" },
+          gray300: { main: grey[300], contrastText: "rgba(0, 0, 0, 0.87)" },
+          gray100: { main: grey[100], contrastText: "rgba(0, 0, 0, 0.87)" },
 
           adminOrange: { main: "#f4511e", contrastText: "#fff" },
         }
@@ -65,17 +72,17 @@ const getDesignTokens = (mode, onMedia) => ({
           secondary: { main: "#6ff9d1" },
 
           lightPrimary: {
-            main: "#E5EEFF",
+            main: "#e5eeff",
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
-          selectedWhite: {
+          pureWhite: {
             main: "#fff",
             contrastText: "rgba(0, 0, 0, 0.87)",
           },
-          unselectedGray: { main: grey[700], contrastText: "#fff" },
-          placholderGray: { main: grey[500], contrastText: "#fff" },
-          searchGary: { main: grey[600], contrastText: "#fff" },
-          hoverGray: { main: grey[800], contrastText: "#fff" },
+          gray700: { main: grey[700], contrastText: "#fff" },
+          gray500: { main: grey[500], contrastText: "#fff" },
+          gray300: { main: grey[600], contrastText: "#fff" },
+          gray100: { main: grey[800], contrastText: "#fff" },
 
           adminOrange: { main: "#f4511e", contrastText: "#fff" },
         }),
@@ -228,7 +235,7 @@ function MyApp({ Component, pageProps }) {
         <link rel="icon" href="/images/favicon.ico" />
       </Head>
       <AuthProvider>
-        <LocalizationProvider dateAdapter={AdapterMoment}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
           <GlobalContext.Provider
             value={{
               projects,
