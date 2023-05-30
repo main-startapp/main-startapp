@@ -133,8 +133,8 @@ const DBListener = () => {
     const q = query(
       collectionRef,
       where("is_deleted", "==", false),
-      where("end_date", ">", daysAgo(90)),
-      orderBy("end_date", "asc")
+      where("end_date", ">", daysAgo(180)),
+      orderBy("end_date", "desc")
     );
 
     const unsub = onSnapshot(

@@ -39,11 +39,12 @@ const EventListItem = ({ index, fullEvent, last }) => {
   const eventAllTags = fullEvent.allTags;
 
   // time related
-  const startMoment = dayjs(event?.start_date);
-  const endMoment = dayjs(event?.end_date);
-  const isExpired = dayjs().isAfter(endMoment);
-  const isSameDay = startMoment.format("L") === endMoment.format("L");
-  const isSameTime = startMoment.format("LLL") === endMoment.format("LLL");
+  const startDate = dayjs(event?.start_date);
+  const endDate = dayjs(event?.end_date);
+  //const isExpired = dayjs().isAfter(endDate);
+  const isExpired = dayjs("2023-1-9").isAfter(endDate); // special case everything before this spring term is expired
+  const isSameDay = startDate.format("L") === endDate.format("L");
+  const isSameTime = startDate.format("LLL") === endDate.format("LLL");
 
   // menu
   const [anchorEl, setAnchorEl] = useState(null);
@@ -58,7 +59,7 @@ const EventListItem = ({ index, fullEvent, last }) => {
   };
 
   // reusable comps
-  const UniversalAvatar = ({ lengthStr, variant }) => {
+  const AvatarIcon = ({ lengthStr, variant }) => {
     return (
       <Avatar
         sx={{
@@ -115,88 +116,6 @@ const EventListItem = ({ index, fullEvent, last }) => {
     ));
   };
 
-  const MoreIcon = () => {
-    return (
-      <IconButton
-        id="eventlistitem-menu-button"
-        aria-controls={open ? "eventlistitem-menu" : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? "true" : undefined}
-        onClick={(e) => {
-          handleMenuClick(e);
-        }}
-        sx={{ padding: 0 }}
-      >
-        <MoreVertIcon />
-      </IconButton>
-    );
-  };
-
-  const MoreMenu = () => {
-    return (
-      <Menu
-        id="eventlistitem-menu"
-        anchorEl={anchorEl}
-        open={open}
-        onClose={(e) => {
-          handleMenuClose(e);
-        }}
-        MenuListProps={{
-          "aria-labelledby": "eventlistitem-menu-button",
-        }}
-      >
-        {ediumUser?.uid === event?.creator_uid && (
-          <MenuItem
-            onClick={(e) => {
-              handleMenuClose(e);
-            }}
-          >
-            <NextLink
-              href={{
-                pathname: "/events/create",
-                query: { eventID: event?.id },
-              }}
-              as="/events/create"
-              passHref
-              style={{
-                color: "inherit",
-              }}
-            >
-              Modify
-            </NextLink>
-          </MenuItem>
-        )}
-        {ediumUser?.uid === event?.creator_uid && (
-          <MenuItem
-            onClick={(e) => {
-              handleVisibility("events", event);
-              handleMenuClose(e);
-            }}
-          >
-            {event?.is_visible ? "Hide" : "Display"}
-          </MenuItem>
-        )}
-        {ediumUser?.uid === event?.creator_uid && (
-          <MenuItem
-            onClick={(e) => {
-              handleDeleteEntry(
-                "events",
-                "evets_ext",
-                "my_event_ids",
-                event?.id,
-                ediumUser?.uid
-              );
-              setFullEvent(null);
-              handleMenuClose(e);
-            }}
-          >
-            Delete
-          </MenuItem>
-        )}
-      </Menu>
-    );
-  };
-
   const TimeItemText = ({ fontSize }) => {
     return (
       <Typography
@@ -210,11 +129,11 @@ const EventListItem = ({ index, fullEvent, last }) => {
         }}
       >
         {isSameDay
-          ? startMoment.format("MMM Do h:mm a") +
-            (isSameTime ? "" : " - " + endMoment.format("h:mm a"))
-          : startMoment.format("MMM Do h:mm a") +
+          ? startDate.format("MMM Do h:mm a") +
+            (isSameTime ? "" : " - " + endDate.format("h:mm a"))
+          : startDate.format("MMM Do h:mm a") +
             " - " +
-            endMoment.format("MMM Do h:mm a")}
+            endDate.format("MMM Do h:mm a")}
       </Typography>
     );
   };
@@ -285,7 +204,7 @@ const EventListItem = ({ index, fullEvent, last }) => {
             }}
           >
             {/* event icon uploaded by users*/}
-            <UniversalAvatar lengthStr="48px" variant="circular" />
+            <AvatarIcon lengthStr="48px" variant="circular" />
             <Box sx={{ display: "flex", flexDirection: "column" }}>
               <TitleItemText />
               <Box sx={{ mt: 1, height: "1.5rem", overflow: "hidden" }}>
@@ -294,8 +213,78 @@ const EventListItem = ({ index, fullEvent, last }) => {
             </Box>
             {ediumUser?.uid === event?.creator_uid && (
               <>
-                <MoreIcon />
-                <MoreMenu />
+                <IconButton
+                  id="eventlistitem-menu-button"
+                  aria-controls={open ? "eventlistitem-menu" : undefined}
+                  aria-haspopup="true"
+                  aria-expanded={open ? "true" : undefined}
+                  onClick={(e) => {
+                    handleMenuClick(e);
+                  }}
+                  sx={{ padding: 0 }}
+                >
+                  <MoreVertIcon />
+                </IconButton>
+                <Menu
+                  id="eventlistitem-menu"
+                  anchorEl={anchorEl}
+                  open={open}
+                  onClose={(e) => {
+                    handleMenuClose(e);
+                  }}
+                  MenuListProps={{
+                    "aria-labelledby": "eventlistitem-menu-button",
+                  }}
+                >
+                  {ediumUser?.uid === event?.creator_uid && (
+                    <MenuItem
+                      onClick={(e) => {
+                        handleMenuClose(e);
+                      }}
+                    >
+                      <NextLink
+                        href={{
+                          pathname: "/events/create",
+                          query: { eventID: event?.id },
+                        }}
+                        as="/events/create"
+                        passHref
+                        style={{
+                          color: "inherit",
+                        }}
+                      >
+                        Modify
+                      </NextLink>
+                    </MenuItem>
+                  )}
+                  {ediumUser?.uid === event?.creator_uid && (
+                    <MenuItem
+                      onClick={(e) => {
+                        handleVisibility("events", event);
+                        handleMenuClose(e);
+                      }}
+                    >
+                      {event?.is_visible ? "Hide" : "Display"}
+                    </MenuItem>
+                  )}
+                  {ediumUser?.uid === event?.creator_uid && (
+                    <MenuItem
+                      onClick={(e) => {
+                        handleDeleteEntry(
+                          "events",
+                          "evets_ext",
+                          "my_event_ids",
+                          event?.id,
+                          ediumUser?.uid
+                        );
+                        setFullEvent(null);
+                        handleMenuClose(e);
+                      }}
+                    >
+                      Delete
+                    </MenuItem>
+                  )}
+                </Menu>
               </>
             )}
           </Box>
@@ -311,7 +300,7 @@ const EventListItem = ({ index, fullEvent, last }) => {
       ) : (
         <>
           <Box sx={{ display: "flex", flexDirection: "row" }}>
-            <UniversalAvatar lengthStr="88px" variant="rounded" />
+            <AvatarIcon lengthStr="88px" variant="rounded" />
             <Box sx={{ display: "flex", flexDirection: "column" }}>
               <TitleItemText />
               <Box sx={{ mt: "4px", height: "1.5rem", overflow: "hidden" }}>
@@ -361,11 +350,11 @@ export default EventListItem;
                 {event.category}
                 <br />
                 {isSameDay
-                  ? startMoment.format("MMM Do h:mm a") +
-                    (isSameTime ? "" : " - " + endMoment.format("h:mm a"))
-                  : startMoment.format("MMM Do h:mm a") +
+                  ? startDate.format("MMM Do h:mm a") +
+                    (isSameTime ? "" : " - " + endDate.format("h:mm a"))
+                  : startDate.format("MMM Do h:mm a") +
                     " - " +
-                    endMoment.format("MMM Do h:mm a")}
+                    endDate.format("MMM Do h:mm a")}
               </>
             }
           /> */

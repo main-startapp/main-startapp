@@ -38,14 +38,14 @@ const EventList = () => {
 
   // event list with predefined sorting
   const sortedFullEvents = useMemo(() => {
-    const eventsLength = fullEvents.length;
-    for (let i = eventsLength - 1; i > -1; i--) {
-      if (dayjs().isAfter(dayjs(fullEvents[i].event.end_date))) {
-        let temp = fullEvents[i];
-        fullEvents.splice(i, 1);
-        fullEvents.push(temp);
-      }
-    }
+    // const eventsLength = fullEvents.length;
+    // for (let i = eventsLength - 1; i > -1; i--) {
+    //   if (dayjs().isAfter(dayjs(fullEvents[i].event.end_date))) {
+    //     let temp = fullEvents[i];
+    //     fullEvents.splice(i, 1);
+    //     fullEvents.push(temp);
+    //   }
+    // }
     return fullEvents;
   }, [fullEvents]);
 
