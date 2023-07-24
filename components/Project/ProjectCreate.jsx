@@ -1,6 +1,4 @@
-// react
 import { useContext, useEffect, useRef, useState } from "react";
-// mui
 import {
   Autocomplete,
   Box,
@@ -25,7 +23,6 @@ import { useTheme } from "@mui/material/styles";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
 import AddLinkIcon from "@mui/icons-material/AddLink";
-// firebase
 import {
   collection,
   doc,
@@ -36,7 +33,6 @@ import {
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
-// edium
 import { db } from "../../firebase";
 import { useAuth } from "../Context/AuthContext";
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
@@ -53,7 +49,6 @@ import {
   categoryStrList,
 } from "../Reusable/MenuStringList";
 import { StyledDateTimeField } from "../Event/EventCreate";
-// next
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
 import SlateEditor from "../SlateEditor";
@@ -73,8 +68,8 @@ const ProjectCreate = (props) => {
   const [isClickable, setIsClickable] = useState(true); // button state to prevent click spam
 
   // can be wrapped up in useMemo if necessary, no premature optimization
-  const oldProject = props.projectID
-    ? findItemFromList(projects, "id", props.projectID)
+  const oldProject = props.projectId
+    ? findItemFromList(projects, "id", props.projectId)
     : null;
 
   // init new project
@@ -188,17 +183,17 @@ const ProjectCreate = (props) => {
       });
     }
 
-    let retID;
+    let retId;
     await projectModRef.then((ret) => {
-      retID = ret?.id;
+      retId = ret?.id;
     });
 
-    // retID: create; !retID: update
-    if (retID) {
+    // retId: create; !retId: update
+    if (retId) {
       // add to my_project_ids in user ext data if create
       const ediumUserExtDocRef = doc(db, "users_ext", ediumUser?.uid);
       const ediumUserExtUpdateRef = {
-        my_project_ids: arrayUnion(retID),
+        my_project_ids: arrayUnion(retId),
         last_timestamp: serverTimestamp(),
       };
       const ediumUserExtModRef = updateDoc(
@@ -209,7 +204,7 @@ const ProjectCreate = (props) => {
       });
 
       // create extension doc for team management if create
-      const extDocRef = doc(db, "projects_ext", retID);
+      const extDocRef = doc(db, "projects_ext", retId);
       const projectExtRef = {
         is_deleted: false,
         members: [ediumUser?.uid],
@@ -275,16 +270,16 @@ const ProjectCreate = (props) => {
       });
     }
 
-    let retID;
+    let retId;
     await projectModRef.then((ret) => {
-      retID = ret?.id;
+      retId = ret?.id;
     });
 
-    // retID: create; !retID: update
-    if (retID) {
+    // retId: create; !retId: update
+    if (retId) {
       // don't add project id to my_project_ids
       // do create extenion doc with extra field
-      const extDocRef = doc(db, "projects_ext", retID);
+      const extDocRef = doc(db, "projects_ext", retId);
       const projectExtRef = {
         is_deleted: false,
         members: [ediumUser?.uid],
@@ -355,12 +350,12 @@ const ProjectCreate = (props) => {
   };
 
   // call deleteEntry BE function
-  const handleDelete = (docID) => {
+  const handleDelete = (docId) => {
     handleDeleteEntry(
       "projects",
       "projects_ext",
       "my_project_ids",
-      docID,
+      docId,
       ediumUser?.uid
     );
 

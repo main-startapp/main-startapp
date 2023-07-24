@@ -1,7 +1,5 @@
-// react
 import { forwardRef, useEffect, useMemo, useRef } from "react";
 import ReactDOM from "react-dom";
-// slate
 import {
   createEditor,
   Editor,
@@ -19,12 +17,9 @@ import {
   useSelected,
 } from "slate-react";
 import { withHistory } from "slate-history";
-// misc libs
 import isHotkey, { isKeyHotkey } from "is-hotkey";
 import isUrl from "is-url";
-// emotion
 import { cx, css } from "@emotion/css";
-// icons
 import {
   MdFormatBold,
   MdFormatItalic,

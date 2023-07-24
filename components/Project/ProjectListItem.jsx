@@ -1,8 +1,5 @@
-// react
 import { useContext, useState } from "react";
-// next
 import NextLink from "next/link";
-// mui
 import {
   Avatar,
   Box,
@@ -15,29 +12,22 @@ import {
 } from "@mui/material";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-// edium
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import {
   handleDeleteEntry,
   handleVisibility,
   isStrInStrList,
 } from "../Reusable/Resusable";
-// misc libs
 import { convert } from "html-to-text";
 import dayjs from "dayjs";
 
 // the project list item component in the project list: has full project data but only shows some brief information
 // prefer not doing any dynamic calculation in this leaf component
-const ProjectListItem = ({ index, fullProject, last }) => {
+const ProjectListItem = ({ index, project, last }) => {
   // context
   const { ediumUser, onMedia } = useContext(GlobalContext);
-  const { setFullProject, searchTerm, searchCateList, searchTypeList } =
+  const { setCurProject, searchTerm, searchCateList, searchTypeList } =
     useContext(ProjectContext);
-
-  // local vars
-  const project = fullProject.project;
-  const projectCreator = fullProject.creator_uid;
-  const projectAllTags = fullProject.allTags;
 
   // menu
   const [anchorEl, setAnchorEl] = useState(null);
@@ -54,7 +44,7 @@ const ProjectListItem = ({ index, fullProject, last }) => {
   return (
     <ListItem
       onClick={() => {
-        setFullProject(fullProject);
+        setCurProject(project);
       }}
       sx={{
         display: "flex",
@@ -98,9 +88,9 @@ const ProjectListItem = ({ index, fullProject, last }) => {
           >
             {project?.title}
           </Typography>
-          {projectAllTags?.length > 0 && (
+          {project?.tags?.length > 0 && (
             <Box sx={{ mt: 1, height: "1.75rem", overflow: "hidden" }}>
-              {projectAllTags?.map((tag, index) => (
+              {project.tags.map((tag, index) => (
                 <Chip
                   key={index}
                   color={
@@ -157,7 +147,7 @@ const ProjectListItem = ({ index, fullProject, last }) => {
               <NextLink
                 href={{
                   pathname: "/projects/create",
-                  query: { projectID: project?.id },
+                  query: { projectId: project?.id },
                 }}
                 as="/projects/create"
                 passHref
@@ -189,7 +179,7 @@ const ProjectListItem = ({ index, fullProject, last }) => {
                   project?.id,
                   ediumUser?.uid
                 );
-                setFullProject(null);
+                setCurProject(null);
                 handleMenuClose(e);
               }}
             >

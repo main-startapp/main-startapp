@@ -1,8 +1,5 @@
-// react
 import { useContext, useState } from "react";
-// next
 import NextLink from "next/link";
-// mui
 import {
   Avatar,
   Box,
@@ -15,14 +12,12 @@ import {
 } from "@mui/material";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-// edium
 import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import {
   handleDeleteEntry,
   handleVisibility,
   isStrInStrList,
 } from "../Reusable/Resusable";
-// misc libs
 import dayjs from "dayjs";
 import { FaClock, FaMapPin } from "react-icons/fa";
 
@@ -245,7 +240,7 @@ const EventListItem = ({ index, fullEvent, last }) => {
                       <NextLink
                         href={{
                           pathname: "/events/create",
-                          query: { eventID: event?.id },
+                          query: { eventId: event?.id },
                         }}
                         as="/events/create"
                         passHref

@@ -72,7 +72,7 @@ const Create = () => {
             maxWidth: "1024px",
           }}
         >
-          <ProjectCreate projectID={query?.projectID} />
+          <ProjectCreate projectId={query?.projectId} />
         </Box>
       </Box>
     </ProjectContext.Provider>

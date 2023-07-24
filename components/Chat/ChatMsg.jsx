@@ -56,10 +56,10 @@ const ChatMsg = (props) => {
   });
   const [messages, setMessages] = useState([]);
   useEffect(() => {
-    const chatID = chat?.id;
-    if (!chatID) return;
+    const chatId = chat?.id;
+    if (!chatId) return;
 
-    const collectionRef = collection(db, "chats", chatID, "messages");
+    const collectionRef = collection(db, "chats", chatId, "messages");
     const q = query(collectionRef, orderBy("sent_at", "asc"));
 
     const unsub = onSnapshot(q, (querySnapshot) => {

@@ -1,6 +1,4 @@
-// react
 import { useContext, useEffect, useState } from "react";
-// mui
 import {
   Accordion,
   AccordionDetails,
@@ -15,9 +13,7 @@ import {
 import { styled } from "@mui/material/styles";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-// edium
-import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
-// firebase
+import { GlobalContext } from "../Context/ShareContexts";
 import { db } from "../../firebase";
 import {
   addDoc,
@@ -33,13 +29,12 @@ import dayjs from "dayjs";
 // prefer not doing any dynamic calculation in this leaf component
 const PositionListItem = (props) => {
   const index = props.index;
-  const posID = props.posID;
+  const posId = props.posId;
   const posTitle = props.posTitle || "";
   const posResp = props.posResp || "";
   const posWeeklyHour = props.posWeeklyHour || "";
   const appURL = props.appURL || "";
   const appDeadline = props.appDeadline || "";
-  const creator = props.creator || null; // creator's user data
 
   // context
   const {
@@ -50,17 +45,15 @@ const PositionListItem = (props) => {
     setForceChatExpand,
     onMedia,
   } = useContext(GlobalContext);
-  const { fullProject } = useContext(ProjectContext);
 
   // local var
-  const project = fullProject?.project;
   const dayDiff = appDeadline ? dayjs().diff(appDeadline, "days") : ""; // +: past; -: future
 
   // useEffect to reset accordion expansion
   const [expandState, setExpandState] = useState("collapseIt");
   useEffect(() => {
     setExpandState("collpaseIt");
-  }, [fullProject]); // every time project changes, this sets each accordion to collapse
+  }, []);
 
   const handleExpand = (e) => {
     expandState === "expandIt"
@@ -83,7 +76,7 @@ const PositionListItem = (props) => {
       "join_requests"
     );
     const jrDocRef = {
-      position_id: posID,
+      position_id: posId,
       requester_uid: ediumUser?.uid,
       status: "requesting",
       last_timestamp: serverTimestamp(),
@@ -91,9 +84,9 @@ const PositionListItem = (props) => {
     jrModRef = addDoc(jrCollectionRef, jrDocRef).catch((error) => {
       console.log(error?.message);
     });
-    let jrRetID;
+    let jrRetId;
     await jrModRef.then((ret) => {
-      jrRetID = ret?.id;
+      jrRetId = ret?.id;
     });
 
     // add it to my user ext
@@ -101,8 +94,8 @@ const PositionListItem = (props) => {
     const ediumUserExtJoinRequests = ediumUserExt.join_requests;
     ediumUserExtJoinRequests.push({
       project_id: project.id,
-      position_id: posID,
-      join_request_doc_id: jrRetID || -1,
+      position_id: posId,
+      join_request_doc_id: jrRetId || -1,
     });
     const ediumUserExtUpdateRef = {
       join_requests: ediumUserExtJoinRequests,
@@ -135,9 +128,9 @@ const PositionListItem = (props) => {
     );
     const chatJR = {
       project_id: project.id,
-      position_id: posID,
+      position_id: posId,
       requester_uid: ediumUser?.uid,
-      join_request_doc_id: jrRetID || -1,
+      join_request_doc_id: jrRetId || -1,
     };
     if (foundChat) {
       // update
@@ -180,12 +173,12 @@ const PositionListItem = (props) => {
     }
 
     // await chat and add message
-    let chatRetID;
+    let chatRetId;
     await chatModRef.then((ret) => {
-      chatRetID = ret?.id;
+      chatRetId = ret?.id;
     }); // only addDoc will return, updateDoc returns undefined
-    const chatID = foundChat ? foundChat.id : chatRetID || -1;
-    const msgCollectionRef = collection(db, "chats", chatID, "messages");
+    const chatId = foundChat ? foundChat.id : chatRetId || -1;
+    const msgCollectionRef = collection(db, "chats", chatId, "messages");
     const msgModRef = addDoc(msgCollectionRef, messageRef).catch((error) => {
       console.log(error?.message);
     });
@@ -195,8 +188,8 @@ const PositionListItem = (props) => {
     await msgModRef;
 
     // open chat accordion
-    setChatPartner(creator);
-    setForceChatExpand(true);
+    // setChatPartner(creator);
+    // setForceChatExpand(true);
   };
 
   // reusable comps
@@ -232,9 +225,9 @@ const PositionListItem = (props) => {
         disabled={
           !ediumUser?.uid ||
           dayDiff > 0 ||
-          ediumUser?.uid === creator?.uid ||
+          ediumUser?.uid === project?.creator_uid ||
           ediumUserExt?.join_requests?.some(
-            (jr) => jr.project_id === project.id && jr.position_id === posID
+            (jr) => jr.project_id === project.id && jr.position_id === posId
           )
         }
         disableElevation

@@ -1,6 +1,4 @@
-// react
 import { useContext, useEffect, useRef } from "react";
-// mui
 import {
   Avatar,
   Box,
@@ -14,10 +12,8 @@ import {
 import { useTheme } from "@mui/material/styles";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
-// edium
 import { EventContext, GlobalContext } from "../Context/ShareContexts";
 import { FixedHeightPaper } from "../Reusable/Resusable";
-// misc libs
 import { motion } from "framer-motion";
 import dayjs from "dayjs";
 import { Interweave } from "interweave";

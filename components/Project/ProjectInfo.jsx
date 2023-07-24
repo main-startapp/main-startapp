@@ -1,15 +1,11 @@
-// react
 import { useContext, useEffect, useRef } from "react";
-// mui
 import { Avatar, Box, Chip, Divider, Fab, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
-// edium
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import PositionListItem from "./PositionListItem";
 import { FixedHeightPaper } from "../Reusable/Resusable";
-// misc libs
 import { Interweave } from "interweave";
 import { UrlMatcher } from "interweave-autolink";
 import { motion } from "framer-motion";
@@ -18,27 +14,22 @@ import SlateEditor from "../SlateEditor";
 const ProjectInfo = () => {
   // context
   const { onMedia } = useContext(GlobalContext);
-  const { fullProject, setFullProject, setIsMobileBackClicked } =
+  const { curProject, setCurProject, setIsMobileBackClicked } =
     useContext(ProjectContext);
   const theme = useTheme();
-
-  // local vars
-  const project = fullProject?.project;
-  const projectCreator = fullProject?.creator;
-  const projectAllTags = fullProject?.allTags;
 
   // transfer code
   // const [tCode, setTCode] = useState("");
   // useEffect(() => {
   //   setTCode("");
-  // }, [fullProject]);
+  // }, []);
 
   // useEffect to reset box scrollbar position
   const boxRef = useRef();
   useEffect(() => {
     window.scrollTo({ top: 0 });
     if (boxRef?.current?.scrollTop) boxRef.current.scrollTop = 0;
-  }, [fullProject]); // every time project changes, this forces each accordion to collapse
+  }, [curProject]);
 
   return (
     <FixedHeightPaper
@@ -49,7 +40,7 @@ const ProjectInfo = () => {
         paddingTop: onMedia.onDesktop ? "32px" : 0,
       }}
     >
-      {fullProject !== null && (
+      {curProject !== null && (
         <Box
           id="projectinfo-box"
           ref={boxRef}
@@ -65,7 +56,7 @@ const ProjectInfo = () => {
           }}
         >
           <motion.div
-            key={project?.title}
+            key={curProject?.title}
             initial={{ opacity: 0, y: "1%" }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -84,7 +75,7 @@ const ProjectInfo = () => {
                   height: "96px",
                   width: "96px",
                 }}
-                src={project?.icon_url}
+                src={curProject?.icon_url}
               >
                 <UploadFileIcon />
               </Avatar>
@@ -96,7 +87,7 @@ const ProjectInfo = () => {
                   fontWeight: "bold",
                 }}
               >
-                {project?.title}
+                {curProject?.title}
               </Typography>
             </Box>
 
@@ -120,7 +111,7 @@ const ProjectInfo = () => {
             >
               {"Description:"}
             </Typography>
-            {project?.description && !project?.slate_desc && (
+            {curProject?.description && !curProject?.slate_desc && (
               <Typography
                 color="text.secondary"
                 component="span"
@@ -135,21 +126,21 @@ const ProjectInfo = () => {
                   }}
                 >
                   <Interweave
-                    content={project?.description}
+                    content={curProject?.description}
                     matchers={[new UrlMatcher("url")]}
                   />
                 </pre>
               </Typography>
             )}
-            {project?.slate_desc && (
+            {curProject?.slate_desc && (
               <SlateEditor
-                valueObj={project}
+                valueObj={curProject}
                 valueKey="slate_desc"
                 onChange={null}
                 isReadOnly={true}
               />
             )}
-            {project?.position_list?.length > 0 && (
+            {curProject?.position_list?.length > 0 && (
               <Box
                 id="projectinfo-positions-box"
                 sx={{
@@ -167,23 +158,22 @@ const ProjectInfo = () => {
                 >
                   {"Positions:"}
                 </Typography>
-                {project.position_list.map((position, index) => (
+                {curProject.position_list.map((position, index) => (
                   <PositionListItem
                     key={index}
                     index={index}
-                    posID={position.id}
+                    posId={position.id}
                     posTitle={position.title}
                     posResp={position.responsibility}
                     posWeeklyHour={position.weekly_hour}
                     appURL={position?.url}
                     appDeadline={position?.deadline}
-                    creator={projectCreator}
                   />
                 ))}
               </Box>
             )}
 
-            {projectAllTags?.length > 0 && (
+            {curProject?.tags?.length > 0 && (
               <Box id="projectinfo-details-box">
                 <Typography
                   color="text.primary"
@@ -192,7 +182,7 @@ const ProjectInfo = () => {
                 >
                   {"Details: "}
                 </Typography>
-                {projectAllTags.map((tag, index) => (
+                {curProject.tags.map((tag, index) => (
                   <Chip
                     key={index}
                     color="lightPrimary"
@@ -210,12 +200,12 @@ const ProjectInfo = () => {
           </motion.div>
         </Box>
       )}
-      {!onMedia.onDesktop && fullProject !== null && (
+      {!onMedia.onDesktop && curProject !== null && (
         <Fab
           color="primary"
           size="small"
           onClick={() => {
-            setFullProject(null);
+            setCurProject(null);
             setIsMobileBackClicked(true);
           }}
           sx={{ position: "fixed", right: 16, bottom: 80 }}
@@ -235,7 +225,7 @@ export default ProjectInfo;
 {
   /*
   onMedia.onDesktop &&
-    (project?.creator_uid !== "T5q6FqwJFcRTKxm11lu0zmaXl8x2" ||
+    (curProject?.creator_uid !== "T5q6FqwJFcRTKxm11lu0zmaXl8x2" ||
       ediumUser?.uid === "T5q6FqwJFcRTKxm11lu0zmaXl8x2") && (
       <Grid item xs={3}>
         <Box

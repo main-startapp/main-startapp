@@ -1,12 +1,8 @@
-// react
 import { useContext, useEffect, useMemo, useState } from "react";
-// mui
 import { Avatar, Badge, Box, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
-// edium
 import { GlobalContext } from "../Context/ShareContexts";
 import { handleUnread } from "../Reusable/Resusable";
-// time
 import dayjs from "dayjs";
 
 const ChatAccordionContact = (props) => {
@@ -26,11 +22,11 @@ const ChatAccordionContact = (props) => {
 
   // local states and vars
   const contact = useMemo(() => {
-    const contactUID =
+    const contactUid =
       chat.chat_user_ids[0] === ediumUser?.uid
         ? chat.chat_user_ids[1]
         : chat.chat_user_ids[0];
-    return users.find((user) => user.uid === contactUID);
+    return users.find((user) => user.uid === contactUid);
   }, [chat.chat_user_ids, ediumUser?.uid, users]);
 
   const my_unread_key = ediumUser?.uid + "_unread"; // the key to get unread msg no.

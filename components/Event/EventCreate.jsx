@@ -1,8 +1,5 @@
-// react
 import { useContext, useEffect, useRef, useState } from "react";
-// next
 import { useRouter } from "next/router";
-// mui
 import {
   Autocomplete,
   Box,
@@ -24,9 +21,7 @@ import {
 } from "@mui/material";
 import AddLinkIcon from "@mui/icons-material/AddLink";
 import { useTheme, styled } from "@mui/material/styles";
-// mui x
 import { DateTimeField } from "@mui/x-date-pickers";
-// firebase
 import {
   collection,
   doc,
@@ -37,7 +32,6 @@ import {
   arrayRemove,
   arrayUnion,
 } from "firebase/firestore";
-// edium
 import { db } from "../../firebase";
 import { useAuth } from "../Context/AuthContext";
 import { GlobalContext, EventContext } from "../Context/ShareContexts";
@@ -55,7 +49,6 @@ import {
 } from "../Reusable/MenuStringList";
 import { EventInfoContent } from "./EventInfo";
 import SlateEditor from "../SlateEditor";
-// time
 import dayjs from "dayjs";
 
 // comp
@@ -90,8 +83,8 @@ const EventCreate = (props) => {
   };
 
   // can be wrapped up in useMemo if necessary, no premature optimization
-  const oldEvent = props.eventID
-    ? findItemFromList(events, "id", props.eventID)
+  const oldEvent = props.eventId
+    ? findItemFromList(events, "id", props.eventId)
     : null;
 
   // init new event
@@ -181,17 +174,17 @@ const EventCreate = (props) => {
       });
     }
 
-    let retID;
+    let retId;
     await eventModRef.then((ret) => {
-      retID = ret?.id;
+      retId = ret?.id;
     });
 
-    // retID: create; !retID: update
-    if (retID) {
+    // retId: create; !retId: update
+    if (retId) {
       // add to my_event_ids in user ext data if create
       const ediumUserExtDocRef = doc(db, "users_ext", ediumUser?.uid);
       const ediumUserExtUpdateRef = {
-        my_event_ids: ediumUserExt?.my_event_ids ? arrayUnion(retID) : [retID],
+        my_event_ids: ediumUserExt?.my_event_ids ? arrayUnion(retId) : [retId],
         last_timestamp: serverTimestamp(),
       };
       const ediumUserExtModRef = updateDoc(
@@ -202,7 +195,7 @@ const EventCreate = (props) => {
       });
 
       // create extension doc for team management if create
-      const extDocRef = doc(db, "events_ext", retID);
+      const extDocRef = doc(db, "events_ext", retId);
       const eventExtRef = {
         is_deleted: false,
         members: [ediumUser?.uid],
@@ -263,16 +256,16 @@ const EventCreate = (props) => {
       });
     }
 
-    let retID;
+    let retId;
     await eventModRef.then((ret) => {
-      retID = ret?.id;
+      retId = ret?.id;
     });
 
-    // retID: create; !retID: update
-    if (retID) {
+    // retId: create; !retId: update
+    if (retId) {
       // don't add event id to my_event_ids
       // do create extenion doc with extra field
-      const extDocRef = doc(db, "events_ext", retID);
+      const extDocRef = doc(db, "events_ext", retId);
 
       const eventExtRef = {
         is_deleted: false,
@@ -341,12 +334,12 @@ const EventCreate = (props) => {
     }, 2000); // wait 2 seconds then go to `events` page
   };
 
-  const handleDelete = (docID) => {
+  const handleDelete = (docId) => {
     handleDeleteEntry(
       "events",
       "events_ext",
       "my_event_ids",
-      docID,
+      docId,
       ediumUser?.uid
     );
 

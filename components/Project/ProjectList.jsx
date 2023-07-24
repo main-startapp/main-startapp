@@ -1,17 +1,11 @@
-// react
 import { useContext, useMemo, useEffect } from "react";
-// next
 import NextLink from "next/link";
 import Router from "next/router";
-// mui
 import { Box, Button, Tooltip, Typography } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-// edium
 import { GlobalContext, ProjectContext } from "../Context/ShareContexts";
 import ProjectListItem from "./ProjectListItem";
 import ProjectListHeader from "./ProjectListHeader";
 import {
-  findItemFromList,
   FixedHeightPaper,
   isStrInObjList,
   isStrInStr,
@@ -24,11 +18,10 @@ import {
 // behavior: filters projects based on the search term and/or search category
 const ProjectList = () => {
   // context
-  const { ediumUser, onMedia } = useContext(GlobalContext);
+  const { projects, ediumUser, onMedia } = useContext(GlobalContext);
   const {
-    fullProject,
-    setFullProject,
-    fullProjects,
+    curProject,
+    setCurProject,
     isSearchingClicked,
     setIsSearchingClicked,
     isMobileBackClicked,
@@ -37,55 +30,49 @@ const ProjectList = () => {
     searchCateList,
     searchTypeList,
   } = useContext(ProjectContext);
-  const theme = useTheme();
 
   // project list with filtering
   // 1st, filtering visibility and category
-  const fullProjectsWIP1st = useMemo(() => {
-    return fullProjects?.filter((fullProject) => {
+  const projectsWIP1st = useMemo(() => {
+    return projects?.filter((project) => {
       // filter out invisible entry
-      if (!fullProject.project.is_visible) return false;
+      if (!project.is_visible) return false;
       // return everything else if no category search
       if (searchCateList.length === 0) return true;
       // else return entries match category
       return searchCateList.some((cate) => {
-        return fullProject.project.category === cate;
+        return project.category === cate;
       });
     });
-  }, [fullProjects, searchCateList]);
+  }, [projects, searchCateList]);
 
   // 2nd, filtering type
-  const fullProjectsWIP2nd = useMemo(() => {
+  const projectsWIP2nd = useMemo(() => {
     // return prev list if no type search
-    if (searchTypeList.length === 0) return fullProjectsWIP1st;
+    if (searchTypeList.length === 0) return projectsWIP1st;
 
     // else return entries match type
-    return fullProjectsWIP1st?.filter((fullProject) => {
+    return projectsWIP1st?.filter((project) => {
       return searchTypeList.some((type) => {
-        return fullProject.project.type === type;
+        return project.type === type;
       });
     });
-  }, [fullProjectsWIP1st, searchTypeList]);
+  }, [projectsWIP1st, searchTypeList]);
 
   // 3rd, filtering term, the most expensive one
-  const filteredFullProjects = useMemo(() => {
+  const filteredProjects = useMemo(() => {
     // return prev list if no term search
-    if (searchTerm === "") return fullProjectsWIP2nd;
+    if (searchTerm === "") return projectsWIP2nd;
 
     // else return entries match term
-    return fullProjectsWIP2nd?.filter((fullProject) => {
+    return projectsWIP2nd?.filter((project) => {
       return (
-        isStrInStr(fullProject.project.title, searchTerm, false) ||
-        isStrInObjList(
-          fullProject.project.position_list,
-          "title",
-          searchTerm,
-          false
-        ) ||
-        isStrInStrList(fullProject.allTags, searchTerm, true)
+        isStrInStr(project.title, searchTerm, false) ||
+        isStrInObjList(project.position_list, "title", searchTerm, false) ||
+        isStrInStrList(project.tags, searchTerm, true)
       ); // in project title partially || in position title partially || in tags exactly
     });
-  }, [fullProjectsWIP2nd, searchTerm]);
+  }, [projectsWIP2nd, searchTerm]);
 
   // project query & auto set initial project
   useEffect(() => {
@@ -98,15 +85,11 @@ const ProjectList = () => {
     // case 3.1 (mobile): on mobile, remove query
     if (onMedia.onDesktop && isSearchingClicked) {
       // user changed searching settings (onDesktop && searching clicked => show 1st entry)
-      if (filteredFullProjects?.length > 0) {
-        setFullProject(filteredFullProjects[0]);
-        shallowUpdateURLQuery(
-          Router.pathname,
-          "pid",
-          filteredFullProjects[0].project.id
-        );
+      if (filteredProjects?.length > 0) {
+        setCurProject(filteredProjects[0]);
+        shallowUpdateURLQuery(Router.pathname, "pid", filteredProjects[0].id);
       } else {
-        setFullProject(null);
+        setCurProject(null);
         shallowUpdateURLQuery(Router.pathname, null, null);
       }
       setIsSearchingClicked(false);
@@ -120,53 +103,49 @@ const ProjectList = () => {
       return; // trigger 2
     }
 
-    const queryPID = Router.query?.pid;
-    const currentPID = fullProject?.project?.id;
+    const queryPid = Router.query?.pid;
+    const currentPid = curProject?.id;
 
-    if (currentPID && currentPID === queryPID) return; // case 1.1
+    if (currentPid && currentPid === queryPid) return; // case 1.1
 
-    if (currentPID) {
+    if (currentPid) {
       // user clicked a new entry on the list (currentID && currentID != queryID) => display query id
       // case 1.1 can be merged with this, it will do a redundant shallowUpdate
-      shallowUpdateURLQuery(Router.pathname, "pid", fullProject.project.id);
+      shallowUpdateURLQuery(Router.pathname, "pid", curProject.id);
       return; // case 1
     }
 
-    if (queryPID) {
-      const foundFullProject = filteredFullProjects?.find(
-        (filteredFullProject) => filteredFullProject.project.id === queryPID
+    if (queryPid) {
+      const foundProject = filteredProjects?.find(
+        (project) => project.id === queryPid
       );
-      if (foundFullProject) {
+      if (foundProject) {
         // user directly input a url with valid query (no currentID && found queryID) => set this found entry
-        setFullProject(foundFullProject);
+        setCurProject(foundProject);
         return; // case 2
       }
     }
 
-    if (!onMedia.onDesktop && filteredFullProjects?.length > 0) {
+    if (!onMedia.onDesktop && filteredProjects?.length > 0) {
       // user input url with no query or invalid query on mobile (no currentID && onMobile && back button not clicked && can't find query) => show mobile list without url query
       // entries length check to ensure filtered entry list has finished calculation
       shallowUpdateURLQuery(Router.pathname, null, null);
       return; // case 3.1
     }
 
-    if (onMedia.onDesktop && filteredFullProjects?.length > 0) {
+    if (onMedia.onDesktop && filteredProjects?.length > 0) {
       // user input url with no query or invalid query on desktop (no currentID && onDekstop && can't find query) => set the 1st entry and update url query
-      setFullProject(filteredFullProjects[0]);
-      shallowUpdateURLQuery(
-        Router.pathname,
-        "pid",
-        filteredFullProjects[0].project.id
-      );
+      setCurProject(filteredProjects[0]);
+      shallowUpdateURLQuery(Router.pathname, "pid", filteredProjects[0].id);
       return; // case 3
     }
   }, [
-    filteredFullProjects,
-    fullProject?.project?.id,
+    curProject?.id,
+    filteredProjects,
     isMobileBackClicked,
     isSearchingClicked,
-    onMedia.onDesktop,
-    setFullProject,
+    onMedia?.onDesktop,
+    setCurProject,
     setIsMobileBackClicked,
     setIsSearchingClicked,
   ]);
@@ -191,12 +170,12 @@ const ProjectList = () => {
           overflowY: "scroll",
         }}
       >
-        {filteredFullProjects?.map((fullProject, index) => (
+        {filteredProjects?.map((project, index) => (
           <ProjectListItem
-            key={fullProject?.project?.id}
-            fullProject={fullProject}
+            key={project?.id}
+            project={project}
             index={index}
-            last={filteredFullProjects.length - 1}
+            last={filteredProjects.length - 1}
           />
         ))}
       </Box>

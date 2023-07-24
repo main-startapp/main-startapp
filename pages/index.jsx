@@ -17,6 +17,7 @@ const Home = () => {
   // context
   const {
     projects,
+    setProjects,
     users,
     setChat,
     setChatPartner,
@@ -42,8 +43,7 @@ const Home = () => {
   }, []);
 
   // project state init
-  const [fullProject, setFullProject] = useState(null); // the selected project with extra data (creator, tags)
-  const [fullProjects, setFullProjects] = useState([]); // the projects list with extra data
+  const [curProject, setCurProject] = useState(null); // the selected rpoject
   const [isSearchingClicked, setIsSearchingClicked] = useState(false); // initialize auto set entry flag for searching
   const [isMobileBackClicked, setIsMobileBackClicked] = useState(false); // initialize show list on mobile
   const [searchTerm, setSearchTerm] = useState("");
@@ -51,45 +51,19 @@ const Home = () => {
   const [searchTypeList, setSearchTypeList] = useState([]);
 
   // build data for this page
-  // projects with extra info from other dataset (creator, merged tags)
   useEffect(() => {
-    setFullProjects(
-      projects?.map((project) => {
-        // creator
-        const projectCreator = findItemFromList(
-          users,
-          "uid",
-          project?.creator_uid
-        );
-        // allTags
-        let projectTags = [];
-        if (project?.category) projectTags.push(project?.category);
-        if (project?.type) projectTags.push(project?.type);
-        if (project?.tags?.length > 0) {
-          projectTags = projectTags.concat(project.tags); // project tags
-        }
-        if (
-          projectCreator?.role === "org_admin" &&
-          projectCreator?.org_tags?.length > 0
-        ) {
-          projectTags = projectTags.concat(projectCreator.org_tags); // org tags
-        }
-        return {
-          project: project,
-          creator: projectCreator,
-          allTags: projectTags,
-        };
-      })
-    );
-  }, [projects, users]);
+    fetch("/api/v1/projects")
+      .then((response) => response.json())
+      .then((data) => setProjects(data.data));
+  }, [setProjects]);
+
+  console.log(projects);
 
   return (
     <ProjectContext.Provider
       value={{
-        fullProject,
-        setFullProject,
-        fullProjects,
-        setFullProjects,
+        curProject,
+        setCurProject,
         isSearchingClicked,
         setIsSearchingClicked,
         isMobileBackClicked,
@@ -102,7 +76,7 @@ const Home = () => {
         setSearchTypeList,
       }}
     >
-      {!onMedia.onDesktop && fullProject === null && <MobileProjectsBar />}
+      {!onMedia.onDesktop && curProject === null && <MobileProjectsBar />}
 
       <Box
         id="projects-main-box"
@@ -160,7 +134,7 @@ const Home = () => {
             <Box
               id="projects-mobile-list-box"
               sx={{
-                display: fullProject === null ? "block" : "none",
+                display: curProject === null ? "block" : "none",
                 // paddingTop: 2,
                 // paddingLeft: 2,
                 width: "100%",
@@ -172,7 +146,7 @@ const Home = () => {
             <Box
               id="projects-mobile-info-box"
               sx={{
-                display: fullProject === null ? "none" : "block",
+                display: curProject === null ? "none" : "block",
                 // paddingTop: 2,
                 // paddingLeft: 2,
                 width: "100%",

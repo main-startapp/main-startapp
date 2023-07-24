@@ -69,13 +69,13 @@ export const handleConnect = async (
   const chatModRef = addDoc(collectionRef, chatRef).catch((error) => {
     console.log(error?.message);
   });
-  let retID;
+  let retId;
   await chatModRef.then((ret) => {
-    retID = ret?.id;
+    retId = ret?.id;
   });
-  if (!retID) return; // extra safe, although this will never happen
+  if (!retId) return; // extra safe, although this will never happen
   // use returned chat doc id to add message
-  const msgCollectionRef = collection(db, "chats", retID, "messages");
+  const msgCollectionRef = collection(db, "chats", retId, "messages");
   const msgModRef = addDoc(msgCollectionRef, messageRef).catch((error) => {
     console.log(error?.message);
   });
@@ -131,17 +131,17 @@ export const handleDeleteEntry = async (
   colletionName,
   extColletionName,
   keyName,
-  entryID,
-  ediumUserID
+  entryId,
+  ediumUserId
 ) => {
   // set is_deleted to true in entry doc
-  const docRef = doc(db, colletionName, entryID);
+  const docRef = doc(db, colletionName, entryId);
   const entryModRef = updateDoc(docRef, { is_deleted: true }).catch((error) => {
     console.log(error?.message);
   });
 
   // set is_deleted to true in entry ext doc
-  const extDocRef = doc(db, extColletionName, entryID);
+  const extDocRef = doc(db, extColletionName, entryId);
   const entryExtModRef = updateDoc(extDocRef, { is_deleted: true }).catch(
     (error) => {
       console.log(error?.message);
@@ -149,9 +149,9 @@ export const handleDeleteEntry = async (
   );
 
   // remove entry id from my_entry_ids
-  const ediumUserExtDocRef = doc(db, "users_ext", ediumUserID);
+  const ediumUserExtDocRef = doc(db, "users_ext", ediumUserId);
   const ediumUserExtUpdateRef = {
-    [keyName]: arrayRemove(entryID),
+    [keyName]: arrayRemove(entryId),
     last_timestamp: serverTimestamp(),
   };
   const ediumUserExtModRef = updateDoc(
@@ -170,8 +170,8 @@ export const handleDeleteEntry = async (
 //============================================================
 // get specific doc from db assumed permission
 //============================================================
-export const getDocFromDB = async (dbName, docID) => {
-  const docRef = doc(db, dbName, docID);
+export const getDocFromDB = async (dbName, docId) => {
+  const docRef = doc(db, dbName, docId);
   const docSnap = await getDoc(docRef).catch((error) => {
     console.log(error?.message);
   });
@@ -204,8 +204,8 @@ export const getDocsByQueryFromDB = async (
 //============================================================
 // find item from list using id, like projects, events
 //============================================================
-export const findItemFromList = (list, key, itemID) => {
-  return list.find((listItem) => listItem[key] === itemID);
+export const findItemFromList = (list, key, itemId) => {
+  return list.find((listItem) => listItem[key] === itemId);
 };
 
 //============================================================

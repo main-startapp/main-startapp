@@ -1,8 +1,5 @@
-// react
 import { useContext, useEffect } from "react";
-// firebase
 import { db } from "../firebase";
-// mui
 import {
   collection,
   doc,
@@ -11,10 +8,8 @@ import {
   query,
   where,
 } from "firebase/firestore";
-// edium
 import { useAuth } from "./Context/AuthContext";
 import { GlobalContext } from "./Context/ShareContexts";
-// time
 import dayjs from "dayjs";
 var advancedFormat = require("dayjs/plugin/advancedFormat");
 dayjs.extend(advancedFormat); // we only need to do it once
@@ -81,13 +76,13 @@ const DBListener = () => {
 
   // listen to realtime projects ext collection, only doc's field: memebers contains currentUser will be pulled
   useEffect(() => {
-    const memberID = currentUser?.uid;
-    if (!memberID) return;
+    const memberId = currentUser?.uid;
+    if (!memberId) return;
 
     const collectionRef = collection(db, "projects_ext");
     const q = query(
       collectionRef,
-      where("members", "array-contains", memberID),
+      where("members", "array-contains", memberId),
       orderBy("last_timestamp", "desc")
     );
     const unsub = onSnapshot(
@@ -161,13 +156,13 @@ const DBListener = () => {
 
   // listen to realtime events ext collection, only doc's field: memebers contains currentUser will be pulled
   useEffect(() => {
-    const memberID = currentUser?.uid;
-    if (!memberID) return;
+    const memberId = currentUser?.uid;
+    if (!memberId) return;
 
     const collectionRef = collection(db, "events_ext");
     const q = query(
       collectionRef,
-      where("members", "array-contains", memberID),
+      where("members", "array-contains", memberId),
       orderBy("last_timestamp", "desc")
     );
     const unsub = onSnapshot(
@@ -219,14 +214,14 @@ const DBListener = () => {
 
   // listen to realtime currentUser's doc
   useEffect(() => {
-    const docID = currentUser?.uid;
-    if (!docID) return;
+    const docId = currentUser?.uid;
+    if (!docId) return;
 
     const unsub = onSnapshot(
-      doc(db, "users", docID),
+      doc(db, "users", docId),
       (doc) => {
         if (doc.exists()) {
-          setEdiumUser({ ...doc.data(), uid: docID });
+          setEdiumUser({ ...doc.data(), uid: docId });
         }
       },
       (error) => {
@@ -239,14 +234,14 @@ const DBListener = () => {
 
   // listen to realtime currentUser's ext doc
   useEffect(() => {
-    const docID = currentUser?.uid;
-    if (!docID) return;
+    const docId = currentUser?.uid;
+    if (!docId) return;
 
     const unsub = onSnapshot(
-      doc(db, "users_ext", docID),
+      doc(db, "users_ext", docId),
       (doc) => {
         if (doc.exists()) {
-          setEdiumUserExt({ ...doc.data(), uid: docID });
+          setEdiumUserExt({ ...doc.data(), uid: docId });
         }
       },
       (error) => {
@@ -259,13 +254,13 @@ const DBListener = () => {
 
   // listen to realtime chats collection, only doc's field: chat_user_ids contains currentUser will be pulled
   useEffect(() => {
-    const userID = currentUser?.uid;
-    if (!userID) return;
+    const userId = currentUser?.uid;
+    if (!userId) return;
 
     const chatsRef = collection(db, "chats");
     const q = query(
       chatsRef,
-      where("chat_user_ids", "array-contains", userID),
+      where("chat_user_ids", "array-contains", userId),
       orderBy("last_timestamp", "desc")
     );
     const unsub = onSnapshot(

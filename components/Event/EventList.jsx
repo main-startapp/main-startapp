@@ -1,12 +1,8 @@
-// react
 import { useContext, useMemo, useEffect } from "react";
-// next
 import NextLink from "next/link";
 import Router from "next/router";
-// mui
 import { Box, Button, Tooltip, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-// edium
 import { GlobalContext, EventContext } from "../Context/ShareContexts";
 import EventListItem from "./EventListItem";
 import EventListHeader from "./EventListHeader";
@@ -16,7 +12,6 @@ import {
   isStrInStrList,
   shallowUpdateURLQuery,
 } from "../Reusable/Resusable";
-// time
 import dayjs from "dayjs";
 
 const EventList = () => {
@@ -124,21 +119,21 @@ const EventList = () => {
       return; // trigger 2
     }
 
-    const queryEID = Router.query?.eid;
-    const currentEID = fullEvent?.event?.id;
+    const queryEid = Router.query?.eid;
+    const currentEid = fullEvent?.event?.id;
 
-    if (currentEID && currentEID === queryEID) return; // case 1.1
+    if (currentEid && currentEid === queryEid) return; // case 1.1
 
-    if (currentEID) {
+    if (currentEid) {
       // user clicked a new entry on the list (currentID && currentID != queryID) => display query id
       // case 1.1 can be merged with this, it will do a redundant shallowUpdate
       shallowUpdateURLQuery(Router.pathname, "eid", fullEvent.event.id);
       return; // case 1
     }
 
-    if (queryEID) {
+    if (queryEid) {
       const foundFullEvent = filteredFullEvents?.find(
-        (filteredFullEvent) => filteredFullEvent.event.id === queryEID
+        (filteredFullEvent) => filteredFullEvent.event.id === queryEid
       );
       if (foundFullEvent) {
         // user directly input a url with valid query (no currentID && found queryID) => set this found entry

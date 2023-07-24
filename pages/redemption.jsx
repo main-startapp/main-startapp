@@ -132,23 +132,23 @@ const Redemption = () => {
       failedCodes
     ) {
       for (const code of codeArray) {
-        let docID;
+        let docId;
         let docExtData;
         // 1. use pCode to get doc id from doc ext
         const collectionRef = collection(db, docExtName);
         const q = query(collectionRef, where("transfer_code", "==", code));
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach((qDoc) => {
-          docID = qDoc.id;
+          docId = qDoc.id;
           docExtData = qDoc.data();
         });
-        if (!docID) {
+        if (!docId) {
           failedCodes.push(code);
           return;
         }
-        myIds.push(docID);
+        myIds.push(docId);
         // 2. update doc
-        const docRef = doc(db, docName, docID);
+        const docRef = doc(db, docName, docId);
         const docUpdateRef = {
           bypass_code: theCipher,
           creator_uid: ediumUser?.uid,
@@ -158,7 +158,7 @@ const Redemption = () => {
           console.log(error?.message);
         });
         // 3. update doc ext
-        const extDocRef = doc(db, docExtName, docID);
+        const extDocRef = doc(db, docExtName, docId);
         delete docExtData.transfer_code;
         const docExtUpdateRef = {
           ...docExtData,
@@ -179,10 +179,10 @@ const Redemption = () => {
     }
 
     // update projects and events
-    const myProjectIDs = ediumUserExt?.my_project_ids
+    const myProjectIds = ediumUserExt?.my_project_ids
       ? ediumUserExt.my_project_ids
       : [];
-    const myEventIDs = ediumUserExt?.my_event_ids
+    const myEventIds = ediumUserExt?.my_event_ids
       ? ediumUserExt.my_event_ids
       : [];
     const failedProjectCodes = [];
@@ -193,7 +193,7 @@ const Redemption = () => {
         pCodes,
         "projects",
         "projects_ext",
-        myProjectIDs,
+        myProjectIds,
         failedProjectCodes
       );
     }
@@ -202,15 +202,15 @@ const Redemption = () => {
         eCodes,
         "events",
         "events_ext",
-        myEventIDs,
+        myEventIds,
         failedEventCodes
       );
     }
     // update user ext
     const userExtDocRef = doc(db, "users_ext", currentUser?.uid);
     const userExtUpdateRef = {
-      my_project_ids: myProjectIDs,
-      my_event_ids: myEventIDs,
+      my_project_ids: myProjectIds,
+      my_event_ids: myEventIds,
       last_timestamp: serverTimestamp(),
     };
 

@@ -1,24 +1,18 @@
-// css import
 import "../styles/globals.css";
 import "../styles/fc.css";
 import "../styles/rsme.css";
-// font weight
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
-// react
 import { useState, useMemo, useEffect } from "react";
-// next
 import Head from "next/head";
-// mui
 import { CssBaseline } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { grey } from "@mui/material/colors";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-// edium
 import { AuthProvider } from "../components/Context/AuthContext";
 import { GlobalContext } from "../components/Context/ShareContexts";
 import Navbar from "../components/Header/Navbar";
@@ -272,7 +266,7 @@ function MyApp({ Component, pageProps }) {
             }}
           >
             <CssBaseline enableColorScheme />
-            <DBListener />
+            {/* <DBListener /> */}
             {onMedia.onDesktop && <Navbar />}
             <Component {...pageProps} />
             {onMedia.onDesktop && ediumUser?.uid && showMsg && <ChatMsgPaper />}

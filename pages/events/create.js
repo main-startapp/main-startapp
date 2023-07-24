@@ -72,7 +72,7 @@ const Create = () => {
             maxWidth: "1024px",
           }}
         >
-          <EventCreate eventID={query?.eventID} />
+          <EventCreate eventId={query?.eventId} />
         </Box>
       </Box>
     </EventContext.Provider>
